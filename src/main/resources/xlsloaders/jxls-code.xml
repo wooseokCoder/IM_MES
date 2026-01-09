@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workbook>
+    <worksheet name="Sheet1">
+		<section startRow="0" endRow="0">
+            <mapping row="0" col="0" >header.codeGrup</mapping>
+            <mapping row="0" col="1" >header.codeCd</mapping>
+            <mapping row="0" col="2" >header.codeName</mapping>
+            <mapping row="0" col="3" >header.sortSeq</mapping>
+            <mapping row="0" col="4" >header.codeDesc</mapping>
+            <mapping row="0" col="5" >header.extChr01</mapping>
+            <mapping row="0" col="6" >header.extChr02</mapping>
+            <mapping row="0" col="7" >header.extChr03</mapping>
+            <mapping row="0" col="8" >header.extChr04</mapping>
+            <mapping row="0" col="9" >header.extChr05</mapping>
+            <mapping row="0" col="10">header.extChr06</mapping>
+            <mapping row="0" col="11">header.extChr07</mapping>
+            <mapping row="0" col="12">header.extChr08</mapping>
+            <mapping row="0" col="13">header.extChr09</mapping>
+            <mapping row="0" col="14">header.extChr10</mapping>
+            <mapping row="0" col="15">header.extNum01</mapping>
+            <mapping row="0" col="16">header.extNum02</mapping>
+            <mapping row="0" col="17">header.extNum03</mapping>
+            <mapping row="0" col="18">header.extNum04</mapping>
+            <mapping row="0" col="19">header.extNum05</mapping>
+            <mapping row="0" col="20">header.extText</mapping>
+		</section>
+        <loop startRow="1" endRow="1" items="list" var="item" varType="com.wsc.framework.model.RecordMap">
+            <section startRow="1" endRow="1">
+                <mapping row="1" col="0" >item.codeGrup</mapping>
+                <mapping row="1" col="1" >item.codeCd</mapping>
+                <mapping row="1" col="2" >item.codeName</mapping>
+                <mapping row="1" col="3" >item.sortSeq</mapping>
+                <mapping row="1" col="4" >item.codeDesc</mapping>
+                <mapping row="1" col="5" >item.extChr01</mapping>
+                <mapping row="1" col="6" >item.extChr02</mapping>
+                <mapping row="1" col="7" >item.extChr03</mapping>
+                <mapping row="1" col="8" >item.extChr04</mapping>
+                <mapping row="1" col="9" >item.extChr05</mapping>
+                <mapping row="1" col="10">item.extChr06</mapping>
+                <mapping row="1" col="11">item.extChr07</mapping>
+                <mapping row="1" col="12">item.extChr08</mapping>
+                <mapping row="1" col="13">item.extChr09</mapping>
+                <mapping row="1" col="14">item.extChr10</mapping>
+                <mapping row="1" col="15">item.extNum01</mapping>
+                <mapping row="1" col="16">item.extNum02</mapping>
+                <mapping row="1" col="17">item.extNum03</mapping>
+                <mapping row="1" col="18">item.extNum04</mapping>
+                <mapping row="1" col="19">item.extNum05</mapping>
+                <mapping row="1" col="20">item.extText</mapping>
+            </section>
+            <loopbreakcondition>
+                <rowcheck offset="2">
+                    <cellcheck offset="2"></cellcheck>
+                </rowcheck>
+            </loopbreakcondition>
+        </loop>
+    </worksheet>
+</workbook>

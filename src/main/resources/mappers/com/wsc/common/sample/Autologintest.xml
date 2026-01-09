@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.sample.Autologintest">
+
+    <!-- 토큰 생성 -->
+    <select id="createTokenForTest" resultType="record" parameterType="params">
+        CALL SP_CREATE_TOKEN(#{sysId}, #{userId}, #{issuUrl}, #{rqstUrl})
+    </select>
+
+    <!-- URL 경로로 메뉴 키 조회 -->
+    <select id="getMenuKeyByUrl" resultType="string" parameterType="params">
+        SELECT MENU_KEY
+          FROM SYS_MENU
+         WHERE SYS_ID   = #{sysId}
+           AND MENU_URL = #{menuUrl}
+         LIMIT 0, 1
+    </select>
+
+</mapper>

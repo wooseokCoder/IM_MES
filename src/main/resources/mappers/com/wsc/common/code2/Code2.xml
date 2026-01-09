@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.code2.Code2">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS "rnum"
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+               CODE_GRUP
+              ,SORT_SEQ
+              ,CODE_CD
+	  	</if>
+    </sql>
+    
+    <sql id="selectColumns">
+         SYS_ID        AS "sysId"
+        ,CODE_GRUP     AS "codeGrup"
+        ,CODE_CD       AS "codeCd"
+        ,CODE_NAME     AS "codeName"
+        ,CODE_NAME_EN  AS "codeNameEn"
+        ,CODE_DESC     AS "codeDesc"
+        ,SORT_SEQ      AS "sortSeq"
+        ,USE_FLAG      AS "useFlag"
+        ,EXT_CHR01     AS "extChr01"
+        ,EXT_CHR02     AS "extChr02"
+        ,EXT_CHR03     AS "extChr03"
+        ,EXT_CHR04     AS "extChr04"
+        ,EXT_CHR05     AS "extChr05"
+        ,EXT_CHR06     AS "extChr06"
+        ,EXT_CHR07     AS "extChr07"
+        ,EXT_CHR08     AS "extChr08"
+        ,EXT_CHR09     AS "extChr09"
+        ,EXT_CHR10     AS "extChr10"
+        ,EXT_NUM01     AS "extNum01"
+        ,EXT_NUM02     AS "extNum02"
+        ,EXT_NUM03     AS "extNum03"
+        ,EXT_NUM04     AS "extNum04"
+        ,EXT_NUM05     AS "extNum05"
+        ,EXT_TEXT      AS "extText"
+        ,REGI_ID       AS "regiId"
+        ,DATE_FORMAT(REGI_DATE,'%Y-%m-%d %H:%i:%s')     
+                       AS "regiDate"
+        ,CHNG_ID       AS "chngId"
+        ,DATE_FORMAT(CHNG_DATE,'%Y-%m-%d %H:%i:%s')     
+                       AS "chngDate"
+    </sql>
+    
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , CODE_CD
+         , CODE_GRUP
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeName)">, CODE_NAME </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeNameEn)">, CODE_NAME_EN </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDesc)">, CODE_DESC </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr01)">, EXT_CHR01 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr02)">, EXT_CHR02 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr03)">, EXT_CHR03 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr04)">, EXT_CHR04 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr05)">, EXT_CHR05 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr06)">, EXT_CHR06 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr07)">, EXT_CHR07 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr08)">, EXT_CHR08 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr09)">, EXT_CHR09 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr10)">, EXT_CHR10 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum01)">, EXT_NUM01 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum02)">, EXT_NUM02 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum03)">, EXT_NUM03 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum04)">, EXT_NUM04 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum05)">, EXT_NUM05 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extText )">, EXT_TEXT  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sortSeq )">, SORT_SEQ  </if>
+         , USE_FLAG
+         , REGI_ID
+         , REGI_DATE
+         , CHNG_ID
+         , CHNG_DATE
+    </sql>
+    
+    <sql id="insertColumns-values">
+           #{sysId}
+         , #{codeCd}
+         , #{codeGrup}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeName)">, #{codeName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeNameEn)">, #{codeNameEn}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDesc)">, #{codeDesc}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr01)">, #{extChr01}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr02)">, #{extChr02}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr03)">, #{extChr03}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr04)">, #{extChr04}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr05)">, #{extChr05}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr06)">, #{extChr06}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr07)">, #{extChr07}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr08)">, #{extChr08}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr09)">, #{extChr09}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr10)">, #{extChr10}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum01)">, #{extNum01}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum02)">, #{extNum02}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum03)">, #{extNum03}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum04)">, #{extNum04}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum05)">, #{extNum05}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extText )">, #{extText}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sortSeq )">, #{sortSeq}   </if>
+         , 'Y'
+         , #{gsUserId}
+         , NOW()
+         , #{gsUserId}
+         , NOW()
+    </sql>
+
+    <sql id="updateColumns">
+           CHNG_ID   = #{gsUserId}
+         , CHNG_DATE = NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeName)">, CODE_NAME = #{codeName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeNameEn)">, CODE_NAME_EN = #{codeNameEn}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDesc)">, CODE_DESC = #{codeDesc}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sortSeq )">, SORT_SEQ  = #{sortSeq}   </if>
+        <!-- <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag )">, CASE WHEN #{useFlag}= 'ALL' THEN USE_FLAG ELSE  #{useFlag} END   </if> -->
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag )">, USE_FLAG  = #{useFlag}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr01)">, EXT_CHR01 = #{extChr01}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr02)">, EXT_CHR02 = #{extChr02}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr03)">, EXT_CHR03 = #{extChr03}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr04)">, EXT_CHR04 = #{extChr04}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr05)">, EXT_CHR05 = #{extChr05}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr06)">, EXT_CHR06 = #{extChr06}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr07)">, EXT_CHR07 = #{extChr07}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr08)">, EXT_CHR08 = #{extChr08}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr09)">, EXT_CHR09 = #{extChr09}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr10)">, EXT_CHR10 = #{extChr10}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum01)">, EXT_NUM01 = #{extNum01}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum02)">, EXT_NUM02 = #{extNum02}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum03)">, EXT_NUM03 = #{extNum03}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum04)">, EXT_NUM04 = #{extNum04}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum05)">, EXT_NUM05 = #{extNum05}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extText )">, EXT_TEXT  = #{extText}   </if>
+    </sql>
+    
+    <sql id="whereClause">
+    	SYS_ID = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeGrup)">AND CODE_GRUP = #{codeGrup}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeCd  )">AND CODE_CD   = #{codeCd}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeName)">AND CODE_NAME = #{codeName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeNameEn)">AND CODE_NAME_EN = #{codeNameEn}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDesc)">AND CODE_DESC LIKE CONCAT('%',#{codeDesc},'%')   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sortSeq )">AND SORT_SEQ  = #{sortSeq}   </if>
+        <!-- <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag )">AND USE_FLAG  = #{useFlag}   </if> -->
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag )">AND USE_FLAG  = CASE WHEN #{useFlag} = 'ALL' THEN USE_FLAG ELSE  #{useFlag} END   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr01)">AND EXT_CHR01 = #{extChr01}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr02)">AND EXT_CHR02 = #{extChr02}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr03)">AND EXT_CHR03 = #{extChr03}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr04)">AND EXT_CHR04 = #{extChr04}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr05)">AND EXT_CHR05 = #{extChr05}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr06)">AND EXT_CHR06 = #{extChr06}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr07)">AND EXT_CHR07 = #{extChr07}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr08)">AND EXT_CHR08 = #{extChr08}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr09)">AND EXT_CHR09 = #{extChr09}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr10)">AND EXT_CHR10 = #{extChr10}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum01)">AND EXT_NUM01 = #{extNum01}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum02)">AND EXT_NUM02 = #{extNum02}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum03)">AND EXT_NUM03 = #{extNum03}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum04)">AND EXT_NUM04 = #{extNum04}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum05)">AND EXT_NUM05 = #{extNum05}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extText )">AND EXT_TEXT LIKE CONCAT('%',#{extText},'%') </if>
+    </sql>
+
+    <select id="search" resultType="code" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_CODE A
+         WHERE <include refid="whereClause" />
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_CODE A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="code" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM SYS_CODE A
+         WHERE SYS_ID    = #{sysId}
+           AND CODE_CD   = #{codeCd}
+           AND CODE_GRUP = #{codeGrup}
+    </select>
+    <insert id="insert" parameterType="params">
+        INSERT 
+          INTO SYS_CODE 
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE SYS_CODE
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID    = #{sysId}
+           AND CODE_CD   = #{codeCd}
+           AND CODE_GRUP = #{codeGrup}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM SYS_CODE
+         WHERE SYS_ID    = #{sysId}
+           AND CODE_CD   = #{codeCd}
+           AND CODE_GRUP = #{codeGrup}
+    </delete>
+    <select id="searchAll" resultType="code" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM SYS_CODE
+         WHERE SYS_ID = #{sysId}
+         ORDER BY
+                SYS_ID
+               ,CODE_GRUP
+               ,SORT_SEQ
+               ,CODE_CD
+    </select>
+    <delete id="deleteAll" parameterType="params">
+        DELETE 
+          FROM SYS_CODE
+         WHERE SYS_ID    = #{sysId}
+           AND CODE_GRUP = #{codeGrup}
+    </delete>
+    
+    <!-- ========================================================== -->
+    <!--   Code Change History                                      -->
+    <!-- ========================================================== -->
+    <insert id="insertHist" parameterType="params">
+        INSERT 
+          INTO SYS_CODE_HIST  
+             ( <include refid="insertColumns-fields" />
+	         , HIST_TYPE
+	         , HIST_DATE
+             )
+        VALUES
+             ( <include refid="insertColumns-values" /> 
+	         , #{histType}
+	         , NOW()
+             )
+    </insert>
+            
+    <!-- ========================================================== -->
+    <!--   Code Term Management                                     -->
+    <!-- ========================================================== -->
+    <select id="searchTerm" resultType="code" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+             , CODE_DATE     AS "codeDate"
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_CODE_TERM A
+         WHERE <include refid="whereClause" />
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDate)">
+           AND CODE_DATE = #{codeDate}  
+        </if>
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchTermCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_CODE_TERM A
+         WHERE <include refid="whereClause" />
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDate)">
+           AND CODE_DATE = #{codeDate}  
+        </if>
+    </select>
+        <select id="selectTerm" resultType="code" parameterType="params">
+        SELECT <include refid="selectColumns" />
+             , CODE_DATE     AS "codeDate"
+          FROM SYS_CODE_TERM A
+         WHERE SYS_ID    = #{sysId}
+           AND CODE_CD   = #{codeCd}
+           AND CODE_GRUP = #{codeGrup}
+    </select>
+    <insert id="insertTerm" parameterType="params">
+        INSERT 
+          INTO SYS_CODE_TERM  
+             ( <include refid="insertColumns-fields" />
+        	 , CODE_DATE
+             )
+        VALUES
+             ( <include refid="insertColumns-values" />
+        	 , #{codeDate}
+             )
+    </insert>
+    <delete id="deleteTerm" parameterType="params">
+        DELETE 
+          FROM SYS_CODE_TERM
+         WHERE SYS_ID    = #{sysId}
+           AND CODE_CD   = #{codeCd}
+           AND CODE_GRUP = #{codeGrup}
+           AND CODE_DATE = #{codeDate}
+    </delete>
+    
+</mapper>

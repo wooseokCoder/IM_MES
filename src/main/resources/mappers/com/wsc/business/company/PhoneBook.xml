@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.business.company.PhoneBook">
+
+	<sql id="pagingColumns">
+        <if test="start == null or end == null">
+				<!-- ,0 AS "rnum" -->
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+ 		 SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM ( 
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                  ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start} 
+         </if>  
+    </sql>
+     
+    <sql id="sortClause">    
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sortValue)">
+		        ${sortValue}
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(sortValue)">
+	  	     SEQ ASC
+	  	</if>
+    </sql>
+    
+    <sql id="selectColumns">
+        SYS_ID			AS "sysId"
+        ,SEQ			AS "SEQ"
+        ,CUST_NAME		AS "custName"
+        ,CUST_TEL		AS "custTel"
+        ,CUST_FAX		AS "custFax"
+        ,CUST_HP		AS "custHP"
+        ,REMARK			AS "remark"
+        ,STAF_DEPT		AS "stafDept"
+        ,REGI_ID		AS "regiId"
+        ,fn_get_code_name('DEPT_CODE',A.STAF_DEPT, #{gsLang}) AS "stafDeptName"
+    </sql>
+    
+    <sql id="insertColumns-fields">
+           SYS_ID 
+         , SEQ  
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custName)">, CUST_NAME </if>       
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custTel)">, CUST_TEL </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custFax)">, CUST_FAX </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custHP)">, CUST_HP </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(remark)">, REMARK </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafDept)">, STAF_DEPT </if>
+         , REGI_ID
+         , REGI_DATE
+         , CHNG_ID 
+         , CHNG_DATE 
+    </sql>
+    
+    <sql id="insertColumns-values">
+           #{sysId}
+         , (select A.* from((SELECT IFNULL(MAX(SEQ)+1,1)  FROM contact_info WHERE SYS_ID = #{sysId} )) as A)
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custName)">, #{custName} </if> 
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custTel)">, #{custTel} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custFax)">, #{custFax} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custHP)">, #{custHP} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(remark)">, #{remark} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafDept)">, #{stafDept} </if>
+         , #{gsUserId}
+         , NOW()
+         , #{gsUserId}
+         , NOW()
+    </sql>
+
+    <sql id="updateColumns">
+		 CUST_NAME= #{custName}
+		, CUST_TEL= #{custTel}
+		, CUST_FAX= #{custFax}
+		, CUST_HP= #{custHP}
+		, REMARK =#{remark}
+		, STAF_DEPT=#{stafDept}
+		, CHNG_ID=#{gsUserId}
+		, CHNG_DATE= NOW()
+    </sql>
+    
+    <sql id="whereClause">
+        SYS_ID=#{sysId}		
+    </sql>
+    
+    <sql id="whereClause-search">    
+        SYS_ID=#{sysId}	
+       		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchCustName)">
+		    AND (CUST_NAME LIKE CONCAT('%',#{searchCustName},'%') OR CUST_TEL LIKE CONCAT('%',#{searchCustName},'%')
+		    OR CUST_FAX LIKE CONCAT('%',#{searchCustName},'%')OR CUST_HP LIKE CONCAT('%',#{searchCustName},'%')OR REMARK LIKE CONCAT('%',#{searchCustName},'%'))
+		   </if>
+       		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchRegiId)">
+		    AND REGI_ID LIKE CONCAT('%',#{searchRegiId},'%')		  
+    		</if>    		
+       		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchStafDept)">
+       		    AND STAF_DEPT   = (CASE WHEN #{searchStafDept} = '' THEN  STAF_DEPT ELSE #{searchStafDept} END)
+<!-- 	       AND STAF_DEPT =
+	       		(select A.* FROM 
+	       				(
+				       		(select CODE_NAME
+								 from sys_code
+							where sys_id=#{sysId}
+							  AND CODE_GRUP='DEPT_CODE'
+							  AND USE_FLAG='Y'
+							  AND CODE_CD=#{searchStafDept} 
+							  )
+		  				 as A)
+				)  --> 
+    		</if>
+
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM CONTACT_INFO A
+           WHERE <include refid="whereClause-search" />
+        ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->    
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM CONTACT_INFO  
+           WHERE <include refid="whereClause-search" />
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM CONTACT_INFO A
+         WHERE SYS_ID=#{sysId}
+           AND SEQ=#{SEQ}
+           AND CUST_NAME=#{custName}
+           AND CUST_TEL=#{custTel}
+           AND CUST_HP=#{custHP}
+           AND CUST_FAX=#{custFax}
+           AND REMARK=#{remark}
+           AND STAF_DEPT=#{stafDept}
+    </select>
+    <insert id="insert"  parameterType="params">
+        INSERT 
+          INTO CONTACT_INFO 
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE CONTACT_INFO
+           SET <include refid="updateColumns" />
+         WHERE SEQ= #{SEQ} 
+		AND SYS_ID= #{sysId}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM CONTACT_INFO
+         WHERE SYS_ID    = #{sysId}
+           AND SEQ		 = #{SEQ}
+    </delete>
+    <select id="getSelectdata" resultType="record" parameterType="params">
+		select *
+		  from sys_code
+		where sys_id=#{sysId}
+		  AND CODE_GRUP='DEPT_CODE'
+		  AND USE_FLAG='Y'
+	</select>
+    <select id="searchAll" resultType="code" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM CONTACT_INFO
+    </select>
+    <delete id="deleteAll" parameterType="params">
+        DELETE 
+          FROM CONTACT_INFO
+         WHERE SYS_ID    = #{sysId}
+           AND CODE_GRUP = #{codeGrup}
+    </delete>
+    
+</mapper>

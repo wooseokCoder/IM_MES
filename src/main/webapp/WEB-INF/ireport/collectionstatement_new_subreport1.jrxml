@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="collectionstatement_new_subreport1" language="groovy" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e5772a19-adcd-4c3b-a14e-05d00bd8c1f3">
+	<property name="ireport.zoom" value="1.3310000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SYS_ID" class="java.lang.String"/>
+	<parameter name="dShetNo" class="java.lang.String"/>
+	<parameter name="dShetType" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+     A.SYS_ID AS "sysId",
+      A.SHET_TYPE AS "shetType",
+      (SELECT SB.CODE_NAME FROM SYS_CODE SB WHERE SB.CODE_GRUP = 'SHET_TYPE' AND SB.CODE_CD = A.SHET_TYPE) AS "shetName",
+      A.SHET_NO AS "shetNo",
+    A.SHET_DATE  AS "shetDate",
+    A.CUST_CODE AS "custCode",
+    A.CUST_NAME AS "custName",
+    A.SHOP_NAME AS "shopName",
+    A.SHET_AMT AS "shetAmt",
+    A.SHET_TAX AS "shetTax",
+    A.SHET_TOT AS "shetTot",
+    A.REMK1 AS "remk1",
+    A.REMK2 AS "remk2",
+    A.REMK3 AS "remk3",
+    DATE_FORMAT(REMK5, '%Y-%m-%d') AS "remk5",
+    A.USE_IDX AS "useIdx",
+    A.BIZ_GP AS "bizGp",
+    (SELECT SB.CODE_NAME FROM SYS_CODE SB  WHERE     SB.CODE_GRUP = 'BSNS_PT_TYPE' AND SB.CODE_CD = A.BIZ_GP) AS "bizName",
+    (SELECT CD2.CODE_NAME FROM SYS_CODE CD2 WHERE     CD2.SYS_ID = A.SYS_ID AND CD2.CODE_CD = A.TAX_TYPE AND CD2.CODE_GRUP = 'TAX_TYPE')AS "taxType",
+    A.STAF_DEPT AS "stafDept",
+    A.STAF_NAME AS "stafName",
+    DATE_FORMAT(A.REGI_DATE, '%Y-%m-%d') AS "regiDate",
+    A.REGI_ID AS "regiUser",
+    A.CHNG_DATE AS "updtDate",
+    A.CHNG_ID AS "updtUser",
+    CONCAT(A.SHET_NO, '::', A.SHET_TYPE) AS "shetNoType",
+    CONCAT(A.SHET_TYPE, A.SHET_NO) AS "estimateNo",
+   (SELECT SB2.USER_NAME FROM SYS_USER SB2 WHERE SB2.USER_ID = A.REGI_ID AND SB2.SYS_ID = A.SYS_ID) AS "userName",
+    CONCAT(A.SHET_TYPE, A.SHET_NO)AS "statmentNo",
+    A.SEND_TYPE AS "sendCode",
+    (SELECT CD2.CODE_NAME FROM SYS_CODE CD2 WHERE     CD2.SYS_ID = A.SYS_ID AND CD2.CODE_CD = A.SEND_TYPE AND CD2.CODE_GRUP = 'PAY_ACC_TYPE') AS "sendType",
+    IFNULL((SELECT CD2.CODE_NAME FROM SYS_CODE CD2 WHERE     CD2.SYS_ID = A.SYS_ID AND CD2.CODE_CD = A.remk4 AND CD2.CODE_GRUP = 'COLL_PAY_YN'),'미결재') AS "remk4",
+     A.DB_AMT AS "dbAmt"
+FROM  SHET_MAST A, SHET_DETL B
+WHERE
+      A.SYS_ID = $P{SYS_ID}
+  AND FIND_IN_SET(A.SHET_TYPE,$P{dShetType})
+  AND FIND_IN_SET(A.SHET_NO, $P{dShetNo})
+  AND A.SYS_ID = B.SYS_ID
+  AND A.SHET_TYPE = B.SHET_TYPE
+  AND A.SHET_NO = B.SHET_NO
+  AND A.SHET_TYPE  = 'C'
+GROUP BY A.SYS_ID, A.SHET_TYPE, A.SHET_NO, A.SHET_DATE, A.CUST_CODE, A.CUST_NAME, A.SHET_AMT, A.SHET_TAX, A.SHET_TOT, A.SEND_TYPE, A.PAY_TYPE, A.PAY_DATE, A.REMK4, A.REMK5, A.REMK3, A.REMK2, A.REMK1, A.BIZ_GP, A.STAF_DEPT, A.STAF_NAME, A.DB_AMT, A.REFERENCE_NO, A.DEPT_NAME
+ORDER
+  BY   A.SHET_NO DESC, A.SHET_DATE DESC]]>
+	</queryString>
+	<field name="sysId" class="java.lang.String"/>
+	<field name="shetType" class="java.lang.String"/>
+	<field name="shetName" class="java.lang.String"/>
+	<field name="shetNo" class="java.lang.String"/>
+	<field name="shetDate" class="java.lang.String"/>
+	<field name="custCode" class="java.lang.String"/>
+	<field name="custName" class="java.lang.String"/>
+	<field name="shopName" class="java.lang.String"/>
+	<field name="shetAmt" class="java.math.BigDecimal"/>
+	<field name="shetTax" class="java.math.BigDecimal"/>
+	<field name="shetTot" class="java.math.BigDecimal"/>
+	<field name="remk1" class="java.lang.String">
+		<fieldDescription><![CDATA[비고1]]></fieldDescription>
+	</field>
+	<field name="remk2" class="java.lang.String">
+		<fieldDescription><![CDATA[비고2]]></fieldDescription>
+	</field>
+	<field name="remk3" class="java.lang.String">
+		<fieldDescription><![CDATA[비고3]]></fieldDescription>
+	</field>
+	<field name="remk5" class="java.lang.String">
+		<fieldDescription><![CDATA[비고5]]></fieldDescription>
+	</field>
+	<field name="useIdx" class="java.lang.String"/>
+	<field name="bizGp" class="java.lang.String"/>
+	<field name="bizName" class="java.lang.String"/>
+	<field name="taxType" class="java.lang.String"/>
+	<field name="stafDept" class="java.lang.String"/>
+	<field name="stafName" class="java.lang.String"/>
+	<field name="regiDate" class="java.lang.String"/>
+	<field name="regiUser" class="java.lang.String"/>
+	<field name="updtDate" class="java.lang.String"/>
+	<field name="updtUser" class="java.lang.String"/>
+	<field name="shetNoType" class="java.lang.String"/>
+	<field name="estimateNo" class="java.lang.String"/>
+	<field name="userName" class="java.lang.String"/>
+	<field name="statmentNo" class="java.lang.String"/>
+	<field name="sendCode" class="java.lang.String"/>
+	<field name="sendType" class="java.lang.String"/>
+	<field name="remk4" class="java.lang.String">
+		<fieldDescription><![CDATA[비고4]]></fieldDescription>
+	</field>
+	<field name="dbAmt" class="java.math.BigDecimal"/>
+	<variable name="No" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$V{COLUMN_NUMBER}]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="701" y="0" width="101" height="20" uuid="8da42a3f-847c-4a54-853d-c3b111b6e0c7"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{remk4}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="158" y="0" width="99" height="20" uuid="ba3c49a0-a08f-4759-bc84-4e381ccaefc5"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{regiUser}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="600" y="0" width="101" height="20" uuid="5d12e1ba-48c8-4ca9-9a64-28f825cb14d5"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{stafName}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="499" y="0" width="101" height="20" uuid="ed98a9de-e072-4c3c-8c4e-2df33c762e79"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false" pdfEncoding="Cp1250" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{remk5}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="257" y="0" width="78" height="20" uuid="0957e012-25f4-4f1f-9b4e-1309dccdae43"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sendType}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="335" y="0" width="82" height="20" uuid="b03eac5f-6869-4843-8922-529f4a56b3fc"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{shetAmt}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="62" height="20" uuid="f1206587-d1cd-40b0-8535-8eb564bb333a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false" pdfEncoding="Cp1250" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{regiDate}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="417" y="0" width="82" height="20" uuid="84b7b88a-9fcf-47a2-8370-86da91b5a484"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dbAmt}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="62" y="0" width="96" height="20" uuid="baf14d76-8f51-40fe-b3e8-cbe87be7444a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{statmentNo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

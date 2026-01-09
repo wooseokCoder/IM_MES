@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="moldregister_subreport1" language="groovy" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="7afaa1dc-57f9-47ed-bbfb-46603bd2e146">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="MOLD_NO" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SYS_ID" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+   B.ROWNUM,B.SYS_ID,B.MOLD_NO,B.MOLD_DATE,B.MOLD_CODE,B.MOLD_STAT,B.VNDR_LOC,B.MANT_COST,B.UPDT_RESN,B.MNG_REMK,B.MOLD_REMK
+FROM
+(
+    SELECT
+        @ROWNUM := @ROWNUM + 1 AS ROWNUM,
+           A.SYS_ID,A.MOLD_NO,A.MOLD_DATE
+,fn_get_code_name('MOLD_CODE',MOLD_CODE,'KO') AS MOLD_CODE
+,fn_get_code_name('MOLD_STAT',A.MOLD_STAT,'KO') AS MOLD_STAT
+,fn_get_code_name('STRG_TYPE',A.VNDR_LOC,'KO') AS VNDR_LOC
+,A.MANT_COST,A.UPDT_RESN,A.MNG_REMK,A.MOLD_REMK
+    FROM
+        MOLD_HIST A,
+       (SELECT @ROWNUM := 0) R
+   WHERE SYS_ID   = $P{SYS_ID}
+     AND MOLD_NO =  $P{MOLD_NO}
+
+) B
+WHERE  B.ROWNUM <= 5]]>
+	</queryString>
+	<field name="ROWNUM" class="java.lang.Double"/>
+	<field name="SYS_ID" class="java.lang.String">
+		<fieldDescription><![CDATA[시스템ID]]></fieldDescription>
+	</field>
+	<field name="MOLD_NO" class="java.lang.String">
+		<fieldDescription><![CDATA[자산번호]]></fieldDescription>
+	</field>
+	<field name="MOLD_DATE" class="java.lang.String">
+		<fieldDescription><![CDATA[관리일자]]></fieldDescription>
+	</field>
+	<field name="MOLD_CODE" class="java.lang.String"/>
+	<field name="MOLD_STAT" class="java.lang.String"/>
+	<field name="VNDR_LOC" class="java.lang.String"/>
+	<field name="MANT_COST" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[금액]]></fieldDescription>
+	</field>
+	<field name="UPDT_RESN" class="java.lang.String">
+		<fieldDescription><![CDATA[사유]]></fieldDescription>
+	</field>
+	<field name="MNG_REMK" class="java.lang.String">
+		<fieldDescription><![CDATA[담당의견]]></fieldDescription>
+	</field>
+	<field name="MOLD_REMK" class="java.lang.String">
+		<fieldDescription><![CDATA[비고]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<rectangle>
+				<reportElement x="702" y="0" width="100" height="20" uuid="9b45268f-76f7-49d0-86ed-6675396ac803"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="565" y="0" width="137" height="20" uuid="6fab0107-1238-4f9b-9910-e7351bbba6b8"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="355" y="0" width="65" height="20" uuid="5a6f3d84-190c-4f6c-8af4-709a9a55178b"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="295" y="0" width="60" height="20" uuid="a477a6a7-0f99-46bd-b760-cad2c5dda8af"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="200" y="0" width="95" height="20" uuid="9567bac5-c0cd-40da-9514-08a8fca9126a"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="140" y="0" width="60" height="20" uuid="2c578154-b3f3-431f-94f7-716c726de64c"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="22" y="0" width="118" height="20" uuid="d2392da5-f806-49ed-a7e6-f8bc87f64650"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="0" width="22" height="20" uuid="96c2b20a-5e46-4d53-80d7-a19205e0a12c"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="22" height="20" uuid="34626bfb-f716-40c4-9cca-3d9e60fcf5d7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[연번]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="22" y="0" width="118" height="20" uuid="a90b29ee-3136-4adf-aad4-e5d09e103ac2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[수정일자]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="140" y="0" width="60" height="20" uuid="325cbe31-ad3b-425e-b949-1388f718b9e9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[관리구분]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="420" y="0" width="145" height="20" uuid="e37c8520-5be3-4fb9-95cb-005ac442ad73"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="200" y="0" width="95" height="20" uuid="8dd6ba60-766c-42a3-949d-7ca8fbec7879"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[보관위치]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="295" y="0" width="60" height="20" uuid="f840068b-5f24-4853-9ccd-de3ad6298d51"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[금형상태]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="355" y="0" width="65" height="20" uuid="2b3c283d-d76f-4fbe-9e52-1fcbede40b7e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[금액(원)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="420" y="0" width="145" height="20" uuid="0c7ba27c-e330-4048-bcd6-cf976141220b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[사유]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="565" y="0" width="137" height="20" uuid="ab08c052-9f7c-4813-bb5f-bbffb5996666"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[담당의견]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="702" y="0" width="100" height="20" uuid="5e2a2f91-5bf5-4094-84d9-230ae6f9f363"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[비고]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<rectangle>
+				<reportElement x="420" y="-1" width="145" height="20" uuid="c01d3591-1f9d-4a78-b19d-a071d2570514"/>
+			</rectangle>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="420" y="-1" width="145" height="20" uuid="15e07f6e-4912-4c70-a1c0-e5e8f22aa528"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{UPDT_RESN}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="702" y="-1" width="100" height="20" uuid="eafa427d-0f9b-4078-9ecb-cfaf2838352d"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="565" y="-1" width="137" height="20" uuid="a2a3020d-0958-4c13-86e5-a67a5830217e"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="355" y="-1" width="65" height="20" uuid="80c38dc3-8ea7-4e57-b255-f45cc1dbd5ac"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="295" y="-1" width="60" height="20" uuid="3b05664f-2f7d-4b24-92a3-2a34ed2cd5c0"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="200" y="-1" width="95" height="20" uuid="53ff8d32-a7be-4908-8f42-ca63b58a7e0c"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="22" y="-1" width="118" height="20" uuid="b60a8764-e389-4014-994c-843d727f40a9"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="-1" width="22" height="20" uuid="68aaf43a-4ce7-45f7-b0bd-138316d81dca"/>
+			</rectangle>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="0" y="-1" width="22" height="20" uuid="9fc4c281-0db7-4cc4-8c48-17004b924b8c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ROWNUM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="22" y="-1" width="118" height="20" uuid="e03d4d2c-754a-45ef-ab42-2dbca85bd4f3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MOLD_DATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="200" y="-1" width="95" height="20" uuid="2d8342e7-0ddf-4c6e-8c54-1e485d4a9cd0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VNDR_LOC}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="295" y="-1" width="60" height="20" uuid="e5f4b6f2-68ca-47d4-8ab5-9bd7ff815ef6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MOLD_STAT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="355" y="-1" width="65" height="20" uuid="69b0cc37-203d-4a90-bbe7-fb408914fe74"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MANT_COST}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="565" y="-1" width="137" height="20" uuid="9ca5c83c-6d5e-4aac-a8fd-bc3465f9a952"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MNG_REMK}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="702" y="-1" width="100" height="20" uuid="dbd62b5a-eb4d-4edb-b095-9cb162b28c35"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MOLD_REMK}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="140" y="-1" width="60" height="20" uuid="e1a6396a-91d0-4e42-92ae-abf85fe6e7f9"/>
+			</rectangle>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="140" y="0" width="60" height="20" uuid="1a545930-fbec-422e-ab3c-c18da22fb425"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MOLD_CODE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

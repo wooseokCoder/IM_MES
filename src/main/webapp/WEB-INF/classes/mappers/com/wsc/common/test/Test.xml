@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.test.Test">
+
+    <!-- Paging Columns -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT *
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>
+    </sql>
+
+    <sql id="selectColumns">
+         A.SYS_ID         AS "sysId"
+        ,A.MENU_KEY       AS "menuKey"
+        ,A.MENU_DESC      AS "menuDesc"
+        ,A.MENU_URL       AS "menuUrl"
+        ,A.PARENT_KEY     AS "parentKey"
+        ,A.MENU_LEVEL     AS "menuLevel"
+        ,A.MENU_SEQ       AS "menuSeq"
+        ,A.USE_FLAG       AS "useFlag"
+        ,A.REGI_ID        AS "regiId"
+        ,DATE_FORMAT(A.REGI_DATE ,'%Y-%m-%d %H:%i:%s') AS "regiDate"
+    </sql>
+
+    <sql id="whereClause">
+        SYS_ID = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuKey)">AND MENU_KEY = #{menuKey}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDesc)">AND MENU_DESC LIKE CONCAT('%',#{menuDesc},'%')</if>
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen" />
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" />
+          FROM SYS_MENU A
+         WHERE <include refid="whereClause" />
+         ORDER BY A.MENU_KEY
+        <include refid="pagingClose" />
+    </select>
+
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM SYS_MENU A
+         WHERE <include refid="whereClause" />
+    </select>
+
+    <insert id="insert" parameterType="params">
+        INSERT INTO SYS_MENU (
+            SYS_ID, MENU_KEY, MENU_DESC, MENU_URL, PARENT_KEY, MENU_LEVEL, MENU_SEQ, USE_FLAG, REGI_ID, REGI_DATE
+        ) VALUES (
+            #{sysId}, #{menuKey}, #{menuDesc}, #{menuUrl}, #{parentKey}, #{menuLevel}, #{menuSeq}, 'Y', #{gsUserId}, NOW()
+        )
+    </insert>
+
+    <update id="update" parameterType="params">
+        UPDATE SYS_MENU
+           SET MENU_DESC = #{menuDesc}
+             , MENU_URL  = #{menuUrl}
+             , CHNG_ID   = #{gsUserId}
+             , CHNG_DATE = NOW()
+         WHERE SYS_ID    = #{sysId}
+           AND MENU_KEY  = #{menuKey}
+    </update>
+
+    <delete id="delete" parameterType="params">
+        DELETE FROM SYS_MENU
+         WHERE SYS_ID    = #{sysId}
+           AND MENU_KEY  = #{menuKey}
+    </delete>
+
+</mapper>

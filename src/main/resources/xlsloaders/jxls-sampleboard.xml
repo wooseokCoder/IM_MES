@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workbook>
+    <worksheet name="Sheet1">
+			  <section startRow="0" endRow="0">
+			       <mapping row="0" col="0" >header.bordNo</mapping>
+			       <mapping row="0" col="1" >header.bordTitle</mapping>
+			       <mapping row="0" col="2" >header.readCnt</mapping>
+			       <mapping row="0" col="3" >header.regiName</mapping>
+		           <mapping row="0" col="4" >header.regiDate</mapping>
+		           <mapping row="0" col="5" >header.chngName</mapping>
+		           <mapping row="0" col="6" >header.chngDate</mapping>
+			  </section>
+        <loop startRow="1" endRow="1" items="list" var="item" varType="com.wsc.framework.model.RecordMap">
+	          <section startRow="1" endRow="1">
+	               <mapping row="1" col="0" >item.bordNo</mapping>
+	               <mapping row="1" col="1" >item.bordTitle</mapping>
+	               <mapping row="1" col="2" >item.readCnt</mapping>
+	               <mapping row="1" col="3" >item.regiName</mapping>
+	               <mapping row="1" col="4" >item.regiDate</mapping>
+	               <mapping row="1" col="5" >item.chngName</mapping>
+	               <mapping row="1" col="6" >item.chngDate</mapping>
+	          </section>
+	          <loopbreakcondition>
+	              <rowcheck offset="0">
+	                  <cellcheck></cellcheck>
+	              </rowcheck>
+	          </loopbreakcondition>
+      </loop>
+    </worksheet>
+</workbook>
+

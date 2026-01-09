@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workbook>
+    <worksheet name="Sheet1">
+		<section startRow="0" endRow="0">
+            <mapping row="0" col="0" >header.itemName</mapping>
+            <mapping row="0" col="1" >header.itemNameAlt</mapping>
+            <mapping row="0" col="2" >header.itemSpec</mapping>
+            <mapping row="0" col="3" >header.itemUnit</mapping>
+            <mapping row="0" col="4" >header.itemUnitQty</mapping>
+            <mapping row="0" col="5" >header.purcPrce</mapping>
+            <mapping row="0" col="6" >header.salePrce</mapping>
+            <mapping row="0" col="7" >header.itemType1</mapping>
+            <mapping row="0" col="8" >header.itemType1Name</mapping>
+            <mapping row="0" col="9" >header.itemType2</mapping>
+            <mapping row="0" col="10" >header.itemType2Name</mapping>
+            <mapping row="0" col="11" >header.itemBar</mapping>
+            <mapping row="0" col="12" >header.modelNo</mapping>
+            <mapping row="0" col="13" >header.modelName</mapping>
+            <mapping row="0" col="14" >header.siNo</mapping>
+            <mapping row="0" col="15" >header.saftQty</mapping>
+            <mapping row="0" col="16" >header.onHandQty</mapping>
+            <mapping row="0" col="17" >header.handQty</mapping>
+            <mapping row="0" col="18" >header.stocLoc</mapping>
+            <mapping row="0" col="19" >header.goodsGP</mapping>
+            <mapping row="0" col="20" >header.AS_GP</mapping>
+            <mapping row="0" col="21" >header.itemRemk</mapping>
+		</section>
+        <loop startRow="1" endRow="1" items="list" var="item" varType="com.wsc.framework.model.RecordMap">
+            <section startRow="1" endRow="1">
+                <mapping row="1" col="0" >item.itemName</mapping>
+                <mapping row="1" col="1" >item.itemNameAlt</mapping>
+                <mapping row="1" col="2" >item.itemSpec</mapping>
+                <mapping row="1" col="3" >item.itemUnit</mapping>
+	            <mapping row="1" col="4" >item.itemUnitQty</mapping>
+	            <mapping row="1" col="5" >item.purcPrce</mapping>
+	            <mapping row="1" col="6" >item.salePrce</mapping>
+	            <mapping row="1" col="7" >item.itemType1</mapping>
+	            <mapping row="1" col="8" >item.itemType1Name</mapping>
+	            <mapping row="1" col="9" >item.itemType2</mapping>
+	            <mapping row="1" col="10" >item.itemType2Name</mapping>
+	            <mapping row="1" col="11" >item.itemBar</mapping>
+	            <mapping row="1" col="12" >item.modelNo</mapping>
+	            <mapping row="1" col="13" >item.modelName</mapping>
+	            <mapping row="1" col="14" >item.siNo</mapping>
+	            <mapping row="1" col="15" >item.saftQty</mapping>
+	            <mapping row="1" col="16" >item.onHandQty</mapping>
+	            <mapping row="1" col="17" >item.handQty</mapping>
+	            <mapping row="1" col="18" >item.stocLoc</mapping>
+	            <mapping row="1" col="19" >item.goodsGP</mapping>
+	            <mapping row="1" col="20" >item.AS_GP</mapping>
+	            <mapping row="1" col="21" >item.itemRemk</mapping>
+            </section>
+            <loopbreakcondition>
+                <rowcheck offset="0">
+                    <cellcheck></cellcheck>
+                </rowcheck>
+            </loopbreakcondition>
+        </loop>
+    </worksheet>
+</workbook>

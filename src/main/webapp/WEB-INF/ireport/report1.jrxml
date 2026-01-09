@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5a3463fa-3857-4c9a-a12c-8f90ee507d85">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SYS_ID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="date1" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="date2" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\root\\Desktop\\인천측기\\ICNbackup\\IREPORT\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="t_custCode" class="java.lang.String"/>
+	<parameter name="t_custName" class="java.lang.String"/>
+	<parameter name="deptCode" class="java.lang.String"/>
+	<parameter name="t_state" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+A.INCOME_DATE		AS "incomeDate"
+        ,A.SEQ          	AS "incomeSeq"
+        ,A.CUST_NAME		AS "custName"
+        ,A.CUST_CD			AS "custCd"
+        ,A.ITEM_CD			AS "itemCode"
+        ,A.ITEM_NAME		AS "itemName"
+        ,A.ITEM_SPEC		AS "itemSpec"
+        ,A.PROG_STATE		AS "progState"
+        ,A.CMPLT_YN			AS "cmpltYn"
+        ,A.REQUEST_REASON	AS "requestReason"
+        ,A.REMARK			AS "remark"
+        ,A.INCOME_PLACE		AS "incomePlace"
+        ,A.INCOME_TYPE		AS "incomeType"
+        ,A.INCOME_DEPT		AS "incomeDept"
+        ,A.BIZ_GP			AS "bizGp"
+        ,A.TAX_YN			AS "taxYn"
+        ,A.SERIAL			AS "serial"
+        ,A.SEV_CHARGE		AS "sevCharge"
+        ,A.CUST_STAF_TEL	AS "custStafTel"
+        ,A.CUST_STAF_FAX	AS "custStafFax"
+        ,A.CUST_STAF		AS "custStaf"
+        ,A.CUST_STAF_HP		AS "custStafHp"
+        ,A.DIST_DATE   		AS "distDate"
+        ,A.DIST_PLACE  		AS "distPlace"
+        ,A.AS_COST			AS "asCost"
+        ,A.TOT_TAX			AS "totTax"
+        ,A.TOT_AMT			AS "totAmt"
+        ,A.ISSUER			AS "issuer"
+        ,(SELECT SB2.USER_NAME FROM SYS_USER SB2 WHERE SB2.USER_ID = A.REGI_ID  AND SB2.SYS_ID = A.SYS_ID) AS "userName"
+FROM AS_MAST A
+WHERE A.SYS_ID=$P{SYS_ID}
+	AND A.INCOME_DATE BETWEEN  $P{date1} AND $P{date2}
+	AND A.CUST_CD
+LIKE CONCAT ('%',IF($P{t_custCode} IS NULL,'',$P{t_custCode}),'%')
+	AND CASE WHEN $P{deptCode} = "00" THEN 1=1		 		ELSE A.INCOME_DEPT LIKE CONCAT('%',$P{deptCode},'%')
+ 	END
+	AND CASE WHEN $P{t_state} = "A" THEN 1=1		 		WHEN $P{t_state} = "Y" THEN A.CMPLT_YN = 'Y'		 		ELSE IFNULL(A.CMPLT_YN,'N') != 'Y'
+ 	END
+
+GROUP BY A.INCOME_DATE
+  ORDER BY A.INCOME_DATE, A.SEQ ASC]]>
+	</queryString>
+	<field name="incomeDate" class="java.lang.String"/>
+	<field name="incomeSeq" class="java.lang.String"/>
+	<field name="custName" class="java.lang.String"/>
+	<field name="custCd" class="java.lang.String"/>
+	<field name="itemCode" class="java.lang.String"/>
+	<field name="itemName" class="java.lang.String"/>
+	<field name="itemSpec" class="java.lang.String"/>
+	<field name="progState" class="java.lang.String"/>
+	<field name="cmpltYn" class="java.lang.String"/>
+	<field name="requestReason" class="java.lang.String"/>
+	<field name="remark" class="java.lang.String">
+		<fieldDescription><![CDATA[비고]]></fieldDescription>
+	</field>
+	<field name="incomePlace" class="java.lang.String"/>
+	<field name="incomeType" class="java.lang.String"/>
+	<field name="incomeDept" class="java.lang.String"/>
+	<field name="bizGp" class="java.lang.String"/>
+	<field name="taxYn" class="java.lang.String"/>
+	<field name="serial" class="java.lang.String">
+		<fieldDescription><![CDATA[시리얼번호]]></fieldDescription>
+	</field>
+	<field name="sevCharge" class="java.lang.String"/>
+	<field name="custStafTel" class="java.lang.String"/>
+	<field name="custStafFax" class="java.lang.String"/>
+	<field name="custStaf" class="java.lang.String"/>
+	<field name="custStafHp" class="java.lang.String"/>
+	<field name="distDate" class="java.lang.String"/>
+	<field name="distPlace" class="java.lang.String"/>
+	<field name="asCost" class="java.math.BigDecimal"/>
+	<field name="totTax" class="java.math.BigDecimal"/>
+	<field name="totAmt" class="java.math.BigDecimal"/>
+	<field name="issuer" class="java.lang.String">
+		<fieldDescription><![CDATA[발행사]]></fieldDescription>
+	</field>
+	<field name="userName" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement x="562" y="0" width="61" height="20" uuid="e38869bb-65b3-4777-b763-8382fe54accf"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[SerialNo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="143" y="0" width="134" height="20" uuid="4c1e3d42-ddc9-4d85-9d4f-3b6d5898b1bf"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[거래처명]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="62" height="20" uuid="a2a7da24-126b-44d7-9a13-cd646a196485"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[접수일자]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="62" y="0" width="81" height="20" uuid="1a79a502-7935-4404-aedc-f9cdf761acaa"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[접수번호]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="623" y="0" width="52" height="20" uuid="95940ee0-98f9-4844-b0fc-547c6e7a5d69"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[처리상태]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="675" y="0" width="52" height="20" uuid="21ae35b5-56bf-485d-a549-1ddf072aa2e6"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[완결처리]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="727" y="0" width="75" height="20" uuid="b27d0377-cf68-458d-bb7f-80383aba4ed7"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[합계금액]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="494" y="0" width="68" height="20" uuid="90e0a07d-7bec-4358-92cf-58c640e7063d"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[규격]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="375" y="0" width="119" height="20" uuid="d6e8fb9c-5e34-4a33-be1a-2374abeb6379"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[품명]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="277" y="0" width="98" height="20" uuid="7b435ed3-20d1-4307-983e-0dc092b82721"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[전화]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="101" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="802" height="100" uuid="262c9234-3e9d-4144-8e4a-089831b3ca8e"/>
+				<subreportParameter name="t_custCode">
+					<subreportParameterExpression><![CDATA[$P{t_custCode}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="shetDate">
+					<subreportParameterExpression><![CDATA[$F{incomeDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SYS_ID">
+					<subreportParameterExpression><![CDATA[$P{SYS_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="t_state">
+					<subreportParameterExpression><![CDATA[$P{t_state}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="deptCode">
+					<subreportParameterExpression><![CDATA[$P{deptCode}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "receiptmanagement_subreport1.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="802" height="42" uuid="1148c52f-b5ce-4d44-95c5-4be7caeb4d6c"/>
+				<subreportParameter name="t_custCode">
+					<subreportParameterExpression><![CDATA[$P{t_custCode}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SYS_ID">
+					<subreportParameterExpression><![CDATA[$P{SYS_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="date2">
+					<subreportParameterExpression><![CDATA[$P{date2}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="t_state">
+					<subreportParameterExpression><![CDATA[$P{t_state}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="deptCode">
+					<subreportParameterExpression><![CDATA[$P{deptCode}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="date1">
+					<subreportParameterExpression><![CDATA[$P{date1}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "receiptmanagement_subreport2.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

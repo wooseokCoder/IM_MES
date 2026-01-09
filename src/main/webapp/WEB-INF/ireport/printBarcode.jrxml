@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="printSerial" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="dde95366-2227-4f0e-b712-7096d50a3077">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SYS_ID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="barcodeType" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="barcodeNo" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="itemCode" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="limitNo" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[$P{limitNo}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="printPos" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[
+SELECT a.grp_no,
+      if( n1 = 0, NULL,  a.serNo) n1,
+      if( n2 = 0, NULL,  a.serNo) n2,
+      if( n3 = 0, NULL,  a.serNo) n3
+FROM  (
+      SELECT x.grp_no,
+            sum( if( x.seq = 1, x.prtnum, 0)) n1,
+            sum( if( x.seq = 2, x.prtnum, 0)) n2,
+            sum( if( x.seq = 0, x.prtnum, 0)) n3
+            ,x.serNo
+      FROM  (
+                    SELECT rownum, if( prtnum < 0, 0, prtnum) prtnum, ceil( rownum / 3) grp_no, mod( rownum, 3) seq
+                        ,rn.serNo as serNo
+                  FROM (
+                               SELECT @row := @row + 1 as rownum, @prt := @row -$P{printPos} +1 as prtnum
+                                    ,t.serNo as serNo
+                              FROM
+                                          (
+                                                SELECT
+                                           (CASE WHEN $P{barcodeType} = 'itemCode' THEN A.ITEM_CODE				             WHEN $P{barcodeType} = 'modelNo' THEN A.MODEL_NO				             ELSE A.ITEM_CODE							         END) AS "serNo"
+                                     FROM   item_mast A
+                                                INNER JOIN ITEM_MAST B
+                                                 ON B.ITEM_CODE = B.ITEM_CODE
+                                                WHERE     A.SYS_ID = $P{SYS_ID}
+                                                      AND A.ITEM_CODE = $P{itemCode}
+                                                        AND FIND_IN_SET( (CASE WHEN $P{barcodeType} = 'itemCode' 					THEN A.ITEM_CODE
+					WHEN $P{barcodeType} = 'modelNo'
+					THEN A.MODEL_NO								ELSE A.ITEM_CODE
+					END)  ,$P{barcodeNo})
+                                                ) t, (SELECT @row := 0) r
+                                          ) rn
+                    WHERE  rownum <= $P{limitNo}+$P{printPos}-1
+                   ) x
+      GROUP BY x.grp_no
+) a]]>
+	</queryString>
+	<field name="grp_no" class="java.lang.Double"/>
+	<field name="n1" class="java.lang.String"/>
+	<field name="n2" class="java.lang.String"/>
+	<field name="n3" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="39" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="373" y="0" width="180" height="39" uuid="80bfc985-eed7-41ec-9f2d-8eefffbe52b0"/>
+				<textElement>
+					<font fontName="C39HrP24DhTt" size="24" pdfFontName="C39HrP24DhTt" pdfEncoding="Cp1250" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{n3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="180" height="39" uuid="5ab2d540-410c-42aa-8dac-36024dd66113"/>
+				<textElement>
+					<font fontName="C39HrP24DhTt" size="24" pdfFontName="C39HrP24DhTt" pdfEncoding="Cp1250" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{n1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="186" y="0" width="180" height="39" uuid="f8bc6bc4-4c02-482b-b0b0-f4847f92670c"/>
+				<textElement>
+					<font fontName="C39HrP24DhTt" size="24" pdfFontName="C39HrP24DhTt" pdfEncoding="Cp1250" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{n2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

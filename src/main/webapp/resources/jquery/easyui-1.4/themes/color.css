@@ -1,0 +1,217 @@
+.c1,.c1:hover{
+	color: #fff;
+	border-color: #3c8b3c;
+	background: #4cae4c;
+	background: -webkit-linear-gradient(top,#4cae4c 0,#449d44 100%);
+	background: -moz-linear-gradient(top,#4cae4c 0,#449d44 100%);
+	background: -o-linear-gradient(top,#4cae4c 0,#449d44 100%);
+	background: linear-gradient(to bottom,#4cae4c 0,#449d44 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#4cae4c,endColorstr=#449d44,GradientType=0);
+}
+a.c1:hover{
+	background: #449d44;
+	filter: none;
+}
+.c2,.c2:hover{
+	color: #fff;
+	border-color: #5f5f5f;
+	background: #747474;
+	background: -webkit-linear-gradient(top,#747474 0,#676767 100%);
+	background: -moz-linear-gradient(top,#747474 0,#676767 100%);
+	background: -o-linear-gradient(top,#747474 0,#676767 100%);
+	background: linear-gradient(to bottom,#747474 0,#676767 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#747474,endColorstr=#676767,GradientType=0);
+}
+a.c2:hover{
+	background: #676767;
+	filter: none;
+}
+.c3,.c3:hover{
+	color: #333;
+	border-color: #ff8080;
+	background: #ffb3b3;
+	background: -webkit-linear-gradient(top,#ffb3b3 0,#ff9999 100%);
+	background: -moz-linear-gradient(top,#ffb3b3 0,#ff9999 100%);
+	background: -o-linear-gradient(top,#ffb3b3 0,#ff9999 100%);
+	background: linear-gradient(to bottom,#ffb3b3 0,#ff9999 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#ffb3b3,endColorstr=#ff9999,GradientType=0);
+}
+a.c3:hover{
+	background: #ff9999;
+	filter: none;
+}
+/* c6 button color change 20160928 �뜝�뙓�눦�삕�뜝�룞�삕 */
+.c4,.c4:hover{
+	/*
+	color: #333;
+	border-color: #52d689;
+	background: #b8eecf;
+	background: -webkit-linear-gradient(top,#b8eecf 0,#a4e9c1 100%);
+	background: -moz-linear-gradient(top,#b8eecf 0,#a4e9c1 100%);
+	background: -o-linear-gradient(top,#b8eecf 0,#a4e9c1 100%);
+	background: linear-gradient(to bottom,#b8eecf 0,#a4e9c1 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#b8eecf,endColorstr=#a4e9c1,GradientType=0);
+	*/
+	border-color:#9c9c9c;
+	color:#202020;
+	background: #fff;
+}
+.c4 .l-btn-left{
+	color:#202020;
+	font-size:12px;
+}
+.c4 .l-btn-left:hover{
+	color:#fff;
+	font-size:12px;
+}
+a.c4:hover{
+	background: #b5b5b5;
+	filter: none;
+}
+a.c4:hover font{
+	color:#fff;
+	font-size:12px;
+}
+.c5,.c5:hover{
+	color: #fff;
+	border-color: #b52b27;
+	background: #d84f4b;
+	background: -webkit-linear-gradient(top,#d84f4b 0,#c9302c 100%);
+	background: -moz-linear-gradient(top,#d84f4b 0,#c9302c 100%);
+	background: -o-linear-gradient(top,#d84f4b 0,#c9302c 100%);
+	background: linear-gradient(to bottom,#d84f4b 0,#c9302c 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#d84f4b,endColorstr=#c9302c,GradientType=0);
+}
+a.c5:hover{
+	background: #c9302c;
+	filter: none;
+}
+/* c6 button color change 20160928 �뜝�뙓�눦�삕�뜝�룞�삕 */
+.c6,.c6:hover{
+	color: #fff;
+	border-color: #275bae;
+	/*border-color:#d6604d;*/
+	/*background:#275bae;
+	background:#1377cc;*/
+	background:#002658;
+	font-weight:600;
+	/*
+	background: -webkit-linear-gradient(top,#2984a4 0,#24748f 100%);
+	background: -moz-linear-gradient(top,#2984a4 0,#24748f 100%);
+	background: -o-linear-gradient(top,#2984a4 0,#24748f 100%);
+	background: linear-gradient(to bottom,#2984a4 0,#24748f 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#2984a4,endColorstr=#24748f,GradientType=0);
+	*/
+}
+a.c6:hover{
+	background: #24748f;
+	border-color: #24748f;
+	/*background: #f4a582;*/
+	filter: none;
+}
+.c7,.c7:hover{
+	color: #333;
+	border-color: #e68900;
+	background: #ffab2e;
+	background: -webkit-linear-gradient(top,#ffab2e 0,#ff9900 100%);
+	background: -moz-linear-gradient(top,#ffab2e 0,#ff9900 100%);
+	background: -o-linear-gradient(top,#ffab2e 0,#ff9900 100%);
+	background: linear-gradient(to bottom,#ffab2e 0,#ff9900 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#ffab2e,endColorstr=#ff9900,GradientType=0);
+}
+a.c7:hover{
+	background: #ff9900;
+	filter: none;
+}
+.c8,.c8:hover{
+	/*
+	color: #fff;
+	border-color: #4b72a4;
+	background: #698cba;
+	background: -webkit-linear-gradient(top,#698cba 0,#577eb2 100%);
+	background: -moz-linear-gradient(top,#698cba 0,#577eb2 100%);
+	background: -o-linear-gradient(top,#698cba 0,#577eb2 100%);
+	background: linear-gradient(to bottom,#698cba 0,#577eb2 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#698cba,endColorstr=#577eb2,GradientType=0);
+	*/
+	border-color:#0e8018;
+	color:#ffffff;
+	background: #0e8818;
+	
+}
+.c8 font{
+	color:#2984a4;
+	font-size:12px;
+}
+a.c8:hover{
+	background: #5dad64;
+	filter: none;
+}
+a.c8:hover font{
+	color:#2984a4;
+	font-size:12px;
+}
+
+/* c7 button color change 20170624 �뜝�뙓�궪�삕�뜝�룞�삕 */
+.c9,.c9:hover{
+	color: #fff;
+	border-color:#4285f4;
+	background:#4285f4;
+	font-weight:600;
+	filter: none;
+	
+}
+a.c9:hover{
+	/*background: #24748f;*/
+	border-color: #74a5f5;
+	background: #74a5f5;
+	filter: none;
+}
+
+/* c10 button color change 20190222 �뜝�룞�삕�뜝�떕占� */
+.c10,.c10:hover{
+	color: #fff;
+	border-color:#778888;
+	background:#778888;
+	font-weight:600;
+	filter: none;
+	
+}
+a.c10:hover{
+	/*background: #24748f;*/
+	border-color: #859191;
+	background: #859191;
+	filter: none;
+}
+
+/* c10 button color change 20190222 �뜝�룞�삕�뜝�떕占� */
+.c11,.c11:hover{
+	color: #000000;
+	border-color:#000000;
+	background:#ffffff;
+	font-weight:600;
+	filter: none;
+	
+}
+a.c11:hover{
+	/*background: #24748f;*/
+	border-color: #000000;
+	background: #f3f3f3;
+	filter: none;
+}
+
+/* c12 button color change 20190313 김경환*/
+.c12,.c12:hover{
+	border-color:#9c9c9c;
+	color:#202020;
+	background: #fff;
+}
+a.c12:hover{
+	background: #b5b5b5;
+	filter: none;
+}
+a.c12:hover font{
+	color:#fff;
+	font-size:12px;
+}
+

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.drawing.DrawingInformationDetail">
+	<select id="select" resultType="record" parameterType="params">
+		CALL sp_select_drawlist(#{sysId},#{listNo})
+	</select>
+	
+	<select id="getDrawItemList" resultType="record" parameterType="params">
+		CALL sp_select_itemlist(#{listNo})
+	</select>
+	
+	<select id="getNdaFileNo2" resultType="String" parameterType="params">
+        SELECT FN_GET_ORDR_NO(#{applId})
+    </select>
+    
+    <select id="drawListInsert" resultType="String" parameterType="params">
+		CALL sp_insert_drawList(#{sysId},#{listType},#{listCode},#{listName},#{bordNo})
+	</select>
+    
+    <insert id="drawItemInsert" parameterType="params">
+		CALL sp_insert_drawItem(#{listNo},#{num},#{itemType},#{itemCode},#{itemName},#{boxX},#{boxY},#{toolX},#{toolY},#{itemUse})
+	</insert>
+	
+	<update id="drawListUpdate" parameterType="params">
+		CALL sp_update_drawList(#{sysId},#{listNo},#{listType},#{listCode},#{listName},#{bordNo})
+	</update>
+	
+	<update id="drawItemUpdate" parameterType="params">
+		CALL sp_update_drawItem(#{listNo},#{num},#{itemType},#{itemCode},#{itemName},#{boxX},#{boxY},#{toolX},#{toolY},#{itemUse})
+	</update>
+</mapper>

@@ -1,0 +1,1616 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.rt.Return">
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+                <!-- ,0 AS "rnum" -->
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+         SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM ( 
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                  ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start} 
+         </if>  
+    </sql>
+    <sql id="whereClause-search">
+           OM.SYS_ID = #{sysId}
+       AND OM.USE_IDX = 'Y'
+<!--        AND OM.ORDR_TYPE IN('RO', 'TO')  -->
+<!--        AND OM.ORDR_TYPE = #{roType} -->
+       AND CASE WHEN #{roType} = 'TR' THEN OM.ORDR_TYPE IN ('TO','TR')
+	            ELSE OM.ORDR_TYPE = #{roType} END
+<!--         <if test="@com.wsc.framework.utils.MybatisUtils@equal(roType,'RO')"> -->
+<!--         AND 0 = (SELECT COUNT(1) FROM ORDR_MAST WHERE SYS_ID = #{sysId} AND USE_IDX = 'Y' AND ORDR_TYPE = 'TO' AND ORDR_NO = CONCAT('TO',SUBSTR(OM.ORDR_NO,3)) LIMIT 1) -->
+<!--         </if> -->
+<!--         <if test="@com.wsc.framework.utils.MybatisUtils@equal(roType,'TO')"> -->
+<!--         AND 1 = (SELECT COUNT(1) FROM ORDR_MAST WHERE SYS_ID = #{sysId} AND USE_IDX = 'Y' AND ORDR_TYPE = 'TO' AND ORDR_NO = CONCAT('TO',SUBSTR(OM.ORDR_NO,3)) LIMIT 1) -->
+<!--         </if> -->
+	   <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ORDR_DATE_FR)">
+	   AND CASE WHEN #{selectDate} = '100' THEN OM.ORDR_DATE <![CDATA[>=]]> FN_CONV_DATE(#{ORDR_DATE_FR})
+	            WHEN #{selectDate} = '200' THEN DATE_FORMAT(OM.ORDR_REG_DATE,  '%Y-%m-%d') <![CDATA[>=]]> FN_CONV_DATE(#{ORDR_DATE_FR})
+	            WHEN #{selectDate} = '300' THEN DATE_FORMAT(OM.ORDR_REV_DATE,  '%Y-%m-%d') <![CDATA[>=]]> FN_CONV_DATE(#{ORDR_DATE_FR})
+	            WHEN #{selectDate} = '400' THEN DATE_FORMAT(OM.ORDR_CFM_DATE,  '%Y-%m-%d') <![CDATA[>=]]> FN_CONV_DATE(#{ORDR_DATE_FR})
+	                                       ELSE DATE_FORMAT(OM.ORDR_CLOSE_DATE, '%Y-%m-%d') <![CDATA[>=]]> FN_CONV_DATE(#{ORDR_DATE_FR}) END
+	   </if>     
+	   <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ORDR_DATE_TO)"> 
+	   AND CASE WHEN #{selectDate} = '100' THEN OM.ORDR_DATE <![CDATA[<=]]> FN_CONV_DATE(#{ORDR_DATE_TO})
+	            WHEN #{selectDate} = '200' THEN DATE_FORMAT(OM.ORDR_REG_DATE,  '%Y-%m-%d') <![CDATA[<=]]> FN_CONV_DATE(#{ORDR_DATE_TO})
+	            WHEN #{selectDate} = '300' THEN DATE_FORMAT(OM.ORDR_REV_DATE,  '%Y-%m-%d') <![CDATA[<=]]> FN_CONV_DATE(#{ORDR_DATE_TO})
+	            WHEN #{selectDate} = '400' THEN DATE_FORMAT(OM.ORDR_CFM_DATE,  '%Y-%m-%d') <![CDATA[<=]]> FN_CONV_DATE(#{ORDR_DATE_TO})
+	                                       ELSE DATE_FORMAT(OM.ORDR_CLOSE_DATE, '%Y-%m-%d') <![CDATA[<=]]> FN_CONV_DATE(#{ORDR_DATE_TO}) END
+	   </if>
+	   AND OM.ORDR_NO LIKE CONCAT(#{ORDR_NO},'%')
+	   AND IFNULL(OM.ORDR_NO_SAP,'') LIKE CONCAT(#{ORDR_NO_SAP},'%')
+	   AND OM.DEAL_CODE = CASE WHEN #{dealCode} = '' THEN OM.DEAL_CODE
+	                           WHEN IFNULL(#{dealCode},'') = '' THEN OM.DEAL_CODE
+	                           ELSE #{dealCode} END
+	   <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(SHIP_SERI_NO)">
+	   AND   OM.ORDR_NO IN  (SELECT ORDR_NO
+							 FROM   ORDR_ITEM
+							 WHERE  IFNULL(SHIP_SERI_NO,'') LIKE CONCAT('%',#{SHIP_SERI_NO},'%'))
+	   </if>
+	   <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(Statkey)">
+	   AND  OM.ORDR_STAT REGEXP #{Statkey}
+	   </if>     
+	   AND IFNULL(OM.SHIP_LOC,'')  = CASE WHEN #{SHIP_LOC} = '' THEN IFNULL(OM.SHIP_LOC,'')
+	                          			  WHEN #{SHIP_LOC} = NULL THEN IFNULL(OM.SHIP_LOC,'')
+	                           			  ELSE #{SHIP_LOC} END     
+	   AND OM.REGI_ID = ( SELECT SU.USER_ID FROM SYS_USER SU WHERE SU.USER_ID =  CASE WHEN #{CHAR_BM} = '' THEN OM.REGI_ID
+																							   WHEN #{CHAR_BM} = NULL THEN OM.REGI_ID
+																							   ELSE #{CHAR_BM} END)   
+	   AND  CASE WHEN #{Mainkey} = "" THEN 1
+                 ELSE CASE WHEN #{TYPE_ORDR} = 'Include' AND #{TYPE_ORDR_OP} = 'AND'
+                                                         AND (OM.ORDR_ABBR LIKE CONCAT('%', substr(#{Mainkey},1,1), '%')
+                                                         AND  OM.ORDR_ABBR LIKE CONCAT('%', substr(#{Mainkey},2,1), '%')
+                                                         AND  OM.ORDR_ABBR LIKE CONCAT('%', substr(#{Mainkey},3,1), '%')
+                                                         AND  OM.ORDR_ABBR LIKE CONCAT('%', substr(#{Mainkey},4,1), '%')
+                                                         AND  OM.ORDR_ABBR LIKE CONCAT('%', substr(#{Mainkey},5,1), '%')
+                                                         AND  OM.ORDR_ABBR LIKE CONCAT('%', substr(#{Mainkey},6,1), '%')) THEN 1
+                           WHEN #{TYPE_ORDR} = 'Include' AND #{TYPE_ORDR_OP} = 'OR'
+                                                         AND (OM.ORDR_ABBR LIKE CONCAT('%', substr(#{Mainkey},1,1), '%')
+                                                         OR  OM.ORDR_ABBR LIKE REPLACE(CONCAT('%', substr(#{Mainkey},2,1), '%'),'%%','')
+                                                         OR  OM.ORDR_ABBR LIKE REPLACE(CONCAT('%', substr(#{Mainkey},3,1), '%'),'%%','')
+                                                         OR  OM.ORDR_ABBR LIKE REPLACE(CONCAT('%', substr(#{Mainkey},4,1), '%'),'%%','')
+                                                         OR  OM.ORDR_ABBR LIKE REPLACE(CONCAT('%', substr(#{Mainkey},5,1), '%'),'%%','')
+                                                         OR  OM.ORDR_ABBR LIKE REPLACE(CONCAT('%', substr(#{Mainkey},6,1), '%'),'%%','')) THEN 1
+                           WHEN #{TYPE_ORDR} = 'Only'    AND  ordr_abbr = #{Mainkey} THEN 1
+                           ELSE 0 END 
+                 END = 1
+	   <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ITEM_MODL)"> 
+	   AND OI.ITEM_MODL LIKE CONCAT('%',#{ITEM_MODL},'%')
+	   </if>
+	   <if test="@com.wsc.framework.utils.MybatisUtils@equal(CH_YN,'Y')"> 
+	   AND (SELECT COUNT(1) FROM RETN_CHEK_MAST WHERE RETN_NO = OM.ORDR_NO ) =  1
+	   </if>
+	   <if test="@com.wsc.framework.utils.MybatisUtils@equal(CH_YN,'N')"> 
+	   AND (SELECT COUNT(1) FROM RETN_CHEK_MAST WHERE RETN_NO = OM.ORDR_NO ) =  0
+	   </if>
+	   <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(REF_NO)"> 
+	   AND RM.RETN_SO_NO LIKE CONCAT('%',#{REF_NO},'%')
+	   </if>
+    </sql>
+    <sql id="sortClause">    
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sortValue)">
+             ${sortValue}
+        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(sortValue)">
+             OM.ORDR_NO desc
+        </if>
+    </sql>
+    <sql id="selectColumns">
+       OM.SYS_ID        AS "sysId"
+      ,OM.ORDR_TYPE     AS "retnType"
+      ,OM.ORDR_NO       AS "ordrNo"
+      ,OM.DEAL_CODE     AS "dealCode"
+      ,OM.DEAL_NAME     AS "dealName"
+      ,OM.ORDR_NO_SAP   AS "ordrNoSap"
+      , (SELECT DMSB1.CHAR_BM
+         FROM   DEAL_MAST DMSB1
+         WHERE  DMSB1.SYS_ID    = OM.SYS_ID
+         AND    DMSB1.DEAL_CODE = OM.DEAL_CODE
+         LIMIT 0, 1 ) AS "charBm"
+      , OI.SHIP_SERI_NO AS "seriNo"
+      , OM.INV_FILE_INFO AS "invNo"  
+      , OM.ORDR_ABBR   AS "ordrAbbr"
+      , OM.ORDR_STAT AS "ordrStat"
+      , fn_get_code_name('RETN_STAT',OM.ORDR_STAT,'en') AS "ordrStatName"
+      , CASE WHEN fn_get_trac_desc2(OI.ITEM_CODE, OM.ORDR_NO) != '' THEN fn_get_trac_desc2(OI.ITEM_CODE, OM.ORDR_NO)
+            WHEN fn_get_atta_desc2(OI.ITEM_CODE, OM.ORDR_NO) != '' THEN fn_get_atta_desc2(OI.ITEM_CODE, OM.ORDR_NO)
+            ELSE fn_get_adp_desc2(OI.ITEM_CODE, OM.ORDR_NO) end AS "itemName"
+      ,(SELECT CODE_DESC
+          FROM SYS_CODE
+         WHERE SYS_ID    = OM.SYS_ID
+           AND CODE_GRUP = 'WARE_HOUS'
+           AND CODE_CD   = OM.SHIP_LOC ) AS "shipLoc"
+      ,DATE_FORMAT(OM.ORDR_DATE, '%m.%d.%Y')  AS "createDate"
+      ,(SELECT APPR_USER FROM SYS_FLOW  WHERE SYS_ID  = #{sysId} AND FLOW_NO = OM.ORDR_NO ORDER BY FLOW_SEQ DESC LIMIT 1) AS lastUser
+      ,(SELECT DATE_FORMAT(APPR_DATE, '%m.%d.%Y') FROM SYS_FLOW  WHERE SYS_ID  = #{sysId} AND FLOW_NO = OM.ORDR_NO ORDER BY FLOW_SEQ DESC LIMIT 1) AS lastDate
+      ,RM.RETN_REF_NO AS refNo
+      ,DATEDIFF(OM.ORDR_DATE, OM.ORDR_CLS_DATE) AS diffDate
+      ,(SELECT DEAL_CODE FROM ORDR_MAST WHERE SYS_ID = #{sysId} AND USE_IDX = 'Y' AND ORDR_TYPE = 'TR' AND ORDR_NO = CONCAT('TR',SUBSTR(OM.ORDR_NO,3)) LIMIT 1) AS "toDealCode"
+      ,(SELECT DEAL_NAME FROM ORDR_MAST WHERE SYS_ID = #{sysId} AND USE_IDX = 'Y' AND ORDR_TYPE = 'TR' AND ORDR_NO = CONCAT('TR',SUBSTR(OM.ORDR_NO,3)) LIMIT 1)  AS "toDealName"
+      ,CASE WHEN RM.RETN_TYPE = 'RO' THEN fn_get_code_name('RETN_RESN',RM.RETN_TYPE_RS, #{gsLang})
+            WHEN RM.RETN_TYPE IN ('TR', 'TO') THEN fn_get_code_name('TRAN_RESN',RM.RETN_TYPE_RS, #{gsLang})
+            ELSE '' END AS retnTypeRsLbl
+      ,RM.RETN_LOC AS retnLoc
+      ,(CASE RM.RETN_LOC_TYPE WHEN 'D' THEN CONCAT(RM.RETN_LOC, ' - ', fn_get_deal_name(RM.RETN_LOC))
+                              WHEN 'W' THEN (SELECT CODE_DESC
+										       FROM   SYS_CODE
+										       WHERE  SYS_ID    = RM.SYS_ID
+										       AND    CODE_GRUP = 'WARE_HOUS'
+										       AND    CODE_CD   = RM.RETN_LOC )
+                              ELSE ''
+        END) AS retnLocLbl
+    </sql>
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /> <!-- PAGING -->
+            SELECT   <include refid="selectColumns" />
+                     <include refid="pagingColumns" />
+              FROM ORDR_MAST OM
+              LEFT OUTER JOIN ORDR_ITEM OI
+                ON OM.SYS_ID    = OI.SYS_ID
+               AND OM.ORDR_TYPE = OI.ORDR_TYPE
+               AND OM.ORDR_NO   = OI.ORDR_NO
+             <!--   AND OI.ORDR_SEQ = 10  -->
+               AND OI.USE_IDX = 'Y'
+              LEFT OUTER JOIN RETN_MAST RM
+                ON OM.SYS_ID    = RM.SYS_ID
+               AND OM.ORDR_NO   = RM.RETN_NO
+            WHERE    <include refid="whereClause-search" />
+            ORDER BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    
+    <select id="searchCount" resultType="int" parameterType="params">
+            SELECT COUNT(1)
+              FROM ORDR_MAST OM
+              LEFT OUTER JOIN ORDR_ITEM OI
+                ON OM.SYS_ID    = OI.SYS_ID
+               AND OM.ORDR_TYPE = OI.ORDR_TYPE
+               AND OM.ORDR_NO   = OI.ORDR_NO
+              <!--   AND OI.ORDR_SEQ = 10  -->
+               AND OI.USE_IDX = 'Y'
+              LEFT OUTER JOIN RETN_MAST RM
+                ON OM.SYS_ID    = RM.SYS_ID
+               AND OM.ORDR_NO   = RM.RETN_NO
+            WHERE  <include refid="whereClause-search" />
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+            SELECT OM.ORDR_NO AS ordrNo
+                  ,ORDR_STAT AS ordrStat
+                  ,fn_get_code_name('RETN_STAT',ORDR_STAT,'en') AS ordrStatName
+                  ,RM.RETN_DO_NO AS retnDoNo
+                  ,RM.RETN_SO_NO AS retnSoNo
+                  ,RM.RETN_REF_NO AS  reference
+                  ,DATE_FORMAT(OM.ORDR_DATE, '%m.%d.%Y') AS ordrDate
+                  ,OM.REGI_ID AS writer
+                  ,OM.DEAL_CODE AS fromDealCode
+                  ,OM.DEAL_NAME AS dealName
+                  ,CONCAT(OM.DEAL_CODE , ' ' , OM.DEAL_NAME) AS fromDealer
+                  ,OM.SHIP_TO_CITY AS fromDealerAddr
+                  ,OM.PAY_METH AS payMeth
+                  ,fn_get_code_name('PAYM_METH',OM.PAY_METH, #{gsLang}) AS payMethLbl
+                  ,OM.CUST_PO_NO AS custPoNo
+                  ,OM.INV_FILE_INFO AS item_invNo
+                  ,DATE_FORMAT(OM.ORDR_CLS_DATE, '%m.%d.%Y') AS item_invDate
+                  ,FORMAT(OM.GROS_AMT, 0) AS item_invAmt
+                  ,RM.TO_DEAL_CODE AS toDealCode
+                  ,RM.TO_DEAL_NAME AS toDealName
+                  ,CONCAT(RM.TO_DEAL_CODE , ' ' , RM.TO_DEAL_NAME) AS toDealer
+                  ,RM.TO_DEAL_CITY AS toDealerAddr
+                  ,DATE_FORMAT(RM.RETL_DATE, '%m.%d.%Y') AS retlDate
+                  ,DATE_FORMAT(RM.TRSF_DATE, '%m.%d.%Y') AS trsfDate
+                  ,APPRL_YN
+                  ,CASE WHEN APPRL_YN = 'Y' THEN 'Yes' 
+                        WHEN APPRL_YN = 'N' THEN 'Not yet' 
+                        ELSE '' END AS APPRL_YN_LBL
+                  ,RM.RETN_TYPE_RD AS retnTypeRd
+                  ,fn_get_code_name('RETURN_TYPE',RM.RETN_TYPE_RD, #{gsLang}) AS retnTypeLbl
+                  ,RM.RETN_TYPE_RS AS retnTypeRs
+                  ,CASE WHEN RM.RETN_TYPE = 'RO' THEN fn_get_code_name('RETN_RESN',RM.RETN_TYPE_RS, #{gsLang})
+                        WHEN RM.RETN_TYPE IN ('TR', 'TO') THEN fn_get_code_name('TRAN_RESN',RM.RETN_TYPE_RS, #{gsLang})
+                        ELSE '' END AS retnTypeRsLbl
+                  ,RM.CHK_WELL_FARGO AS chk_wf
+                  ,RM.CHK_DEAL AS chk_deal
+                  ,RM.CHK_LS AS chk_ls
+                  ,RM.RETN_LOC AS retnLoc
+                  ,RM.RETN_LOC_TYPE AS retnLocType
+                  ,RM.RETN_LOC_ADDR AS retnLocAddr
+                  ,RM.RETN_LOC_ZIP AS retnLocZip
+                  ,RM.RETN_LOC_CITY AS retnLocCity
+                  ,RM.RETN_LOC_REGN AS retnLocRegn
+                  ,RM.RETN_LOC_CNTY AS retnLocCnty
+                  ,DATE_FORMAT(RM.EST_RETN_DATE, '%m.%d.%Y') AS estRetnDate
+                  ,RM.RETN_RESN AS retnResn
+                  ,REPLACE(RM.RETN_RESN, '\n', "&lt;br&gt;") AS retnResnLbl
+                  ,RM.TRSF_RESN_RD AS  trsfResnRd
+                  ,REPLACE(RM.TRSF_RESN, '\n', "&lt;br&gt;") AS trsfResnLbl
+                  ,RM.TRSF_RESN AS trsfResn
+     <!--              ,DATE_FORMAT(RM.MOVE_DATE, '%m.%d.%Y') AS moveDate
+                  ,RM.MOVE_ADDR AS moveAddr
+                  ,RM.MOVE_WHY AS moveWhy
+                  ,REPLACE(RM.MOVE_WHY, '\n', "&lt;br&gt;") AS moveWhyLbl-->
+                  ,RM.SWAP_YN AS swapYn
+                  ,RM.TRANS_YN AS transYn
+                  ,RM.GRAD_YN AS gradYn
+   <!--                ,(SELECT OI.ITEM_MODL FROM ORDR_ITEM OI WHERE OI.ORDR_NO = RM.RETN_NO AND OI.SHIP_SERI_NO = RM.SWAP_ONG_SERI_NO_01 AND RM.SWAP_ONG_SERI_NO_01 <![CDATA[<> ]]> '' LIMIT 1) AS swapModl_01
+                  ,(SELECT OI.ITEM_MODL FROM ORDR_ITEM OI WHERE OI.ORDR_NO = RM.RETN_NO AND OI.SHIP_SERI_NO = RM.SWAP_ONG_SERI_NO_02 AND RM.SWAP_ONG_SERI_NO_01 <![CDATA[<> ]]> '' LIMIT 1) AS swapModl_02
+                  ,(SELECT OI.ITEM_MODL FROM ORDR_ITEM OI WHERE OI.ORDR_NO = RM.RETN_NO AND OI.SHIP_SERI_NO = RM.SWAP_ONG_SERI_NO_03 AND RM.SWAP_ONG_SERI_NO_01 <![CDATA[<> ]]> '' LIMIT 1) AS swapModl_03
+                  ,(SELECT OI.ITEM_MODL FROM ORDR_ITEM OI WHERE OI.ORDR_NO = RM.RETN_NO AND OI.SHIP_SERI_NO = RM.SWAP_ONG_SERI_NO_04 AND RM.SWAP_ONG_SERI_NO_01 <![CDATA[<> ]]> '' LIMIT 1) AS swapModl_04
+                  ,(SELECT OI.ITEM_MODL FROM ORDR_ITEM OI WHERE OI.ORDR_NO = RM.RETN_NO AND OI.SHIP_SERI_NO = RM.SWAP_ONG_SERI_NO_05 AND RM.SWAP_ONG_SERI_NO_01 <![CDATA[<> ]]> '' LIMIT 1) AS swapModl_05
+                 ,RM.SWAP_ONG_SERI_NO_01 AS swapOrgSeriNo_01
+                  ,RM.SWAP_ONG_SERI_NO_02 AS swapOrgSeriNo_02
+                  ,RM.SWAP_ONG_SERI_NO_03 AS swapOrgSeriNo_03
+                  ,RM.SWAP_ONG_SERI_NO_04 AS swapOrgSeriNo_04
+                  ,RM.SWAP_ONG_SERI_NO_05 AS swapOrgSeriNo_05
+                  ,RM.SWAP_SERI_NO_01 AS swapSeriNo_01
+                  ,RM.SWAP_SERI_NO_02 AS swapSeriNo_02
+                  ,RM.SWAP_SERI_NO_03 AS swapSeriNo_03
+                  ,RM.SWAP_SERI_NO_04 AS swapSeriNo_04
+                  ,RM.SWAP_SERI_NO_05 AS swapSeriNo_05
+                  ,RM.SWAP_REMK_01 AS swapRemkNo_01
+                  ,RM.SWAP_REMK_02 AS swapRemkNo_02
+                  ,RM.SWAP_REMK_03 AS swapRemkNo_03
+                  ,RM.SWAP_REMK_04 AS swapRemkNo_04
+                  ,RM.SWAP_REMK_05 AS swapRemkNo_05-->
+                  ,RM.INST_DESC AS instDesc
+                  ,REPLACE(RM.INST_DESC, '\n', "&lt;br&gt;") AS instDescLbl
+                  ,RCM.INSP_TOT_GRAD
+                  ,RCM.INSP_GRAD_A
+                  ,RCM.INSP_GRAD_B
+                  ,RCM.INSP_GRAD_C
+                  ,RCM.APPR_REQR
+                  ,RCM.APPR_MNGR
+                  ,RM.FFR_NO AS ffrNo
+                  ,'RT'  AS bordGrup
+                  ,OM.ORDR_NO AS bordNo
+                  ,RM.REMK AS remk
+              FROM ORDR_MAST OM
+                   LEFT OUTER JOIN RETN_CHEK_MAST RCM
+                    ON OM.ORDR_NO   = RCM.RETN_NO
+                  ,RETN_MAST RM
+
+             WHERE OM.SYS_ID    = #{sysId}
+               AND OM.ORDR_NO   = #{ordrNo}
+               AND OM.ORDR_NO   = RM.RETN_NO
+    </select>
+    <select id="selectItem" resultType="record" parameterType="params">
+            SELECT OI.ITEM_MODL    AS itemModl
+                  ,OI.ITEM_TYPE    AS itemType
+                  ,OI.ITEM_CODE    AS itemCode
+                  ,OI.ITEM_NAME    AS itemName
+                  ,OI.ITEM_MODL    AS ITEMMODL1
+                  ,OI.ITEM_TYPE    AS ITEMTYPE1
+                  ,OI.ITEM_CODE    AS ITEMCODE1
+                  ,OI.ITEM_NAME    AS ITEMNAME1
+                  ,OI.SHIP_SERI_NO AS seriNo
+                  ,fn_get_vin_no(OI.SHIP_SERI_NO) AS vinNo
+                  ,RI.USE_HOUR     AS useHour
+                  ,RI.CRED_AMT     AS credAmt
+                  ,RI.RE_BILL_PRCE AS reBillPrce
+                  ,RI.TERM_GE_LST  AS termGeLst
+                  ,RI.FLOR_PERD    AS florPerd
+                  ,RI.RETL_INTV    AS retlIntv
+                  ,RI.ACC_COMT     AS accComt
+                  ,RI.NOT_ACC_COMT AS notAccComt
+                  ,OM.INV_FILE_INFO AS item_invNo
+                  ,IFNULL(DATE_FORMAT(OM.ORDR_CLS_DATE, '%m.%d.%Y'),'') AS item_invDate
+                  ,FORMAT(OI.ITEM_AMT, 0) AS item_invAmt
+              FROM ORDR_MAST OM
+                  ,ORDR_ITEM OI
+                  ,RETN_ITEM RI
+             WHERE 
+                   OM.SYS_ID    = #{sysId}
+               AND OM.SYS_ID    = OI.SYS_ID
+               AND OM.ORDR_NO   = #{ordrNo}
+               AND OM.ORDR_NO   = OI.ORDR_NO
+               AND OI.ORDR_NO   = RI.RETN_NO
+               AND OI.ORDR_SEQ  = RI.RETN_SEQ
+    </select>
+    <select id="selectTransItem" resultType="record" parameterType="params">
+            SELECT ITEM_MODL    AS itemModl
+                  ,SHIP_SERI_NO AS seriNo
+                  ,ITEM_QTY     AS qty
+                  ,HOUR         AS hours
+                  ,BEF_INFO     AS bfeInfo
+                  ,AFT_INFO     AS aftInfo
+                  ,FORMAT(ITEM_AMT, 0)     AS reBillPrce
+                  ,SYS_REMK     AS remark
+              FROM RETN_TRANS_ITEM
+             WHERE 
+                   SYS_ID    = #{sysId}
+               AND RETN_NO   = #{ordrNo}
+    </select>
+    <select id="selectSwapItem" resultType="record" parameterType="params">
+            SELECT ITEM_MODL    AS itemModl
+                  ,SHIP_SERI_NO AS seriNo
+                  ,ITEM_QTY     AS qty
+                  ,OLD_SERI_NO  AS oldSeri
+                  ,NEW_SERI_NO  AS newSeri
+                  ,SYS_REMK     AS remark
+              FROM RETN_SWAP_ITEM
+             WHERE 
+                   SYS_ID    = #{sysId}
+               AND RETN_NO   = #{ordrNo}
+    </select>
+    <select id="getRetnOrdrNo" resultType="String" parameterType="params">
+        SELECT FN_GET_ORDR_NO(#{roType})
+<!--         SELECT FN_GET_ORDR_NO('RO') -->
+    </select>
+    <insert id="ordrMastInsert" parameterType="params">
+        INSERT INTO ORDR_MAST
+           (SYS_ID
+           ,ORDR_TYPE
+           ,ORDR_NO
+           ,ORDR_DATE
+           ,ORDR_STAT
+           ,ORDR_NO_SAP
+           ,DEAL_CODE
+           ,DEAL_NAME
+           ,SHIP_TO
+           ,SHIP_TO_NAME
+           ,SHIP_TO_ADDRESS1
+           ,SHIP_TO_POBOX
+           ,SHIP_TO_CITY
+           ,SHIP_TO_ZIP
+           ,SHIP_TO_COUNTRY
+           ,SHIP_TO_LZONE
+           ,SHIP_TO_STATE
+           ,SHIP_TO_TEL
+           ,SHIP_TO_TEL_EXT
+           ,SHIP_TO_MOB
+           ,SHIP_TO_FAX
+           ,SHIP_TO_EMAIL
+           ,CUST_PO_NO
+           ,PAY_METH
+           ,ORDR_CRET_USER
+           ,USE_IDX
+           ,INV_FILE_INFO
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ORDR_CLS_DATE)">,ORDR_CLS_DATE</if>
+           <!-- <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(GROS_AMT)">,GROS_AMT</if> -->
+           <if test="@com.wsc.framework.utils.MybatisUtils@equal(roType,'ER')">
+           ,EO_STS
+           ,EST_RETN_DATE
+           ,RETN_LOC
+           ,RETN_LOC_TYPE
+           </if>
+           ,PREV_ORDR_NO
+           ,ORDR_REG_DATE
+		   ,ORDR_REV_DATE
+           ,REGI_ID
+           ,REGI_DATE)
+        VALUES
+           (#{sysId}
+           ,SUBSTR(#{ordrNo},1,2)
+           ,#{ordrNo}
+           ,DATE_FORMAT(NOW(), '%Y-%m-%d')
+           ,'100'
+           ,NULL
+           ,#{fromDealCode}
+           ,(SELECT DEAL_NAME FROM DEAL_MAST WHERE SYS_ID = #{sysId} AND DEAL_CODE = #{fromDealCode})
+           ,#{fromShipTo}
+           ,#{fromShipToName}
+           ,#{fromShipToAddress1}
+           ,#{fromShipToPobox}
+           ,#{fromShipToCity}
+           ,#{fromShipToZip}
+           ,#{fromShipToCountry}
+           ,#{fromShipToLzone}
+           ,#{fromShipToState}
+           ,#{fromShipToTel}
+           ,#{fromShipToTelext}
+           ,#{fromShipToMob}
+           ,#{fromShipToFax}
+           ,#{fromShipToEmail}
+           ,#{custPoNo}
+           ,#{payMeth}
+           ,#{gsUserId}
+           ,'Y'
+           ,#{INV_FILE_INFO}
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ORDR_CLS_DATE)">,FN_CONV_DATE(#{ORDR_CLS_DATE})</if>
+           <!--<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(GROS_AMT)">,REPLACE(#{GROS_AMT},',','')</if> -->
+           <if test="@com.wsc.framework.utils.MybatisUtils@equal(roType,'ER')">
+           ,#{eoSts}
+           ,FN_CONV_DATE(#{estRetnDate})
+           ,#{retnLoc}
+           ,#{retnLocType}
+           </if>
+           ,#{retnDoNo}
+           ,fn_get_regdate(#{sysId},#{gsUserId})
+		   ,fn_get_revdate(#{sysId},#{gsUserId})
+           ,#{gsUserId}
+           ,NOW())
+    </insert>
+    <insert id="retnMastInsert" parameterType="params">
+        INSERT INTO RETN_MAST
+           (SYS_ID
+           ,RETN_TYPE
+           ,RETN_NO
+           ,RETN_DATE
+           ,RETN_TYPE_RD
+           ,RETN_TYPE_RS
+           ,RETN_DO_NO
+           ,RETN_SO_NO
+           ,RETN_REF_NO
+           ,RETN_LOC
+           ,RETN_LOC_TYPE
+           ,RETN_LOC_ADDR
+           ,RETN_LOC_ZIP
+           ,RETN_LOC_CITY
+           ,RETN_LOC_REGN
+           ,RETN_LOC_CNTY
+           ,EST_RETN_DATE
+           ,TO_DEAL_CODE
+           ,TO_DEAL_NAME
+           ,TO_DEAL_ADDRESS1
+           ,TO_DEAL_POBOX
+           ,TO_DEAL_ZIP
+           ,TO_DEAL_COUNTRY
+           ,TO_DEAL_CITY
+           ,TO_DEAL_LZONE
+           ,TO_DEAL_STATE
+           ,TO_DEAL_TEL
+           ,TO_DEAL_TEL_EXT
+           ,TO_DEAL_MOB
+           ,TO_DEAL_FAX
+           ,TO_DEAL_EMAIL
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(retlDate)">
+           ,RETL_DATE
+           </if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(trsfDate)">
+           ,TRSF_DATE
+           </if>
+           ,APPRL_YN
+           ,CHK_WELL_FARGO
+           ,CHK_DEAL
+           ,CHK_LS
+           ,RETN_RESN
+           ,TRSF_RESN_RD
+           ,TRSF_RESN
+           ,FFR_NO
+           ,SWAP_YN
+           ,TRANS_YN
+           ,GRAD_YN
+           ,INST_DESC
+           ,REMK
+           ,USE_IDX
+           ,REGI_ID
+           ,REGI_DATE)
+        VALUES
+           (#{sysId}
+           ,SUBSTR(#{ordrNo},1,2)
+           ,#{ordrNo}
+           ,DATE_FORMAT(NOW(), '%Y-%m-%d')
+           ,#{roType}
+           ,#{trsfResnRd}
+           ,#{retnDoNo}
+           ,#{retnSoNo}
+           ,#{reference}
+           ,#{retnLoc}
+           ,#{retnLocType}
+           ,#{retnLocAddr}
+           ,#{retnLocZip}
+           ,#{retnLocCity}
+           ,#{retnLocLzone}
+           ,#{retnLocCnty}
+           ,FN_CONV_DATE(#{estRetnDate})
+           ,#{toDealCode}
+           ,#{toShipToName}
+           ,#{toShipToAddress1}
+           ,#{toShipToPobox}
+           ,#{toShipToZip}
+           ,#{toShipToCountry}
+           ,#{toShipToCity}
+           ,#{toShipToLzone}
+           ,#{toShipToState}
+           ,#{toShipToTel}
+           ,#{toShipToTelext}
+           ,#{toShipToMob}
+           ,#{toShipToFax}
+           ,#{toShipToEmail}
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(retlDate)">
+           ,FN_CONV_DATE( fn_null_date_fr(#{retlDate}))
+           </if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(trsfDate)">
+           ,FN_CONV_DATE( fn_null_date_fr(#{trsfDate}))
+           </if>
+           ,#{RdDealerAppr}
+           ,#{chk_wf}
+           ,#{chk_deal}
+           ,#{chk_ls}
+           ,#{retnResn}
+           ,#{trsfResnRd}
+           ,#{trsfResn}
+           ,#{ffrNo}
+           ,#{swapYn}
+           ,#{transYn}
+           ,#{gradYn}
+           ,#{instDesc}
+           ,#{remk}
+           ,'Y' 
+           ,#{gsUserId}
+           ,NOW())
+    </insert>
+    <insert id="ordrItemInsert" parameterType="params">
+        INSERT INTO ORDR_ITEM
+           (SYS_ID
+           ,ORDR_TYPE
+           ,ORDR_NO
+           ,ORDR_SEQ
+           ,ITEM_TYPE
+           ,ITEM_MODL
+           ,ITEM_CODE
+           ,ITEM_NAME
+           ,SHIP_SERI_NO
+           ,VIN_NO
+           ,ITEM_QTY
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(GROS_AMT)">
+           ,ITEM_AMT
+           ,ITEM_PRCE
+           </if>
+           ,USE_IDX
+           ,UNUSE_DATE
+           ,SYS_REMK
+           ,REGI_DATE
+           ,REGI_ID)
+        VALUES
+           (#{sysId}
+           ,SUBSTR(#{ordrNo},1,2)
+           ,#{ordrNo}
+           ,(SELECT IFNULL(MAX(OI.ORDR_SEQ),0) + 10 FROM ORDR_ITEM OI WHERE ORDR_NO=#{ordrNo} )
+           ,#{ITEM_TYPE}
+           ,#{ITEM_MODL}
+           ,#{ITEM_CODE}
+           ,#{ITEM_NAME}
+           ,#{SERI_NO}
+           ,#{VIN_NO}
+           ,1
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(GROS_AMT)">
+           ,REPLACE(#{GROS_AMT},',','')
+           ,REPLACE(#{GROS_AMT},',','')
+           </if>
+           ,'Y'
+           ,null
+           ,null
+           ,NOW()
+           ,#{gsUserId})
+    </insert>
+    <insert id="retnItemInsert" parameterType="params">
+        INSERT INTO RETN_ITEM
+           (SYS_ID
+           ,RETN_TYPE
+           ,RETN_NO
+           ,RETN_SEQ
+           ,USE_HOUR
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(CRED_AMT)">
+           ,CRED_AMT
+           </if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(RE_BILL_PRCE)">
+           ,RE_BILL_PRCE
+           </if>
+           ,TERM_GE_LST
+           ,FLOR_PERD
+           ,RETL_INTV
+           ,ACC_COMT
+           ,NOT_ACC_COMT
+           ,USE_IDX
+           ,REGI_DATE
+           ,REGI_ID)
+        VALUES
+           (#{sysId}
+           ,SUBSTR(#{ordrNo},1,2)
+           ,#{ordrNo}
+           ,(SELECT IFNULL(MAX(OI.RETN_SEQ),0) + 10 FROM RETN_ITEM OI WHERE RETN_NO=#{ordrNo} )
+           ,#{USE_HOUR}
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(CRED_AMT)">
+           ,#{CRED_AMT}
+           </if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(RE_BILL_PRCE)">
+           ,#{RE_BILL_PRCE}
+           </if>
+           ,#{TERM_GE_LST}
+           ,#{FLOR_PERD}
+           ,#{RETL_INTV}
+           ,#{ACC_COMT}
+           ,#{NOT_ACC_COMT}
+           ,'Y'
+           ,NOW()
+           ,#{gsUserId})
+    </insert>
+    <insert id="retnTransInsert" parameterType="params">
+        INSERT INTO RETN_TRANS_ITEM
+           (SYS_ID
+           ,RETN_NO
+           ,RETN_SEQ
+           ,ITEM_MODL
+           ,SHIP_SERI_NO
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ITEM_QTY)">
+           ,ITEM_QTY
+           </if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(HOUR)">
+           ,HOUR
+           </if>
+           ,BEF_INFO
+           ,AFT_INFO
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ITEM_AMT)">
+           ,ITEM_AMT
+           </if>
+           ,SYS_REMK
+           ,USE_IDX
+           ,REGI_DATE
+           ,REGI_ID)
+        VALUES
+           (#{sysId}
+           ,#{ordrNo}
+           ,(SELECT IFNULL(MAX(OI.RETN_SEQ),0) + 10 FROM RETN_TRANS_ITEM OI WHERE RETN_NO=#{ordrNo} )
+           ,#{ITEM_MODL}
+           ,#{SHIP_SERI_NO}
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ITEM_QTY)">
+           ,#{ITEM_QTY}
+           </if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(HOUR)">
+           ,#{HOUR}
+           </if>
+           ,#{BEF_INFO}
+           ,#{AFT_INFO}
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ITEM_AMT)">
+           ,REPLACE(#{ITEM_AMT},',','')
+           </if>
+           ,#{SYS_REMK}
+           ,'Y'
+           ,NOW()
+           ,#{gsUserId})
+    </insert>
+    <insert id="retnSwapInsert" parameterType="params">
+        INSERT INTO RETN_SWAP_ITEM
+           (SYS_ID
+           ,RETN_NO
+           ,RETN_SEQ
+           ,ITEM_MODL
+           ,SHIP_SERI_NO
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ITEM_QTY)">
+           ,ITEM_QTY
+           </if>
+           ,OLD_SERI_NO
+           ,NEW_SERI_NO
+           ,SYS_REMK
+           ,USE_IDX
+           ,REGI_DATE
+           ,REGI_ID)
+        VALUES
+           (#{sysId}
+           ,#{ordrNo}
+           ,(SELECT IFNULL(MAX(OI.RETN_SEQ),0) + 10 FROM RETN_SWAP_ITEM OI WHERE RETN_NO=#{ordrNo} )
+           ,#{ITEM_MODL}
+           ,#{SHIP_SERI_NO}
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ITEM_QTY)">
+           ,#{ITEM_QTY}
+           </if>
+           ,#{OLD_SERI_NO}
+           ,#{NEW_SERI_NO}
+           ,#{SYS_REMK}
+           ,'Y'
+           ,NOW()
+           ,#{gsUserId})
+    </insert>
+    <delete id="ordrItemDelete" parameterType="params">
+        DELETE FROM ORDR_ITEM
+         WHERE SYS_ID    = #{sysId}
+           AND ORDR_TYPE = SUBSTR(#{ordrNo},1,2)
+           AND ORDR_NO   = #{ordrNo}
+    </delete>
+    <delete id="retnItemDelete" parameterType="params">
+        DELETE FROM RETN_ITEM
+         WHERE SYS_ID    = #{sysId}
+           AND RETN_TYPE = SUBSTR(#{ordrNo},1,2)
+           AND RETN_NO   = #{ordrNo}
+    </delete>
+    <delete id="ordrMastDelete" parameterType="params">
+        DELETE FROM ORDR_MAST
+         WHERE SYS_ID    = #{sysId}
+           AND ORDR_TYPE = SUBSTR(#{ordrNo},1,2)
+           AND ORDR_NO   = #{ordrNo}
+    </delete>
+    <delete id="retnMastDelete" parameterType="params">
+        DELETE FROM RETN_MAST
+         WHERE SYS_ID    = #{sysId}
+           AND RETN_TYPE = SUBSTR(#{ordrNo},1,2)
+           AND RETN_NO   = #{ordrNo}
+    </delete>
+    <delete id="retnSwapDelete" parameterType="params">
+        DELETE FROM RETN_SWAP_ITEM
+         WHERE SYS_ID    = #{sysId}
+           AND RETN_NO   = #{ordrNo}
+    </delete>
+    <delete id="retnTransDelete" parameterType="params">
+        DELETE FROM RETN_TRANS_ITEM
+         WHERE SYS_ID    = #{sysId}
+           AND RETN_NO   = #{ordrNo}
+    </delete>
+    <select id="searchAddr" resultType="record" parameterType="params">
+        SELECT DM.DEAL_CODE
+             , DM.DEAL_NAME AS SHIP_TO_NAME
+             , DM.SALE_GRUP
+             , DM.WARE_HOUS
+             , DM.E_MAIL AS SHIP_TO_EMAIL
+             , DM.TEL_NO AS SHIP_TO_TEL
+             , DM.TEL_EXT AS SHIP_TO_TEL_EXT
+             , DM.MOB_NO AS SHIP_TO_MOB
+             , DM.FAX_NO AS SHIP_TO_FAX
+             , DM.TRANS_ZONE AS SHIP_TO_STATE
+             , DM.ADDR_STR AS SHIP_TO_ADDRESS1
+             , DM.ADDR_BOX AS SHIP_TO_POBOX
+             , DM.ADDR_REGN AS SHIP_TO_LZONE
+             , DM.ADDR_CITY AS SHIP_TO_CITY
+             , DM.ADDR_CNTY AS SHIP_TO_COUNTRY
+             , DM.PAY_TYPE
+             , DM.POST_CODE AS SHIP_TO_ZIP
+             , IFNULL(DM.SHIP_TO,DM.DEAL_CODE) AS SHIP_TO
+        FROM   DEAL_MAST DM
+        WHERE  DM.DEAL_CODE =  #{DEAL_CODE}
+    </select>
+    <select id="searchOrder" resultType="record" parameterType="params">
+        SELECT OM.ORDR_NO AS retnDoNo, 
+               OM.ORDR_NO_SAP AS retnSoNo,
+               CASE WHEN OM.ORDR_NO      = #{refNo} THEN OM.ORDR_NO
+                    WHEN OM.ORDR_NO_SAP  = #{refNo} THEN OM.ORDR_NO_SAP
+                    ELSE OM.ORDR_NO_SAP END AS refNo,
+               OM.DEAL_CODE,
+               FORMAT(OI.ITEM_AMT, 0) AS GROS_AMT,
+               OM.SHIP_TO_CITY,
+               OM.INV_FILE_INFO,
+               DATE_FORMAT(OM.ORDR_CLS_DATE, '%m.%d.%Y') AS ORDR_CLS_DATE,
+               OM.CUST_PO_NO,
+               OM.PAY_METH,
+               DATE_FORMAT(OM.EST_RETN_DATE, '%m.%d.%Y') AS EST_RETN_DATE,
+               OM.RETN_LOC,
+               OM.RETN_LOC_TYPE,
+               OI.ITEM_MODL,
+               OI.ITEM_TYPE,
+               OI.SHIP_SERI_NO,
+               fn_get_vin_no(OI.SHIP_SERI_NO) AS VIN_NO,
+               OI.ITEM_TYPE,
+               OI.ITEM_CODE,
+               OI.ITEM_NAME
+        FROM   ORDR_MAST OM,
+               ORDR_ITEM OI
+        WHERE  OM.SYS_ID    = OI.SYS_ID
+           AND OM.ORDR_TYPE = OI.ORDR_TYPE
+           AND OM.ORDR_NO   = OI.ORDR_NO
+           AND OI.ITEM_TYPE <![CDATA[<>]]> 'DISC'
+           AND OI.ITEM_TYPE NOT LIKE '%OP%'
+           AND OM.ORDR_TYPE NOT IN ('RO','TO','TR','ER')
+           AND( OM.ORDR_NO =  #{refNo}
+           OR ORDR_NO_SAP = #{refNo}
+           OR OM.ORDR_NO = (SELECT ORDR_NO FROM ORDR_ITEM WHERE SHIP_SERI_NO = #{refNo} AND ORDR_TYPE NOT IN ('RO','TO','TR','ER') ORDER BY SUBSTRING(ORDR_NO,3) DESC LIMIT 1))
+    </select>
+    <select id="searchOrderHist" resultType="record" parameterType="params">
+        SELECT '' AS retnDoNo, 
+               MH.SALE_NO AS retnSoNo,
+               MH.SALE_NO AS refNo,
+               MH.DEAL_CODE,
+               0 AS GROS_AMT,
+               '' AS SHIP_TO_CITY,
+               '' AS INV_FILE_INFO,
+               DATE_FORMAT(MH.GI_ENTRY_DATE, '%m.%d.%Y')  AS ORDR_CLS_DATE,
+               '' AS CUST_PO_NO,
+               '' AS PAY_METH,
+               MH.ITEM_MODL,
+               MH.ITEM_TYPE,
+               MH.SERI_NO AS SHIP_SERI_NO,
+               MH.ITEM_TYPE,
+               MH.ITEM_CODE,
+               MH.ITEM_NAME
+          FROM MI_HIST MH
+         WHERE MH.SYS_ID    = #{sysId}
+           AND( MH.SALE_NO = #{refNo}
+           OR MH.SALE_NO = (SELECT SALE_NO FROM MI_HIST WHERE SERI_NO = #{refNo} ORDER BY GI_ENTRY_DATE DESC LIMIT 1))
+    </select>
+    <select id="searchOrderSeriNo" resultType="record" parameterType="params">
+        SELECT OM.ORDR_NO AS retnDoNo, 
+               OM.ORDR_NO_SAP AS retnSoNo,
+               OM.DEAL_CODE,
+               FORMAT(OI.ITEM_AMT, 0) AS GROS_AMT,
+               OM.SHIP_TO_CITY,
+               OM.INV_FILE_INFO,
+               DATE_FORMAT(OM.ORDR_CLS_DATE, '%m.%d.%Y')  AS ORDR_CLS_DATE,
+               OM.CUST_PO_NO,
+               OM.PAY_METH,
+               OI.ITEM_MODL,
+               OI.ITEM_TYPE,
+               OI.SHIP_SERI_NO,
+               fn_get_vin_no(OI.SHIP_SERI_NO) AS VIN_NO,
+               OI.ITEM_TYPE,
+               OI.ITEM_CODE,
+               OI.ITEM_NAME
+        FROM   ORDR_MAST OM,
+               ORDR_ITEM OI
+        WHERE  OM.SYS_ID    = OI.SYS_ID
+           AND OM.ORDR_TYPE = OI.ORDR_TYPE
+           AND OM.ORDR_NO   = OI.ORDR_NO
+           AND OI.ITEM_TYPE <![CDATA[<>]]> 'DISC'
+           AND OI.ITEM_TYPE NOT LIKE '%OP%'
+           AND OM.ORDR_TYPE NOT IN ('RO','TO','TR','ER')
+           AND OI.SHIP_SERI_NO  =  #{refNo}
+    </select>
+    <select id="searchOrderSeriNoHist" resultType="record" parameterType="params">
+        SELECT '' AS retnDoNo, 
+               MH.SALE_NO AS retnSoNo,
+               MH.DEAL_CODE,
+               0 AS GROS_AMT,
+               '' AS SHIP_TO_CITY,
+               '' AS INV_FILE_INFO,
+               DATE_FORMAT(MH.GI_ENTRY_DATE, '%m.%d.%Y')  AS ORDR_CLS_DATE,
+               '' AS CUST_PO_NO,
+               '' AS PAY_METH,
+               MH.ITEM_MODL,
+               MH.ITEM_TYPE,
+               MH.SERI_NO AS SHIP_SERI_NO,
+               MH.ITEM_TYPE,
+               MH.ITEM_CODE,
+               MH.ITEM_NAME
+          FROM MI_HIST MH
+         WHERE MH.SYS_ID    = #{sysId}
+           AND MH.SERI_NO   = #{refNo}
+    </select>
+    
+    <update id="ordrInfoUpdate" parameterType="params">
+        UPDATE ORDR_MAST
+           SET DEAL_CODE = #{fromDealCode}
+             <!--  ,DEAL_NAME = (SELECT DEAL_NAME FROM DEAL_MAST WHERE SYS_ID = #{sysId} AND DEAL_CODE = #{fromDealCode}) -->
+              ,DEAL_NAME =  #{fromShipToName}
+              ,SHIP_TO = #{fromShipTo}
+              ,SHIP_LOC = NULL <!-- TODO -->
+              ,SHIP_TO_NAME = #{fromShipToName}
+              ,SHIP_TO_ADDRESS1 = #{fromShipToAddress1}
+              ,SHIP_TO_POBOX = #{fromShipToPobox}
+              ,SHIP_TO_CITY = #{fromShipToCity}
+              ,SHIP_TO_ZIP = #{fromShipToZip}
+              ,SHIP_TO_COUNTRY = #{fromShipToCountry}
+              ,SHIP_TO_LZONE = #{fromShipToLzone}
+              ,SHIP_TO_STATE = #{fromShipToState}
+              ,SHIP_TO_TEL = #{fromShipToTel}
+              ,SHIP_TO_TEL_EXT = #{fromShipToTelext}
+              ,SHIP_TO_MOB = #{fromShipToMob}
+              ,SHIP_TO_FAX = #{fromShipToFax}
+              ,SHIP_TO_EMAIL = #{fromShipToEmail}
+              ,CUST_PO_NO = #{custPoNo}
+              ,PAY_METH = #{payMeth}
+              ,ORDR_ABBR = fn_get_ordr_abbr(#{ordrNo})
+              ,INV_FILE_INFO = #{INV_FILE_INFO}
+              <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ORDR_CLS_DATE)">
+              ,ORDR_CLS_DATE = FN_CONV_DATE( fn_null_date_fr(#{ORDR_CLS_DATE}))
+              </if>
+           <!-- ,GROS_AMT  = REPLACE(#{GROS_AMT},',','')-->
+              ,CHNG_ID = #{gsUserId}
+              ,CHNG_DATE = NOW()
+        WHERE  ORDR_NO   = #{ordrNo}
+    </update>
+    <update id="retnMastUpdate" parameterType="params">
+        UPDATE  RETN_MAST
+           SET  RETN_DO_NO           =  #{retnDoNo}
+               ,RETN_SO_NO           =  #{retnSoNo}
+               ,RETN_REF_NO          =  #{reference}
+	           ,TO_DEAL_CODE         =  #{toDealCode}
+	           ,TO_DEAL_NAME         =  #{toShipToName}
+	           ,TO_DEAL_ADDRESS1     =  #{toShipToAddress1}
+	           ,TO_DEAL_POBOX        =  #{toShipToPobox}
+	           ,TO_DEAL_ZIP          =  #{toShipToZip}
+	           ,TO_DEAL_COUNTRY      =  #{toShipToCountry}
+	           ,TO_DEAL_CITY         =  #{toShipToCity}
+	           ,TO_DEAL_LZONE        =  #{toShipToLzone}
+	           ,TO_DEAL_STATE        =  #{toShipToState}
+	           ,TO_DEAL_TEL          =  #{toShipToTel}
+	           ,TO_DEAL_TEL_EXT      =  #{toShipToTelext}
+	           ,TO_DEAL_MOB          =  #{toShipToMob}
+	           ,TO_DEAL_FAX          =  #{toShipToFax}
+	           ,TO_DEAL_EMAIL        =  #{toShipToEmail}
+	           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(retlDate)">
+	           ,RETL_DATE            =  FN_CONV_DATE( fn_null_date_fr(#{retlDate}))
+               </if>
+               
+               <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(trsfDate)">
+               ,TRSF_DATE            =  FN_CONV_DATE( fn_null_date_fr(#{trsfDate}))
+               </if>
+               ,APPRL_YN             =  #{RdDealerAppr}
+	           ,CHK_WELL_FARGO       =  #{chk_wf}
+	           ,CHK_DEAL             =  #{chk_deal}
+	           ,CHK_LS               =  #{chk_ls}
+	           ,RETN_RESN            =  #{retnResn}
+	           ,TRSF_RESN_RD         =  #{trsfResnRd}
+	           ,TRSF_RESN            =  #{trsfResn}
+	    <!--        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(moveDate)">
+	           ,MOVE_DATE            =  FN_CONV_DATE( fn_null_date_fr(#{moveDate}))
+	           </if>
+	           ,MOVE_ADDR            =  #{moveAddr}
+	           ,MOVE_WHY             =  #{moveWhy} -->
+	           ,SWAP_YN              =  #{swapYn}
+	           ,TRANS_YN             =  #{transYn}
+	           ,GRAD_YN              =  #{gradYn}
+	   <!--         ,SWAP_ONG_SERI_NO_01  =  #{swapOrgSeriNo_01}
+	           ,SWAP_ONG_SERI_NO_02  =  #{swapOrgSeriNo_02}
+	           ,SWAP_ONG_SERI_NO_03  =  #{swapOrgSeriNo_03}
+	           ,SWAP_ONG_SERI_NO_04  =  #{swapOrgSeriNo_04}
+	           ,SWAP_ONG_SERI_NO_05  =  #{swapOrgSeriNo_05}
+	           ,SWAP_SERI_NO_01      =  #{swapSeriNo_01}
+	           ,SWAP_SERI_NO_02      =  #{swapSeriNo_02}
+	           ,SWAP_SERI_NO_03      =  #{swapSeriNo_03}
+	           ,SWAP_SERI_NO_04      =  #{swapSeriNo_04}
+	           ,SWAP_SERI_NO_05      =  #{swapSeriNo_05}
+	           ,SWAP_REMK_01         =  #{swapRemkNo_01}
+	           ,SWAP_REMK_02         =  #{swapRemkNo_02}
+	           ,SWAP_REMK_03         =  #{swapRemkNo_03}
+	           ,SWAP_REMK_04         =  #{swapRemkNo_04}
+	           ,SWAP_REMK_05         =  #{swapRemkNo_05}-->
+	           ,FFR_NO               =  #{ffrNo}
+	           ,INST_DESC            =  #{instDesc}
+	           ,REMK                 =  #{remk}
+               ,CHNG_ID              = #{gsUserId}
+               ,CHNG_DATE            = NOW()
+        WHERE  RETN_NO               = #{ordrNo}
+    </update>
+    <update id="ordrMastUpdateOrg" parameterType="params">
+        UPDATE ORDR_MAST A, ORDR_MAST B
+           SET
+               A.GROS_AMT       = (SELECT  SUM(OI.ITEM_AMT) FROM ORDR_ITEM OI WHERE ORDR_NO=#{ordrNo} )
+             , A.ORDR_AMT       = (SELECT SUM(OI.ITEM_AMT) FROM ORDR_ITEM OI WHERE ORDR_NO=#{ordrNo} )
+             , A.DISC_AMT       = 0
+             , A.PAY_CURR       = B.PAY_CURR
+             , A.PAY_TO         = B.PAY_TO
+             , A.SALE_GRUP      = B.SALE_GRUP
+             , A.SHIP_LOC       = B.SHIP_LOC
+             , A.NATN_CODE      = B.NATN_CODE
+             , A.AREA_CODE      = B.AREA_CODE
+             , A.PLANT_PICKUP   = B.PLANT_PICKUP
+             , A.LS_SHIP_YN     = B.LS_SHIP_YN
+             , A.RETAIL_YN      = B.RETAIL_YN
+             , A.LTL_YN         = B.LTL_YN
+             , A.FULL_LOAD      = B.FULL_LOAD
+             , A.DROP_SHIP      = B.DROP_SHIP
+             , A.DEAL_CRET_IDX  = B.DEAL_CRET_IDX
+          <!--     , A.ORDR_CRET_USER = B.ORDR_CRET_USER-->
+             , A.CONF_MAIL_IDX  = B.CONF_MAIL_IDX
+             , A.DELI_ADDR      = B.DELI_ADDR
+             , A.ORDR_ABBR      = fn_get_ordr_abbr(#{ordrNo})
+        WHERE  A.ORDR_NO        = #{ordrNo}
+          AND  B.ORDR_NO        = #{retnDoNo}
+    </update>
+ <!--    <update id="ordrItemUpdateOrg" parameterType="params">
+        UPDATE ORDR_ITEM A, ORDR_ITEM B
+           SET A.ITEM_TYPE  = B.ITEM_TYPE
+             , A.ITEM_CODE  = B.ITEM_CODE
+             , A.ITEM_NAME  = B.ITEM_NAME
+             , A.ITEM_SPEC  = B.ITEM_SPEC
+             , A.ITEM_MODL  = B.ITEM_MODL
+             , A.ITEM_UNIT  = B.ITEM_UNIT
+             , A.ITEM_QTY   = B.ITEM_QTY
+             , A.DISC_TYPE  = B.DISC_TYPE
+             , A.DISC_VALU  = B.DISC_VALU
+             , A.SHIP_LOC   = B.SHIP_LOC
+             , A.STOR_LOC   = B.STOR_LOC
+             , A.UNUSE_DATE = B.UNUSE_DATE
+             , A.SYS_REMK   = B.SYS_REMK
+         WHERE A.ORDR_NO    = #{ordrNo}
+           AND B.ORDR_NO    = #{retnDoNo}
+           AND A.SHIP_SERI_NO = B.SHIP_SERI_NO
+    </update> -->
+    
+    <update id="ordrMastUpdateOrgHist" parameterType="params">
+        UPDATE ORDR_MAST A
+           SET A.ORDR_ABBR      = fn_get_ordr_abbr(#{ordrNo})
+             , A.GROS_AMT       = (SELECT  SUM(OI.ITEM_AMT) FROM ORDR_ITEM OI WHERE ORDR_NO=#{ordrNo} )
+             , A.ORDR_AMT       = (SELECT SUM(OI.ITEM_AMT) FROM ORDR_ITEM OI WHERE ORDR_NO=#{ordrNo} )
+             , A.DISC_AMT       = 0
+        WHERE  A.ORDR_NO        = #{ordrNo}
+    </update>
+ <!--    <update id="ordrItemUpdateOrgHist" parameterType="params">
+        UPDATE ORDR_ITEM A, MI_HIST B
+           SET A.ITEM_TYPE  = B.ITEM_TYPE
+             , A.ITEM_CODE  = B.ITEM_CODE
+             , A.ITEM_NAME  = B.ITEM_NAME
+             , A.ITEM_SPEC  = NULL
+             , A.ITEM_MODL  = B.ITEM_MODL
+             , A.ITEM_UNIT  = NULL
+             , A.ITEM_QTY   = NULL
+             , A.DISC_TYPE  = NULL
+             , A.DISC_VALU  = NULL
+             , A.SHIP_LOC   = NULL
+             , A.STOR_LOC   = NULL
+             , A.UNUSE_DATE = NULL
+             , A.SYS_REMK   = NULL
+         WHERE A.ORDR_NO    = #{ordrNo}
+           AND B.SALE_NO    = #{retnSoNo}
+           AND A.SHIP_SERI_NO = B.SERI_NO
+    </update> -->
+     <!-- 
+    <update id="retnMastUpdateOrg" parameterType="params">
+       UPDATE RETN_MAST
+           SET RETN_DO_NO = #{retnDoNo}
+             , RETN_SO_NO = #{retnSoNo}
+         WHERE RETN_NO    = #{ordrNo} 
+    </update>-->
+    <update id="ordrMastUpdateNotOrg" parameterType="params">
+        UPDATE ORDR_MAST
+           SET
+               ORDR_AMT     = NULL
+             , DISC_AMT     = NULL
+             , PAY_CURR     = NULL
+             , PAY_TO       = NULL
+             , SALE_GRUP    = NULL
+             , SHIP_LOC     = NULL
+             , NATN_CODE    = NULL
+             , AREA_CODE    = NULL
+             , PLANT_PICKUP = NULL
+             , LS_SHIP_YN   = NULL
+             , RETAIL_YN    = NULL
+             , LTL_YN       = NULL
+             , FULL_LOAD    = NULL
+             , DROP_SHIP    = NULL
+             , DEAL_CRET_IDX  = NULL
+           <!--   , ORDR_CRET_USER = NULL -->
+             , CONF_MAIL_IDX  = NULL
+             , DELI_ADDR      = NULL
+        WHERE  ORDR_NO        = #{ordrNo}
+    </update>
+    <select id="getWFInfo" parameterType="params" resultType="record">
+            SELECT FLOW_SEQ
+                  ,APPR_AUTH_CODE
+                  ,fn_get_code_name('RETN_STAT',FLOW_STAT,'en') AS FLOW_STAT
+                  ,APPR_USER
+                  ,DATE_FORMAT(APPR_DATE, '%m.%d.%Y') AS APPR_DATE
+                  ,APPR_YN
+                  ,APPR_COMT
+              FROM SYS_FLOW 
+             WHERE 
+                   SYS_ID     = #{sysId}
+               AND FLOW_NO    = #{ordrNo}
+             ORDER BY FLOW_SEQ
+    </select>
+    
+    <!-- 
+    <select id="setWFInfo" parameterType="params" resultType="record">
+        CALL SP_SYS_FLOW_CREATE(#{sysId},#{gsUserId},#{ordrNo}, #{ordrStat}, #{apprYn}, #{apprComt})
+    </select>
+    <select id="createTO" parameterType="params" resultType="record">
+        CALL SP_SYS_TO_CREATE(#{sysId},#{gsUserId},#{ordrNo}, #{ordrStat})
+    </select>
+    <update id="ordrStatUpdate">
+        UPDATE ORDR_MAST
+           SET ORDR_STAT = #{ordrStat}
+        WHERE  ORDR_NO   = #{ordrNo}
+    </update>
+     -->
+    <select id="update_Sts_Wf_Info" parameterType="params" resultType="record">
+        CALL SP_RETN_UPDATE_STS_WF(#{sysId},#{gsUserId},#{ordrNo}, #{apprYn}, #{apprComt})
+    </select>
+    
+    <select id="createTO" parameterType="params" resultType="record">
+        CALL SP_RETN_CREATE_TO(#{sysId},#{gsUserId},#{ordrNo})
+    </select>
+    
+    <select id="getRetnReviewMailInfo" parameterType="params" resultType="record">
+       <!-- CALL SP_ORDR_DETAIL_GET_RETN_REVIEW_MAIL_INFO(#{sysId},#{gsUserId},#{ordrStat},#{gsLang}, #{ordrNo}) --> 
+        CALL SP_ORDR_DETAIL_GET_RETN_REVIEW_MAIL_INFO(#{sysId},#{gsUserId},#{gsLang}, #{ordrNo})
+    </select>
+    
+    <select id="getRetnMailMainInfo" resultType="record" parameterType="params">
+        CALL SP_RETN_MAIL_GET_MAIN_ITEM_LIST(#{sysId},#{gsUserId},#{gsLang}, #{ordrNo}, 'MAIN')
+    </select>
+    
+    <select id="getRetnMailTrInfo" resultType="record" parameterType="params">
+        CALL SP_RETN_MAIL_GET_MAIN_ITEM_LIST(#{sysId},#{gsUserId},#{gsLang}, #{ordrNo}, 'TR')
+    </select>
+    
+    <select id="getRetnMailAttaInfo" resultType="record" parameterType="params">
+        CALL SP_RETN_MAIL_GET_MAIN_ITEM_LIST(#{sysId},#{gsUserId},#{gsLang}, #{ordrNo}, 'ATTA')
+    </select>
+    <select id="getOderInfo" resultType="record" parameterType="params">
+            SELECT
+	             ordrNo
+	            ,ordrType
+	            ,ordrStat
+	            ,ORG_AUTH_CODE
+	            ,createUser
+	            ,nowUser
+	            ,CASE WHEN ordrStat IN ('100','200','250') AND ORG_AUTH_CODE = 'BM' THEN 'Y' 
+	                  WHEN ordrStat IN ('200','350') AND ORG_AUTH_CODE = 'SALES' THEN 'Y' 
+	                  WHEN ordrStat IN ('300') AND  ORG_AUTH_CODE = 'SALES' THEN 'Y'
+	<!--                   WHEN ordrStat IN ('300') AND  ORG_AUTH_CODE = 'CEO' THEN 'Y' CEO 추후 추가 예정 -->
+				 ELSE 'N' END edit_YN 
+            FROM (
+                SELECT OM.ORDR_NO    AS ordrNo
+		              ,OM.ORDR_TYPE AS ordrType
+		              ,ORDR_STAT     AS ordrStat
+		<!--                ,CASE WHEN (SELECT CODE_CD FROM   SYS_CODE WHERE SYS_ID =  #{sysId} AND CODE_GRUP = 'RETN_MAIL'  AND CODE_NAME  = #{gsUserId}) = 'CEO' THEN 'CEO' CEO 추후 추가 예정 -->
+		              ,CASE WHEN (SELECT CODE_CD FROM   SYS_CODE WHERE SYS_ID =  #{sysId} AND CODE_GRUP = 'RETN_MAIL'  AND CODE_NAME  = #{gsUserId}) = 'SALES' THEN 'SALES' 
+		                    ELSE (SELECT ORG_AUTH_CODE FROM SYS_USER WHERE USER_ID = #{gsUserId}) END AS ORG_AUTH_CODE
+		              ,ORDR_CRET_USER AS createUser
+		              ,#{gsUserId} AS nowUser
+	             FROM ORDR_MAST OM
+	            WHERE OM.SYS_ID    =  #{sysId}
+	              AND OM.ORDR_NO   =  #{ordrNo})aa
+               
+    </select>
+    <select id="getCheckItem" parameterType="params" resultType="record">
+            SELECT CHEK_AREA
+                  ,CHEK_ITEM
+                  ,CHEK_METH
+                  ,CHEK_STAT
+                  ,CHEK_DECN
+                  ,ABNO_CONT
+                  ,CHEK_REMK
+                  ,(SELECT COUNT(1) FROM retn_chek_item B WHERE B.CHEK_AREA = A.CHEK_AREA AND B.RETN_NO = A.RETN_NO) AS ROWSPAN
+                  ,RETN_NO AS formatNo
+                  ,CHEK_SEQ
+            FROM retn_chek_item A
+            WHERE 
+                     SYS_ID  =  #{sysId}
+            AND      RETN_NO = ( SELECT retn_no from retn_chek_item WHERE RETN_NO IN ('20210101',#{retnNo}) ORDER by RETN_NO desc LIMIT 1)
+            ORDER BY CHEK_SEQ
+    </select>
+    
+    <select id="getCheckMiss" parameterType="params" resultType="record">
+            SELECT 
+              ITEM_CODE
+            , ITEM_NAME
+            , ITEM_QTY
+            , ITEM_CONT
+            ,'I' as oper
+            FROM retn_chek_part
+            WHERE 
+                 SYS_ID = 'IMMES'
+            AND RETN_NO = #{retnNo}
+            ORDER BY ITEM_CODE
+    </select>
+    <select id="getGrad" parameterType="params" resultType="record">
+            SELECT EVAL_TYPE
+                  ,EVAL_CONT
+                  ,EVAL_PONT
+                  ,EVAL_STD
+                  ,(SELECT COUNT(1) FROM retn_chek_grad B WHERE B.EVAL_TYPE = A.EVAL_TYPE AND B.RETN_NO = A.RETN_NO) AS COLSPAN
+                  ,RETN_NO AS formatNo
+                  ,EVAL_SEQ
+            FROM retn_chek_grad A
+            WHERE 
+                     SYS_ID  =  #{sysId}
+            AND      RETN_NO = ( SELECT retn_no from retn_chek_grad WHERE RETN_NO IN ('20210101',#{retnNo}) ORDER by RETN_NO desc LIMIT 1)
+            ORDER BY EVAL_TYPE,EVAL_SEQ
+    </select>
+    <select id="getCheckInfo" resultType="record" parameterType="params">
+            SELECT OM.ORDR_NO AS RETN_NO
+                  ,OM.ORDR_TYPE AS RETN_TYPE
+                  ,fn_get_code_name('RETURN_TYPE',OM.ORDR_TYPE,'en')	AS RETN_TYPE_NAME
+                  ,OM.REGI_DATE
+                  ,OM.REGI_ID
+                  ,OM.DEAL_CODE
+                  ,OM.DEAL_NAME
+                  ,OM.SHIP_TO_ADDRESS1
+                  ,INSP_DATE
+                  ,INSP_USER
+                  ,CASE WHEN IFNULL(RETN_MODL, '') = '' THEN OI.ITEM_MODL ELSE RETN_MODL END AS RETN_MODL
+                  ,RETN_CHAS_NO
+                  ,RETN_ENGN_NO
+                  ,RETN_WORK_HOUR
+                  ,INSP_TOT_GRAD
+                  ,INSP_GRAD_A
+                  ,INSP_GRAD_B
+                  ,INSP_GRAD_C
+                  ,APPR_REQR
+                  ,APPR_MNGR
+                  ,RETN_REMK
+                  ,SALED_DATE
+                  ,CHEK_DATE
+            FROM ORDR_MAST OM
+		    LEFT OUTER JOIN RETN_CHEK_MAST RCM
+                         ON RCM.SYS_ID    = OM.SYS_ID
+                        AND OM.ORDR_NO    = RCM.RETN_NO
+		    LEFT OUTER JOIN ordr_item OI
+                         ON OM.SYS_ID     = OI.SYS_ID
+                        AND OM.ORDR_NO    = OI.ORDR_NO
+                        AND OI.ITEM_TYPE  = 'TR'
+            WHERE OM.SYS_ID    = #{sysId}
+              AND OM.ORDR_NO   = #{retnNo}
+    </select>
+    <select id="getCheckAttLL" resultType="record" parameterType="params">
+            SELECT 
+             'LL' AS ITEM_TYPE
+            ,ITEM_MODL AS ITEM_MODL
+            ,ITEM_SERI_NO AS ITEM_SERI_NO
+            ,ITEM_BUCK_IDX AS ITEM_BUCK_IDX
+            ,ITEM_REMK AS ITEM_REMK
+            ,1 AS seq
+            FROM retn_chek_atta
+            WHERE SYS_ID    = #{sysId}
+              AND RETN_NO   = #{retnNo}
+              AND ITEM_TYPE = 'LL'
+            UNION
+            SELECT 
+             ITEM_TYPE AS ITEM_TYPE
+            ,ITEM_MODL AS ITEM_MODL
+            ,SHIP_SERI_NO AS ITEM_SERI_NO
+            ,'' AS ITEM_BUCK_IDX
+            ,'' AS ITEM_REMK
+            ,2 AS seq
+            FROM ordr_item
+            WHERE SYS_ID    = #{sysId}
+              AND ORDR_NO   = #{retnNo}
+              AND ITEM_TYPE = 'LL'
+              ORDER BY seq
+            LIMIT 1
+    </select>
+    <select id="getCheckAttLB" resultType="record" parameterType="params">
+            SELECT 
+             'LB' AS ITEM_TYPE
+            ,ITEM_MODL AS ITEM_MODL
+            ,ITEM_SERI_NO AS ITEM_SERI_NO
+            ,ITEM_BUCK_IDX AS ITEM_BUCK_IDX
+            ,ITEM_REMK AS ITEM_REMK
+            ,1 AS seq
+            FROM retn_chek_atta
+            WHERE SYS_ID    = #{sysId}
+              AND RETN_NO   = #{retnNo}
+              AND ITEM_TYPE = 'LB'
+            UNION
+            SELECT 
+             ITEM_TYPE AS ITEM_TYPE
+            ,ITEM_MODL AS ITEM_MODL
+            ,SHIP_SERI_NO AS ITEM_SERI_NO
+            ,'' AS ITEM_BUCK_IDX
+            ,'' AS ITEM_REMK
+            ,2 AS seq
+            FROM ordr_item
+            WHERE SYS_ID    = #{sysId}
+              AND ORDR_NO   = #{retnNo}
+              AND ITEM_TYPE = 'LB'
+              ORDER BY seq
+            LIMIT 1
+    </select>
+    <select id="getCheckAttOTH" resultType="record" parameterType="params">
+            SELECT 
+             'OTH' AS ITEM_TYPE
+            ,ITEM_MODL AS ITEM_MODL
+            ,ITEM_SERI_NO AS ITEM_SERI_NO
+            ,ITEM_BUCK_IDX AS ITEM_BUCK_IDX
+            ,ITEM_REMK AS ITEM_REMK
+            ,1 AS seq
+            FROM retn_chek_atta
+            WHERE SYS_ID    = #{sysId}
+              AND RETN_NO   = #{retnNo}
+              AND ITEM_TYPE = 'OTH'
+            UNION
+            SELECT 
+             'OTH' AS ITEM_TYPE
+            ,ITEM_MODL AS ITEM_MODL
+            ,SHIP_SERI_NO AS ITEM_SERI_NO
+            ,'' AS ITEM_BUCK_IDX
+            ,'' AS ITEM_REMK
+            ,2 AS seq
+            FROM ordr_item
+            WHERE SYS_ID    = #{sysId}
+              AND ORDR_NO   = #{retnNo}
+              AND ITEM_TYPE IN ('LM')
+              ORDER BY seq
+            LIMIT 1
+    </select>
+    <select id="mastSelectCnt" resultType="int" parameterType="params">
+            SELECT COUNT(1)
+            FROM   RETN_CHEK_MAST
+            WHERE  SYS_ID    = #{sysId}
+            AND    RETN_NO   = #{retnNo}
+    </select>
+    <update id="mastUpdate">
+            UPDATE RETN_CHEK_MAST
+               SET INSP_DATE     = NOW()
+                  ,INSP_USER     = #{gsUserId}
+                  <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(wsDate)">
+                  ,SALED_DATE    = FN_CONV_DATE( fn_null_date_fr(#{wsDate}))
+                  </if>
+                  <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(checkDate)">
+                  ,CHEK_DATE     = FN_CONV_DATE( fn_null_date_fr(#{checkDate}))
+                  </if>
+                  ,RETN_MODL     = #{trmodel}
+                  ,RETN_CHAS_NO  = #{chassis}
+                  ,RETN_ENGN_NO  = #{engine}
+                  ,RETN_WORK_HOUR= #{workH}
+                  ,INSP_TOT_GRAD = #{INSP_TOT_GRAD}
+                  ,INSP_GRAD_A   = #{INSP_GRAD_A}
+                  ,INSP_GRAD_B   = #{INSP_GRAD_B}
+                  ,INSP_GRAD_C   = #{INSP_GRAD_C}
+                  ,APPR_REQR     = #{gsUserId}
+              <!--     ,APPR_MNGR     = #{APPR_MNGR} -->
+                  ,RETN_REMK     = #{RETN_REMK}
+                  ,CHNG_ID       = #{gsUserId}
+                  ,CHNG_DATE     = NOW()
+            WHERE  SYS_ID    = #{sysId}
+            AND    RETN_NO   = #{retnNo}
+    </update>
+    <insert id="mastInsert">
+            INSERT  
+            INTO RETN_CHEK_MAST
+               ( SYS_ID
+                 ,RETN_NO
+                 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(wsDate)">
+                 ,SALED_DATE
+                 </if>
+                 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(checkDate)">
+                 ,CHEK_DATE
+                 </if>
+                 ,INSP_DATE
+                 ,INSP_USER
+                 ,RETN_MODL
+                 ,RETN_CHAS_NO
+                 ,RETN_ENGN_NO
+                 ,RETN_WORK_HOUR
+                 ,INSP_TOT_GRAD
+                 ,INSP_GRAD_A
+                 ,INSP_GRAD_B
+                 ,INSP_GRAD_C
+                 ,APPR_REQR
+        <!--          ,APPR_MNGR  -->
+                 ,RETN_REMK
+                 ,USE_IDX
+                 ,REGI_ID
+                 ,REGI_DATE)
+            VALUES
+               ( #{sysId}
+                ,#{retnNo}
+                <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(wsDate)">
+                ,FN_CONV_DATE( fn_null_date_fr(#{wsDate}))
+                </if>
+                <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(checkDate)">
+                ,FN_CONV_DATE( fn_null_date_fr(#{checkDate}))
+                </if>
+                ,NOW()
+                ,#{gsUserId}
+                ,#{trmodel}
+                ,#{chassis}
+                ,#{engine}
+                ,#{workH}
+                ,#{INSP_TOT_GRAD}
+                ,#{INSP_GRAD_A}
+                ,#{INSP_GRAD_B}
+                ,#{INSP_GRAD_C}
+                ,#{gsUserId}
+    <!--            ,#{APPR_MNGR}-->
+                ,#{RETN_REMK}
+                ,'Y'
+                ,#{gsUserId}
+                ,NOW())
+    </insert>
+    <select id="gradSelectCnt" resultType="int" parameterType="params">
+            SELECT COUNT(1)
+            FROM   RETN_CHEK_GRAD
+            WHERE  SYS_ID    = #{sysId}
+            AND    RETN_NO   = #{retnNo}
+    </select>
+    <update id="gradUpdate">
+            UPDATE RETN_CHEK_GRAD
+               SET EVAL_PONT     = #{grad_EVAL_PONT}
+                  ,CHNG_ID       = #{gsUserId}
+                  ,CHNG_DATE     = NOW()
+            WHERE  SYS_ID        = #{sysId}
+            AND    RETN_NO       = #{retnNo}
+            AND    EVAL_TYPE     = #{grad_EVAL_TYPE}
+            AND    EVAL_SEQ      = #{grad_EVAL_SEQ}
+    </update>
+    <insert id="gradInsert">
+            INSERT  
+            INTO RETN_CHEK_GRAD
+               ( SYS_ID
+                 ,RETN_NO
+                 ,EVAL_TYPE
+                 ,EVAL_SEQ
+                 ,EVAL_CONT
+                 ,EVAL_PONT
+                 ,EVAL_IDX
+                 ,EVAL_STD
+                 ,EVAL_REMK
+                 ,USE_IDX
+                 ,REGI_ID
+                 ,REGI_DATE)
+            VALUES
+               ( #{sysId}
+                ,#{retnNo}
+                ,#{grad_EVAL_TYPE}
+                ,#{grad_EVAL_SEQ}
+                ,(SELECT ST.EVAL_CONT FROM RETN_CHEK_GRAD ST WHERE ST.RETN_NO = #{grad_formatNo} AND ST.EVAL_TYPE = #{grad_EVAL_TYPE} AND ST.EVAL_SEQ = #{grad_EVAL_SEQ})
+                ,#{grad_EVAL_PONT}
+                ,#{EVAL_IDX}
+                ,(SELECT ST.EVAL_STD FROM RETN_CHEK_GRAD ST WHERE ST.RETN_NO = #{grad_formatNo} AND ST.EVAL_TYPE = #{grad_EVAL_TYPE}  AND ST.EVAL_SEQ = #{grad_EVAL_SEQ})
+                ,#{EVAL_REMK}
+                ,'Y'
+                ,#{gsUserId}
+                ,NOW())
+    </insert>
+    <select id="checkItemSelectCnt" resultType="int" parameterType="params">
+            SELECT COUNT(1)
+            FROM   RETN_CHEK_ITEM
+            WHERE  SYS_ID    = #{sysId}
+            AND    RETN_NO   = #{retnNo}
+    </select>
+    <update id="checkItemUpdate">
+            UPDATE RETN_CHEK_ITEM
+               SET CHEK_STAT     = #{ci_CHEK_STAT}
+                  ,CHEK_DECN     = #{ci_CHEK_DECN}
+                  ,ABNO_CONT     = #{ci_ABNO_CONT}
+                  ,CHEK_REMK     = #{ci_CHEK_REMK}
+                  ,CHNG_ID       = #{gsUserId}
+                  ,CHNG_DATE     = NOW()
+            WHERE  SYS_ID        = #{sysId}
+            AND    RETN_NO       = #{retnNo}
+            AND    CHEK_SEQ      = #{ci_CHEK_SEQ}
+    </update>
+    <insert id="checkItemInsert">
+            INSERT  
+            INTO RETN_CHEK_ITEM
+               ( SYS_ID
+                 ,RETN_NO
+                 ,CHEK_SEQ
+                 ,CHEK_AREA
+                 ,CHEK_ITEM
+                 ,CHEK_METH
+                 ,CHEK_STAT
+                 ,CHEK_DECN
+                 ,ABNO_CONT
+                 ,CHEK_REMK
+                 ,USE_IDX
+                 ,REGI_ID
+                 ,REGI_DATE)
+            VALUES
+               ( #{sysId}
+                ,#{retnNo}
+                ,#{ci_CHEK_SEQ}
+                ,(SELECT ST.CHEK_AREA FROM RETN_CHEK_ITEM ST WHERE ST.RETN_NO = #{ci_formatNo} AND ST.CHEK_SEQ = #{ci_CHEK_SEQ})
+                ,(SELECT ST.CHEK_ITEM FROM RETN_CHEK_ITEM ST WHERE ST.RETN_NO = #{ci_formatNo} AND ST.CHEK_SEQ = #{ci_CHEK_SEQ})
+                ,(SELECT ST.CHEK_METH FROM RETN_CHEK_ITEM ST WHERE ST.RETN_NO = #{ci_formatNo} AND ST.CHEK_SEQ = #{ci_CHEK_SEQ})
+                ,#{ci_CHEK_STAT}
+                ,#{ci_CHEK_DECN}
+                ,#{ci_ABNO_CONT}
+                ,#{ci_CHEK_REMK}
+                ,'Y'
+                ,#{gsUserId}
+                ,NOW())
+    </insert>
+    <select id="checkAttaSelectCnt" resultType="int" parameterType="params">
+            SELECT COUNT(1)
+            FROM   RETN_CHEK_ATTA
+            WHERE  SYS_ID    = #{sysId}
+            AND    RETN_NO   = #{retnNo}
+    </select>
+    <update id="checkAttaUpdate">
+            UPDATE RETN_CHEK_ATTA
+               SET ITEM_MODL     = #{att_model}
+                  ,ITEM_SERI_NO  = #{att_seriNo}
+                  ,ITEM_BUCK_IDX  = #{att_bucket}
+                  ,ITEM_REMK     = #{att_remark}
+                  ,CHNG_ID       = #{gsUserId}
+                  ,CHNG_DATE     = NOW()
+            WHERE  SYS_ID        = #{sysId}
+            AND    RETN_NO       = #{retnNo}
+            AND    ITEM_TYPE     = #{att_itemType} <!-- todo -->
+    </update>
+    <insert id="checkAttaInsert">
+            INSERT  
+            INTO RETN_CHEK_ATTA
+               ( SYS_ID
+                 ,RETN_NO
+                 ,ITEM_SEQ
+                 ,ITEM_TYPE
+                 ,ITEM_MODL
+                 ,ITEM_SERI_NO
+                 ,ITEM_BUCK_IDX
+                 ,ITEM_REMK
+                 ,USE_IDX
+                 ,REGI_ID
+                 ,REGI_DATE)
+            VALUES
+               ( #{sysId}
+                ,#{retnNo}
+                ,(SELECT IFNULL(MAX(OI.ITEM_SEQ),0) + 10 FROM RETN_CHEK_ATTA OI WHERE RETN_NO=#{retnNo} )
+                ,#{att_itemType}
+                ,#{att_model}
+                ,#{att_seriNo}
+                ,#{att_bucket}
+                ,#{att_remark}
+                ,'Y'
+                ,#{gsUserId}
+                ,NOW())
+    </insert>
+    <select id="checkPartSelectCnt" resultType="int" parameterType="params">
+            SELECT COUNT(1)
+            FROM   RETN_CHEK_PART
+            WHERE  SYS_ID    = #{sysId}
+            AND    RETN_NO   = #{retnNo}
+    </select>
+    <delete id="checkPartdelete" parameterType="params">
+            DELETE FROM RETN_CHEK_PART
+            WHERE  SYS_ID        = #{sysId}
+            AND    RETN_NO       = #{retnNo}
+    </delete>
+    <insert id="checkPartInsert">
+            INSERT  
+            INTO RETN_CHEK_PART
+               ( SYS_ID
+                 ,RETN_NO
+                 ,ITEM_SEQ
+                 ,ITEM_CODE
+                 ,ITEM_NAME
+                 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(part_ITEM_QTY)">
+                 ,ITEM_QTY
+                 </if>
+                 ,ITEM_CONT
+                 ,USE_IDX
+                 ,REGI_ID
+                 ,REGI_DATE)
+            VALUES
+               ( #{sysId}
+                ,#{retnNo}
+                ,(SELECT IFNULL(MAX(OI.ITEM_SEQ),0) + 10 FROM RETN_CHEK_PART OI WHERE RETN_NO=#{retnNo} )
+                ,#{part_ITEM_CODE}
+                ,#{part_ITEM_NAME}
+                <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(part_ITEM_QTY)">
+                ,#{part_ITEM_QTY}
+                </if>
+                ,#{part_ITEM_CONT}
+                ,'Y'
+                ,#{gsUserId}
+                ,NOW())
+    </insert>
+    <update id="UpdateCheckAppr">
+            UPDATE RETN_CHEK_MAST
+               SET APPR_MNGR     = #{gsUserId}
+                  ,CHNG_ID       = #{gsUserId}
+                  ,CHNG_DATE     = NOW()
+            WHERE  SYS_ID    = #{sysId}
+            AND    RETN_NO   = #{retnNo}
+    </update>
+    <delete id="chekMastDelete" parameterType="params">
+            DELETE FROM RETN_CHEK_MAST
+            WHERE  SYS_ID        = #{sysId}
+            AND    RETN_NO       = #{ordrNo}
+    </delete>
+    <delete id="chekAttaDelete" parameterType="params">
+            DELETE FROM RETN_CHEK_ATTA
+            WHERE  SYS_ID        = #{sysId}
+            AND    RETN_NO       = #{ordrNo}
+    </delete>
+    <delete id="chekGradDelete" parameterType="params">
+            DELETE FROM RETN_CHEK_GRAD
+            WHERE  SYS_ID        = #{sysId}
+            AND    RETN_NO       = #{ordrNo}
+    </delete>
+    <delete id="chekItemDelete" parameterType="params">
+            DELETE FROM RETN_CHEK_ITEM
+            WHERE  SYS_ID        = #{sysId}
+            AND    RETN_NO       = #{ordrNo}
+    </delete>
+    <delete id="chekPartDelete" parameterType="params">
+            DELETE FROM RETN_CHEK_PART
+            WHERE  SYS_ID        = #{sysId}
+            AND    RETN_NO       = #{ordrNo}
+    </delete>
+    
+    <select id="getRetnDealAddr" resultType="record" parameterType="params">
+    	CALL SP_ORDR_DETAIL_DL_GET_SHIP_ADDR(#{sysId}, #{dealCode}, #{gsLang})
+    </select>
+    
+    <select id="getRetnWHAddr" resultType="record" parameterType="params">
+    	CALL SP_ORDR_DETAIL_DL_GET_SHIP_ADDR(#{sysId}, #{dealCode}, #{gsLang})
+    </select>
+</mapper>

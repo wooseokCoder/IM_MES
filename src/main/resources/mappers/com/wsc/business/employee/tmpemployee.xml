@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.business.employee.tmpemployee">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+         	   A.REGI_DATE DESC
+         	  ,A.CHNG_DATE DESC
+	  	</if>
+    </sql>
+    
+    <sql id="selectColumns">
+         SYS_ID            AS "sysId"
+        ,CASE COMP_CODE WHEN 'A' THEN '' WHEN '01' THEN '국내사업부' WHEN '02' THEN '중국사업부'
+         ELSE COMP_CODE END AS "compCode"
+      	,EMPL_NO           AS "emplNo"
+      	,EMPL_TYPE		   AS "emplType"
+        ,EMPL_NAME         AS "emplName"
+        ,EMPL_NAME_ENG     AS "emplNameEng"
+        ,EMPL_NAME_HAN     AS "emplNameHan"
+        ,SOCI_SECU_NO      AS "sociSecuNo"
+        ,BIRTH_DAY         AS "birthDay"
+        ,SOL_LUN_CAL       AS "solLunCal"
+        ,GENDER            AS "gender"
+        ,JOIN_DAY          AS "joinDay"
+        ,DEPT_CODE         AS "deptCode"
+        ,fn_get_code_name('DEPT_CODE',DEPT_CODE, #{gsLang}) AS "deptName"  
+        ,UPPR_DEPT_CODE    AS "upprDeptCode"
+        ,fn_get_code_name('PST_TYPE',POSITION, #{gsLang}) AS "position"
+        ,BUSI_CHARGE AS "busiCharge"
+        ,CONCAT(fn_get_code_name('BUSI_CHARGE',SUBSTRING(REPLACE(BUSI_CHARGE,'/',''),1,2), #{gsLang})
+			  ,IF(
+				 IFNULL(SUBSTRING(REPLACE(BUSI_CHARGE,'/',''),3,2),'')
+				 ,CONCAT('/',fn_get_code_name('BUSI_CHARGE',SUBSTRING(REPLACE(BUSI_CHARGE,'/',''),3,2), #{gsLang}))
+				 ,''
+				)
+			 ,IF(
+				 IFNULL(SUBSTRING(REPLACE(BUSI_CHARGE,'/',''),5,2),'')
+				 ,CONCAT('/',fn_get_code_name('BUSI_CHARGE',SUBSTRING(REPLACE(BUSI_CHARGE,'/',''),5,2), #{gsLang}))
+				 ,''
+				)
+			) AS "busiChargeName"
+        ,ADDRESS           AS "address"
+        ,ADD_NO    	       AS "addNo"
+        ,BON_ADDRESS       AS "bonAddress"
+        ,BON_ADD_NO 	   AS "bonAddNo"
+        ,EMPL_TEL 	       AS "emplTel"
+        ,EMPL_HP		   AS "emplHp"
+        ,EMPL_MAIL         AS "emplMail"
+        ,BLOOD_TYPE        AS "bloodType"
+        ,HEIGTH            AS "heigth"
+        ,SIGHT             AS "sight"
+        ,HOBBY             AS "hobby"
+        ,RELIGION          AS "religion"
+        ,MEDICAL_HISTORY   AS "medicalHistory"
+        ,WEIGTH            AS "weigth"
+        ,GARDEN            AS "garden"
+        ,ESTATE            AS "estate"
+        ,DWELLING          AS "dwelling"
+        ,SITE              AS "site"
+        ,PHOTO             AS "photo"
+        ,EMPL_REMK         AS "emplRemk"
+		,fn_get_code_name('EXIT_YN',EXIT_YN, #{gsLang}) AS "exitYn"
+        ,EXIT_DATE         AS "exitDate"
+        ,REGI_ID           AS "regiId"
+        ,DATE_FORMAT(REGI_DATE      ,'%Y-%m-%d %H:%i:%s')
+                             AS "regiDate"
+        ,CHNG_ID           AS "chngId"
+        ,DATE_FORMAT(CHNG_DATE      ,'%Y-%m-%d %H:%i:%s')
+                             AS "chngDate"
+      </sql>
+      
+    <sql id="whereClause">
+        SYS_ID = #{sysId}
+        AND EMPL_TYPE='T'
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchEmplName    )">AND EMPL_NAME    LIKE CONCAT('%',#{searchEmplName},'%')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compCode    )">AND COMP_CODE        = #{compCode}       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchEmplNo)">AND EMPL_NO         = #{searchEmplNo}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode    )">AND DEPT_CODE       = #{deptCode}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptName    )">AND DEPT_NAME       = #{deptName}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(upprDeptCode)">AND UPPR_DEPT_CODE  = #{upprDeptCode}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplTel     )">AND EMPL_TEL        = #{emplTel}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplHp      )">AND EMPL_HP         = #{emplHp}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplMail    )">AND EMPL_MAIL       = #{emplMail}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplRemk    )">AND EMPL_REMK       = #{emplRemk}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(s_exitYn    )">AND EXIT_YN        = CASE WHEN #{s_exitYn} = 'ALL' THEN  EXIT_YN ELSE #{s_exitYn} END </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(s_busiCharge   )">AND BUSI_CHARGE  LIKE CONCAT('%',CASE WHEN #{s_busiCharge } = 'ALL' THEN  BUSI_CHARGE ELSE #{s_busiCharge} END ,'%')</if>
+        
+    </sql>
+   
+    <sql id="insertColumns-fields">
+  		  SYS_ID
+         , COMP_CODE
+         , EMPL_NO
+         , EMPL_TYPE
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplName   )">, EMPL_NAME</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNameEng)">, EMPL_NAME_ENG</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNameHan)">, EMPL_NAME_HAN</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sociSecuNo )">, SOCI_SECU_NO</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(birthDay   )">, BIRTH_DAY</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(solLunCal  )">, SOL_LUN_CAL</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gender     )">, GENDER</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(joinDay    )">, JOIN_DAY</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode   )">, DEPT_CODE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptName   )">, DEPT_NAME</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(upprDeptCode)">, UPPR_DEPT_CODE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(position   )">, POSITION</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(busiCharge )">, BUSI_CHARGE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(address    )">, ADDRESS</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addNo      )">, ADD_NO</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bonAddress )">, BON_ADDRESS</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bonAddNo   )">, BON_ADD_NO</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplTel    )">, EMPL_TEL</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplHp     )">, EMPL_HP</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplMail   )">, EMPL_MAIL</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bloodType  )">, BLOOD_TYPE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(heigth     )">, HEIGTH</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sight      )">, SIGHT</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(hobby      )">, HOBBY</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(religion   )">, RELIGION</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(medicalHistory)">, MEDICAL_HISTORY</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(weigth     )">, WEIGTH</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(garden     )">, GARDEN</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(estate     )">, ESTATE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dwelling   )">, DWELLING</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(site       )">, SITE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(photo      )">, PHOTO</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplRemk   )">, EMPL_REMK</if>
+         , EXIT_YN
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(exitDate   )">, EXIT_DATE</if>
+         , REGI_ID
+         , REGI_DATE
+    </sql>
+    
+    <sql id="insertColumns-values">
+           #{sysId}
+         , '01'
+         , #{emplNo}
+         , 'T'
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplName        )">, #{emplName}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNameEng     )">, #{emplNameEng}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNameHan     )">, #{emplNameHan}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sociSecuNo      )">, #{sociSecuNo}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(birthDay        )">, #{birthDay}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(solLunCal       )">, #{solLunCal}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gender          )">, #{gender}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(joinDay         )">, #{joinDay}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode        )">, #{deptCode}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptName        )">, #{deptName}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(upprDeptCode    )">, #{upprDeptCode}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(position        )">, #{position}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(busiCharge      )">, #{busiCharge}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(address         )">, #{address}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addNo           )">, #{addNo}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bonAddress      )">, #{bonAddress}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bonAddNo        )">, #{bonAddNo}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplTel         )">, #{emplTel}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplHp          )">, #{emplHp}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplMail        )">, #{emplMail}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bloodType       )">, #{bloodType}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(heigth          )">, #{heigth}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sight           )">, #{sight}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(hobby           )">, #{hobby}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(religion        )">, #{religion}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(medicalHistory  )">, #{medicalHistory}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(weigth          )">, #{weigth}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(garden          )">, #{garden}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(estate          )">, #{estate}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dwelling        )">, #{dwelling}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(site            )">, #{site}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(photo           )">, #{photo}</if>
+          , 'Y'
+<!--          <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(exitYn          )">, #{exitYn}</if> -->
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(exitDate        )">, #{exitDate}</if>
+         , #{gsUserId}
+         , NOW()
+    </sql>
+
+    <sql id="updateColumns">
+          CHNG_ID   = #{gsUserId}
+         ,CHNG_DATE = NOW()
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplName          )">,EMPL_NAME               =#{emplName}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNameEng      )">, EMPL_NAME_ENG          =#{emplNameEng}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNameHan      )">, EMPL_NAME_HAN          =#{emplNameHan}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sociSecuNo       )">, SOCI_SECU_NO           =#{sociSecuNo}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(birthDay         )">, BIRTH_DAY              =#{birthDay}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(solLunCal        )">, SOL_LUN_CAL            =#{solLunCal}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gender           )">, GENDER                 =#{gender}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(joinDay          )">, JOIN_DAY               =#{joinDay}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode         )">, DEPT_CODE              =#{deptCode}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptName         )">, DEPT_NAME              =#{deptName}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(upprDeptCode     )">, UPPR_DEPT_CODE         =#{upprDeptCode}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(position         )">, POSITION               =#{position}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(busiCharge       )">, BUSI_CHARGE            =#{busiCharge}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(address          )">, ADDRESS                =#{address}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addNo            )">, ADD_NO                 =#{addNo}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bonAddress       )">, BON_ADDRESS            =#{bonAddress}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bonAddNo         )">, BON_ADD_NO             =#{bonAddNo}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplTel          )">, EMPL_TEL               =#{emplTel}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplHp           )">, EMPL_HP                =#{emplHp}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplMail         )">, EMPL_MAIL              =#{emplMail}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bloodType        )">, BLOOD_TYPE             =#{bloodType}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(heigth           )">, HEIGTH                 =#{heigth}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sight            )">, SIGHT                  =#{sight}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(hobby            )">, HOBBY                  =#{hobby}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(religion         )">, RELIGION               =#{religion}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(medicalHistory   )">, MEDICAL_HISTORY        =#{medicalHistory}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(weigth           )">, WEIGTH                 =#{weigth}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(garden           )">, GARDEN                 =#{garden}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(estate           )">, ESTATE                 =#{estate}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dwelling         )">, DWELLING               =#{dwelling}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(site             )">, SITE                   =#{site}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(photo            )">, PHOTO                  =#{photo}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplRemk         )">, EMPL_REMK              =#{emplRemk}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(exitYn           )">, EXIT_YN                = #{exitYn}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(exitDate         )">, EXIT_DATE              =#{exitDate}</if>
+    </sql>
+    
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM EMPL_MAST A
+         WHERE <include refid="whereClause" />
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+   
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM EMPL_MAST A
+         WHERE <include refid="whereClause" />
+    </select>
+    
+    <select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM EMPL_MAST A
+         WHERE SYS_ID   = #{sysId}
+           AND EMPL_NO  = #{emplNo}
+    </select>
+    
+       <select id="searchAll" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+           FROM EMPL_MAST A
+         WHERE SYS_ID = #{sysId}
+         AND EMPL_NO  = #{emplNo}
+    </select>
+    
+    <select id="getEmplNo" resultType="record" parameterType="params">
+    	SELECT CONCAT('E', LPAD(CAST(ifnull(SUBSTR(MAX(EMPL_NO),2,5),'0') AS UNSIGNED)+1, 5, '0') ) AS "emplNo"
+          FROM EMPL_MAST
+         WHERE SYS_ID    = #{sysId}
+    </select>
+    
+    
+    <insert id="insert" parameterType="params">
+    <selectKey resultType="string" keyProperty="emplNo" order="BEFORE">
+            SELECT CONCAT('E', LPAD(CAST(ifnull(SUBSTR(MAX(EMPL_NO),2,5),'0') AS UNSIGNED)+1, 5, '0') ) AS "emplNo"
+              FROM EMPL_MAST
+             WHERE SYS_ID    = #{sysId}
+        </selectKey>
+        INSERT 
+          INTO EMPL_MAST 
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    
+    <update id="update" parameterType="params">
+        UPDATE EMPL_MAST
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID   = #{sysId}
+           AND EMPL_NO  = #{emplNo}        
+    </update>
+    
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM EMPL_MAST
+         WHERE SYS_ID   = #{sysId}
+           AND EMPL_NO  = #{emplNo}
+    </delete>
+
+</mapper>

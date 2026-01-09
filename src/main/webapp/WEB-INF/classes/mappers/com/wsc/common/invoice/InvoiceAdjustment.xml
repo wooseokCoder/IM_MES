@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.invoice.InvoiceAdjustment">
+    
+    <select id="search" resultType="record" parameterType="params">
+        CALL sp_search_invoice_adjust(#{sysId}, #{start}, #{end}, #{ordrNo}, #{selectDate}, #{shipDateFr}, #{shipDateTo}, #{ordrStat})
+    </select>
+    
+    <select id="searchCount" resultType="int" parameterType="params">
+        CALL sp_search_invoice_adjust_count(#{sysId}, #{ordrNo}, #{selectDate}, #{shipDateFr}, #{shipDateTo}, #{ordrStat})
+    </select>
+    
+    <update id="Invoiceadjustmentupdate" parameterType="params">
+        CALL sp_update_invoice_adjust(#{sysId}, #{gsUserId}, #{ordrNo}, #{ordrNoSap}, #{deliNoSap}, #{invNoSap}, #{invChgRemk})
+    </update>
+    
+    <!-- selectInfo -->
+    <select id="selectInfo" resultType="record" parameterType="params">
+		CALL sp_select_invoice_adjust(#{sysId}, #{ordrNo}, #{ordrSeq}, #{ordrStat})
+    </select>
+    
+    <update id="updateSapStat" parameterType="params">
+        CALL sp_update_invoice_adjust_inv_no(#{sysId}, #{ordrNo}, #{itemCode}, #{shipSeriNo}, #{updateType}, #{gsUserId})
+    </update>
+    
+    <update id="updateSapInv" parameterType="params">
+        CALL sp_update_invoice_adjust_inv_no(#{sysId}, #{ordrNo}, #{itemCode}, #{shipSeriNo}, #{updateType}, #{gsUserId})
+    </update>
+
+</mapper>

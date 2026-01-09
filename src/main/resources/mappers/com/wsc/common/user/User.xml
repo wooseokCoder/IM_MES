@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.user.User">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT *
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+         	   A.REGI_DATE DESC
+         	  ,A.CHNG_DATE DESC
+	  	</if>
+    </sql>
+
+    <sql id="selectColumns">
+         SYS_ID              AS "sysId"
+        ,USER_ID             AS "userId"
+        ,USER_NAME           AS "userName"
+        ,USER_PWD            AS "userPwd"
+        ,USER_TYPE           AS "userType"
+        ,MENU_SET           AS "menuSet"
+        ,MENU_TYPE           AS "menuType"
+        ,MOBILE_TYPE AS "mobileType"
+        ,ORG_AUTH_CODE       AS "orgAuthCode"
+        ,SPC_AUTH_CODE       AS "spcAuthCode"
+        ,IFNULL(DASH_TYPE, 'DT01')		     AS "dashType"
+        ,COM_CODE            AS "comCode"
+        ,COM_NAME            AS "comName"
+        ,EMPL_NO             AS "emplNo"
+        ,DEPT_CODE           AS "deptCode"
+        ,ifnull(DEPT_NAME,
+                 (SELECT CODE_NAME
+                    FROM SYS_CODE
+                   WHERE SYS_ID    = A.SYS_ID
+                     AND CODE_CD   = A.DEPT_CODE
+                     AND CODE_GRUP = 'DEPT_CODE')
+            )                AS "deptName"
+        ,UPPR_DEPT_CODE      AS "upprDeptCode"
+        ,USER_TEL            AS "userTel"
+        ,USER_HP             AS "userHp"
+        ,USER_MAIL           AS "userMail"
+        ,USER_REMK           AS "userRemk"
+        ,USE_FLAG            AS "useFlag"
+        ,REGI_ID             AS "regiId"
+        ,DATE_FORMAT(REGI_DATE      ,'%Y-%m-%d %H:%i:%s')
+                             AS "regiDate"
+        ,CHNG_ID             AS "chngId"
+        ,DATE_FORMAT(CHNG_DATE      ,'%Y-%m-%d %H:%i:%s')
+                             AS "chngDate"
+        ,DATE_FORMAT(PWD_CHNG_DATE  ,'%Y-%m-%d %H:%i:%s')
+                             AS "pwdChngDate"
+        ,DATE_FORMAT(LAST_LOGIN_DATE,'%Y-%m-%d %H:%i:%s')
+                             AS "lastLoginDate"
+        ,LOGIN_FAIL_CNT      AS "loginFailCnt"
+        ,(SELECT CODE_NAME
+            FROM SYS_CODE
+           WHERE SYS_ID    =A.SYS_ID
+             AND CODE_GRUP = 'USER_TYPE'
+             AND CODE_CD   =A.USER_TYPE
+             AND USE_FLAG  = 'Y'
+         )                   AS "userTypeDesc"
+        ,IFNULL(ID_SFDC, '') AS "idSfdc"
+        ,IFNULL(SFDC_FLAG, '') AS "sfdcFlag"
+        ,IFNULL(NOTI_ALLREAD_YN, '') AS "notiAllreadYn"
+    </sql>
+    <sql id="whereClause">
+        SYS_ID = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userId      )">AND USER_ID      LIKE CONCAT('%',#{userId},'%')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userName    )">AND USER_NAME    LIKE CONCAT('%',#{userName},'%')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userType    )">AND USER_TYPE       = #{userType}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(orgAuthCode )">AND ORG_AUTH_CODE   = #{orgAuthCode}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(spcAuthCode )">AND SPC_AUTH_CODE   = #{spcAuthCode}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comCode     )">AND COM_CODE        = #{comCode}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comName     )">AND COM_NAME        = #{comName}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNo      )">AND EMPL_NO         = #{emplNo}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode    )">AND DEPT_CODE       = #{deptCode}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptName    )">AND DEPT_NAME       = #{deptName}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(upprDeptCode)">AND UPPR_DEPT_CODE  = #{upprDeptCode}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userTel     )">AND USER_TEL        = #{userTel}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userHp      )">AND USER_HP         = #{userHp}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userMail    )">AND USER_MAIL       = #{userMail}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userRemk    )">AND USER_REMK       = #{userRemk}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag     )">AND USE_FLAG        = CASE WHEN #{useFlag} = 'ALL' THEN   USE_FLAG ELSE #{useFlag} END       </if>
+    </sql>
+
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , USER_ID
+         , USER_NAME
+         , USER_PWD
+         , USER_TYPE
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(orgAuthCode )">, ORG_AUTH_CODE   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(spcAuthCode )">, SPC_AUTH_CODE   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comCode     )">, COM_CODE        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comName     )">, COM_NAME        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNo      )">, EMPL_NO         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode    )">, DEPT_CODE       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptName    )">, DEPT_NAME       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(upprDeptCode)">, UPPR_DEPT_CODE  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userTel     )">, USER_TEL        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userHp      )">, USER_HP         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userMail    )">, USER_MAIL       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userRemk    )">, USER_REMK       </if>
+         , USE_FLAG
+         , REGI_ID
+         , REGI_DATE
+         , CHNG_ID
+         , CHNG_DATE
+         , PWD_CHNG_DATE
+    </sql>
+
+    <sql id="insertColumns-values">
+           #{sysId}
+         , #{userId}
+         , #{userName}
+         , #{userPwd}
+         , #{userType}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(orgAuthCode )">, #{orgAuthCode}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(spcAuthCode )">, #{spcAuthCode}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comCode     )">, #{comCode}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comName     )">, #{comName}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNo      )">, #{emplNo}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode    )">, #{deptCode}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptName    )">, #{deptName}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(upprDeptCode)">, #{upprDeptCode}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userTel     )">, #{userTel}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userHp      )">, #{userHp}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userMail    )">, #{userMail}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userRemk    )">, #{userRemk}        </if>
+         , 'Y'
+         , #{gsUserId}
+         , NOW()
+         , #{gsUserId}
+         , NOW()
+         , NOW()
+    </sql>
+
+    <sql id="updateColumns">
+           CHNG_ID   = #{gsUserId}
+         , CHNG_DATE = NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userName    )">, USER_NAME       = #{userName}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userType    )">, USER_TYPE       = #{userType}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(orgAuthCode )">, ORG_AUTH_CODE   = #{orgAuthCode}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(spcAuthCode )">, SPC_AUTH_CODE   = #{spcAuthCode}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comCode     )">, COM_CODE        = #{comCode}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comName     )">, COM_NAME        = #{comName}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNo      )">, EMPL_NO         = #{emplNo}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode    )">, DEPT_CODE       = #{deptCode}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptName    )">, DEPT_NAME       = #{deptName}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(upprDeptCode)">, UPPR_DEPT_CODE  = #{upprDeptCode}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userTel     )">, USER_TEL        = #{userTel}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userHp      )">, USER_HP         = #{userHp}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userMail    )">, USER_MAIL       = #{userMail}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userRemk    )">, USER_REMK       = #{userRemk}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag     )">, USE_FLAG        = #{useFlag}         </if>
+    </sql>
+
+
+    <select id="search" resultType="user" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_USER A
+         WHERE <include refid="whereClause" />
+         ORDER
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM SYS_USER A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="user" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM SYS_USER A
+         WHERE SYS_ID   = #{sysId}
+           AND USER_ID  = #{userId}
+           AND USE_FLAG !='N'
+    </select>
+
+    <insert id="insert" parameterType="params">
+        INSERT
+          INTO SYS_USER
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE SYS_USER
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID   = #{sysId}
+           AND USER_ID  = #{userId}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE
+          FROM SYS_USER
+         WHERE SYS_ID   = #{sysId}
+           AND USER_ID  = #{userId}
+    </delete>
+
+    <!-- 인증 체크 -->
+    <select id="checkPassword" parameterType="params" resultType="string">
+        SELECT CASE COUNT(1) WHEN 0 THEN 'X' ELSE 'O' END
+          FROM SYS_USER
+         WHERE SYS_ID   = #{sysId}
+           AND USER_ID  = #{userId}
+           AND (USER_PWD = HEX( AES_ENCRYPT( #{userId},#{userPwd}))
+                OR fn_chk_user_pwd(#{userPwd}) = 'Y')
+    </select>
+
+    <!-- 90일 동안 암호를 사용 체크-->
+    <select id="check90days" parameterType="params" resultType="string">
+        SELECT CASE WHEN DATE_FORMAT(NOW(), '%Y%m%d') <![CDATA[>]]> DATE_FORMAT( PWD_CHNG_DATE + INTERVAL 90 DAY, '%Y%m%d')  THEN 'X' ELSE 'O' END
+          FROM SYS_USER
+         WHERE SYS_ID   = #{sysId}
+           AND USER_ID  = #{userId}
+    </select>
+    
+    <!-- Bank User 체크-->
+    <select id="checkBankUser" parameterType="params" resultType="string">
+    	CALL sp_get_check_bank_user(#{sysId}, #{userId})
+    </select>
+    
+    <!-- ROOT 메뉴 체크-->
+    <select id="checkRootMenu" parameterType="params" resultType="string">
+        CALL sp_get_check_root_menu(#{sysId}, #{userId})
+    </select>
+    
+    <!-- 비밀번호 변경시 변경일시 업데이트 -->
+    <update id="updatePassword" parameterType="params">
+        UPDATE SYS_USER
+           SET CHNG_ID   = #{gsUserId}
+              ,CHNG_DATE = NOW()
+              ,USER_PWD  = HEX( AES_ENCRYPT( #{userId},#{userPwd}))
+         WHERE SYS_ID    = #{sysId}
+           AND USER_ID   = #{userId}
+    </update>
+
+    <!-- 로그인 실패시 실패카운트 증가 -->
+    <update id="updateFailure" parameterType="params">
+        UPDATE SYS_USER
+           SET LOGIN_FAIL_CNT = LOGIN_FAIL_CNT + 1
+         WHERE SYS_ID         = #{sysId}
+           AND USER_ID        = #{userId}
+    </update>
+
+    <!-- 로그인 성공시 실패카운트 리셋 및 최종로그인일시 업데이트 -->
+    <update id="updateSuccess" parameterType="params">
+        UPDATE SYS_USER
+           SET LOGIN_FAIL_CNT  = 0
+              ,LAST_LOGIN_DATE = NOW()
+         WHERE SYS_ID          = #{sysId}
+           AND USER_ID         = #{userId}
+    </update>
+
+	<select id="getUserType" resultType="string" parameterType="params">
+		SELECT USER_TYPE AS "userType"
+		  FROM SYS_USER
+		 WHERE SYS_ID = #{sysId}
+		   AND USER_ID = #{gsUserId}
+	</select>
+	
+	<select id="getUserGroup" resultType="string" parameterType="params">
+		SELECT GROUP_ID AS "groupId"
+		  FROM SYS_UGRP
+		 WHERE SYS_ID  = #{sysId}
+		   AND USER_ID = #{gsUserId}
+	</select>
+	
+	<select id="unsubscribeMail" resultType="string" parameterType="params">
+		CALL SP_SET_UNSUBSCRIBE_MAIL(#{sysId}, #{userId}, #{type})
+	</select>
+	
+	<select id="getExhbnImg" resultType="record" parameterType="params">
+		CALL sp_get_exhbn_image(#{code})
+	</select>
+	
+	<select id="getExhbnStates" resultType="record" parameterType="params">
+		CALL sp_get_exhbn_States()
+	</select>
+	
+	<select id="getExhbnStates2" resultType="record" parameterType="params">
+		CALL sp_get_exhbn_States2(#{COUNTRY})
+	</select>
+	
+	<select id="getCouponInfo" resultType="record" parameterType="params">
+		CALL sp_get_exhbn_coupon_info(#{code})
+	</select>
+	
+	<select id="getMailCheck" resultType="record" parameterType="params">
+		CALL sp_get_exhbn_mail_check(#{code}, #{email})
+	</select>
+	
+	<select id="saveCustInfo" resultType="record" parameterType="params">
+		CALL sp_save_exhbn_cust_info(#{code}, #{fristName}, #{lastName}, #{phone}, #{country}, #{addr}, #{city}, #{states}, #{zipCode}, #{email}, #{couponNo})
+	</select>
+	
+	<select id="getCouponCnt" resultType="record" parameterType="params">
+		CALL sp_get_exhbn_coupon_cnt(#{code})
+	</select>
+	
+	<select id="getSelectOldId" resultType="record" parameterType="params">
+		CALL SP_GET_SELECT_OLD_ID(#{sysId}, #{userId})
+	</select>
+	
+	
+</mapper>

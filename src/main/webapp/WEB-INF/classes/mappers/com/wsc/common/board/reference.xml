@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.board.Reference">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS "rnum"
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+	  		   A.BORD_SEQ  ASC
+	  		  ,A.REGI_DATE DESC
+	  	</if>
+    </sql>
+    
+    <sql id="selectColumns">
+         SYS_ID        AS "sysId"
+        ,BORD_NO       AS "bordNo"
+        ,BORD_GRUP     AS "bordGrup"
+        ,BORD_TITLE    AS "bordTitle"
+        ,BORD_TYPE     AS "bordType"
+        ,BORD_BGN      AS "bordBgn"
+        ,BORD_END      AS "bordEnd"
+        ,READ_CNT      AS "readCnt"
+        ,BORD_SEQ      AS "bordSeq"
+        ,BORD_PNO      AS "bordPno"
+        ,OPEN_TYPE     AS "openType"
+        ,USE_FLAG      AS "useFlag"
+        ,REGI_ID       AS "regiId"
+        ,DATE_FORMAT(REGI_DATE,'%Y-%m-%d %H:%i:%s')    
+                       AS "regiDate"
+        ,CHNG_ID       AS "chngId"
+        ,DATE_FORMAT(CHNG_DATE,'%Y-%m-%d %H:%i:%s')     
+                       AS "chngDate"
+		,(SELECT USER_NAME
+		    FROM SYS_USER
+		   WHERE SYS_ID  = A.SYS_ID
+		     AND USER_ID = A.REGI_ID
+		 )             AS "regiName"
+		,(SELECT USER_NAME
+		    FROM SYS_USER
+		   WHERE SYS_ID  = A.SYS_ID
+		     AND USER_ID = A.CHNG_ID
+		 )             AS "chngName"
+		,BORD_NO       AS "id"
+		,BORD_PNO      AS "parentId"
+		,CASE WHEN (SELECT COUNT(*)
+		              FROM SYS_BORD
+		             WHERE SYS_ID    = A.SYS_ID
+		               AND BORD_PNO  = A.BORD_NO
+		               AND BORD_GRUP = A.BORD_GRUP) = 0
+		      THEN 'open'
+		      ELSE 'closed'
+		 END           AS "state"
+		 ,(SELECT COUNT(Atch_No)
+		    FROM SYS_FILE
+		   WHERE SYS_ID    = A.SYS_ID
+		     AND ATCH_NO   = A.BORD_NO
+		     AND ATCH_GRUP = A.BORD_GRUP 
+		)              AS "fileCnt"
+    </sql>
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , BORD_NO
+         , BORD_GRUP
+         , BORD_TITLE
+         , READ_CNT
+         , BORD_SEQ
+         , USE_FLAG
+         , REGI_ID
+         , REGI_DATE
+         , CHNG_ID
+         , CHNG_DATE
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordType )">, BORD_TYPE  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordBgn  )">, BORD_BGN   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordEnd  )">, BORD_END   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordPno  )">, BORD_PNO   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(openType )">, OPEN_TYPE  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordText )">, BORD_TEXT  </if>
+    </sql>
+    <sql id="insertColumns-values">
+           #{sysId}
+         , #{bordNo}
+         , #{bordGrup}
+         , #{bordTitle}
+         , 0
+         , 999999999
+         , 'Y'
+         , #{gsUserId}
+         , NOW()
+         , #{gsUserId}
+         , NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordType )">, #{bordType}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordBgn  )">, #{bordBgn}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordEnd  )">, #{bordEnd}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordPno  )">, #{bordPno}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(openType )">, #{openType}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordText )">, #{bordText:BLOB}  </if>
+    </sql>
+    <sql id="updateColumns">
+           CHNG_ID   = #{gsUserId}
+         , CHNG_DATE = NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordTitle)">, BORD_TITLE = #{bordTitle}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordText )">, BORD_TEXT  = #{bordText:BLOB}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordType )">, BORD_TYPE  = #{bordType}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordBgn  )">, BORD_BGN   = #{bordBgn}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordEnd  )">, BORD_END   = #{bordEnd}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(readCnt  )">, READ_CNT   = #{readCnt}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordSeq  )">, BORD_SEQ   = #{bordSeq}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag  )">, USE_FLAG   = #{useFlag}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(openType )">, OPEN_TYPE  = #{openType}   </if>
+    </sql>
+    <sql id="whereClause">
+    		SYS_ID    = #{sysId}
+    	AND BORD_GRUP = #{bordGrup}
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag  )">AND USE_FLAG   = #{useFlag}    </if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(regiId   )">AND REGI_ID    = #{regiId}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordTitle)">AND BORD_TITLE LIKE CONCAT('%',#{bordTitle},'%')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordText )">AND BORD_TEXT  LIKE CONCAT('%',#{bordText},'%') </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordType )">AND BORD_TYPE  = #{bordType}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordBgn  )">AND BORD_BGN   = #{bordBgn}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordEnd  )">AND BORD_END   = #{bordEnd}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(openType )">AND OPEN_TYPE  = #{openType}   </if>
+        <!-- 검색조건,검색텍스트 입력시 -->
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchText) and @com.wsc.framework.utils.MybatisUtils@notEmpty(searchKey)">
+			<choose>
+	    		<when test="searchKey == 'S01'"> 
+	    			AND A.BORD_TITLE LIKE CONCAT('%',#{searchText},'%')
+	    		</when>
+	    		<when test="searchKey == 'S02'"> 
+	    			AND A.BORD_TEXT  LIKE CONCAT('%',#{searchText},'%')
+	    		</when>
+	    		<when test="searchKey == 'S03'"> 
+	    			AND EXISTS (
+	    			    SELECT 1
+	    			      FROM SYS_USER
+	    			     WHERE SYS_ID  = A.SYS_ID
+	    			       AND USER_ID = A.REGI_ID
+	    			       AND USER_NAME LIKE CONCAT('%',#{searchText},'%')
+	    			    )
+	    		</when>
+	    		<otherwise>
+	    		</otherwise>
+			</choose>
+	    </if>
+	    <!-- 답변게시판에서 트리검색시 사용 -->
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordPno)">
+            AND BORD_PNO = #{bordPno}    
+        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(bordPno)">
+            AND BORD_PNO IS NULL    
+        </if>
+        
+        <!-- 답변게시판(B04)의 경우 하위노드가 있는 경우 삭제글이 보임. -->
+        <if test='bordGrup == "B04"'>
+        	AND (   (USE_FLAG = 'Y')
+        	     OR (USE_FLAG = 'N' AND (SELECT COUNT(*) 
+        	                               FROM SYS_BORD
+        	                              WHERE SYS_ID    = A.SYS_ID
+        	                                AND BORD_PNO  = A.BORD_NO
+        	                                AND BORD_GRUP = A.BORD_GRUP
+        	                                AND USE_FLAG  = 'Y'
+        	                            ) <![CDATA[>]]> 0
+        	        
+        	        )
+        	    )
+        </if>
+        <!-- 현재기준(todayYn = 'Y')인 경우 -->
+        <if test='todayYn == "Y"'>
+           AND DATE_FORMAT(NOW(),'%Y-%m-%d') BETWEEN BORD_BGN AND BORD_END
+        </if>
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_BORD A
+         WHERE <include refid="whereClause" />
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_BORD A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+              ,BORD_TEXT  AS "bordText"
+          FROM SYS_BORD A
+         WHERE SYS_ID    = #{sysId}
+           AND BORD_NO   = #{bordNo}
+           AND BORD_GRUP = #{bordGrup}
+    </select>
+    <insert id="insert" parameterType="params">
+        <selectKey resultType="string" keyProperty="bordNo" order="BEFORE">
+            SELECT CONCAT('B', LPAD(CAST(ifnull(SUBSTR(MAX(BORD_NO),2,9),'0') AS UNSIGNED)+1, 9, '0') )
+                AS "bordNo"
+              FROM SYS_BORD
+             WHERE SYS_ID    = #{sysId}
+               AND BORD_GRUP = #{bordGrup}
+        </selectKey>
+        INSERT 
+          INTO SYS_BORD 
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE SYS_BORD
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID    = #{sysId}
+           AND BORD_NO   = #{bordNo}
+           AND BORD_GRUP = #{bordGrup}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM SYS_BORD
+         WHERE SYS_ID    = #{sysId}
+           AND BORD_NO   = #{bordNo}
+           AND BORD_GRUP = #{bordGrup}
+    </delete>
+    <update id="updateReadCnt" parameterType="params">
+        UPDATE SYS_BORD
+           SET READ_CNT  = READ_CNT + 1
+         WHERE SYS_ID    = #{sysId}
+           AND BORD_NO   = #{bordNo}
+           AND BORD_GRUP = #{bordGrup}
+    </update>
+    <update id="updateDisable" parameterType="params">
+        UPDATE SYS_BORD
+           SET CHNG_ID     = #{gsUserId}
+             , CHNG_DATE   = NOW()
+             , USE_FLAG    = 'N'
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+    </update>
+
+    <!-- ========================================================== -->
+    <!--   Board Target Management                                  -->
+    <!-- ========================================================== -->
+    <sql id="selectColumns-target">
+         A.SYS_ID        AS "sysId"
+        ,A.BORD_NO       AS "bordNo"
+        ,A.BORD_GRUP     AS "bordGrup"
+        ,A.TGT_USER_ID   AS "tgtUserId"
+        ,A.VNDR_CODE     AS "vndrCode"
+        ,A.VNDR_NAME     AS "vndrName"
+        ,A.SAVE_IDX      AS "saveIdx"
+        ,DATE_FORMAT(A.READ_DATE,'%Y-%m-%d %H:%i:%s')    
+                         AS "readDate"
+        ,A.USE_FLAG      AS "useFlag"
+        ,A.REGI_ID       AS "regiId"
+        ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')   
+                         AS "regiDate"
+        ,A.CHNG_ID       AS "chngId"
+        ,DATE_FORMAT(A.CHNG_DATE,'%Y-%m-%d %H:%i:%s') 
+                         AS "chngDate"
+        ,B.BORD_TITLE    AS "bordTitle"
+        ,B.BORD_TYPE     AS "bordType"
+        ,B.BORD_BGN      AS "bordBgn"
+        ,B.BORD_END      AS "bordEnd"
+        ,B.READ_CNT      AS "readCnt"
+        ,B.BORD_SEQ      AS "bordSeq"
+		,(SELECT USER_NAME
+		    FROM SYS_USER
+		   WHERE SYS_ID  = A.SYS_ID
+		     AND USER_ID = A.REGI_ID
+		 )               AS "regiName"
+		,(SELECT USER_NAME
+		    FROM SYS_USER
+		   WHERE SYS_ID  = A.SYS_ID
+		     AND USER_ID = A.CHNG_ID
+		 )               AS "chngName"
+		,(SELECT USER_NAME
+		    FROM SYS_USER
+		   WHERE SYS_ID  = A.SYS_ID
+		     AND USER_ID = A.TGT_USER_ID
+		 )               AS "tgtName"
+    </sql>
+    <sql id="whereClause-target">
+    	    A.SYS_ID    = #{sysId}
+    	AND A.BORD_GRUP = #{bordGrup}
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag  )">AND A.USE_FLAG    = #{useFlag}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordNo   )">AND A.BORD_NO     = #{bordNo}      </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode )">AND A.VNDR_CODE   = #{vndrCode}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName )">AND A.VNDR_NAME   = #{vndrName}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saveIdx  )">AND A.SAVE_IDX    = #{saveIdx}     </if>
+        <if test='"R".equals(pageType)'> AND A.TGT_USER_ID = #{gsUserId} </if><!-- 받은메일함인 경우 -->
+	    <if test='"S".equals(pageType)'> AND A.REGI_ID     = #{gsUserId} </if><!-- 보낸메일함인 경우 -->
+    </sql>
+
+    <select id="searchTarget" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns-target" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_BORD_TGT  A
+         INNER JOIN
+               SYS_BORD      B
+            ON B.SYS_ID      = A.SYS_ID
+  	       AND B.BORD_NO     = A.BORD_NO
+   	       AND B.BORD_GRUP   = A.BORD_GRUP
+         WHERE <include refid="whereClause-target" />
+         ORDER 
+            BY 
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+	  		   B.BORD_SEQ  ASC
+	  		  ,A.REGI_DATE DESC
+	  	</if>
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchTargetCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_BORD_TGT  A
+         INNER JOIN
+               SYS_BORD      B
+            ON B.SYS_ID      = A.SYS_ID
+  	       AND B.BORD_NO     = A.BORD_NO
+   	       AND B.BORD_GRUP   = A.BORD_GRUP
+         WHERE <include refid="whereClause-target" />
+    </select>
+    <select id="selectTarget" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns-target" />
+              ,B.BORD_TEXT  AS "bordText"
+          FROM SYS_BORD_TGT  A
+         INNER JOIN
+               SYS_BORD      B
+            ON B.SYS_ID      = A.SYS_ID
+  	       AND B.BORD_NO     = A.BORD_NO
+   	       AND B.BORD_GRUP   = A.BORD_GRUP
+         WHERE A.SYS_ID      = #{sysId}
+           AND A.BORD_NO     = #{bordNo}
+           AND A.BORD_GRUP   = #{bordGrup}
+           AND A.TGT_USER_ID = #{tgtUserId}
+		<if test="useFlag != null">
+		   AND A.USE_FLAG    = #{useFlag}
+		</if>
+    </select>
+    <insert id="insertTarget" parameterType="params">
+        INSERT 
+          INTO SYS_BORD_TGT
+             ( SYS_ID
+	         , BORD_NO
+	         , BORD_GRUP
+	         , TGT_USER_ID
+	         , VNDR_CODE
+	         , VNDR_NAME
+	         , USE_FLAG
+	         , REGI_ID
+	         , REGI_DATE
+	         , CHNG_ID
+	         , CHNG_DATE
+	         , READ_DATE
+             )
+        SELECT #{sysId}
+             , #{bordNo}
+             , #{bordGrup}
+             , A.USER_ID
+             , A.DEPT_CODE
+             , ifnull(A.DEPT_NAME, 
+                      fn_get_code_name('DEPT_CODE',A.DEPT_CODE, #{gsLang})
+               )
+             , 'Y'
+             , #{gsUserId}
+             , NOW()
+             , #{gsUserId}
+             , NOW()
+		<if test='"Y".equals(readYn) ==  true'>, NOW() </if>
+		<if test='"Y".equals(readYn) == false'>, NULL    </if>
+          FROM SYS_USER A
+         WHERE A.SYS_ID  = #{sysId}
+	    <if test="targets == null">
+           AND A.USER_ID = #{gsUserId}
+	    </if>
+	    <if test="targets != null">
+           AND A.USER_ID IN
+		  	<foreach item="item" index="index" collection="targets" open="(" separator="," close=")">
+		        #{item}
+		  	</foreach>
+	    </if>
+    </insert>
+    
+    <update id="updateTarget" parameterType="params">
+        UPDATE SYS_BORD_TGT
+           SET CHNG_ID     = #{gsUserId}
+             , CHNG_DATE   = NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode )">, VNDR_CODE = #{vndrCode} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName )">, VNDR_NAME = #{vndrName} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saveIdx  )">, SAVE_IDX  = #{saveIdx}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag  )">, USE_FLAG  = #{useFlag}  </if>
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+           AND TGT_USER_ID = #{tgtUserId}
+    </update>
+    <update id="updateTargetDisable" parameterType="params">
+        UPDATE SYS_BORD_TGT
+           SET CHNG_ID     = #{gsUserId}
+             , CHNG_DATE   = NOW()
+             , USE_FLAG    = 'N'
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+           AND TGT_USER_ID = #{tgtUserId}
+    </update>
+    
+    <delete id="deleteTargetAll" parameterType="params">
+        DELETE 
+          FROM SYS_BORD_TGT
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+    </delete>
+    <update id="updateTargetRead" parameterType="params">
+        UPDATE SYS_BORD_TGT
+           SET READ_DATE   = NOW()
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+           AND TGT_USER_ID = #{tgtUserId}
+    </update>
+
+</mapper>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.business.item.ModelManagement">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    
+    <sql id="selectColumns">
+         A.MODEL_NO        AS "modelNo"
+        ,A.MODEL_NAME      AS "modelName"
+        ,A.BARCODE    	   AS "barCode"
+        ,A.ADM_IDX   	   AS "admIdx"
+        ,A.MODEL_LOC       AS "modelLoc"
+        ,A.STAF_NAME       AS "stafName"
+        ,A.REMK       	   AS "modelRemk"
+    </sql>
+    <sql id="whereClause">
+    		A.SYS_ID    = #{sysId}
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelName)">AND MODEL_NO LIKE CONCAT('%',#{modelName},'%')</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(admIdx   )">AND ADM_IDX    = #{admIdx}</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelLoc )">AND MODEL_LOC  = #{modelLoc}</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafName )">AND STAF_NAME  LIKE CONCAT('%',#{stafName},'%')</if>
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM MODEL_MAST A
+         WHERE <include refid="whereClause" />
+         ORDER
+            BY A.MODEL_NO ASC, A.MODEL_NAME ASC
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM MODEL_MAST A
+         WHERE <include refid="whereClause" />
+    </select>
+    
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , MODEL_NO
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelName)">, MODEL_NAME </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelLoc )">, MODEL_LOC  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(barCode  )">, BARCODE    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(admIdx   )">, ADM_IDX    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafName )">, STAF_NAME  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelRemk)">, REMK 	  </if>
+         , USE_IDX
+         , REGI_ID
+         , REGI_DATE
+    </sql>
+    
+    <sql id="insertColumns-values">
+           #{sysId}
+         , #{modelNo}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelName)">, #{modelName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelLoc )">, #{modelLoc}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(barCode  )">, #{barCode}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(admIdx   )">, #{admIdx}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafName )">, #{stafName}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelRemk)">, #{modelRemk}  </if>
+         , 'Y'                                                            
+         , #{gsUserId}                                                    
+         , NOW()
+    </sql>
+
+    <sql id="updateColumns">
+           CHNG_ID   = #{gsUserId}
+         , CHNG_DATE = NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(barCode  )">, BARCODE   = #{barCode}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(admIdx   )">, ADM_IDX   = #{admIdx}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelLoc )">, MODEL_LOC = #{modelLoc}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafName )">, STAF_NAME = #{stafName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelRemk)">, REMK      = #{modelRemk} </if>
+    </sql>
+    
+    <select id="select" resultType="menu" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM MODEL_MAST A
+         WHERE SYS_ID   = #{sysId}
+           AND MODEL_NO = #{modelNo}
+    </select>
+    <insert id="insert" parameterType="params">
+        INSERT 
+          INTO MODEL_MAST
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE MODEL_MAST
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID    = #{sysId}
+           AND MODEL_NO  = #{modelNo}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM MODEL_MAST
+         WHERE SYS_ID    = #{sysId}
+           AND MODEL_NO  = #{modelNo}
+    </delete>
+    
+</mapper>

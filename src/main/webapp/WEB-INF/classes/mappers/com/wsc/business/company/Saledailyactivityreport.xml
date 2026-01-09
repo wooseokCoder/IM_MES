@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wsc.business.company.Saledailyactivityreport">
+
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS "rnum"
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT *
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+	  		  SHET_NO DESC, SHET_DATE DESC
+	  	</if>
+    </sql>
+
+    <sql id="whereClause">
+    		SYS_ID    = #{sysId}
+    	AND SHET_TYPE  = 'D'
+    	<choose>
+    		<when test="@com.wsc.framework.utils.MybatisUtils@notEmpty(date1) and @com.wsc.framework.utils.MybatisUtils@notEmpty(date2)">
+    			AND SHET_DATE   BETWEEN #{date1} AND #{date2}
+    		</when>
+    		<otherwise>
+    			AND SHET_DATE   BETWEEN DATE_FORMAT(NOW(),'%Y-%m-%d') AND DATE_FORMAT(NOW(),'%Y-%m-%d')
+    		</otherwise>
+    	</choose>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(salEply)">AND STAF_NAME LIKE (SELECT SB.CODE_NAME
+																																	        FROM SYS_CODE SB
+																																	        WHERE     SB.SYS_ID = A.SYS_ID
+																																	              AND SB.CODE_CD = #{salEply}
+																																	              AND SB.CODE_GRUP = 'SAL_EPLY_TYPE') </if>
+
+		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchStafDept  )">AND STAF_DEPT   = #{searchStafDept}    </if>
+
+    </sql>
+
+    <sql id="selectColumns">
+	   SYS_ID 			AS "sysId"
+     , SHET_TYPE    	AS "shetType"
+     , fn_get_code_name('SHET_TYPE',A.SHET_TYPE, #{gsLang}) AS "shetName"
+     , SHET_NO      	AS "shetNo"
+     , SHET_DATE    	AS "shetDate"
+     , CUST_CODE    	AS "custCode"
+     , CUST_NAME    	AS "custName"
+     , SHOP_NAME    	AS "shopName"
+     , SHET_AMT     	AS "shetAmt"
+     , SHET_TAX     	AS "shetTax"
+     , SHET_TOT     	AS "shetTot"
+     , TOT_BAL_AMT  	AS "totBalAmt"
+     , TOT_COST     	AS "totCost"
+     , TAX_IDX      	AS "taxIdx"
+     , PRE_REM_IDX  	AS "preRemIdx"
+     , DEC_LEN      	AS "decLen"
+     , DISC_RATE    	AS "discRate"
+     , TAX_PRNT_IDX  	AS "taxPrntIdx"
+     , TAX_SAVE_IDX  	AS "taxSaveIdx"
+     , REMK1        	AS "remk1"
+     , REMK2        	AS "remk2"
+     , REMK3        	AS "remk3"
+     , REMK4        	AS "remk4"
+     , REMK5        	AS "remk5"
+     , USE_IDX      	AS "useIdx"
+     , BIZ_GP			AS "bizGp"
+     , fn_get_code_name('BSNS_PT_TYPE',A.BIZ_GP, #{gsLang}) AS "bizName"
+     , STAF_DEPT		AS "stafDept"
+     , STAF_NAME		AS "stafName"
+     , COMP_TEL     	AS "compTel"
+     , COMP_FAX     	AS "compFax"
+     , COMP_MAIL    	AS "compMail"
+     , REGI_DATE 		AS "regiDate"
+     , REGI_ID    		AS "regiUser"
+     , CHNG_DATE 		AS "updtDate"
+     , CHNG_ID    		AS "updtUser"
+     , CONCAT(SHET_NO,'::',SHET_TYPE) 	AS "shetNoType"
+     , CONCAT(SHET_TYPE,SHET_NO) 		AS "shetNT"
+ 	 , SHET_NO				AS "estimateNo"
+     , (SELECT SB2.USER_NAME FROM SYS_USER SB2 WHERE  SB2.SYS_ID = A.SYS_ID AND SB2.USER_ID = A.REGI_ID ) AS "userName"
+<!--      , (SELECT fn_get_last_misu(A.SYS_ID,A.CUST_CODE,DATE_FORMAT(now(),'%Y-%m-%d')) FROM CUST_MAST C1 WHERE C1.SYS_ID = #{sysId} AND C1.SYS_ID = A.SYS_ID AND C1.CUST_CODE = A.CUST_CODE) AS "payableAmt" -->
+     , '' AS "payableAmt"
+     , (SELECT C2.LIMIT_AMT FROM CUST_MAST C2 WHERE C2.SYS_ID = #{sysId} AND  C2.SYS_ID = A.SYS_ID AND C2.CUST_CODE = A.CUST_CODE) AS "creditAmt"
+     , (SELECT SB3.USER_NAME FROM SYS_USER SB3 WHERE  SB3.SYS_ID = A.SYS_ID AND SB3.USER_ID = A.RECEIPT_NAME ) AS "receiptName"
+     , SHOP_STAF_NAME 	AS "shopStafName"
+     , COMP_STAF_NAME 	AS "compStafName"
+     , TAX_TYPE 		AS "taxType"
+     , PAY_TYPE 		AS "payType"
+     , fn_get_code_name('PAY_TYPE',A.PAY_TYPE, #{gsLang}) AS "payTypeName"
+     , BILL_SITE 		AS "billSite"
+     , SHOP_ACC_NAME 	AS "shopAccName"
+     , SHOP_ACC_TEL 	AS "shopAccTel"
+     , SEND_TYPE 		AS "sendType"
+     , fn_get_code_name('SEND_TYPE',A.SEND_TYPE, #{gsLang}) AS "sendTypeName"
+     , SUPPLY_NAME 		AS "supplyName"
+     , DUE_DATE 		AS "dueDate"
+     , PAY_DATE 		AS "payDate"
+     , AUTO_YN 		    AS "autoYn"
+     , UNSTOR_DEPOT 	AS "unstorDepot"
+	 , fn_get_code_name('STRG_TYPE',A.UNSTOR_DEPOT, #{gsLang}) AS "unstorDepotName"
+     , FREE_YN		AS "freeYN"
+     , QC_YN		AS "qcYN"
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SHET_MAST A
+         WHERE <include refid="whereClause" />
+         ORDER
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT count(1)
+          FROM SHET_MAST A
+         WHERE <include refid="whereClause" />
+    </select>
+
+    <delete id="delete" parameterType="params">
+	    DELETE
+		  FROM SHET_MAST
+		 WHERE SHET_NO = #{shetNo}
+		   AND SHET_TYPE = #{shetType}
+		   AND SYS_ID = #{sysId}
+    </delete>
+
+	<sql id="selectFootColumns">
+       SYS_ID       AS "sysId"
+     , SHET_TYPE    AS "shetType"
+     , SHET_NO      AS "shetNo"
+     , SHET_SEQ     AS "shetSeq"
+     , SHET_DATE    AS "shetDate"
+     , ITEM_CODE    AS "itemCode"
+     , ITEM_NAME    AS "itemName"
+     , ITEM_SPEC    AS "itemSpec"
+     , ITEM_UNIT    AS "itemUnit"
+     , ITEM_QTY     AS "itemQty"
+     , ITEM_QTY     AS "itemQty_org"
+     , ITEM_PRCE    AS "itemPrce"
+     , TOT_PRCE		AS "totPrce"
+     , ITEM_COST    AS "itemCost"
+     , TOT_TAX      AS "totTax"
+     , TOT_AMT      AS "totAmt"
+     , base_prce    AS "basePrce"
+     , DISC_RATE    AS "discRate"
+     , PURC_PRCE    AS "purcPrce"
+     , SALE_PRCE    AS "salePrce"
+     , ON_HAND_QTY  AS "onHandQty"
+     , LAST_TRAD    AS "lastTrad"
+     , LAST_PRCE    AS "lastPrce"
+     , MARGIN_RATE  AS "marginRate"
+     , CUST_CODE    AS "custCode"
+     , CUST_NAME	AS "custName"
+     , SHOP_NAME    AS "shopName"
+     , REMK         AS "remk"
+     , USE_IDX      AS "useIdx"
+     , REGI_DATE	AS "regiDate"
+     , REGI_ID	AS "regiUser"
+     , CHNG_DATE	AS "updtDate"
+     , CHNG_ID	AS "updtUser"
+     , 'R'          AS "rowStat"
+     , CONCAT(SHET_NO,'::',SHET_SEQ) AS "shetNoSeq"
+     , ITEM_PRCE 	AS "itemPrceTemp"
+     , UNSTOR_DEPOT AS "unstorDepot1"
+	</sql>
+    <sql id="whereFootClause">
+    		SYS_ID    = #{sysId}
+    	<choose>
+    		<when test="@com.wsc.framework.utils.MybatisUtils@notEmpty(hShetType)">
+    			AND SHET_TYPE = #{hShetType}
+    		</when>
+    		<otherwise>
+    			AND SHET_TYPE = ''
+    		</otherwise>
+    	</choose>
+
+    	<choose>
+    		<when test="@com.wsc.framework.utils.MybatisUtils@notEmpty(hShetNo)">
+    			AND SHET_NO   = #{hShetNo}
+    		</when>
+    		<otherwise>
+    			AND SHET_NO = ''
+    		</otherwise>
+    	</choose>
+
+
+    </sql>
+    <select id="foot" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectFootColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM shet_detl A
+         WHERE <include refid="whereFootClause" />
+         ORDER
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+
+    <select id="footCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM shet_detl A
+         WHERE <include refid="whereFootClause" />
+    </select>
+
+
+     <sql id="selectCustColumns">
+                SYS_ID       AS "sysId"
+     , CUST_CODE    AS "custCode"
+     , CUST_NAME 	AS "custName"
+     , CUST_INFO_NAME	AS "custInfoName"
+     , fn_get_code_name('CUST_TYPE',A.CUST_TYPE, #{gsLang}) AS "custTypeName"
+     , CUST_TYPE	AS "custType"
+     , SHOP_NAME 	AS "shopName"
+     , MARGIN_RATE  AS "marginRate"
+     , CARRY_AMT 	AS "carryAmt"
+     , BIZ_NO 		AS "bizNo"
+     , BIZ_CLSS 	AS "bizClss"
+     , BIZ_TYPE 	AS "bizType"
+     , ADDR_MAIN 	AS "addrMain"
+     , ADDR_SUB 	AS "addrSub"
+     , ADDR_ZIP 	AS "addrZip"
+     , OWN_NAME 	AS "ownName"
+     , OWN_HP 		AS "ownHp"
+     , COMP_TEL1 	AS "compTel1"
+     , COMP_TEL2 	AS "compTel2"
+     , COMP_FAX 	AS "compFax"
+     , COMP_MAIL 	AS "compMail"
+     , COMP_HOME 	AS "compHome"
+     , COMP_STAF_NAME 	AS "stafName"
+     , COMP_STAF_HP 	AS "stafHp"
+     , COMP_STAF_TEL1 	AS "stafTel1"
+     , COMP_STAF_TEL2 	AS "stafTel2"
+     , COMP_STAF_MAIL 	AS "stafMail"
+     , CUST_REMK 	AS "custRemk"
+     , CUST_MEMO 	AS "custMemo"
+     , USE_IDX 		AS "useIdx"
+     , REGI_DATE 	AS "regiDate"
+     , REGI_ID 	AS "regiUser"
+     , CHNG_DATE 	AS "updtDate"
+     , CHNG_ID	AS "updtUser"
+     ,PAYABLE_AMT    AS "payableAmt"
+     <!--  , fn_get_last_misu(A.SYS_ID,A.CUST_CODE,DATE_FORMAT(now(),'%Y-%m-%d')) as "payableAmt"   -->
+     , LIMIT_AMT  AS "creditAmt"
+    </sql>
+    <sql id="whereCustClause">
+	       SYS_ID = #{sysId}
+	   AND USE_IDX = 'Y'
+	   <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pCustName)"> AND ( CUST_NAME LIKE CONCAT('%',#{pCustName},'%') OR CUST_INFO_NAME LIKE CONCAT('%',#{pCustName},'%'))</if>
+	 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pCustType)"> AND CUST_TYPE = #{pCustType}      	  </if>
+	   <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pOwnName)"> AND ( OWN_NAME LIKE CONCAT('%',#{pOwnName},'%') )</if>
+    </sql>
+    <sql id="sortCustClause">
+     SYS_ID, CUST_NAME
+    </sql>
+
+    <select id="cust" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectCustColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM cust_mast A
+         WHERE <include refid="whereCustClause" />
+         ORDER
+            BY <include refid="sortCustClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+
+    <select id="custCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM cust_mast A
+         WHERE <include refid="whereCustClause" />
+    </select>
+
+    <sql id="insertShetMast-fields">
+          SYS_ID
+		, SHET_TYPE
+        , SHET_NO
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(shetDate  	)">, SHET_DATE  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custCode  	)">, CUST_CODE	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custName  	)">, CUST_NAME	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(remk1  	)">, REMK1		</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(remk3  	)">, REMK3		</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useIdx  	)">, USE_IDX		</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafName	)">, STAF_NAME		</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafDept  		)">, STAF_DEPT </if>
+        , REGI_DATE
+        , REGI_ID
+    </sql>
+
+    <sql id="insertShetMast-values">
+		  #{sysId}
+		, #{shetType}
+        , #{shetNo}
+       	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(shetDate  	)">, #{shetDate}	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custCode  	)">, #{custCode}	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custName  	)">, #{custName}	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(remk1  	)">, #{remk1}	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(remk3  	)">, #{remk3}	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useIdx  	)">, #{useIdx}	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafName	)">, #{stafName}	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafDept  		)">,#{stafDept}</if>
+        , DATE_FORMAT(NOW(),'%Y%m%d%H%i%s')
+        , #{gsUserId}
+    </sql>
+
+    <!-- 전표등록 마스터 등록 -->
+	<insert id="SaledailyactivityreportinsertShetMast" parameterType="params">
+		INSERT INTO SHET_MAST(<include refid="insertShetMast-fields" />)
+		              VALUES(<include refid="insertShetMast-values" />)
+	</insert>
+
+	<sql id="insertShetMast-updates">
+	      CHNG_DATE = DATE_FORMAT(NOW(),'%Y%m%d%H%i%s')
+		, CHNG_ID   = #{gsUserId}
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(shetDate   )">, SHET_DATE  = #{shetDate}	</if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custCode   )">, CUST_CODE  = #{custCode}	</if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custName   )">, CUST_NAME  = #{custName}	</if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafName   )">, STAF_NAME  = #{stafName}	</if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafDept  		)">, STAF_DEPT = #{stafDept} </if>
+	    ,REMK1		= IFNULL(#{remk1},"")
+	    ,REMK3		= IFNULL(#{remk3},"")
+	</sql>
+
+
+	<!-- 전표등록 마스터 갱신 -->
+	<update id="SaledailyactivityreportupdateShetMast" parameterType="params">
+		UPDATE SHET_MAST
+		   SET <include refid="insertShetMast-updates" />
+		 WHERE SYS_ID 		= #{sysId}
+		   AND SHET_TYPE 	= #{shetType}
+		   AND SHET_NO 		= #{shetNo}
+	</update>
+
+	<sql id="insertShetMastDetl-fields">
+		  SYS_ID
+        , SHET_TYPE
+        , SHET_NO
+        , SHET_SEQ
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(shetDate  )">, SHET_DATE  	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custCode  )">, CUST_CODE	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custName  )">, CUST_NAME	</if>
+        , TOT_AMT
+        , ITEM_PRCE
+        , ITEM_COST
+        , TOT_PRCE
+        , TOT_TAX
+        , REMK
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useIdx    )">, USE_IDX		</if>
+        , REGI_DATE
+        , REGI_ID
+	</sql>
+
+	<sql id="insertShetMastDetl-values">
+		  #{sysId}
+        , #{shetType}
+        , #{shetNo}
+        , (SELECT * FROM(SELECT IFNULL(MAX(SHET_SEQ)+1,1) FROM SHET_DETL WHERE SYS_ID = #{sysId} AND SHET_TYPE = #{shetType} AND SHET_NO = #{shetNo}) AS TEMP)
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(shetDate  )">, #{shetDate}		</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custCode  )">, #{custCode}		</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custName  )">, #{custName}		</if>
+        , IF(#{totAmt}="",0,#{totAmt})
+        , IF(#{itemPrce}="",0,#{itemPrce})
+        , IF(#{itemCost}="",0,#{itemCost})
+        , IF(#{totPrce}="",0,#{totPrce})
+        , IF(#{totTax}="",0,#{totTax})
+        , IFNULL(#{remk},"")
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useIdx   )">, #{useIdx}		</if>
+        , DATE_FORMAT(NOW(),'%Y%m%d%H%i%s')
+        , #{gsUserId}
+	</sql>
+
+    <!-- 전표등록상세 마스터 등록 -->
+	<insert id="SaledailyactivityreportinsertShetMastDetl" parameterType="params">
+		INSERT INTO SHET_DETL(<include refid="insertShetMastDetl-fields" />)
+		              VALUES(<include refid="insertShetMastDetl-values"/>)
+	</insert>
+
+	<sql id="insertShetMastDetl-updates">
+		  CHNG_DATE = DATE_FORMAT(NOW(),'%Y%m%d%H%i%s')
+		, CHNG_ID   = #{gsUserId}
+		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(shetDate  )">, SHET_DATE    = #{shetDate}	</if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custCode  )">, CUST_CODE    = #{custCode}	</if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(custName  )">, CUST_NAME    = #{custName}	</if>
+	    , TOT_AMT   = IF(#{totAmt}="",0,#{totAmt})
+	    , ITEM_PRCE = IF(#{itemPrce}="",0,#{itemPrce})
+	    , ITEM_COST = IF(#{itemCost}="",0,#{itemCost})
+	    , TOT_PRCE  = IF(#{totPrce}="",0,#{totPrce})
+	    , TOT_TAX   = IF(#{totTax}="",0,#{totTax})
+	    , REMK   	= IFNULL(#{remk},"")
+	</sql>
+
+	<!-- 전표등록상세 마스터 갱신 -->
+	<update id="SaledailyactivityreportupdateShetMastDetl" parameterType="params">
+		UPDATE SHET_DETL
+		   SET <include refid="insertShetMastDetl-updates" />
+		 WHERE SYS_ID    = #{sysId}
+		   AND SHET_TYPE = #{shetType}
+		   AND SHET_NO   =  SUBSTR(#{shetNoSeq},1,INSTR(#{shetNoSeq},'::')-1)
+		   AND SHET_SEQ  = SUBSTR(#{shetNoSeq},INSTR(#{shetNoSeq},'::')+2,LENGTH(#{shetNoSeq}))
+	</update>
+
+	<!-- 전표등록상세 마스터 삭제 -->
+	<delete id="SaledailyactivityreportdeleteShetMastDetl" parameterType="params">
+		DELETE
+		  FROM SHET_DETL
+		 WHERE SHET_NO = SUBSTR(#{shetNoSeq},1,INSTR(#{shetNoSeq},'::')-1)
+		   AND SHET_SEQ = SUBSTR(#{shetNoSeq},INSTR(#{shetNoSeq},'::')+2,LENGTH(#{shetNoSeq}))
+	</delete>
+
+	<insert id="SaledailyactivityreportinserDeleteShetMast" parameterType="params">
+		INSERT INTO SHET_MAST_DEL
+		SELECT SYS_ID
+		     , DATE_FORMAT(NOW(),'%Y%m%d%H%i%s') AS DELT_TIME
+		     , SHET_TYPE
+		     , SHET_NO
+		     , SHET_DATE
+		     , CUST_CODE
+		     , CUST_NAME
+		     , SHOP_NAME
+		     , SHET_AMT
+		     , SHET_TAX
+		     , SHET_TOT
+		     , TOT_BAL_AMT
+		     , TOT_COST
+		     , TAX_IDX
+		     , PRE_REM_IDX
+		     , DEC_LEN
+		     , DISC_RATE
+		     , TAX_PRNT_IDX
+		     , TAX_SAVE_IDX
+		     , REMK1
+		     , REMK2
+		     , REMK3
+		     , REMK4
+		     , REMK5
+		     , USE_IDX
+		     , REGI_DATE
+		     , REGI_ID
+		     , CHNG_DATE
+		     , CHNG_ID
+		     , 'ADMIN' AS DELT_LOC
+		     , 'ADMIN' AS DELT_USER
+		  FROM SHET_MAST
+		 WHERE SHET_NO = #{shetNo}
+		   AND SHET_TYPE = #{shetType}
+		   AND SYS_ID = #{sysId}
+	</insert>
+
+	<insert id="SaledailyactivityreportinserDeleteShetDetl" parameterType="params">
+	    INSERT INTO SHET_DETL_DEL
+		SELECT SYS_ID
+		     , DATE_FORMAT(NOW(),'%Y%m%d%H%i%s') AS DELT_TIME
+		     , SHET_TYPE
+		     , SHET_NO
+		     , SHET_SEQ
+		     , SHET_DATE
+		     , ITEM_CODE
+		     , ITEM_NAME
+		     , ITEM_SPEC
+		     , ITEM_UNIT
+		     , ITEM_QTY
+		     , ITEM_PRCE
+		     , ITEM_COST
+		     , TOT_TAX
+		     , TOT_AMT
+		     , BASE_PRCE
+		     , DISC_RATE
+		     , PURC_PRCE
+		     , SALE_PRCE
+		     , ON_HAND_QTY
+		     , LAST_TRAD
+		     , LAST_PRCE
+		     , MARGIN_RATE
+		     , CUST_CODE
+		     , SHOP_NAME
+		     , REMK
+		     , USE_IDX
+		     , REGI_DATE
+		     , REGI_ID
+		     , CHNG_DATE
+		     , CHNG_ID
+		     , 'ADMIN' AS DELT_LOC
+		     , 'ADMIN' AS DELT_USER
+		  FROM SHET_DETL
+		 WHERE SHET_NO = #{shetNo}
+		   AND SHET_TYPE = #{shetType}
+		   AND SYS_ID = #{sysId}
+	</insert>
+
+	<delete id="SaledailyactivityreportdeleteShetDetl" parameterType="params">
+	    DELETE
+		  FROM SHET_DETL
+		 WHERE SHET_NO = #{shetNo}
+		   AND SHET_TYPE = #{shetType}
+		   AND SYS_ID = #{sysId}
+	</delete>
+
+</mapper>

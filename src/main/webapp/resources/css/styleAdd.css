@@ -1,0 +1,22 @@
+@charset "euc-kr";
+
+.textbox .textbox-prompt{
+	font-family:NimbusRomNo9L !important;
+	font-weight: 400 !important;
+	color: #979797;
+}
+.textbox.combo::placeholder, .textbox.combo input::placeholder{
+	font-family:NimbusRomNo9L !important;
+	font-weight: 400 !important;
+	color: #979797;
+}
+.textbox.combo::-webkit-input-placeholder, .textbox.combo input::-webkit-input-placeholder{
+	font-family:NimbusRomNo9L !important;
+	font-weight: 400 !important;
+	color: #979797;
+}
+.textbox.combo:-ms-input-placeholder, .textbox.combo input:-ms-input-placeholder{
+	font-family:NimbusRomNo9L !important;
+	font-weight: 400 !important;
+	color: #979797;
+}

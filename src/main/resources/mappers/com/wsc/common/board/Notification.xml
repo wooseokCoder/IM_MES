@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.board.Notification">
+    <select id="selectBordList" resultType="record" parameterType="params">
+    	CALL sp_select_user_noti(#{sysId}, #{gsUserId}, #{bordGrup})
+<!--         SELECT 
+        	A.SYS_ID,
+        	A.BORD_GRUP, 
+        	A.BORD_NO, 
+        	A.BORD_TITLE, 
+        	A.BORD_TYPE, 
+        	A.BORD_TEXT, 
+        	A.OPEN_CLS,
+        	A.LINK_URL,
+			B.TGT_USER_ID, 
+			B.READ_DATE, 
+			B.REGI_DATE,
+			DATE_FORMAT(STR_TO_DATE(B.REGI_DATE, '%Y-%m-%d %H:%i:%s'), '%b %e, %Y, %l:%i %p') AS FMT_DATE
+		FROM 
+			SYS_BORD A, SYS_BORD_TGT B
+		WHERE 
+			A.SYS_ID = B.SYS_ID
+			AND A.BORD_GRUP = B.BORD_GRUP
+			AND A.BORD_NO = B.BORD_NO
+			AND A.SYS_ID = #{sysId}
+			AND A.BORD_GRUP = #{bordGrup}
+			AND A.BORD_NO = 'B000000001'
+			AND B.READ_DATE IS NULL
+			AND B.TGT_USER_ID = #{gsUserId}
+			AND STR_TO_DATE(B.REGI_DATE, '%Y-%m-%d %H:%i:%s') >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
+		ORDER BY 
+			B.REGI_DATE DESC -->
+    </select>
+    
+    <update id="updateNotiRead" parameterType="params">
+    	UPDATE 
+    		SYS_BORD_TGT 
+    	SET 
+    		READ_DATE=DATE_FORMAT(SYSDATE(), '%Y-%m-%d %H:%i:%s')
+		WHERE 
+			SYS_ID = #{sysId}
+			AND BORD_GRUP = #{bordGrup}
+			<if test='bordNo != null and bordNo != ""'>
+			AND BORD_NO = #{bordNo}
+			</if>
+			AND TGT_USER_ID = #{gsUserId}
+    </update>
+    
+    
+
+</mapper>

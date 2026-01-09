@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.board.LSTASearch">
+    <select id="search" resultType="record" parameterType="params">
+    	CALL sp_get_lsta_user_search(#{sysId}, #{s_userId})
+    </select>
+    
+    <select id="searchCount" resultType="int" parameterType="params">
+        CALL sp_get_lsta_user_search_count(#{sysId}, #{s_userId})
+    </select>
+    
+    <select id="selectLstaList" resultType="record" parameterType="params">
+		CALL sp_get_lsta_user_search_list(#{sysId})
+    </select>
+
+</mapper>

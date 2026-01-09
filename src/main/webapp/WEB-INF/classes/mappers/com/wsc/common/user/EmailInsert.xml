@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.user.EmailInsert">
+
+        <update id="EmailInsert" parameterType="params">
+        UPDATE SYS_USER
+           SET SMTP_MAIL = #{SMTP_MAIL}
+              ,SMTP_PW = #{SMTP_PW}
+         WHERE SYS_ID   = #{sysId}
+           AND USER_ID  = #{gsUserId}          
+       </update>
+    
+        <select id="gsSmtpMail" resultType="String" parameterType="params">
+        SELECT replace(SMTP_MAIL,'@lstractorusa.com','')as SMTP_MAIL
+        FROM   SYS_USER
+        WHERE  USER_ID  = #{gsUserId}
+        AND SYS_ID      = #{sysId}      
+       </select>
+    
+</mapper>

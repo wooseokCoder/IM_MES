@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.loader.Loader">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS "rnum"
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+               EXCL_GRUP
+              ,FORM_CODE
+	  	</if>
+    </sql>
+    
+    <sql id="selectColumns">
+         SYS_ID        AS "sysId"
+        ,EXCL_GRUP     AS "exclGrup"
+        ,FORM_CODE     AS "formCode"
+        ,FORM_NAME     AS "formName"
+        ,FORM_DESC     AS "formDesc"
+        ,TITLE_NO      AS "titleNo"
+        ,START_NO      AS "startNo"
+        ,PIVOT_YN      AS "pivotYn"
+        ,USE_FLAG      AS "useFlag"
+        ,REGI_ID       AS "regiId"
+        ,DATE_FORMAT(REGI_DATE,'%Y-%m-%d %H:%i:%s') 
+                       AS "regiDate"
+        ,CHNG_ID       AS "chngId"
+        ,DATE_FORMAT(CHNG_DATE,'%Y-%m-%d %H:%i:%s')   
+                       AS "chngDate"
+    </sql>
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , EXCL_GRUP
+         , FORM_CODE
+         , FORM_NAME
+         , USE_FLAG
+         , REGI_ID
+         , REGI_DATE
+         , CHNG_ID
+         , CHNG_DATE
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(formDesc)" >, FORM_DESC</if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(titleNo)"  >, TITLE_NO </if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(startNo)"  >, START_NO </if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pivotYn)"  >, PIVOT_YN </if>
+    </sql>
+    <sql id="insertColumns-values">
+           #{sysId}
+         , #{exclGrup}
+         , #{formCode}
+         , #{formName}
+         , 'Y'
+         , #{gsUserId}
+         , NOW()
+         , #{gsUserId}
+         , NOW()
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(formDesc)" >, #{formDesc}</if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(titleNo)"  >, #{titleNo} </if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(startNo)"  >, #{startNo} </if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pivotYn)"  >, #{pivotYn} </if>
+    </sql>
+
+    <sql id="updateColumns">
+           CHNG_ID   = #{gsUserId}
+         , CHNG_DATE = NOW()
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(formName)" >, FORM_NAME = #{formName} </if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(formDesc)" >, FORM_DESC = #{formDesc} </if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(titleNo)"  >, TITLE_NO  = #{titleNo}  </if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(startNo)"  >, START_NO  = #{startNo}  </if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pivotYn)"  >, PIVOT_YN  = #{pivotYn}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag)"  >, USE_FLAG  = #{useFlag}  </if>
+    </sql>
+    <sql id="whereClause">
+    	        SYS_ID    = #{sysId}
+            AND EXCL_GRUP = #{exclGrup}
+		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(formCode)"> AND FORM_CODE = #{formCode} </if>
+		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(titleNo)" > AND TITLE_NO  = #{titleNo}  </if>
+		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(startNo)" > AND START_NO  = #{startNo}  </if>
+		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pivotYn)" > AND PIVOT_YN  = #{pivotYn}  </if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag)" > AND USE_FLAG  = #{useFlag}  </if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(formName)">
+	        AND FORM_NAME LIKE CONCAT('%',#{formName},'%')
+	    </if>
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(formDesc)">
+	        AND FORM_DESC LIKE CONCAT('%',#{formDesc},'%' ) 
+	    </if>
+    </sql>
+
+    <select id="search" resultType="loaderForm" parameterType="map">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_EXCL_FORM A
+         WHERE <include refid="whereClause" />
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="map">
+        SELECT COUNT(1) 
+          FROM SYS_EXCL_FORM A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="loaderForm" parameterType="map">
+        SELECT <include refid="selectColumns" />
+          FROM SYS_EXCL_FORM A
+         WHERE SYS_ID      = #{sysId}
+           AND EXCL_GRUP   = #{exclGrup}
+           AND FORM_CODE   = #{formCode}
+    </select>
+    <insert id="insert" parameterType="map">
+        INSERT 
+          INTO SYS_EXCL_FORM 
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="map">
+        UPDATE SYS_EXCL_FORM
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID      = #{sysId}
+           AND EXCL_GRUP   = #{exclGrup}
+           AND FORM_CODE   = #{formCode}
+    </update>
+    <delete id="delete" parameterType="map">
+        DELETE 
+          FROM SYS_EXCL_FORM
+         WHERE SYS_ID      = #{sysId}
+           AND EXCL_GRUP   = #{exclGrup}
+           AND FORM_CODE   = #{formCode}
+    </delete>
+
+    <!-- ========================================================== -->
+    <!--   Excel Field Information                                  -->
+    <!-- ========================================================== -->
+    <sql id="selectColumns-item">
+         A.SYS_ID        AS "sysId"
+        ,A.EXCL_GRUP     AS "exclGrup"
+        ,A.FORM_CODE     AS "formCode"
+        ,A.ITEM_CODE     AS "itemCode"
+        ,A.ITEM_NAME     AS "itemName"
+        ,A.ITEM_TYPE     AS "itemType"
+        ,A.ITEM_DESC     AS "itemDesc"
+        ,A.ITEM_DEF      AS "itemDef"
+        ,A.ITEM_SEQ      AS "itemSeq"
+        ,A.EXCL_CODE     AS "exclCode"
+        ,A.USE_FLAG      AS "useFlag"
+        ,A.REGI_ID       AS "regiId"
+        ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')    
+                         AS "regiDate"
+        ,A.CHNG_ID       AS "chngId"
+        ,DATE_FORMAT(A.CHNG_DATE,'%Y-%m-%d %H:%i:%s')    
+                         AS "chngDate"
+    </sql>
+
+    <sql id="whereClause-item">
+	        A.SYS_ID    = #{sysId}
+        AND A.EXCL_GRUP = #{exclGrup}
+        AND A.FORM_CODE = #{formCode}
+       <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemCode)" > AND A.ITEM_CODE = #{itemCode} </if>
+       <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemName)" > AND A.ITEM_NAME = #{itemName} </if>
+       <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType)" > AND A.ITEM_TYPE = #{itemType} </if>
+       <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemDesc)" > AND A.ITEM_DESC = #{itemDesc} </if>
+       <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemDef)"  > AND A.ITEM_DEF  = #{itemDef}  </if>
+       <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemSeq)"  > AND A.ITEM_SEQ  = #{itemSeq}  </if>
+       <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(exclCode)" > AND A.EXCL_CODE = #{exclCode} </if>
+       <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag)"  > AND A.USE_FLAG  = #{useFlag}  </if>
+    </sql>
+
+    <select id="searchItem" resultType="loaderItem" parameterType="map">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns-item" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_EXCL_ITEM A
+         WHERE <include refid="whereClause-item" />
+         ORDER 
+            BY A.ITEM_SEQ
+              ,A.ITEM_CODE
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchItemCount" resultType="int" parameterType="map">
+        SELECT COUNT(1) 
+          FROM SYS_EXCL_ITEM A
+         WHERE <include refid="whereClause-item" />
+    </select>
+    <select id="selectItem" resultType="loaderItem" parameterType="map">
+        SELECT <include refid="selectColumns-item" />
+          FROM SYS_EXCL_ITEM A
+         WHERE A.SYS_ID     = #{sysId}
+           AND A.EXCL_GRUP  = #{exclGrup}
+           AND A.FORM_CODE  = #{formCode}
+           AND A.ITEM_CODE  = #{itemCode}
+    </select>
+    <insert id="insertItem" parameterType="map">
+        INSERT 
+          INTO SYS_EXCL_ITEM 
+             ( SYS_ID
+             , EXCL_GRUP
+             , FORM_CODE
+             , ITEM_CODE
+		     , ITEM_NAME
+		    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType)" >, ITEM_TYPE</if>
+		    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemDesc)" >, ITEM_DESC</if>
+		    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemDef)"  >, ITEM_DEF </if>
+		    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemSeq)"  >, ITEM_SEQ </if>
+		    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(exclCode)" >, EXCL_CODE</if>
+		     , USE_FLAG
+		     , REGI_ID
+		     , REGI_DATE
+		     , CHNG_ID
+		     , CHNG_DATE
+             )
+        VALUES
+             ( #{sysId}
+             , #{exclGrup}
+             , #{formCode}
+             , #{itemCode}
+		     , #{itemName}
+		    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType)" >, #{itemType} </if>
+		    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemDesc)" >, #{itemDesc} </if>
+		    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemDef)"  >, #{itemDef}  </if>
+		    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemSeq)"  >, #{itemSeq}  </if>
+		    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(exclCode)" >, #{exclCode} </if>
+		     , 'Y'
+		     , #{gsUserId}
+		     , NOW()
+		     , #{gsUserId}
+		     , NOW()
+             )
+    </insert>
+
+	<update id="updateItem" parameterType="map">
+		UPDATE SYS_EXCL_ITEM A
+		   SET A.CHNG_ID   = #{gsUserId}
+             , A.CHNG_DATE = NOW()		   
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemName)" >, A.ITEM_NAME = #{itemName} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType)" >, A.ITEM_TYPE = #{itemType} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemDesc)" >, A.ITEM_DESC = #{itemDesc} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemDef)"  >, A.ITEM_DEF  = #{itemDef}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemSeq)"  >, A.ITEM_SEQ  = #{itemSeq}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(exclCode)" >, A.EXCL_CODE = #{exclCode} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag)"  >, A.USE_FLAG  = #{useFlag}  </if>
+         WHERE A.SYS_ID     = #{sysId}
+           AND A.EXCL_GRUP  = #{exclGrup}
+           AND A.FORM_CODE  = #{formCode}
+           AND A.ITEM_CODE  = #{itemCode}
+	</update>
+
+    <delete id="deleteItem" parameterType="map">
+        DELETE 
+          FROM SYS_EXCL_ITEM A
+         WHERE A.SYS_ID     = #{sysId}
+           AND A.EXCL_GRUP  = #{exclGrup}
+           AND A.FORM_CODE  = #{formCode}
+           AND A.ITEM_CODE  = #{itemCode}
+    </delete>
+    
+    <delete id="deleteItemAll" parameterType="map">
+        DELETE 
+          FROM SYS_EXCL_ITEM A
+         WHERE A.SYS_ID     = #{sysId}
+           AND A.EXCL_GRUP  = #{exclGrup}
+           AND A.FORM_CODE  = #{formCode}
+    </delete>
+
+	<!-- 콤보형 데이터 검색 -->
+    <select id="searchCombo" resultType="record" parameterType="map">
+        SELECT SYS_ID        AS "sysId"
+              ,FORM_CODE     AS "codeCd"
+              ,FORM_NAME     AS "codeName"
+          FROM SYS_EXCL_FORM A
+         WHERE SYS_ID       = #{sysId}
+           AND EXCL_GRUP    = #{codeGrup}
+           AND USE_FLAG     = 'Y'
+         ORDER 
+            BY FORM_NAME
+    </select>
+
+</mapper>

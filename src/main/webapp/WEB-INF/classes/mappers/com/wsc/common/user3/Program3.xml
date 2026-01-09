@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.user3.Program3">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+         	   A.REGI_DATE DESC
+         	  ,A.CHNG_DATE DESC
+	  	</if>
+    </sql>
+    
+    <sql id="selectV_sys_auth">
+    	SELECT a.sys_id  AS sys_id, 
+		       a.user_id AS user_id, 
+		       '10.USER'     AS auth_type, 
+		       a.prog_id AS prog_id, 
+		       a.tran_a  AS tran_a, 
+		       a.tran_c  AS tran_c, 
+		       a.tran_r  AS tran_r, 
+		       a.tran_u  AS tran_u, 
+		       a.tran_d  AS tran_d, 
+		       a.tran_p  AS tran_p, 
+		       a.tran_s  AS tran_s, 
+		       a.tran_1  AS tran_1, 
+		       a.tran_2  AS tran_2, 
+		       a.tran_3  AS tran_3, 
+		       a.tran_4  AS tran_4, 
+		       a.tran_5  AS tran_5 
+		FROM   sys_upgm a 
+		WHERE  a.sys_id = #{sysId}
+		AND    a.user_id = #{userId}
+		UNION 
+		SELECT   a.sys_id      AS sys_id, 
+		         b.user_id     AS user_id, 
+		         '20.GROUP'        AS auth_type, 
+		         a.prog_id     AS prog_id, 
+		         Max(a.tran_a) AS tran_a, 
+		         Max(a.tran_c) AS tran_c, 
+		         Max(a.tran_r) AS tran_r, 
+		         Max(a.tran_u) AS tran_u, 
+		         Max(a.tran_d) AS tran_d, 
+		         Max(a.tran_p) AS tran_p, 
+		         Max(a.tran_s) AS tran_s, 
+		         Max(a.tran_1) AS tran_1, 
+		         Max(a.tran_2) AS tran_2, 
+		         Max(a.tran_3) AS tran_3, 
+		         Max(a.tran_4) AS tran_4, 
+		         Max(a.tran_5) AS tran_5 
+		FROM     sys_gpgm a 
+		JOIN     sys_ugrp b
+		WHERE    a.sys_id = b.sys_id
+		AND      a.group_id = b.group_id
+		AND      b.sys_id = #{sysId}
+		AND      b.user_id = #{userId}
+		GROUP BY a.sys_id, 
+		         b.user_id, 
+		         a.prog_id 
+		UNION 
+		SELECT a.sys_id  AS sys_id, 
+		       b.user_id AS user_id, 
+		       '30.DEFAULT'  AS auth_type, 
+		       a.prog_id AS prog_id, 
+		       '0'           AS tran_a, 
+		       '0'           AS tran_c, 
+		       '0'           AS tran_r, 
+		       '0'           AS tran_u, 
+		       '0'           AS tran_d, 
+		       '0'           AS tran_p, 
+		       '0'           AS tran_s, 
+		       '0'           AS tran_1, 
+		       '0'           AS tran_2, 
+		       '0'           AS tran_3, 
+		       '0'           AS tran_4, 
+		       '0'           AS tran_5 
+		FROM   sys_prog a 
+		JOIN   sys_user b
+		WHERE  a.sys_id = b.sys_id
+		AND    b.sys_id = #{sysId}
+		AND    b.user_id = #{userId}
+    </sql>
+    
+    <!-- ========================================================== -->
+    <!--   Common Program Column Information                        -->
+    <!-- ========================================================== -->
+    <sql id="selectColumns">
+         A.SYS_ID        AS "sysId"
+        ,A.PROG_ID       AS "progId"
+        ,A.TRAN_A        AS "tranA"
+        ,A.TRAN_C        AS "tranC"
+        ,A.TRAN_R        AS "tranR"
+        ,A.TRAN_U        AS "tranU"
+        ,A.TRAN_D        AS "tranD"
+        ,A.TRAN_P        AS "tranP"
+        ,A.TRAN_S        AS "tranS"
+        ,A.TRAN_1        AS "tran1"
+        ,A.TRAN_2        AS "tran2"
+        ,A.TRAN_3        AS "tran3"
+        ,A.TRAN_4        AS "tran4"
+        ,A.TRAN_5        AS "tran5"
+        ,A.REGI_ID       AS "regiId"
+        ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')     
+                         AS "regiDate"
+        ,A.CHNG_ID       AS "chngId"
+        ,DATE_FORMAT(A.CHNG_DATE,'%Y-%m-%d %H:%i:%s')     
+                         AS "chngDate"
+    </sql>
+    <sql id="whereClause">
+        A.SYS_ID = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progId)">AND A.PROG_ID   LIKE CONCAT('%',#{progId},'%')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranA )">AND A.TRAN_A    = #{tranA}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranC )">AND A.TRAN_C    = #{tranC}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranR )">AND A.TRAN_R    = #{tranR}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranU )">AND A.TRAN_U    = #{tranU}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranD )">AND A.TRAN_D    = #{tranD}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranP )">AND A.TRAN_P    = #{tranP}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranS )">AND A.TRAN_S    = #{tranS}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran1 )">AND A.TRAN_1    = #{tran1}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran2 )">AND A.TRAN_2    = #{tran2}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran3 )">AND A.TRAN_3    = #{tran3}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran4 )">AND A.TRAN_4    = #{tran4}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran5 )">AND A.TRAN_5    = #{tran5}     </if>
+    </sql>
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , PROG_ID
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranA)">, TRAN_A    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranC)">, TRAN_C    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranR)">, TRAN_R    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranU)">, TRAN_U    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranD)">, TRAN_D    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranP)">, TRAN_P    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranS)">, TRAN_S    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran1)">, TRAN_1    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran2)">, TRAN_2    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran3)">, TRAN_3    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran4)">, TRAN_4    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran5)">, TRAN_5    </if>
+         , REGI_ID
+         , REGI_DATE
+         , CHNG_ID
+         , CHNG_DATE
+    </sql>
+    <sql id="insertColumns-values">
+           #{sysId}
+         , #{progId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranA)">, #{tranA}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranC)">, #{tranC}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranR)">, #{tranR}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranU)">, #{tranU}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranD)">, #{tranD}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranP)">, #{tranP}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranS)">, #{tranS}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran1)">, #{tran1}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran2)">, #{tran2}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran3)">, #{tran3}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran4)">, #{tran4}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran5)">, #{tran5}     </if>
+         , #{gsUserId}
+         , NOW()
+         , #{gsUserId}
+         , NOW()
+    </sql>
+    <sql id="updateColumns">
+           CHNG_ID    = #{gsUserId}
+         , CHNG_DATE  = NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranA)">, TRAN_A    = #{tranA}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranC)">, TRAN_C    = #{tranC}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranR)">, TRAN_R    = #{tranR}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranU)">, TRAN_U    = #{tranU}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranD)">, TRAN_D    = #{tranD}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranP)">, TRAN_P    = #{tranP}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranS)">, TRAN_S    = #{tranS}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran1)">, TRAN_1    = #{tran1}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran2)">, TRAN_2    = #{tran2}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran3)">, TRAN_3    = #{tran3}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran4)">, TRAN_4    = #{tran4}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran5)">, TRAN_5    = #{tran5}     </if>
+    </sql>
+
+    <!-- ========================================================== -->
+    <!--   Program Management                                       -->
+    <!-- ========================================================== -->
+
+    <sql id="selectColumns-program">
+        <include refid="selectColumns" />
+        ,A.PROG_NAME     AS "progName"
+        ,A.PROG_TYPE     AS "progType"
+        ,A.SYS_LOC       AS "sysLoc"
+        ,A.USE_FLAG      AS "useFlag"
+    </sql>
+    <sql id="whereClause-program">
+        <include refid="whereClause" />
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progName)">AND A.PROG_NAME LIKE CONCAT('%',#{progName},'%')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progType)">AND A.PROG_TYPE = #{progType}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sysLoc  )">AND A.SYS_LOC   = #{sysLoc}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag )">AND A.USE_FLAG  = #{useFlag}   </if>
+    </sql>
+    <sql id="insertColumns-fields-program">
+        <include refid="insertColumns-fields" />
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progType)">, PROG_TYPE </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sysLoc  )">, SYS_LOC   </if>
+        ,PROG_NAME
+        ,USE_FLAG
+    </sql>
+    <sql id="insertColumns-values-program">
+        <include refid="insertColumns-values" />
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progType)">, #{progType}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sysLoc  )">, #{sysLoc}    </if>
+        ,#{progName}
+        ,'Y'
+    </sql>
+    <sql id="updateColumns-program">
+        <include refid="updateColumns" />
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progName)">, PROG_NAME = #{progName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progType)">, PROG_TYPE = #{progType}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sysLoc  )">, SYS_LOC   = #{sysLoc}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag )">, USE_FLAG  = #{useFlag}   </if>
+    </sql>
+    
+    <select id="search" resultType="prog" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns-program" />
+             , A.PROG_ID       AS "progId2"
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_PROG   A
+         WHERE <include refid="whereClause-program" />
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_PROG   A
+         WHERE <include refid="whereClause-program" />
+    </select>
+    <select id="select" resultType="prog" parameterType="params">
+        SELECT <include refid="selectColumns-program" />
+             , A.PROG_ID       AS "progId2"
+          FROM SYS_PROG   A
+         WHERE A.SYS_ID   = #{sysId}
+           AND A.PROG_ID  = #{progId}
+    </select>
+    <insert id="insert" parameterType="params">
+        INSERT 
+          INTO SYS_PROG 
+             ( <include refid="insertColumns-fields-program" /> )
+        VALUES
+             ( <include refid="insertColumns-values-program" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE SYS_PROG
+           SET <include refid="updateColumns-program" />
+         WHERE SYS_ID    = #{sysId}
+           AND PROG_ID   = #{progId}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM SYS_PROG
+         WHERE SYS_ID    = #{sysId}
+           AND PROG_ID   = #{progId}
+    </delete>
+    
+    <!-- ========================================================== -->
+    <!--   Group Program Management                                 -->
+    <!-- ========================================================== -->
+    <sql id="selectColumns-groupprogram">
+        <include refid="selectColumns" />
+        ,A.GROUP_ID      AS "groupId"
+        ,(SELECT GROUP_NAME
+            FROM SYS_GRUP
+           WHERE SYS_ID   = A.SYS_ID
+             AND GROUP_ID = A.GROUP_ID
+         )               AS "groupName"
+        ,(SELECT PROG_NAME
+            FROM SYS_PROG
+           WHERE SYS_ID   = A.SYS_ID
+             AND PROG_ID  = A.PROG_ID
+         )               AS "progName"
+    </sql>
+
+    <select id="searchGroupProgram" resultType="prog" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns-groupprogram" />
+        	 , A.PROG_ID       AS "progId2"
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_GPGM A
+         WHERE A.SYS_ID = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progId )">AND A.PROG_ID  = #{progId}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(groupId)">AND A.GROUP_ID = #{groupId}  </if>
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchGroupProgramCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_GPGM A
+         WHERE A.SYS_ID = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progId )">AND A.PROG_ID  = #{progId}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(groupId)">AND A.GROUP_ID = #{groupId}  </if>
+    </select>
+    <select id="selectGroupProgram" resultType="prog" parameterType="params">
+        SELECT <include refid="selectColumns-groupprogram" />
+             , A.PROG_ID       AS "progId2"
+          FROM SYS_GPGM A
+         WHERE SYS_ID   = #{sysId}
+           AND PROG_ID  = #{progId}
+           AND GROUP_ID = #{groupId}
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranA  )">AND TRAN_A = #{tranA}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranC  )">AND TRAN_C = #{tranC}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranR  )">AND TRAN_R = #{tranR}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranU  )">AND TRAN_U = #{tranU}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranD  )">AND TRAN_D = #{tranD}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranP  )">AND TRAN_P = #{tranP}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranS  )">AND TRAN_S = #{tranS}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran1  )">AND TRAN_1 = #{tran1}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran2  )">AND TRAN_2 = #{tran2}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran3  )">AND TRAN_3 = #{tran3}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran4  )">AND TRAN_4 = #{tran4}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran5  )">AND TRAN_5 = #{tran5}</if>
+    </select>
+    <insert id="insertGroupProgram" parameterType="params">
+        INSERT 
+          INTO SYS_GPGM 
+             ( GROUP_ID,   <include refid="insertColumns-fields" /> )
+        VALUES
+             ( #{groupId}, <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="updateGroupProgram" parameterType="params">
+        UPDATE SYS_GPGM
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID    = #{sysId}
+           AND PROG_ID   = #{progId}
+           AND GROUP_ID  = #{groupId}
+    </update>
+    <delete id="deleteGroupProgram" parameterType="params">
+        DELETE 
+          FROM SYS_GPGM
+         WHERE SYS_ID    = #{sysId}
+           AND PROG_ID   = #{progId}
+           AND GROUP_ID  = #{groupId}
+    </delete>
+
+    <!-- ========================================================== -->
+    <!--   User Program Management                                  -->
+    <!-- ========================================================== -->
+    <sql id="selectColumns-userprogram">
+        <include refid="selectColumns" />
+        ,A.USER_ID      AS "userId"
+        ,(SELECT USER_NAME
+            FROM SYS_USER
+           WHERE SYS_ID   = A.SYS_ID
+             AND USER_ID  = A.USER_ID
+         )              AS "userName"
+        ,(SELECT PROG_NAME
+            FROM SYS_PROG
+           WHERE SYS_ID   = A.SYS_ID
+             AND PROG_ID  = A.PROG_ID
+         )               AS "progName"
+    </sql>
+    <select id="searchUserProgram" resultType="prog" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns-userprogram" />
+             , A.PROG_ID as "progId2"
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_UPGM A
+         WHERE A.SYS_ID = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progId)">AND A.PROG_ID = #{progId}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userId)">AND A.USER_ID = #{userId}  </if>
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchUserProgramCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_UPGM A
+         WHERE A.SYS_ID = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progId)">AND A.PROG_ID = #{progId}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userId)">AND A.USER_ID = #{userId}  </if>
+    </select>
+    <select id="selectUserProgram" resultType="prog" parameterType="params">
+        SELECT <include refid="selectColumns-userprogram" />
+             , A.PROG_ID as "progId2"
+          FROM SYS_UPGM A
+         WHERE SYS_ID   = #{sysId}
+           AND PROG_ID  = #{progId}
+           AND USER_ID  = #{userId}
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranA  )">AND TRAN_A = #{tranA}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranC  )">AND TRAN_C = #{tranC}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranR  )">AND TRAN_R = #{tranR}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranU  )">AND TRAN_U = #{tranU}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranD  )">AND TRAN_D = #{tranD}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranP  )">AND TRAN_P = #{tranP}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tranS  )">AND TRAN_S = #{tranS}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran1  )">AND TRAN_1 = #{tran1}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran2  )">AND TRAN_2 = #{tran2}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran3  )">AND TRAN_3 = #{tran3}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran4  )">AND TRAN_4 = #{tran4}</if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tran5  )">AND TRAN_5 = #{tran5}</if>
+    </select>
+    <insert id="insertUserProgram" parameterType="params">
+        INSERT 
+          INTO SYS_UPGM 
+             ( USER_ID,   <include refid="insertColumns-fields" /> )
+        VALUES
+             ( #{userId}, <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="updateUserProgram" parameterType="params">
+        UPDATE SYS_UPGM
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID    = #{sysId}
+           AND PROG_ID   = #{progId}
+           AND USER_ID   = #{userId}
+    </update>
+    <delete id="deleteUserProgram" parameterType="params">
+        DELETE 
+          FROM SYS_UPGM
+         WHERE SYS_ID    = #{sysId}
+           AND PROG_ID   = #{progId}
+           AND USER_ID   = #{userId}
+    </delete>
+    
+    <!-- ========================================================== -->
+    <!--   Program 권한정보 조회 (VIEW V_SYS_AUTH 사용)               -->
+    <!-- ========================================================== -->
+    <select id="selectSecurity" resultType="prog" parameterType="params">
+           SELECT A.SYS_ID   AS "sysId"
+                 ,A.PROG_ID  AS "progId"
+                 ,A.TRAN_A   AS "tranA"
+                 ,A.TRAN_C   AS "tranC"
+                 ,A.TRAN_R   AS "tranR"
+                 ,A.TRAN_U   AS "tranU"
+                 ,A.TRAN_D   AS "tranD"
+                 ,A.TRAN_P   AS "tranP"
+                 ,A.TRAN_S   AS "tranS"
+                 ,A.TRAN_1   AS "tran1"
+                 ,A.TRAN_2   AS "tran2"
+                 ,A.TRAN_3   AS "tran3"
+                 ,A.TRAN_4   AS "tran4"
+                 ,A.TRAN_5   AS "tran5"
+                 ,(SELECT PROG_NAME
+                     FROM SYS_PROG
+                    WHERE SYS_ID  = A.SYS_ID
+                      AND PROG_ID = A.PROG_ID
+                  )          AS "progName"
+                 ,(SELECT MENU_KEY
+                     FROM SYS_MENU
+                    WHERE SYS_ID   = A.SYS_ID
+                      AND MENU_URL = A.PROG_ID
+                    LIMIT 0, 1
+                  )          AS "menuKey"
+             FROM ( SELECT x.sys_id, x.user_id,
+                          CASE x.auth_type
+                               WHEN  '10.USER'   THEN 'USER'
+                               WHEN  '20.GROUP'  THEN 'GROUP'
+                               ELSE  'DEFAULT'   END  auth_type,
+                          x.prog_id, x.tran_a, x.tran_c, x.tran_r, x.tran_u, x.tran_d,
+                          x.tran_p, x.tran_s, x.tran_1, x.tran_2, x.tran_3, x.tran_4,
+                          x.tran_5
+                   FROM ( SELECT a.*
+                          FROM  (SELECT (CASE @vjob WHEN a.prog_id THEN @rownum:=@rownum+1 ELSE @rownum:=1 END) auth_seq,
+                                        (@vjob:=a.prog_id) vjob,
+                                         a.*
+                                 FROM    (<include refid="selectV_sys_auth" />) a, (SELECT @vjob:='', @rownum:=0 FROM DUAL) b
+                                 ORDER BY a.sys_id, a.user_id, a.prog_id, a.auth_type ) a
+                          WHERE a.auth_seq = 1) x )  A
+            WHERE A.SYS_ID    = #{sysId}
+              AND A.PROG_ID   = #{uri}
+              AND A.USER_ID   = #{userId}
+              AND A.USER_ID   = '3'
+    </select>
+</mapper>

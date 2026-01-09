@@ -1,0 +1,30 @@
+# --- 이클립스 및 Java 관련 (컴파일된 결과물 제외) ---
+.metadata/
+bin/
+target/
+*.class
+
+# --- 이클립스 설정 파일 (개인마다 다를 수 있어 제외 권장) ---
+.settings/
+.project
+.classpath
+
+# --- 보안 및 설정 파일 (절대 올리면 안 됨) ---
+# DB 접속 정보가 들어있는 파일들을 여기에 추가하세요.
+globals.properties
+context-datasource.xml
+app.properties
+# 또는 특정 경로 지정
+/lsbas/src/main/resources/certification/lsdp_cert.pem
+/lsbas/src/main/resources/certification/lsdp_private.key
+/lsbas/src/main/resources/certification/lsdpw_cert.pem
+/lsbas/src/main/resources/certification/lsdpw_private.key
+
+# --- OS 및 도구 관련 ---
+.DS_Store
+Thumbs.db
+.vscode/
+.history/
+
+# --- SVN 관련 (Git과 혼용 시 SVN 메타데이터 제외) ---
+.svn/

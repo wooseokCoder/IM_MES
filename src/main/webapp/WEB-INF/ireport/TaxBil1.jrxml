@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report7" language="groovy" pageWidth="595" pageHeight="840" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="3e72fde4-2a71-45e6-900c-f24f8034bb3e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="9"/>
+	<parameter name="SYS_ID" class="java.lang.String"/>
+	<parameter name="hShetNo" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\cnode\\Desktop\\리포트작업중\\매출관리-매출관리\\계산서\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT DATE_FORMAT(now(), '%Y-%m-%d') as print_time]]>
+	</queryString>
+	<field name="print_time" class="java.lang.String"/>
+	<background>
+		<band height="800" splitType="Stretch">
+			<line>
+				<reportElement x="-20" y="407" width="595" height="1" uuid="4520f3fb-7a26-4762-ba77-59fe47ad2305"/>
+				<graphicElement>
+					<pen lineWidth="2.0" lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</background>
+	<detail>
+		<band height="800">
+			<subreport isUsingCache="false" runToBottom="false">
+				<reportElement mode="Transparent" x="0" y="0" width="555" height="400" uuid="5e2e8e9c-8c57-4dee-b9a3-b8ed22fde663"/>
+				<subreportParameter name="SYS_ID">
+					<subreportParameterExpression><![CDATA[$P{SYS_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="hShetNo">
+					<subreportParameterExpression><![CDATA[$P{hShetNo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:TaxBill1-1.jrxml"]]></subreportExpression>
+			</subreport>
+			<subreport runToBottom="true">
+				<reportElement mode="Transparent" x="0" y="420" width="555" height="380" uuid="331123f2-7c81-439f-8e31-e2ebb23020d8"/>
+				<subreportParameter name="SYS_ID">
+					<subreportParameterExpression><![CDATA[$P{SYS_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="hShetNo">
+					<subreportParameterExpression><![CDATA[$P{hShetNo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:TaxBill1-2.jrxml"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

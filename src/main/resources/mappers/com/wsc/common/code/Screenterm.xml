@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.code.Screenterm">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS "rnum"
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT *
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>
+    </sql>
+    <sql id="sortClause">
+    	REGI_DATE
+    </sql>
+
+    <sql id="selectColumns">
+	       SYS_ID       as "sysId"
+	     , ITEM_GRP     as "itemGrp"
+	     , ITEM_ID      as "itemId"
+	     , ITEM_NM      as "itemNm"
+	     , ITEM_NM_KOR  as "itemNmKor"
+	     , ITEM_NM_ENG  as "itemNmEng"
+	     , ITEM_NM_PORT as "itemNmPort"
+	     , ITEM_NM_VIET as "itemNmViet"
+	     , ITEM_NM_ETC  as "itemNmEtc"
+	     , ITEM_DESC    as "itemDesc"
+	     , ITEM_TYPE    as "itemType"
+	     , ITEM_LEN     as "itemLen"
+	     , ITEM_SCALE   as "itemScale"
+	     , ITEM_ATR1    as "itemAtr1"
+	     , ITEM_ATR2    as "itemAtr2"
+	     , ITEM_ATR3    as "itemAtr3"
+	     , ITEM_REMK    as "itemRemk"
+	     , USE_FLAG     as "useFlag"
+	     , REGI_ID      as "regiId"
+	     , DATE_FORMAT(REGI_DATE,'%Y-%m-%d %H:%i:%s')  as "regiDate"
+	     , CHNG_ID      as "chngId"
+	     , DATE_FORMAT(CHNG_DATE,'%Y-%m-%d %H:%i:%s')    as "chngDate"
+    </sql>
+
+    <sql id="whereClause">
+    	SYS_ID = #{sysId}
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemGrpKey)">AND ITEM_GRP = (CASE WHEN #{itemGrpKey} ='ALL' THEN ITEM_GRP ELSE #{itemGrpKey} END) </if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag)">AND USE_FLAG = (CASE WHEN #{useFlag} = 'ALL' THEN USE_FLAG ELSE #{useFlag} END)</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemId)">AND ITEM_ID LIKE CONCAT('%',#{itemId},'%')</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNm)">AND ITEM_NM LIKE CONCAT('%',#{itemNm},'%') </if>
+    </sql>
+
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , ITEM_GRP
+         , ITEM_ID
+         , ITEM_NM
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmKor)">, ITEM_NM_KOR </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmEng)">, ITEM_NM_ENG </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmPort)">, ITEM_NM_PORT </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmViet)">, ITEM_NM_VIET </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmEtc)">, ITEM_NM_ETC </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemDesc)">, ITEM_DESC </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType)">, ITEM_TYPE </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemLen)">, ITEM_LEN </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemScale)">, ITEM_SCALE </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemAtr1)">, ITEM_ATR1 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemAtr2)">, ITEM_ATR2 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemAtr3)">, ITEM_ATR3 </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemRemk)">, ITEM_REMK </if>
+         , USE_FLAG
+         , REGI_ID
+         , REGI_DATE
+         , CHNG_ID
+         , CHNG_DATE
+    </sql>
+
+
+    <sql id="insertColumns-values">
+           #{sysId}
+         , (CASE WHEN #{itemGrp} = 'N0001' THEN #{itemGrp}
+                 WHEN #{itemGrp} = 'N0002' THEN #{itemGrp}
+                 ELSE ifnull((SELECT MENU_URL FROM SYS_MENU WHERE SYS_ID = #{sysId} AND MENU_KEY = #{itemGrp}), #{itemGrp}) END )
+         , #{itemId}
+         , #{itemNm}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmKor)">, #{itemNmKor} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmEng)">, #{itemNmEng} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmPort)">, #{itemNmPort} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmViet)">, #{itemNmViet} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmEtc)">, #{itemNmEtc} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemDesc)">, #{itemDesc} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType)">, #{itemType} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemLen)">, #{itemLen} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemScale)">, #{itemScale} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemAtr1)">, #{itemAtr1} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemAtr2)">, #{itemAtr2} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemAtr3)">, #{itemAtr3} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemRemk)">, #{itemRemk} </if>
+         , #{useFlag}
+         , #{gsUserId}
+         , NOW()
+         , #{gsUserId}
+         , NOW()
+    </sql>
+
+    <sql id="updateColumns">
+         CHNG_DATE = NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNm)">, ITEM_NM = #{itemNm}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmKor)">, ITEM_NM_KOR = #{itemNmKor}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmEng)">, ITEM_NM_ENG = #{itemNmEng}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmPort)">, ITEM_NM_PORT = #{itemNmPort}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmViet)">, ITEM_NM_VIET = #{itemNmViet}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNmEtc)">, ITEM_NM_ETC = #{itemNmEtc}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemDesc)">, ITEM_DESC  = #{itemDesc}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag )">, USE_FLAG  = #{useFlag}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType)">, ITEM_TYPE = #{itemType}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemLen)">, ITEM_LEN = #{itemLen}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemAtr1)">, ITEM_ATR1 = #{itemAtr1}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemAtr2)">, ITEM_ATR2 = #{itemAtr2}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemAtr3)">, ITEM_ATR3 = #{itemAtr3}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemRemk)">, ITEM_REMK = #{itemRemk}  </if>
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_DIC A
+         WHERE <include refid="whereClause" />
+         ORDER
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM SYS_DIC A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM SYS_DIC A
+         WHERE SYS_ID    = #{sysId}
+           AND ITEM_GRP  = (CASE WHEN #{itemGrp} = 'N0001' THEN #{itemGrp}
+				                 WHEN #{itemGrp} = 'N0002' THEN #{itemGrp}
+				                 ELSE (SELECT MENU_URL FROM SYS_MENU WHERE SYS_ID = #{sysId} AND MENU_KEY = #{itemGrp}) END )
+           AND ITEM_ID   = #{itemId}
+    </select>
+
+    <insert id="insert" parameterType="params">
+        INSERT
+          INTO SYS_DIC
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+
+    <update id="update" parameterType="params">
+        UPDATE SYS_DIC
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID    = #{sysId}
+           AND ITEM_GRP   = #{itemGrp}
+           AND ITEM_ID = #{itemId}
+    </update>
+
+    <delete id="delete" parameterType="params">
+        DELETE
+          FROM SYS_DIC
+         WHERE SYS_ID    = #{sysId}
+           AND ITEM_GRP   = #{itemGrp}
+           AND ITEM_ID = #{itemId}
+    </delete>
+
+     <select id="selectProgKeyList" resultType="record" parameterType="params">
+
+	   SELECT A.*
+	     FROM(
+	        SELECT A.PROG_ID
+	             , A.PROG_NAME
+	             , B.MENU_KEY
+	          FROM SYS_PROG A
+	             , SYS_MENU B
+	         WHERE A.SYS_ID = #{sysId}
+	           AND A.SYS_ID = B.SYS_ID
+	           AND A.PROG_ID = B.MENU_URL
+	           AND A.USE_FLAG = 'Y'
+	         UNION ALL
+	        SELECT 'N0001' AS PROG_ID
+	             , 'E-help메뉴얼' AS PROG_NAME
+	             , 'N0001' AS MENU_KEY
+	          FROM DUAL
+	         UNION ALL
+	        SELECT 'N0002' AS PROG_ID
+	             , 'E-help사용자메모' AS PROG_NAME
+	             , 'N0002' AS MENU_KEY
+	          FROM DUAL ) A
+	   ORDER BY A.PROG_NAME ASC
+
+    </select>
+
+     <select id="selectLangNm" resultType="record" parameterType="params">
+
+	SELECT SYS_ID       as "sysId"
+	     , ITEM_GRP     as "itemGrp"
+	     , ITEM_ID      as "itemId"
+	     , ITEM_NM
+	     , ITEM_NM_KOR  as "itemNmKor"
+	     , ITEM_NM_ENG  as "itemNmEng"
+	     , ITEM_NM_PORT as "itemNmPort"
+	     , ITEM_NM_VIET as "itemNmViet"
+	     , ITEM_NM_ETC  as "itemNmEtc"
+	     , (CASE WHEN #{gsLang} = 'ko' THEN ifnull(ITEM_NM_KOR,ITEM_NM)
+	             WHEN #{gsLang} = 'en' THEN ifnull(ITEM_NM_ENG,ITEM_NM)
+	             WHEN #{gsLang} = 'pt' THEN ifnull(ITEM_NM_PORT,ITEM_NM)
+	             WHEN #{gsLang} = 'vi' THEN ifnull(ITEM_NM_VIET,ITEM_NM)
+	             WHEN #{gsLang} = 'etc' THEN ifnull(ITEM_NM_ETC,ITEM_NM)
+	             ELSE ITEM_NM END) as "itemNm"
+	  FROM SYS_DIC
+	 WHERE SYS_ID = #{sysId}
+	   AND ITEM_GRP = (CASE WHEN #{itemKey} = 'N0001' THEN #{itemKey}
+	                        WHEN #{itemKey} = 'N0002' THEN #{itemKey}
+	                        ELSE (SELECT MENU_URL FROM SYS_MENU WHERE SYS_ID = #{sysId} AND MENU_KEY = #{itemKey}) END)
+
+    </select>
+
+</mapper>

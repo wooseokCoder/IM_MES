@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.drawing.DrawingInformation">
+	<!-- 검색 -->
+    <select id="searchCount" resultType="int" parameterType="params">
+		CALL SP_GET_DRAWING_LIST_COUNT(#{sysId},#{listCode},#{listName},#{listType})
+    </select>
+	<select id="search" resultType="record" parameterType="params">
+		CALL SP_GET_DRAWING_LIST(#{sysId},#{start},#{end},#{listCode},#{listName},#{listType})
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+    	CALL sp_select_drawlist(#{sysId},#{listNo})
+    </select>
+    <select id="getDrawItemView" resultType="record" parameterType="params">
+    	CALL sp_select_itemlist(#{listNo})
+    </select>
+    <delete id="delete" parameterType="params">
+    	CALL sp_delete_drawing(#{sysId},#{listNo})
+    </delete>
+</mapper>

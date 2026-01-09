@@ -1,0 +1,201 @@
+TODO LIST
+
+
+**********************************************
+**     2014.08.29 화면 컬럼사이즈,정렬 참조 (배민영)  **
+**********************************************
+1.업체코드 : 80, 가운데정렬
+2.업체명 : 150
+3.품번 : 100, 가운데정렬
+4.품명 : 160
+5.일자 : 80 (Mask: yyyy.MM.dd)
+6.공장코드 : 80, 가운데정렬
+7.공장명 : 110
+8.금액 : 90
+9.건수 : 60 (4글자면-70)
+
+
+
+
+********************************************
+**     2014.08.27 화면 그리드 Sorting (배민영)  **
+********************************************
+
+1. Grid 의 OnHeadClick 에 gfn_gridSort(..) 함수 추가
+
+	gfn_gridSort(obj, object(obj.BindDataset), nCell);
+	
+		-> jsCommFuncSub1.js 에 있는 함수임.
+	
+	(참조화면 : Material/purchaseOrder.xml)
+
+**********************************************************
+**     2014.08.27 화면 그리드 dynamic size contol (배민영)    **
+**********************************************************
+
+아래와 같이(8.24일) 해주시고 
+다음과 같이 공통함수 사용하셔도 됩니다.
+
+(jsCommFuncSub1.js)
+
+function gfn_onSize(obj,nCx,nCy,nState)
+{
+	var gridObj = components["Grid"][0];
+	var shpObj = components["Shape"][0];
+	if(nCx > 1010){
+		gridObj.Width = obj.Width -20;
+	}
+	
+	if(nCx > 1020){
+		shpObj.Width = obj.Width -10;
+	}
+}
+
+위 공통함수는 조회박스 1개 와 그리드 1개인 화면에서 사용가능합니다.
+
+
+****************************************
+**     2014.08.24 화면 그리드 dynamic size contol (정성만)     **
+****************************************
+0.  일단 svn에서 다 update받는다.
+
+1. 각 화면파일(.xml)의 form 속성의 Scroll속성을 False로 바꿔준다. 
+
+2. form event속성중 OnSize 이벤트를 활성화 시킨다.
+
+3. 아래의 소스코드를 넣어준다.
+
+if(nCx > 1020){ //1020는 dynamic을 원하는  해당 화면의 grid의 실제 width값을 적어준다.
+	grid_sawon.Width = this.Width -20; // grid_sawon은 dynamic을 원하는  해당 화면의 grid의 이름으로 교체	
+}
+
+4. 이해안가시면 정성만한테 문의
+
+끝 
+
+
+
+
+
+****************************************
+**     2014.08.21 게시판 에디터 적용  (정성만)     **
+****************************************
+0.  일단 svn에서 다 update받는다.
+
+
+1. 게시판 관련 소스파일중 PID의 XML파일에서 게시판 저장 (수정포함) 버튼 클릭시 이벤트 소스중 대분분 이렇게 되어있을것이다.
+
+	//웹에티터 내용 가져오기
+	var objDocument = boardEditer.Document;
+	var objHtmlElementCollection = objDocument.All();	
+	
+	var contents = objHtmlElementCollection.item("content");		
+			
+	boardInsert_Info.AddRow(); // Dataset에 빈 Record한줄 추가					
+	
+	boardInsert_Info.SetColumn(boardInsert_Info.Row,"BORD_TITLE",   edit_title.Value);	
+	boardInsert_Info.SetColumn(boardInsert_Info.Row,"BORD_TEXT",   contents.Value);
+	boardInsert_Info.SetColumn(boardInsert_Info.Row,"BORD_GRUP",   BORD_GRUP);
+	boardInsert_Info.SetColumn(boardInsert_Info.Row,"BORD_NO",   BORD_NO);		
+
+
+2. 각자화면에 맞춰서  다음과 같이 수정해준다. (추가된 부분은 주석표시하였음)
+
+
+	//웹에티터 내용 가져오기		
+	var objDocument = boardEditer.Document;
+	var objHtmlElementCollection = objDocument.All();
+	
+	
+	~~~~~~이부분 추가 2014.08.21~~~~~~~~
+	http.Sync = true;
+	var btnTemp = objHtmlElementCollection.item("btn");			
+	btnTemp.Click();	
+	http.Sync = false;
+	~~~~~~이부분 추가 2014.08.21~~~~~~~~	
+				
+	var contents = objHtmlElementCollection.item("content");			
+	
+	~~~~~~이부분 추가 2014.08.21~~~~~~~~
+	var bordText = Replace(contents.value,"?","!@^!");
+	~~~~~~이부분 추가 2014.08.21~~~~~~~~	
+			
+	boardInsert_Info.AddRow(); // Dataset에 빈 Record한줄 추가					
+	
+	boardInsert_Info.SetColumn(boardInsert_Info.Row,"BORD_TITLE",   edit_title.Value);
+	
+	~~~~~~이부분 추가 2014.08.21~~~~~~~~ 여기는 contents.Value 이부분을  -->  UrlEncode(bordText) 이렇게 바꿔준다. 	
+	boardInsert_Info.SetColumn(boardInsert_Info.Row,"BORD_TEXT",   UrlEncode(bordText));
+
+
+3. 저장 및 수정 Transaction 의 action이 밑에 두곳이 아닌 다른곳을 탈 경우 정성만에게 이야기 할것
+
+	Transaction("saveBorde","wvanQuery::common/json/saveMail.action","input=boardInsert_Info:u","out_ds=output","","callbackBorde");
+    Transaction("saveBorde","wvanQuery::common/json/saveBorde.action","input=boardUpdate_Info:u","out_ds=output","","callbackBordeUpdate");	
+	
+끝 
+
+
+
+
+
+
+
+
+
+****************************************
+**     2014.07.25 레이아웃 공통 변경 사항       **
+****************************************
+(1) 그리드 속성 수정	
+		HeadHeight : 20
+		RowHeight : 20
+		BoldHead : false
+		BkSelColor : #E8D9FF
+		BkColor2 : #F9F9F9
+
+(2) 그리드 더블클릭한후 속성 수정
+		BkColor : #E7E9EE (HEAD 부분)
+		Valign : center (HEAD, BODY 부분)				
+		
+(3) 폰트 : 굴림체,9 (그리드폰트 : 굴림체,9)
+		=> Form 클릭 후 Font 속성에 적용
+
+(4) 조회버튼 : Reset 버튼과 사이즈 동일하게 변경
+
+(5) 그리드 체크박스 선택시 색상변경기능 있을시 => 'wheat' 으로 함.
+
+(6) 조회박스 
+		BkColor : #E7E9EE			
+
+
+=> 참조화면은 자재정보>"발주정보 화면"(Material::purchaseOrder.xml) 참조하시기 바랍니다.
+
+
+
+
+
+
+****************************************
+**     2014.07.25 deploy 적용법  (정성만)     **
+****************************************
+
+1. deploy를 소스에 적용하려면 struts-common.xml 파일과 mi330U_new폴더를 update를 받는다.
+
+2. mi330U_new/install/miplatform.js파일의 소스 1번째 라인에 userBaseURL변수에 자신의 ip를 적어준다.
+
+#deploy없이 개발하려면 1. <- 이곳의 파일과 폴더를 update를 받지 않아야 한다.#
+끝 
+
+
+   
+****************************************
+**     2014.08.26 표준 ctrl
+****************************************
+
+# 조회/reset 단추 위치
+	: 마지막 조회ctrl 라인에 맞추기로  (Bae K, Lee K)
+
+# grid, cal : shortageDeductionClaim 참조
+	: sunken --> flat
+
+   

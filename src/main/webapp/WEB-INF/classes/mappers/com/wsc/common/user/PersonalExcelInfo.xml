@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.user.PersonalExcelInfo">
+    <select id="getSelectPersonalExcelGroup" resultType="record" parameterType="params">
+        CALL sp_get_select_personal_excel_group(#{sysId})
+    </select>
+    
+    <select id="search" resultType="record" parameterType="params">
+        CALL sp_search_personal_excel_info(#{sysId}, #{start}, #{end}, #{s_windId})
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+		CALL sp_search_personal_excel_info_count(#{sysId}, #{s_windId})
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+    	CALL sp_select_personal_excel_info(#{sysId}, #{windId}, #{colId})
+    </select>
+    <insert id="insert" parameterType="params">
+		CALL sp_insert_personal_excel_info(#{sysId}, #{windId}, #{viewSeq}, #{viewType}, #{colId}, #{colDesc} , #{exceColId}, #{style}, #{excelDown}, #{mergCode}, #{useYn},#{useRemk}, #{gsUserId})
+    </insert>
+    <update id="update" parameterType="params">
+		CALL sp_update_personal_excel_info(#{sysId}, #{windId}, #{viewSeq}, #{viewType}, #{colId}, #{colDesc} , #{exceColId}, #{style}, #{excelDown}, #{mergCode}, #{useYn},#{useRemk}, #{gsUserId})
+    </update>
+    <delete id="delete" parameterType="params">
+		CALL sp_delete_personal_excel_info(#{sysId}, #{windId}, #{colId})
+    </delete> 
+
+</mapper>

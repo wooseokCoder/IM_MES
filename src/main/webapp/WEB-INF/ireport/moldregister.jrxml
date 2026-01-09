@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="moldregister" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9ed256e5-753c-4005-9cd1-1ca7f17725e7">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SYS_ID" class="java.lang.String"/>
+	<parameter name="MOLD_NO" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[".\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT MOLD_NO,PART_NO,PART_NAME,ITEM_NO,ITEM_NAME,VNDR_NAME,MOLD_PUB_COMP,PROD_COM
+,fn_get_code_name('STOR_LOC',MOLD_LOC, 'ko') AS "MOLD_LOC",COMP_NAME,COMP_ADDR,DAMG_IDX,PANT_IDX,STOR_RACK_IDX
+,fn_get_code_name('PROD_COM',PROC_NM, 'ko') AS 'PROC_NM',MATR_TYPE,ITEM_W,ITEM_H,ITEM_L,ITEM_KG,ITEM_CVT,DUR_SHOT_QTY,POST_PRCE,TOT_PRCE,ATCH_NO
+FROM   MOLD_MAST
+WHERE  SYS_ID = $P{SYS_ID}
+AND    MOLD_NO = $P{MOLD_NO}]]>
+	</queryString>
+	<field name="MOLD_NO" class="java.lang.String">
+		<fieldDescription><![CDATA[자산번호(금형관리번호)]]></fieldDescription>
+	</field>
+	<field name="PART_NO" class="java.lang.String">
+		<fieldDescription><![CDATA[품번]]></fieldDescription>
+	</field>
+	<field name="PART_NAME" class="java.lang.String">
+		<fieldDescription><![CDATA[품명(금형명칭)]]></fieldDescription>
+	</field>
+	<field name="ITEM_NO" class="java.lang.String">
+		<fieldDescription><![CDATA[단품번호]]></fieldDescription>
+	</field>
+	<field name="ITEM_NAME" class="java.lang.String">
+		<fieldDescription><![CDATA[단품명]]></fieldDescription>
+	</field>
+	<field name="VNDR_NAME" class="java.lang.String">
+		<fieldDescription><![CDATA[업체명(인수처)]]></fieldDescription>
+	</field>
+	<field name="MOLD_PUB_COMP" class="java.lang.String">
+		<fieldDescription><![CDATA[형 제작사]]></fieldDescription>
+	</field>
+	<field name="PROD_COM" class="java.lang.String">
+		<fieldDescription><![CDATA[제작업체]]></fieldDescription>
+	</field>
+	<field name="MOLD_LOC" class="java.lang.String"/>
+	<field name="COMP_NAME" class="java.lang.String">
+		<fieldDescription><![CDATA[외주시 업체명]]></fieldDescription>
+	</field>
+	<field name="COMP_ADDR" class="java.lang.String">
+		<fieldDescription><![CDATA[외주업체 주소]]></fieldDescription>
+	</field>
+	<field name="DAMG_IDX" class="java.lang.String">
+		<fieldDescription><![CDATA[손상여부(○, X)]]></fieldDescription>
+	</field>
+	<field name="PANT_IDX" class="java.lang.String">
+		<fieldDescription><![CDATA[도색여부(○, X)]]></fieldDescription>
+	</field>
+	<field name="STOR_RACK_IDX" class="java.lang.String">
+		<fieldDescription><![CDATA[보관RACK여부(○, X)]]></fieldDescription>
+	</field>
+	<field name="PROC_NM" class="java.lang.String"/>
+	<field name="MATR_TYPE" class="java.lang.String">
+		<fieldDescription><![CDATA[재질]]></fieldDescription>
+	</field>
+	<field name="ITEM_W" class="java.lang.String">
+		<fieldDescription><![CDATA[가로]]></fieldDescription>
+	</field>
+	<field name="ITEM_H" class="java.lang.String">
+		<fieldDescription><![CDATA[높이]]></fieldDescription>
+	</field>
+	<field name="ITEM_L" class="java.lang.String">
+		<fieldDescription><![CDATA[세로]]></fieldDescription>
+	</field>
+	<field name="ITEM_KG" class="java.lang.String">
+		<fieldDescription><![CDATA[중량(KG)]]></fieldDescription>
+	</field>
+	<field name="ITEM_CVT" class="java.lang.String">
+		<fieldDescription><![CDATA[CAVITY]]></fieldDescription>
+	</field>
+	<field name="DUR_SHOT_QTY" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[내구 SHOTⓐ]]></fieldDescription>
+	</field>
+	<field name="POST_PRCE" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[취득금액(백만원)]]></fieldDescription>
+	</field>
+	<field name="TOT_PRCE" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[총 금액(백만원) = 결정가]]></fieldDescription>
+	</field>
+	<field name="ATCH_NO" class="java.lang.String">
+		<fieldDescription><![CDATA[파일첨부키(SYS_FILE)]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="512" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="232" width="802" height="279" uuid="222e5953-f000-4f28-94c7-4a999ca7f249"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="180" y="0" width="622" height="53" uuid="d32abd01-2274-4988-9e48-81ab9a0a93ce"/>
+			</rectangle>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="212" width="802" height="20" backcolor="#CCCCCC" uuid="ae9afab2-b340-4e1a-ba7b-2aafc9081b99"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[형 변경 이력 ( Change Record )]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="212" width="802" height="20" backcolor="#FFFFFF" uuid="dad4a566-7dc7-484b-a7df-90502760bd7c"/>
+			</rectangle>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="66" width="100" height="20" backcolor="#CCCCCC" uuid="a14021fb-9963-43b1-80f2-dcb8d64b97e0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[Part No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="100" y="66" width="135" height="20" backcolor="#CCCCCC" uuid="8894f3e8-f09f-4885-8f2a-5bd88ecd2f25"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[Part Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="235" y="66" width="101" height="20" backcolor="#CCCCCC" uuid="728f7c7a-4ef3-4b94-aba4-257970d30cae"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[Sub Part No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="336" y="66" width="166" height="20" backcolor="#CCCCCC" uuid="318286e6-21bc-498d-8b78-f33e709f93ae"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[Sub Part Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="502" y="66" width="152" height="20" backcolor="#CCCCCC" uuid="b37ee65e-0ccf-456c-9c7c-171be388c1eb"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[Supplier]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="654" y="66" width="148" height="20" backcolor="#CCCCCC" uuid="53201416-6cae-4b45-a348-1ee428b76ffb"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[Manufacture]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="53" width="100" height="20" backcolor="#CCCCCC" uuid="b305cf28-c4e3-4e01-8ec7-4790d1136359"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[부품번호]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="100" y="53" width="135" height="20" backcolor="#CCCCCC" uuid="7b420bee-9441-479b-b906-549cf8823905"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[부 품 명]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="235" y="53" width="101" height="20" backcolor="#CCCCCC" uuid="48b77e81-0354-447c-b204-8dde5a23734a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[단품번호]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="336" y="53" width="166" height="20" backcolor="#CCCCCC" uuid="5f2cdf3f-4d63-42d8-abdf-37087efe2a0e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[단 품 명]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="502" y="53" width="152" height="20" backcolor="#CCCCCC" uuid="79aafe25-df9e-4363-b6f7-ac51c049a841"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[부품업체]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="654" y="53" width="148" height="20" backcolor="#CCCCCC" uuid="adba3e2c-366e-47e0-941f-21c270e9e2de"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[형제작업체]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="0" width="622" height="33" uuid="82132856-99f2-4936-97e9-ea36597748fd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="14" isBold="true" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[형 이력 및 관리카드]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="26" width="622" height="20" uuid="53b37a52-5da9-495f-89de-d6c86f0c2e00"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="12" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[History Card of Mold]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="86" width="100" height="20" uuid="43b27470-2e71-4086-a743-5f4719a69b83"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="100" y="86" width="135" height="20" uuid="95f1ac49-30c3-43ed-a049-068d69cb9386"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="235" y="86" width="101" height="20" uuid="e361f11b-524e-4167-99a1-e47e2e5c3303"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="336" y="86" width="166" height="20" uuid="ff0a2002-ddac-4c4e-a30e-d682a5a47de3"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="502" y="86" width="152" height="20" uuid="39e09020-2c7a-4b01-b849-228851f0e994"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="654" y="86" width="148" height="20" uuid="a503890b-5d80-42ab-837d-16a63d1db702"/>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="33" width="180" height="20" uuid="c6fd76aa-ffc7-443c-ba42-46a7953e8c57"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MOLD_NO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="13" width="180" height="20" backcolor="#CCCCCC" uuid="576dd9cf-ef54-4d53-944b-c2aaa8288879"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[Administration No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="180" height="20" backcolor="#CCCCCC" uuid="038770be-a8dd-4782-b188-7737ecf0f57b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[형 관 리 번 호]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="86" width="100" height="20" uuid="55e07987-6f2b-4705-be73-cf202988ded1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PART_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="100" y="86" width="135" height="20" uuid="7540aee8-9b58-4e65-94f4-d7ff34bfcb59"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PART_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="235" y="86" width="101" height="20" uuid="edf80cb2-1a0c-4c4b-85ac-738d1420c900"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="336" y="86" width="166" height="20" uuid="e97bad7d-a283-4c66-8ad4-1e964de5453b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="502" y="86" width="152" height="20" uuid="01a043df-5209-4870-9d12-cd2118f7c97d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VNDR_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="654" y="86" width="148" height="20" uuid="64b8a481-88d9-4a18-b633-7162f1d35c1f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MOLD_PUB_COMP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="139" width="100" height="20" uuid="a6ee5eed-7b35-4ab5-b0b2-c5cb88e3edcb"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MOLD_LOC}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="119" width="100" height="20" backcolor="#CCCCCC" uuid="0c71cf1c-6949-4031-ade2-936f2fe32f9f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[(외주 or 자사)]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="100" y="139" width="135" height="20" uuid="5bde0f53-3303-47fa-a924-bcb5fa68268c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMP_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="100" y="106" width="135" height="33" backcolor="#CCCCCC" uuid="fd15c299-8336-4572-a90d-6a85ba06a2a5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[외주시 업체명]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="235" y="139" width="267" height="20" uuid="acfc3b5e-0c9c-41e2-86e2-86c03ee2b4d8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMP_ADDR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="235" y="106" width="267" height="33" backcolor="#CCCCCC" uuid="aaaa524b-1069-4a6d-a376-6b3e74abcf4f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[외주업체 주소]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="502" y="139" width="100" height="20" uuid="0c285179-0c4d-45c0-b037-c06291e27af1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DAMG_IDX}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="602" y="139" width="100" height="20" uuid="cc16c8d4-ae8a-49ae-a1be-23f88f6bd88f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PANT_IDX}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="702" y="139" width="100" height="20" uuid="a5c05c28-ffd2-45c8-af88-cbb6ad446f78"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STOR_RACK_IDX}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="502" y="119" width="100" height="20" backcolor="#CCCCCC" uuid="a2bb82a2-d13c-4233-8192-561b7acd1091"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[(O,X)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="602" y="119" width="100" height="20" backcolor="#CCCCCC" uuid="5a4c60c0-e3b7-43ca-87af-62707cd76ef4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[(O,X)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="702" y="119" width="100" height="20" backcolor="#CCCCCC" uuid="98d9d082-4301-49d7-91fc-2a42eeaa99ff"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[(O,X)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="106" width="100" height="20" backcolor="#CCCCCC" uuid="a874a9f5-8d8d-4998-80c9-287015dbcd3d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[형 위 치]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="502" y="106" width="100" height="20" backcolor="#CCCCCC" uuid="c76b9503-3ecc-417d-bdba-ea32d55416c9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[손상여부]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="602" y="106" width="100" height="20" backcolor="#CCCCCC" uuid="338374dc-92c4-40b0-9a71-6ab9727cfd47"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[도색여부]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="702" y="106" width="100" height="20" backcolor="#CCCCCC" uuid="1d7652bc-21d1-4833-8f8a-1507ed99e952"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[보관RACK여부]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="106" width="100" height="33" uuid="c9b8bd54-993c-4d16-90a5-f5506aebee60"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="100" y="106" width="135" height="33" uuid="2bd20178-9dde-4803-9421-49b44feed646"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="235" y="106" width="267" height="33" uuid="7d55f645-afe2-4e4d-9c04-ec8991d9aa68"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="502" y="106" width="100" height="33" uuid="9e118d63-13d7-4e29-a90f-2152cd742871"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="602" y="106" width="100" height="33" uuid="04f489a3-4851-4f7f-bc1b-666eea6de54a"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="702" y="106" width="100" height="33" uuid="14f3e15b-a225-4749-97f5-e0571aac64af"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="139" width="100" height="20" uuid="942a4a55-10a3-4c49-8dcf-a57a6f61a0d7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="100" y="139" width="135" height="20" uuid="857f5533-7610-40c9-8428-e3ba3e32162f"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="235" y="139" width="267" height="20" uuid="b499f26d-82ad-4556-b252-05ba4197f48a"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="502" y="139" width="100" height="20" uuid="e70449b1-73d7-4a70-8aec-0e892474e271"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="602" y="139" width="100" height="20" uuid="5b862160-c235-4670-8c98-d0ca322eb2a5"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="702" y="139" width="100" height="20" uuid="b1e76863-4283-419a-9851-7d2d9d0bb78e"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="33" width="180" height="20" uuid="7797c0d9-d1e4-463f-a325-435b1e4d57e0"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="0" width="180" height="33" uuid="0fcdfaf5-cf4d-42b7-a93b-26b134dfdb1f"/>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="192" width="100" height="20" uuid="e22ee012-aef0-4c86-94d2-61c469e68739"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PROC_NM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="172" width="100" height="20" backcolor="#CCCCCC" uuid="0b8178e0-8afd-4078-9438-d1b320703912"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[Process]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="100" y="192" width="100" height="20" uuid="adc0d982-a4e2-46f2-9fe6-635c10a1441b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MATR_TYPE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="100" y="172" width="100" height="20" backcolor="#CCCCCC" uuid="b73849c3-4f2b-4525-895e-dc5319128920"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[Material]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="200" y="192" width="62" height="20" uuid="5518b6ff-83c4-4f87-9ef6-b616312aeede"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_W}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="262" y="192" width="62" height="20" uuid="d35713e2-beed-4717-976c-1bbc51d82189"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_L}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="200" y="172" width="186" height="20" backcolor="#CCCCCC" uuid="41fcb570-596e-42e5-8ebd-3ee4800181c8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[(가로*세로*높이)]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="324" y="192" width="62" height="20" uuid="0dde52f1-0224-46af-bdd2-1d14071ca33b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_H}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="386" y="192" width="68" height="20" uuid="25da143c-6487-41f6-bc93-35db42d80aa2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_KG}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="454" y="192" width="48" height="20" uuid="4ae6d3e7-df8b-4a43-b594-adfc600e246e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_CVT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="502" y="192" width="100" height="20" uuid="8b1d5f98-51cc-4317-a66f-fd68fd0b493a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DUR_SHOT_QTY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="386" y="172" width="68" height="20" backcolor="#CCCCCC" uuid="39deaec5-67d9-4798-89df-36cf4b32c43f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[Weight(Kg)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="502" y="172" width="100" height="20" backcolor="#CCCCCC" uuid="e1ad7eda-6514-4907-8bc5-5a9d4db843ac"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[Endurance Shot]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="602" y="192" width="100" height="20" uuid="7a2e237a-17d6-4b7b-ba91-d8f5e550e8d9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POST_PRCE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="702" y="192" width="100" height="20" uuid="c2403904-557e-47fc-b870-736bf2689cc1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOT_PRCE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="602" y="172" width="100" height="20" backcolor="#CCCCCC" uuid="93d9331c-a3b2-4af9-a738-0a08349650e1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[Decision Price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="702" y="172" width="100" height="20" backcolor="#CCCCCC" uuid="cb4a586b-4570-4584-9cef-aaab8287d9be"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[(원)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="159" width="100" height="20" backcolor="#CCCCCC" uuid="ffbfac47-5641-4638-86b1-6f9a04b0a46a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[공 정 명]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="100" y="159" width="100" height="20" backcolor="#CCCCCC" uuid="3d5ef220-f28b-4300-83b6-d9d5d88afc75"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[주재질]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="200" y="159" width="186" height="20" backcolor="#CCCCCC" uuid="685fd841-0cb3-43ab-8325-0533ae156425"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[SIZE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="386" y="159" width="68" height="20" backcolor="#CCCCCC" uuid="cf0990bd-0f13-4ce3-856f-94b4917bfbb0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[중량(Kg)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="454" y="159" width="48" height="33" backcolor="#CCCCCC" uuid="cb4ead86-d347-4bf9-bccf-0bd2b4fb4b75"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[CAVITY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="502" y="159" width="100" height="20" backcolor="#CCCCCC" uuid="49179459-58f0-416a-ba96-005797e92442"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[내구SHOP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="602" y="159" width="100" height="20" backcolor="#CCCCCC" uuid="e7f55271-5b50-4de7-a07f-fd5cdc0f803f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[최초 취득가(원)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="702" y="159" width="100" height="20" backcolor="#CCCCCC" uuid="79a21a97-7208-4c7c-a506-7505e4c1a89d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[총 취득금액]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="159" width="100" height="33" uuid="bb92fbfc-25a1-412c-a3c2-d51009cc9960"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="100" y="159" width="100" height="33" uuid="2d08e6f9-7898-45f3-9ae8-a6c323a990a0"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="200" y="159" width="186" height="33" uuid="e3ca62b1-2a0d-4b5d-a020-ec4b3451b70c"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="386" y="159" width="68" height="33" uuid="fa20e6f0-14b0-429b-a8a8-11cc434c69bd"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="454" y="159" width="48" height="33" uuid="b3af5863-6b93-4845-a663-740bb0934d4c"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="502" y="159" width="100" height="33" uuid="9c001c7b-2c4c-4462-815c-2f6d39d2f1a4"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="602" y="159" width="100" height="33" uuid="3f9cbfa9-47e8-4830-95e0-8283c10e6606"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="702" y="159" width="100" height="33" uuid="bced48a1-b450-43b7-9a50-68111463f5a5"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="192" width="100" height="20" uuid="8a5d7bd1-f4ce-4032-bd94-0811e8455eec"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="100" y="192" width="100" height="20" uuid="3f3261c0-3cb4-4421-a1bf-3d8058c7839d"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="200" y="192" width="186" height="20" uuid="94df8217-2efe-47e3-90c0-8afc63065ec4"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="386" y="192" width="68" height="20" uuid="004d5270-718f-4b83-b2fb-73107e26e25b"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="454" y="192" width="48" height="20" uuid="0437c67f-ca76-4aed-911c-012c7ed04523"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="502" y="192" width="100" height="20" uuid="9bb7bc8f-4305-4815-a15d-f4f2aa76d820"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="602" y="192" width="100" height="20" uuid="9e25ce92-651d-40ea-9e86-63bac362e64c"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="702" y="192" width="100" height="20" uuid="1108e0e0-0afd-45ee-b048-60f2587c1483"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="53" width="100" height="33" uuid="a0930dde-b40e-4202-8bbe-8a054def1baa"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="100" y="53" width="135" height="33" uuid="1166379d-6d81-4643-8feb-896df3eee98f"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="235" y="53" width="101" height="33" uuid="400d22fb-8a13-40ff-8d21-a53c0c0ee98d"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="336" y="53" width="166" height="33" uuid="5136f959-2ca5-4ce8-957f-142fada7c811"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="502" y="53" width="152" height="33" uuid="bfe0d09d-9187-4cf3-9bef-c0b0965e230b"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="654" y="53" width="148" height="33" uuid="9a7479fd-7391-4e1d-91f0-81b03180a7ee"/>
+			</rectangle>
+			<subreport>
+				<reportElement x="0" y="232" width="802" height="140" uuid="45a6fc18-4373-49f1-8b83-d6509b3c7b84"/>
+				<subreportParameter name="MOLD_NO">
+					<subreportParameterExpression><![CDATA[$P{MOLD_NO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SYS_ID">
+					<subreportParameterExpression><![CDATA[$P{SYS_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:moldregister_subreport1.jrxml"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="0" y="372" width="802" height="140" uuid="6be2b0ff-b3ee-4e0e-a9aa-a7da237aad73"/>
+				<subreportParameter name="SYS_ID">
+					<subreportParameterExpression><![CDATA[$P{SYS_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ATCH_NO">
+					<subreportParameterExpression><![CDATA[$F{ATCH_NO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:moldregister_subreport2.jrxml"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,18 @@
+@charset "utf-8";
+
+/*@media screen and (min-width:956px){
+	ul.nav li.dropdown:hover,ul.nav li.dropdown:hover>a{
+		background-color:#dd0000 !important; 
+		color:#fff !important;
+		border-top-left-radius:8px;
+		border-top-right-radius:8px;
+	}
+	ul.nav li.dropdown:hover > ul.dropdown-menu{
+		display: block;     
+		margin: 0; 
+	}
+}*/
+@media screen and (max-width:955px){
+	.main_navbar_bg{background-color:rgb(242,242,242) !important;}
+/* 	#main-navbar-collapse{padding-left:10px !important;margin-top:46px;} */
+}

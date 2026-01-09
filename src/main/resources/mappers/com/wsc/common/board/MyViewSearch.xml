@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.board.MyViewSearch">
+    <select id="search" resultType="record" parameterType="params">
+    	CALL sp_get_sys_win_col(#{sysId}, #{gsUserId}, #{windId}, #{viewId})
+    </select>
+    
+    <select id="searchCount" resultType="int" parameterType="params">
+        CALL sp_get_sys_win_col_count(#{sysId}, #{gsUserId}, #{windId}, #{viewId})
+    </select>
+    
+    <select id="search2" resultType="record" parameterType="params">
+    	CALL sp_get_user_vw_col(#{sysId}, #{gsUserId}, #{windId}, #{viewId})
+    </select>
+    
+    <select id="search2Count" resultType="int" parameterType="params">
+        CALL sp_get_user_vw_col_count(#{sysId}, #{gsUserId}, #{windId}, #{viewId})
+    </select>
+    
+    <select id="getMyViewList" resultType="record" parameterType="params">
+		CALL sp_get_my_view_list(#{sysId}, #{gsUserId}, #{windId})
+    </select>
+    
+    <select id="saveMyViewMast" resultType="record" parameterType="params">
+		CALL sp_save_my_view_mast(#{sysId}, #{gsUserId}, #{windId}, #{viewId}, #{viewName}, #{viewSeq}, #{viewDefa})
+    </select>
+    
+    <select id="saveMyViewColList" resultType="record" parameterType="params">
+		CALL sp_save_my_view_col(#{sysId}, #{gsUserId}, #{windId}, #{viewId}, #{colId}, #{colDesc}, #{viewSeq}, #{viewType}, #{exceColId}, #{style}, #{exceDownYn}, #{mergCode})
+    </select>
+    
+    <select id="deleteMyViewColList" resultType="record" parameterType="params">
+		CALL sp_delete_my_view_col(#{sysId}, #{gsUserId}, #{windId}, #{viewId})
+    </select>
+    
+    <select id="getMyViewMastInfo" resultType="record" parameterType="params">
+		CALL sp_get_my_view_mast(#{sysId}, #{gsUserId}, #{windId}, #{viewId})
+    </select>
+    
+	<select id="deleteMyView" resultType="record" parameterType="params">
+		CALL sp_delete_my_view(#{sysId}, #{gsUserId}, #{windId}, #{viewId})
+    </select>
+    
+</mapper>

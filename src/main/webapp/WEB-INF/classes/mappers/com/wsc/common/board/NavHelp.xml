@@ -1,0 +1,1031 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.board.NavHelp">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS "rnum"
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+	  		   A.BORD_SEQ  ASC
+	  		  ,A.REGI_DATE DESC
+	  	</if>
+    </sql>
+    
+    <sql id="selectColumns">
+         SYS_ID        AS "sysId"
+        ,BORD_NO       AS "BORDNO1"
+        ,BORD_NO       AS "bordNo"
+        ,BORD_GRUP     AS "bordGrup"
+        ,BORD_TITLE    AS "BORDTITLE1"
+        ,BORD_TITLE    AS "bordTitle"
+        ,BORD_TYPE     AS "bordType"
+        ,FN_CONV_DATE1(BORD_BGN)
+        		       AS "bordBgn"
+        ,FN_CONV_DATE1(BORD_END)
+        		       AS "bordEnd"
+        ,READ_CNT      AS "readCnt"
+        ,BORD_SEQ      AS "bordSeq"
+        ,BORD_PNO      AS "bordPno"
+        ,OPEN_TYPE     AS "openType"
+        ,OPEN_CLS	   AS "openCls"
+        ,USE_FLAG      AS "useFlag"
+        ,DATA_GRP1	   AS "dataGrp1"
+        ,DATA_GRP2	   AS "dataGrp2"
+        ,DATA_GRP3	   AS "dataGrp3"
+        ,DATA_GRP4	   AS "dataGrp4"
+        ,DATA_SER1	   AS "dataSer1"
+        ,DATA_SER2	   AS "dataSer2"
+        ,DATA_SER3	   AS "dataSer3"
+        ,DATA_SER4	   AS "dataSer4"
+        ,DATA_SER5	   AS "dataSer5"
+        ,CONCAT(IFNULL(DATA_SER1,''),
+        		IF(IFNULL(CONCAT(',',DATA_SER2),'') = ',' OR IFNULL(CONCAT(',',DATA_SER2),'') = '','',CONCAT(',',DATA_SER2)),
+        		IF(IFNULL(CONCAT(',',DATA_SER3),'') = ',' OR IFNULL(CONCAT(',',DATA_SER3),'') = '','',CONCAT(',',DATA_SER3)),
+        		IF(IFNULL(CONCAT(',',DATA_SER4),'') = ',' OR IFNULL(CONCAT(',',DATA_SER4),'') = '','',CONCAT(',',DATA_SER4)),
+        		IF(IFNULL(CONCAT(',',DATA_SER5),'') = ',' OR IFNULL(CONCAT(',',DATA_SER5),'') = '','',CONCAT(',',DATA_SER5)))
+        			   AS "dataSerT"
+        ,DATA_MD01	   AS "dataMd01"
+        ,DATA_MD02	   AS "dataMd02"
+        ,DATA_MD03	   AS "dataMd03"
+        ,DATA_MD04	   AS "dataMd04"
+        ,DATA_MD05	   AS "dataMd05"
+        ,DATA_MD06	   AS "dataMd06"
+        ,DATA_MD07	   AS "dataMd07"
+        ,DATA_MD08	   AS "dataMd08"
+        ,DATA_MD09	   AS "dataMd09"
+        ,DATA_MD10	   AS "dataMd10"
+        ,CONCAT(IFNULL(DATA_MD01,''),
+        		IF(IFNULL(CONCAT(',',DATA_MD02),'') = ',' OR IFNULL(CONCAT(',',DATA_MD02),'') = '','',CONCAT(',',DATA_MD02)),
+        		IF(IFNULL(CONCAT(',',DATA_MD03),'') = ',' OR IFNULL(CONCAT(',',DATA_MD03),'') = '','',CONCAT(',',DATA_MD03)),
+        		IF(IFNULL(CONCAT(',',DATA_MD04),'') = ',' OR IFNULL(CONCAT(',',DATA_MD04),'') = '','',CONCAT(',',DATA_MD04)),
+        		IF(IFNULL(CONCAT(',',DATA_MD05),'') = ',' OR IFNULL(CONCAT(',',DATA_MD05),'') = '','',CONCAT(',',DATA_MD05)),
+        		IF(IFNULL(CONCAT(',',DATA_MD06),'') = ',' OR IFNULL(CONCAT(',',DATA_MD06),'') = '','',CONCAT(',',DATA_MD06)),
+        		IF(IFNULL(CONCAT(',',DATA_MD07),'') = ',' OR IFNULL(CONCAT(',',DATA_MD07),'') = '','',CONCAT(',',DATA_MD07)),
+        		IF(IFNULL(CONCAT(',',DATA_MD08),'') = ',' OR IFNULL(CONCAT(',',DATA_MD08),'') = '','',CONCAT(',',DATA_MD08)),
+        		IF(IFNULL(CONCAT(',',DATA_MD09),'') = ',' OR IFNULL(CONCAT(',',DATA_MD09),'') = '','',CONCAT(',',DATA_MD09)),
+        		IF(IFNULL(CONCAT(',',DATA_MD10),'') = ',' OR IFNULL(CONCAT(',',DATA_MD10),'') = '','',CONCAT(',',DATA_MD10)))
+        			   AS "dataMdT"
+        ,SEAR_IDX	   AS "searIdx"
+        ,REGI_ID       AS "regiId"
+        ,DATE_FORMAT(REGI_DATE,'%Y-%m-%d %H:%i:%s')     
+                       AS "regiDate"
+        ,CHNG_ID       AS "chngId"
+        ,DATE_FORMAT(CHNG_DATE,'%Y-%m-%d %H:%i:%s')     
+                       AS "chngDate"
+		,(SELECT USER_NAME
+		    FROM SYS_USER
+		   WHERE SYS_ID  = A.SYS_ID
+		     AND USER_ID = A.REGI_ID
+		 )             AS "regiName"
+		,(SELECT USER_NAME
+		    FROM SYS_USER
+		   WHERE SYS_ID  = A.SYS_ID
+		     AND USER_ID = A.CHNG_ID
+		 )             AS "chngName"
+		,BORD_NO       AS "id"
+		,BORD_PNO      AS "parentId"
+		,CASE WHEN (SELECT COUNT(*)
+		              FROM SYS_BORD
+		             WHERE SYS_ID    = A.SYS_ID
+		               AND BORD_PNO  = A.BORD_NO
+		               AND BORD_GRUP = A.BORD_GRUP) = 0
+		      THEN 'open'
+		      ELSE 'closed'
+		 END           AS "state"
+		,(SELECT COUNT(Atch_No)
+		    FROM SYS_FILE
+		   WHERE SYS_ID    = A.SYS_ID
+		     AND ATCH_NO   = A.BORD_NO
+		     AND ATCH_GRUP = A.BORD_GRUP 
+		)              AS "fileCnt"
+		,(SELECT COUNT(BORD_PNO)
+		    FROM SYS_BORD
+		   WHERE SYS_ID    = A.SYS_ID
+		     AND BORD_GRUP = A.BORD_GRUP
+		     AND BORD_PNO  = A.BORD_NO
+ 		)              AS "replyCnt" 
+ 		,CASE WHEN BORD_TYPE = 'ALL' THEN 'All user'
+ 		      WHEN BORD_TYPE = 'DLR' THEN 'All dealer'
+ 		      ELSE CONCAT('Specific dealer :  ',(SELECT GROUP_CONCAT(TGT_USER_ID)
+											    FROM SYS_BORD_TGT
+											   WHERE SYS_ID    = A.SYS_ID
+											     AND BORD_GRUP = A.BORD_GRUP
+											     AND BORD_NO  = A.BORD_NO
+									 		)) END           AS  "target"
+		,CASE WHEN BORD_TYPE = 'ALL' THEN ''
+ 		      WHEN BORD_TYPE = 'DLR' THEN ''
+		      ELSE(SELECT GROUP_CONCAT(TGT_USER_ID)
+				    FROM SYS_BORD_TGT
+				   WHERE SYS_ID    = A.SYS_ID
+				     AND BORD_GRUP = A.BORD_GRUP
+				     AND BORD_NO  = A.BORD_NO)  END	 AS		"targetValue"
+		,(SELECT FILE_NAME
+		    FROM SYS_FILE
+		   WHERE SYS_ID    = A.SYS_ID
+		     AND ATCH_NO   = A.BORD_NO
+		     AND ATCH_GRUP = A.BORD_GRUP
+		     AND THUMB_NAIL = "Y"
+		     limit 1 )              AS "thumbNail"
+		,LANGUAGE
+    </sql>
+    
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , BORD_NO
+         , BORD_GRUP
+         , BORD_TITLE
+         , READ_CNT
+         , BORD_SEQ
+         , USE_FLAG
+         , REGI_ID
+         , REGI_DATE
+         , CHNG_ID
+         , CHNG_DATE
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordType )">, BORD_TYPE  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordBgn  )">, BORD_BGN   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordEnd  )">, BORD_END   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordPno  )">, BORD_PNO   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(openType )">, OPEN_TYPE  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordText )">, BORD_TEXT  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataGrp1 )">, DATA_GRP1  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataGrp2 )">, DATA_GRP2  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataGrp3 )">, DATA_GRP3  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataGrp4 )">, DATA_GRP4  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataSer1 )">, DATA_SER1  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataSer2 )">, DATA_SER2  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataSer3 )">, DATA_SER3  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataSer4 )">, DATA_SER4  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataSer5 )">, DATA_SER5  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd01 )">, DATA_MD01  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd02 )">, DATA_MD02  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd03 )">, DATA_MD03  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd04 )">, DATA_MD04  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd05 )">, DATA_MD05  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd06 )">, DATA_MD06  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd07 )">, DATA_MD07  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd08 )">, DATA_MD08  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd09 )">, DATA_MD09  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd10 )">, DATA_MD10  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searIdx  )">, SEAR_IDX  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(justOne  )">, OPEN_CLS  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(LANGUAGE )">, LANGUAGE  </if>
+    </sql>
+    <sql id="insertColumns-values">
+           #{sysId}
+         , #{bordNo}
+         , #{bordGrup}
+         , TRIM(#{bordTitle})
+         , 0
+         , 999999999
+         , 'Y'
+         , #{gsUserId}
+         , NOW()
+         , #{gsUserId}
+         , NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordType )">, #{bordType}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordBgn  )">, FN_CONV_DATE(#{bordBgn})   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordEnd  )">, FN_CONV_DATE(#{bordEnd})   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordPno  )">, #{bordPno}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(openType )">, #{openType}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordText )">, #{bordText}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataGrp1 )">, #{dataGrp1}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataGrp2 )">, #{dataGrp2}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataGrp3 )">, #{dataGrp3}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataGrp4 )">, #{dataGrp4}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataSer1 )">, #{dataSer1}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataSer2 )">, #{dataSer2}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataSer3 )">, #{dataSer3}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataSer4 )">, #{dataSer4}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataSer5 )">, #{dataSer5}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd01 )">, #{dataMd01}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd02 )">, #{dataMd02}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd03 )">, #{dataMd03}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd04 )">, #{dataMd04}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd05 )">, #{dataMd05}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd06 )">, #{dataMd06}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd07 )">, #{dataMd07}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd08 )">, #{dataMd08}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd09 )">, #{dataMd09}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dataMd10 )">, #{dataMd10}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searIdx  )">, #{searIdx}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(justOne  )">, #{justOne}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(LANGUAGE  )">, #{LANGUAGE}  </if>
+    </sql>
+    <sql id="updateColumns">
+           CHNG_ID   = #{gsUserId}
+         , CHNG_DATE = NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordTitle)">, BORD_TITLE = TRIM(#{bordTitle}) </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordText )">, BORD_TEXT  = #{bordText}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordType )">, BORD_TYPE  = #{bordType}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordBgn  )">, BORD_BGN   = FN_CONV_DATE(#{bordBgn})    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordEnd  )">, BORD_END   = FN_CONV_DATE(#{bordEnd})    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(readCnt  )">, READ_CNT   = #{readCnt}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordSeq  )">, BORD_SEQ   = #{bordSeq}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag  )">, USE_FLAG   = #{useFlag}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(openType )">, OPEN_TYPE  = #{openType}        </if>
+        , DATA_GRP1 = IFNULL(#{dataGrp1},'')
+        , DATA_GRP2 = IFNULL(#{dataGrp2},'')
+        , DATA_GRP3 = IFNULL(#{dataGrp3},'')
+        , DATA_GRP4 = IFNULL(#{dataGrp4},'')
+        , DATA_SER1 = IFNULL(#{dataSer1},'')
+        , DATA_SER2 = IFNULL(#{dataSer2},'')
+        , DATA_SER3 = IFNULL(#{dataSer3},'')
+        , DATA_SER4 = IFNULL(#{dataSer4},'')
+        , DATA_SER5 = IFNULL(#{dataSer5},'')
+        , DATA_MD01 = IFNULL(#{dataMd01},'')
+        , DATA_MD02 = IFNULL(#{dataMd02},'')
+        , DATA_MD03 = IFNULL(#{dataMd03},'')
+        , DATA_MD04 = IFNULL(#{dataMd04},'')
+        , DATA_MD05 = IFNULL(#{dataMd05},'')
+        , DATA_MD06 = IFNULL(#{dataMd06},'')
+        , DATA_MD07 = IFNULL(#{dataMd07},'')
+        , DATA_MD08 = IFNULL(#{dataMd08},'')
+        , DATA_MD09 = IFNULL(#{dataMd09},'')
+        , DATA_MD10 = IFNULL(#{dataMd10},'')
+        , SEAR_IDX  = IFNULL(#{searIdx},'')
+        , LANGUAGE  = IFNULL(#{LANGUAGE},'')
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(justOne )">, OPEN_CLS  = #{justOne}   </if>
+    </sql>
+    <sql id="whereClause">
+    		SYS_ID    = #{sysId}
+    	AND BORD_GRUP = #{bordGrup}
+    	AND USE_FLAG  = "Y"
+    	<choose>
+	   		<when test="bordGrup == 'B28'"> 
+	   			AND DATA_GRP2 = 'Service Bulletin' 
+	   		</when>
+	   		<otherwise>
+    		</otherwise>
+   		</choose>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(regiId   )">AND REGI_ID    = #{regiId}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordTitle)">AND BORD_TITLE LIKE CONCAT('%',#{bordTitle},'%')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordText )">AND BORD_TEXT  LIKE CONCAT('%',#{bordText},'%') </if>
+        <if test='bordGrup != "B06"'>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordType )">AND BORD_TYPE  = #{bordType}   </if>
+        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordBgn  )">AND BORD_BGN   = #{bordBgn}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordEnd  )">AND BORD_END   = #{bordEnd}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(openType )">AND OPEN_TYPE  = #{openType}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchGrp1)">AND DATA_GRP1  = #{searchGrp1}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchGrp2)">AND DATA_GRP2  = #{searchGrp2}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchGrp3)">
+        	AND (DATA_SER1 = #{searchGrp3} OR DATA_SER2 = #{searchGrp3} OR DATA_SER3 = #{searchGrp3} OR DATA_SER4 = #{searchGrp3} OR DATA_SER5 = #{searchGrp3})
+        	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchGrp4)">
+        	AND (DATA_MD01 = #{searchGrp4} OR DATA_MD02 = #{searchGrp4} OR DATA_MD03 = #{searchGrp4} OR DATA_MD04 = #{searchGrp4} OR DATA_MD05 = #{searchGrp4} OR DATA_MD06 = #{searchGrp4} OR DATA_MD07 = #{searchGrp4} OR DATA_MD08 = #{searchGrp4} OR DATA_MD09 = #{searchGrp4} OR DATA_MD10 = #{searchGrp4}) 
+        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(language)">
+            AND LANGUAGE = #{language}
+        </if>
+        <!-- 검색조건,검색텍스트 입력시 -->
+	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchText) and @com.wsc.framework.utils.MybatisUtils@notEmpty(searchKey)">
+			<choose>
+	    		<when test="searchKey == 'S01'"> 
+	    			AND A.BORD_TITLE LIKE CONCAT('%',#{searchText},'%') 
+	    		</when>
+	    		<when test="searchKey == 'S02'"> 
+	    			AND A.BORD_TEXT  LIKE CONCAT('%',#{searchText},'%') 
+	    		</when>
+	    		<when test="searchKey == 'S03'"> 
+	    			AND EXISTS (
+	    			    SELECT 1
+	    			      FROM SYS_USER
+	    			     WHERE SYS_ID  = A.SYS_ID
+	    			       AND USER_ID = A.REGI_ID
+	    			       AND USER_NAME LIKE CONCAT('%',#{searchText},'%') 
+	    			    )
+	    		</when>
+	    		<when test="searchKey == 'S04'"> 
+	    			AND A.SEAR_IDX  LIKE CONCAT('%',#{searchText},'%') 
+	    		</when>
+	    		<when test="searchKey == 'S06'"> 
+	    			AND (LOWER(BORD_TITLE) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(CONVERT(BORD_TEXT USING utf8mb4)) LIKE LOWER(CONCAT('%', #{searchText}, '%'))
+                    OR   LOWER(SEAR_IDX)  LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_SER1) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_SER2) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_SER3) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_SER4) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_SER5) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_MD01) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_MD02) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_MD03) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_MD04) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_MD05) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_MD06) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_MD07) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_MD08) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_MD09) LIKE LOWER(CONCAT('%',#{searchText},'%'))
+                    OR   LOWER(DATA_MD10) LIKE LOWER(CONCAT('%',#{searchText},'%')) )
+	    		</when>
+	    		<otherwise>
+	    		</otherwise>
+			</choose>
+	    </if>
+	    <choose>
+    		<when test="searchKey == 'S05'"> 
+    			AND A.REGI_DATE BETWEEN FN_CONV_DATE(#{date1}) AND FN_CONV_DATE(#{date2})
+    		</when>
+    		<otherwise>
+    		</otherwise>
+    	</choose>
+	    <!-- 답변게시판에서 트리검색시 사용 -->
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordPno)">
+            AND BORD_PNO = #{bordPno}    
+        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(bordPno)">
+            AND BORD_PNO IS NULL    
+        </if>
+        
+        <!-- 답변게시판(B04)의 경우 하위노드가 있는 경우 삭제글이 보임. -->
+        <if test='bordGrup == "B04"'>
+        	AND (   (USE_FLAG = 'Y')
+        	     OR (USE_FLAG = 'N' AND (SELECT COUNT(*) 
+        	                               FROM SYS_BORD
+        	                              WHERE SYS_ID    = A.SYS_ID
+        	                                AND BORD_PNO  = A.BORD_NO
+        	                                AND BORD_GRUP = A.BORD_GRUP
+        	                                AND USE_FLAG  = 'Y'
+        	                            ) <![CDATA[>]]> 0
+        	        
+        	        )
+        	    )
+        </if>
+        <!-- 현재기준(todayYn = 'Y')인 경우 -->
+        <if test='todayYn == "Y"'>
+           AND DATE_FORMAT(NOW(),'%Y-%m-%d') BETWEEN BORD_BGN AND BORD_END
+        </if>
+        <!-- 대시보드 더이상 안보기 -->
+        <if test='notAnyMore == "Y"'>
+           AND ( SELECT CASE 
+                  WHEN A.BORD_NO <![CDATA[<>]]> 'B000000000' AND A.BORD_TYPE = 'ALL' AND COUNT(CASE WHEN X.TGT_USER_ID = #{gsUserId} AND X.READ_DATE IS NOT NULL THEN 1 END) = 0
+                  THEN 'Y'
+                  WHEN A.BORD_NO = 'B000000000' AND A.BORD_TYPE = 'ALL' AND COUNT(CASE WHEN X.TGT_USER_ID = #{gsUserId} AND X.READ_DATE IS NOT NULL THEN 1 END) = 0
+                  AND (SELECT COUNT(D.DEAL_CODE) FROM DEAL_MAST D WHERE D.DEAL_CODE = #{gsUserId} AND D.BLOCK_IDX = 'Y')  = 1
+                  THEN 'Y'
+                  WHEN A.BORD_TYPE = 'DLR' AND #{gsOrgAuthCode} = 'DEAL' AND COUNT(CASE WHEN X.TGT_USER_ID = #{gsUserId} AND X.READ_DATE IS NOT NULL THEN 1 END) = 0
+                  AND (SELECT COUNT(D.DEAL_CODE) FROM DEAL_MAST D WHERE D.DEAL_CODE = #{gsUserId} AND D.BLOCK_IDX = 'Y')  = 1
+                  THEN 'Y'
+                  WHEN A.BORD_TYPE = 'LSA' AND #{gsOrgAuthCode} != 'DEAL' AND COUNT(CASE WHEN X.TGT_USER_ID = #{gsUserId} AND X.READ_DATE IS NOT NULL THEN 1 END) = 0
+                  THEN 'Y'
+                  WHEN A.BORD_TYPE = 'USR' AND COUNT(CASE WHEN X.TGT_USER_ID = #{gsUserId} AND X.READ_DATE IS NULL THEN 1 END) > 0
+                  THEN 'Y' END
+                  FROM SYS_BORD_TGT X
+                 WHERE A.SYS_ID = X.SYS_ID
+                  AND   X.BORD_GRUP = #{bordGrup}
+                  AND   A.BORD_GRUP = X.BORD_GRUP
+                  AND   A.BORD_NO = X.BORD_NO) = 'Y' 
+	     </if>
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_BORD A
+         WHERE <include refid="whereClause" />
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_BORD A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+              ,BORD_TEXT  AS "bordText"
+          FROM SYS_BORD A
+         WHERE SYS_ID    = #{sysId}
+           AND BORD_NO   = #{bordNo}
+           AND BORD_GRUP = #{bordGrup}
+    </select>
+    <insert id="insert" parameterType="params">
+       <!--  <selectKey resultType="string" keyProperty="bordNo" order="BEFORE">
+             SELECT 
+             	MENU_URL AS "bordNo" 
+             FROM 
+             	SYS_MENU
+			 WHERE 
+			 	SYS_ID = #{sysId}
+			 	AND MENU_KEY = #{menuKey}
+        </selectKey> -->
+        INSERT 
+          INTO SYS_BORD 
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE SYS_BORD
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID    = #{sysId}
+           AND BORD_NO   = #{bordNo}
+           AND BORD_GRUP = #{bordGrup}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM SYS_BORD
+         WHERE SYS_ID    = #{sysId}
+           AND BORD_NO   = #{bordNo}
+           AND BORD_GRUP = #{bordGrup}
+    </delete>
+    <update id="updateReadCnt" parameterType="params">
+        UPDATE SYS_BORD
+           SET READ_CNT  = READ_CNT + 1
+         WHERE SYS_ID    = #{sysId}
+           AND BORD_NO   = #{bordNo}
+           AND BORD_GRUP = #{bordGrup}
+    </update>
+    <update id="updateDisable" parameterType="params">
+        UPDATE SYS_BORD
+           SET CHNG_ID     = #{gsUserId}
+             , CHNG_DATE   = NOW()
+             , USE_FLAG    = 'N'
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+    </update>
+
+    <!-- ========================================================== -->
+    <!--   Board Target Management                                  -->
+    <!-- ========================================================== -->
+    <sql id="selectColumns-target">
+         A.SYS_ID        AS "sysId"
+        ,A.BORD_NO       AS "bordNo"
+        ,A.BORD_GRUP     AS "bordGrup"
+        ,A.TGT_USER_ID   AS "tgtUserId"
+        ,A.VNDR_CODE     AS "vndrCode"
+        ,A.VNDR_NAME     AS "vndrName"
+        ,A.SAVE_IDX      AS "saveIdx"
+        ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')     
+                         AS "readDate"
+        ,A.USE_FLAG      AS "useFlag"
+        ,A.REGI_ID       AS "regiId"
+        ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')     
+                         AS "regiDate"
+        ,A.CHNG_ID       AS "chngId"
+        ,DATE_FORMAT(A.CHNG_DATE,'%Y-%m-%d %H:%i:%s')     
+                         AS "chngDate"
+        ,B.BORD_TITLE    AS "bordTitle"
+        ,B.BORD_TYPE     AS "bordType"
+        ,B.BORD_BGN      AS "bordBgn"
+        ,B.BORD_END      AS "bordEnd"
+        ,B.READ_CNT      AS "readCnt"
+        ,B.BORD_SEQ      AS "bordSeq"
+		,(SELECT USER_NAME
+		    FROM SYS_USER
+		   WHERE SYS_ID  = A.SYS_ID
+		     AND USER_ID = A.REGI_ID
+		 )               AS "regiName"
+		,(SELECT USER_NAME
+		    FROM SYS_USER
+		   WHERE SYS_ID  = A.SYS_ID
+		     AND USER_ID = A.CHNG_ID
+		 )               AS "chngName"
+		,(SELECT USER_NAME
+		    FROM SYS_USER
+		   WHERE SYS_ID  = A.SYS_ID
+		     AND USER_ID = A.TGT_USER_ID
+		 )               AS "tgtName"
+    </sql>
+    <sql id="whereClause-target">
+    	    A.SYS_ID    = #{sysId}
+    	AND A.BORD_GRUP = #{bordGrup}
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag  )">AND A.USE_FLAG    = #{useFlag}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordNo   )">AND A.BORD_NO     = #{bordNo}      </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode )">AND A.VNDR_CODE   = #{vndrCode}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName )">AND A.VNDR_NAME   = #{vndrName}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saveIdx  )">AND A.SAVE_IDX    = #{saveIdx}     </if>
+        <if test='"R".equals(pageType)'> AND A.TGT_USER_ID = #{gsUserId} </if><!-- 받은메일함인 경우 -->
+	    <if test='"S".equals(pageType)'> AND A.REGI_ID     = #{gsUserId} </if><!-- 보낸메일함인 경우 -->
+    </sql>
+
+    <select id="searchTarget" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns-target" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_BORD_TGT  A
+         INNER JOIN
+               SYS_BORD      B
+            ON B.SYS_ID      = A.SYS_ID
+  	       AND B.BORD_NO     = A.BORD_NO
+   	       AND B.BORD_GRUP   = A.BORD_GRUP
+         WHERE <include refid="whereClause-target" />
+         ORDER 
+            BY 
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+	  		   B.BORD_SEQ  ASC
+	  		  ,A.REGI_DATE DESC
+	  	</if>
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchTargetCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_BORD_TGT  A
+         INNER JOIN
+               SYS_BORD      B
+            ON B.SYS_ID      = A.SYS_ID
+  	       AND B.BORD_NO     = A.BORD_NO
+   	       AND B.BORD_GRUP   = A.BORD_GRUP
+         WHERE <include refid="whereClause-target" />
+    </select>
+    <select id="selectTarget" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns-target" />
+              ,B.BORD_TEXT  AS "bordText"
+          FROM SYS_BORD_TGT  A
+         INNER JOIN
+               SYS_BORD      B
+            ON B.SYS_ID      = A.SYS_ID
+  	       AND B.BORD_NO     = A.BORD_NO
+   	       AND B.BORD_GRUP   = A.BORD_GRUP
+         WHERE A.SYS_ID      = #{sysId}
+           AND A.BORD_NO     = #{bordNo}
+           AND A.BORD_GRUP   = #{bordGrup}
+           AND A.TGT_USER_ID = #{tgtUserId}
+		<if test="useFlag != null">
+		   AND A.USE_FLAG    = #{useFlag}
+		</if>
+    </select>
+    <insert id="insertTarget" parameterType="params">
+        INSERT 
+          INTO SYS_BORD_TGT
+             ( SYS_ID
+	         , BORD_NO
+	         , BORD_GRUP
+	         , TGT_USER_ID
+	         , VNDR_CODE
+	         , VNDR_NAME
+	         , USE_FLAG
+	         , REGI_ID
+	         , REGI_DATE
+	         , CHNG_ID
+	         , CHNG_DATE
+	         , READ_DATE
+             )
+        SELECT #{sysId}
+             , #{bordNo}
+             , #{bordGrup}
+             , A.USER_ID
+             , A.DEPT_CODE
+             , ifnull(A.DEPT_NAME, 
+                      (SELECT CODE_NAME
+                         FROM SYS_CODE
+                        WHERE SYS_ID    = A.SYS_ID
+                          AND CODE_CD   = A.DEPT_CODE
+                          AND CODE_GRUP =  'DEPT_CODE'
+                      )
+               )
+             , 'Y'
+             , #{gsUserId}
+             , NOW()
+             , #{gsUserId}
+             , NOW()
+		<if test='"Y".equals(readYn) ==  true'>, NOW() </if>
+		<if test='"Y".equals(readYn) == false'>, NULL    </if>
+          FROM SYS_USER A
+         WHERE A.SYS_ID  = #{sysId}
+	    <if test="targets == null">
+           AND A.USER_ID = #{gsUserId}
+	    </if>
+	    <if test="targets != null">
+           AND A.USER_ID IN
+		  	<foreach item="item" index="index" collection="targets" open="(" separator="," close=")">
+		        #{item}
+		  	</foreach>
+	    </if>
+    </insert>
+    
+    <update id="updateTarget" parameterType="params">
+        UPDATE SYS_BORD_TGT
+           SET CHNG_ID     = #{gsUserId}
+             , CHNG_DATE   = NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode )">, VNDR_CODE = #{vndrCode} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName )">, VNDR_NAME = #{vndrName} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saveIdx  )">, SAVE_IDX  = #{saveIdx}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag  )">, USE_FLAG  = #{useFlag}  </if>
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+           AND TGT_USER_ID = #{tgtUserId}
+    </update>
+    <update id="updateTargetDisable" parameterType="params">
+        UPDATE SYS_BORD_TGT
+           SET CHNG_ID     = #{gsUserId}
+             , CHNG_DATE   = NOW()
+             , USE_FLAG    = 'N'
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+           AND TGT_USER_ID = #{tgtUserId}
+    </update>
+    
+    <delete id="deleteTargetAll" parameterType="params">
+        DELETE 
+          FROM SYS_BORD_TGT
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+    </delete>
+    <update id="updateTargetRead" parameterType="params">
+        UPDATE SYS_BORD_TGT
+           SET READ_DATE   = NOW()
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+           AND TGT_USER_ID = #{tgtUserId}
+    </update>
+
+    <!-- <select id="alterTop" resultType="record" parameterType="params">
+	SELECT A.SYS_ID
+	     , A.BORD_GRUP
+	     , A.BORD_NO
+	     , A.BORD_TITLE
+	     , A.BORD_SEQ
+	     , DATE_FORMAT(A.REGI_DATE,'%Y.%m.%d') AS REGI_DATE
+	  FROM(
+	        SELECT SYS_ID
+	             , BORD_GRUP
+	             , BORD_NO
+	             , BORD_TITLE
+	             , BORD_SEQ
+	             , REGI_DATE
+	          FROM SYS_BORD
+	         WHERE SYS_ID = #{sysId}
+	           AND BORD_GRUP = 'B08'
+	           AND BORD_SEQ != 999999999
+	         ORDER BY BORD_SEQ ASC) A
+	   LIMIT 0,3
+    </select> -->
+    
+    <!-- <select id="alterBottom" resultType="record" parameterType="params">
+		SELECT A.SYS_ID
+		     , A.BORD_GRUP
+		     , A.BORD_NO
+		     , A.BORD_TITLE
+		     , A.BORD_SEQ
+		     , DATE_FORMAT(A.REGI_DATE,'%Y.%m.%d') AS REGI_DATE
+		  FROM(
+		      SELECT SYS_ID
+		           , BORD_GRUP
+		           , BORD_NO
+		           , BORD_TITLE
+		           , BORD_SEQ
+		           , REGI_DATE
+		        FROM SYS_BORD
+		       WHERE SYS_ID = #{sysId}
+		         AND BORD_GRUP = 'B08'
+		         AND BORD_SEQ != 999999999
+		         AND NOT EXISTS(SELECT A.SYS_ID
+		           , A.BORD_GRUP
+		           , A.BORD_NO
+		           , A.BORD_TITLE
+		           , A.BORD_SEQ
+		           , A.REGI_DATE
+		        FROM(
+		              SELECT SYS_ID
+		                   , BORD_GRUP
+		                   , BORD_NO
+		                   , BORD_TITLE
+		                   , BORD_SEQ
+		                   , REGI_DATE
+		                FROM SYS_BORD
+		               WHERE SYS_ID = #{sysId}
+		                 AND BORD_GRUP = 'B08'
+		                 AND BORD_SEQ != 999999999
+		               ORDER BY BORD_SEQ ASC) A
+		       LIMIT 0,3)        
+		      UNION ALL 
+		      SELECT SYS_ID
+		           , BORD_GRUP
+		           , BORD_NO
+		           , BORD_TITLE
+		           , BORD_SEQ
+		           , REGI_DATE
+		        FROM SYS_BORD
+		       WHERE SYS_ID = #{sysId}
+		         AND BORD_GRUP = 'B08'
+		         AND BORD_SEQ = 999999999) A
+		 ORDER BY BORD_SEQ ASC, REGI_DATE DESC
+    </select> -->
+
+
+	<!-- <select id="searchBordDetail" resultType="record" parameterType="params">
+		SELECT SYS_ID        AS "sysId"
+		     , BORD_NO       AS "bordNo"
+		     , BORD_GRUP     AS "bordGrup"
+		     , BORD_TITLE   AS "bordTitle"
+		     , (SELECT MENU_DESC
+					    FROM SYS_MENU
+				     WHERE SYS_ID = #{sysId}
+					    AND MENU_KEY = BORD_TITLE  )   AS "bordTitle2"
+		     , BORD_TYPE     AS "bordType"
+		     , BORD_BGN      AS "bordBgn"
+		     , BORD_END      AS "bordEnd"
+		     , READ_CNT      AS "readCnt"
+		     , BORD_SEQ      AS "bordSeq"
+		     , BORD_PNO      AS "bordPno"
+		     , OPEN_TYPE     AS "openType"
+		     , USE_FLAG      AS "useFlag"
+		     , REGI_ID       AS "regiId"
+		     , DATE_FORMAT(REGI_DATE,'%Y-%m-%d %H:%i:%s') AS "regiDate"
+		     , CHNG_ID       AS "chngId"
+		     , DATE_FORMAT(CHNG_DATE,'%Y-%m-%d %H:%i:%s')AS "chngDate"
+			 ,(SELECT USER_NAME
+			     FROM SYS_USER
+			    WHERE SYS_ID  = A.SYS_ID
+			      AND USER_ID = A.REGI_ID
+			  )             AS "regiName"
+			 ,(SELECT USER_NAME
+			     FROM SYS_USER
+			    WHERE SYS_ID  = A.SYS_ID
+			      AND USER_ID = A.CHNG_ID
+			  )             AS "chngName"
+			 , BORD_TEXT  AS "bordText"
+		     , 'HELPVIEW' as "gubun"
+		  FROM SYS_BORD A
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND BORD_TYPE= 'ALL'
+		   AND A.BORD_NO     = #{bordNo}
+	</select>  -->   
+	
+	<select id="searchViewsList" resultType="record" parameterType="params">
+    	SELECT A.TGT_USER_ID AS "tgtUserId"
+    	      ,A.VNDR_CODE   AS "vndrCode"
+    	      ,A.VNDR_NAME   AS "vndrName"
+    	      ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')
+    	                     AS "readDate"
+          FROM SYS_BORD_TGT A
+         WHERE A.SYS_ID    = #{sysId}
+           AND A.BORD_GRUP = #{bordGrup}
+           AND A.BORD_NO   = #{bordNo}
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchText) and @com.wsc.framework.utils.MybatisUtils@notEmpty(searchKey)">
+				<choose>
+		    		<when test="searchKey == 'S01'"> 
+		    			AND (SELECT TGT_USER_ID
+					           FROM SYS_BORD_TGT
+					          WHERE SYS_ID      = A.SYS_ID
+					            AND BORD_NO     = A.BORD_NO
+					            AND TGT_USER_ID = A.TGT_USER_ID
+					            AND BORD_GRUP   = A.BORD_GRUP) LIKE CONCAT('%',#{searchText},'%')  
+		    		</when>
+		    		<when test="searchKey == 'S02'"> 
+		    			AND (SELECT VNDR_CODE
+					           FROM SYS_BORD_TGT
+					          WHERE SYS_ID      = A.SYS_ID
+					            AND BORD_NO     = A.BORD_NO
+					            AND TGT_USER_ID = A.TGT_USER_ID
+					            AND BORD_GRUP   = A.BORD_GRUP) LIKE CONCAT('%',#{searchText},'%')
+		    		</when>
+		    		<when test="searchKey == 'S03'"> 
+		    			AND (SELECT VNDR_NAME
+					           FROM SYS_BORD_TGT
+					          WHERE SYS_ID      = A.SYS_ID
+					            AND BORD_NO     = A.BORD_NO
+					            AND TGT_USER_ID = A.TGT_USER_ID
+					            AND BORD_GRUP   = A.BORD_GRUP) LIKE CONCAT('%',#{searchText},'%')
+		    		</when>
+		    		<otherwise>
+		    		</otherwise>
+			    </choose>
+		   </if>
+    	 ORDER 
+    	    BY A.READ_DATE ASC, A.TGT_USER_ID ASC
+	</select>
+    <select id="searchViewsListCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_BORD_ADDR A
+         WHERE A.SYS_ID    = #{sysId}
+           AND A.BORD_GRUP = #{bordGrup}
+           AND A.BORD_NO   = #{bordNo}
+    </select>
+    
+    <!-- <select id="searchBordImg" resultType="record" parameterType="params">
+		SELECT FILE_NAME
+		     , SAVE_NAME
+		     , FILE_PATH
+		     , FILE_TYPE
+		     , FILE_SIZE
+		     , CONCAT(#{fileImagePath},FILE_PATH,'/',SAVE_NAME) AS FULL_PATH
+		  FROM SYS_FILE
+		 WHERE ATCH_GRUP = #{ATCH_GRUP}
+		   AND ATCH_NO = #{ATCH_NO}
+		 ORDER BY CASE WHEN THUMB_NAIL = 'Y' THEN 1 ELSE 2 END,FILE_NO
+    </select> -->
+
+    <select id="getManualSeries" resultType="record" parameterType="params">
+    SELECT A.*
+	  FROM (
+		SELECT DISTINCT(DATA_SER1)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_SER1 IS NOT NULL
+		   AND DATA_SER1 != ''
+		 UNION
+		SELECT DISTINCT(DATA_SER2)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_SER2 IS NOT NULL
+		   AND DATA_SER2 != ''
+		 UNION
+		SELECT DISTINCT(DATA_SER3)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_SER3 IS NOT NULL
+		   AND DATA_SER3 != ''
+		 UNION
+		SELECT DISTINCT(DATA_SER4)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_SER4 IS NOT NULL
+		   AND DATA_SER4 != ''
+		 UNION
+		SELECT DISTINCT(DATA_SER5)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_SER5 IS NOT NULL
+		   AND DATA_SER5 != ''
+		 UNION
+		SELECT DISTINCT(CODE_CD)
+		  FROM SYS_CODE
+		 WHERE SYS_ID = #{sysId}
+		   AND CODE_GRUP = 'SERI_TYPE'
+		   AND CODE_CD IS NOT NULL
+		   AND CODE_CD != ''
+        ) A
+ 	ORDER BY DATA_SER1 ASC;  
+	</select>
+	
+	<select id="getManualModel" resultType="record" parameterType="params">
+	SELECT A.*
+	  FROM   (
+		SELECT DISTINCT(DATA_MD01)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_MD01 IS NOT NULL
+		   AND DATA_MD01 != ''
+		 UNION
+		SELECT DISTINCT(DATA_MD02)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_MD02 IS NOT NULL
+		   AND DATA_MD02 != ''
+		 UNION
+		SELECT DISTINCT(DATA_MD03)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_MD03 IS NOT NULL
+		   AND DATA_MD03 != ''
+		 UNION
+		SELECT DISTINCT(DATA_MD04)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_MD04 IS NOT NULL
+		   AND DATA_MD04 != ''
+		 UNION
+		SELECT DISTINCT(DATA_MD05)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_MD05 IS NOT NULL
+		   AND DATA_MD05 != ''
+		 UNION
+		SELECT DISTINCT(DATA_MD06)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_MD06 IS NOT NULL
+		   AND DATA_MD06 != ''
+		 UNION
+		SELECT DISTINCT(DATA_MD07)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_MD07 IS NOT NULL
+		   AND DATA_MD07 != ''
+		 UNION
+		SELECT DISTINCT(DATA_MD08)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_MD08 IS NOT NULL
+		   AND DATA_MD08 != ''
+		 UNION
+		SELECT DISTINCT(DATA_MD09)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_MD09 IS NOT NULL
+		   AND DATA_MD09 != ''
+		 UNION
+		SELECT DISTINCT(DATA_MD10)
+		  FROM SYS_BORD
+		 WHERE SYS_ID = #{sysId}
+		   AND BORD_GRUP = #{bordGrup}
+		   AND DATA_MD10 IS NOT NULL
+		   AND DATA_MD10 != ''
+		 UNION
+		SELECT DISTINCT(CODE_CD)
+		  FROM SYS_CODE
+		 WHERE SYS_ID = #{sysId}
+		   AND CODE_GRUP = 'MODL_CODE'
+		   AND CODE_CD IS NOT NULL
+		   AND CODE_CD != ''
+        ) A
+  	ORDER BY DATA_MD01 ASC;
+	</select>
+	
+	<select id="getRegiUserId" resultType="record" parameterType="params">
+		SELECT REGI_ID
+		 FROM SYS_BORD
+   	    WHERE SYS_ID = #{sysId}
+   	      AND BORD_GRUP =  #{bordGrup}
+   	      AND BORD_NO = #{bordNo}
+	</select>
+	
+    <select id="dealerCheck" resultType="int" parameterType="params">
+   	      SELECT COUNT(*)  AS CNT
+   	        FROM DEAL_MAST 
+   	       WHERE SYS_ID  = #{sysId}
+            AND DEAL_CODE IN 
+            <foreach collection="dealerList" item="item" open="(" close=")" separator=",">
+            #{item}
+            </foreach>
+	</select>
+    
+    <select id="selectNavHelpByMenuKey" resultType="record" parameterType="params">
+		SELECT 
+			B.BORD_NO, B.BORD_TITLE, B.BORD_TEXT, M.MENU_KEY, M.MENU_DESC,M.MENU_URL 
+		FROM 
+			SYS_MENU M 
+			LEFT JOIN SYS_BORD B
+			ON 
+			B.SYS_ID = M.SYS_ID 
+			AND M.SYS_ID=#{sysId}
+			AND B.bord_grup = #{bordGrup}
+			AND B.BORD_NO = M.MENU_URL
+		WHERE 
+			M.MENU_KEY = #{menuKey}
+		ORDER BY 
+			MENU_SEQ ASC 
+		LIMIT 1
+    </select>
+    
+    <select id="selectNavHelpByMenuUrl" resultType="record" parameterType="params">	
+		CALL sp_select_nav_help_by_menu_url(#{sysId}, #{bordGrup}, #{bordNo})
+    </select>
+    
+    <select id="selectNavHelpExistsByMenuUrl" resultType="record" parameterType="params">	
+		CALL sp_select_nav_help_exists_by_menu_url(#{sysId}, #{bordGrup}, #{bordNo})
+    </select>
+    
+</mapper>

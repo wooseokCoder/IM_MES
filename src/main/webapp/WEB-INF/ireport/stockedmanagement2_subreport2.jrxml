@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="stockedmanagement2_subreport2" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="2adc5254-9f55-402a-a5e9-c11736d715a8">
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="hShetNo" class="java.lang.String"/>
+	<parameter name="SYS_ID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+   	A.SYS_ID       AS "sysId"
+     , A.SHET_TYPE    AS "shetType"
+     , A.SHET_NO      AS "shetNo"
+     , A.SHET_SEQ     AS "shetSeq"
+     , A.SHET_DATE    AS "shetDate"
+     , A.ITEM_CODE    AS "itemCode"
+     , A.ITEM_NAME    AS "itemName"
+     , A.ITEM_SPEC    AS "itemSpec"
+     , A.ITEM_UNIT    AS "itemUnit"
+     , A.ITEM_QTY     AS "itemQty"
+     , A.ITEM_PRCE    AS "itemPrce"
+     , A.ITEM_PRCE * ITEM_QTY	AS "totPrce"
+     , A.ITEM_COST    AS "itemCost"
+     , A.TOT_TAX      AS "totTax"
+     , A.TOT_AMT      AS "totAmt"
+     , A. base_prce    AS "basePrce"
+     , A.DISC_RATE    AS "discRate"
+     , A.PURC_PRCE    AS "purcPrce"
+     , A.SALE_PRCE    AS "salePrce"
+     , A.ON_HAND_QTY  AS "onHandQty"
+     , A.LAST_TRAD    AS "lastTrad"
+     , A.LAST_PRCE    AS "lastPrce"
+     , A.MARGIN_RATE  AS "marginRate"
+     , A.CUST_CODE    AS "custCode"
+     , A.SHOP_NAME    AS "shopName"
+     , A.REMK         AS "remk"
+     , A.USE_IDX      AS "useIdx"
+     , A.REGI_DATE	AS "regiDate"
+     , A.REGI_ID	AS "regiUser"
+     , A.CHNG_DATE	AS "updtDate"
+     , A.CHNG_ID	AS "updtUser"
+     , 'R'          AS "rowStat"
+     , CONCAT(A.SHET_NO,'::',A.SHET_SEQ) AS "shetNoSeq"
+			 FROM shet_detl A
+         WHERE A.SYS_ID    = $P{SYS_ID}
+    	AND A.SHET_TYPE  = 'R'
+	AND A.SHET_NO   = $P{hShetNo}]]>
+	</queryString>
+	<field name="sysId" class="java.lang.String"/>
+	<field name="shetType" class="java.lang.String"/>
+	<field name="shetNo" class="java.lang.String"/>
+	<field name="shetSeq" class="java.math.BigDecimal"/>
+	<field name="shetDate" class="java.lang.String"/>
+	<field name="itemCode" class="java.lang.String"/>
+	<field name="itemName" class="java.lang.String"/>
+	<field name="itemSpec" class="java.lang.String"/>
+	<field name="itemUnit" class="java.lang.String"/>
+	<field name="itemQty" class="java.math.BigDecimal"/>
+	<field name="itemPrce" class="java.math.BigDecimal"/>
+	<field name="totPrce" class="java.math.BigDecimal"/>
+	<field name="itemCost" class="java.math.BigDecimal"/>
+	<field name="totTax" class="java.math.BigDecimal"/>
+	<field name="totAmt" class="java.math.BigDecimal"/>
+	<field name="basePrce" class="java.math.BigDecimal"/>
+	<field name="discRate" class="java.math.BigDecimal"/>
+	<field name="purcPrce" class="java.math.BigDecimal"/>
+	<field name="salePrce" class="java.math.BigDecimal"/>
+	<field name="onHandQty" class="java.math.BigDecimal"/>
+	<field name="lastTrad" class="java.lang.String"/>
+	<field name="lastPrce" class="java.lang.String"/>
+	<field name="marginRate" class="java.math.BigDecimal"/>
+	<field name="custCode" class="java.lang.String"/>
+	<field name="shopName" class="java.lang.String"/>
+	<field name="remk" class="java.lang.String">
+		<fieldDescription><![CDATA[비고]]></fieldDescription>
+	</field>
+	<field name="useIdx" class="java.lang.String"/>
+	<field name="regiDate" class="java.lang.String"/>
+	<field name="regiUser" class="java.lang.String"/>
+	<field name="updtDate" class="java.lang.String"/>
+	<field name="updtUser" class="java.lang.String"/>
+	<field name="rowStat" class="java.lang.String"/>
+	<field name="shetNoSeq" class="java.lang.String"/>
+	<variable name="sumItemCost" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{itemCost}]]></variableExpression>
+	</variable>
+	<variable name="sumtotTax" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{totTax}]]></variableExpression>
+	</variable>
+	<variable name="sumtotAmt" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{totAmt}]]></variableExpression>
+	</variable>
+	<variable name="sumItemQty" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{itemQty}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="468" y="0" width="87" height="20" uuid="786841f7-d7cb-441a-b8c5-dfdcbfbace69"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font pdfEncoding="Cp1250"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sumtotAmt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="358" y="0" width="57" height="20" uuid="75702e2a-77fd-446d-94b1-a7b0c8cecf3d"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font pdfEncoding="Cp1250"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sumItemCost}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="315" y="0" width="43" height="20" uuid="d1ce4268-0555-45c9-8989-758106286acc"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font pdfEncoding="Cp1250"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sumItemQty}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="415" y="0" width="53" height="20" uuid="651de249-ab82-4126-9218-d1366b6148de"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font pdfEncoding="Cp1250"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sumtotTax}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="315" height="20" uuid="76bbeaa2-689e-464a-9bf7-a14d2e46e025"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[[합 계]]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="SD0980_WPCS_SO"
+	targetNamespace="http://lscns.co.kr/SD/WPCS"
+	xmlns:p1="http://lscns.co.kr/SD/WPCS"
+	xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+	<wsdl:documentation />
+	<wsp:UsingPolicy wsdl:required="true" />
+	<wsp:Policy wsu:Id="OP_SD0980_WPCS_SO" />
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://lscns.co.kr/SD/WPCS"
+			xmlns="http://lscns.co.kr/SD/WPCS"
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:element name="MT_SD0980_WPCS" type="DT_SD0980_WPCS" />
+			<xsd:element name="MT_SD0980_WPCS_response"
+				type="DT_SD0980_WPCS_response" />
+			<xsd:complexType name="DT_SD0980_WPCS_response">
+				<xsd:annotation>
+					<xsd:appinfo source="http://sap.com/xi/VersionID">af1ad51eac8811e6b135000000461b76
+					</xsd:appinfo>
+				</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="GT_ORDER_INFO" minOccurs="0"
+						maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:appinfo source="http://sap.com/xi/TextID">375f017b4ee111e6ca3f28b2bd899076
+							</xsd:appinfo>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="WPC_PO_NO" type="xsd:string"
+									minOccurs="0">
+									<xsd:annotation>
+										<xsd:appinfo source="http://sap.com/xi/TextID">375f01774ee111e6902528b2bd899076
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element name="PART_NO" type="xsd:string"
+									minOccurs="0">
+									<xsd:annotation>
+										<xsd:appinfo source="http://sap.com/xi/TextID">375f01784ee111e694d028b2bd899076
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element name="ORDER_NO" type="xsd:string"
+									minOccurs="0">
+									<xsd:annotation>
+										<xsd:appinfo source="http://sap.com/xi/TextID">126604d84eea11e6cf3028b2bd899076
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element name="PART_NO2" type="xsd:string"
+									minOccurs="0">
+									<xsd:annotation>
+										<xsd:appinfo source="http://sap.com/xi/TextID">5169e1244f2311e6a19728b2bd899076
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element name="INVOICE" type="xsd:string"
+									minOccurs="0">
+									<xsd:annotation>
+										<xsd:appinfo source="http://sap.com/xi/TextID">5169e1254f2311e6ae7728b2bd899076
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element name="SITECD" type="xsd:string"
+									minOccurs="0">
+									<xsd:annotation>
+										<xsd:appinfo source="http://sap.com/xi/TextID">126604d94eea11e6952528b2bd899076
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element name="STATUS" type="xsd:string"
+									minOccurs="0">
+									<xsd:annotation>
+										<xsd:appinfo source="http://sap.com/xi/TextID">126604da4eea11e6c33728b2bd899076
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element name="ORDER_QTY" type="xsd:string"
+									minOccurs="0">
+									<xsd:annotation>
+										<xsd:appinfo source="http://sap.com/xi/TextID">126604db4eea11e6b48a28b2bd899076
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element name="CHG_QTY" type="xsd:string"
+									minOccurs="0">
+									<xsd:annotation>
+										<xsd:appinfo source="http://sap.com/xi/TextID">60dcd1b57db211e684e200ff1090f709
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element name="QTY" type="xsd:string"
+									minOccurs="0">
+									<xsd:annotation>
+										<xsd:appinfo source="http://sap.com/xi/TextID">126604dc4eea11e6b43628b2bd899076
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element name="DUEDATE" type="xsd:string"
+									minOccurs="0">
+									<xsd:annotation>
+										<xsd:appinfo source="http://sap.com/xi/TextID">126604dd4eea11e6cfb528b2bd899076
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="DT_SD0980_WPCS">
+				<xsd:annotation>
+					<xsd:appinfo source="http://sap.com/xi/VersionID">b67e186b81f111e99024000000461b76
+					</xsd:appinfo>
+				</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="SITECD" type="xsd:string"
+						minOccurs="0">
+						<xsd:annotation>
+							<xsd:appinfo source="http://sap.com/xi/TextID">369fe3bd4ee411e6c9f628b2bd899076
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="FROM_DATE" type="xsd:string">
+						<xsd:annotation>
+							<xsd:appinfo source="http://sap.com/xi/TextID">369fe3be4ee411e6af5828b2bd899076
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="TO_DATE" type="xsd:string"
+						minOccurs="0">
+						<xsd:annotation>
+							<xsd:appinfo source="http://sap.com/xi/TextID">369fe3bf4ee411e6b9b828b2bd899076
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="WPC_PO_NO" type="xsd:string"
+						minOccurs="0">
+						<xsd:annotation>
+							<xsd:appinfo source="http://sap.com/xi/TextID">369fe3c04ee411e6b82428b2bd899076
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="MATNR" type="xsd:string"
+						minOccurs="0">
+						<xsd:annotation>
+							<xsd:appinfo source="http://sap.com/xi/TextID">369fe3c14ee411e68b5b28b2bd899076
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="MT_SD0980_WPCS">
+		<wsdl:documentation />
+		<wsdl:part name="MT_SD0980_WPCS" element="p1:MT_SD0980_WPCS" />
+	</wsdl:message>
+	<wsdl:message name="MT_SD0980_WPCS_response">
+		<wsdl:documentation />
+		<wsdl:part name="MT_SD0980_WPCS_response"
+			element="p1:MT_SD0980_WPCS_response" />
+	</wsdl:message>
+	<wsdl:portType name="SD0980_WPCS_SO">
+		<wsdl:documentation />
+		<wsdl:operation name="SD0980_WPCS_SO">
+			<wsdl:documentation />
+			<wsp:Policy>
+				<wsp:PolicyReference URI="#OP_SD0980_WPCS_SO" />
+			</wsp:Policy>
+			<wsdl:input message="p1:MT_SD0980_WPCS" />
+			<wsdl:output message="p1:MT_SD0980_WPCS_response" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="SD0980_WPCS_SOBinding"
+		type="p1:SD0980_WPCS_SO">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http"
+			xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+		<wsdl:operation name="SD0980_WPCS_SO">
+			<soap:operation
+				soapAction="http://sap.com/xi/WebService/soap1.1"
+				xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+			<wsdl:input>
+				<soap:body use="literal"
+					xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"
+					xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="SD0980_WPCS_SOService">
+		<wsdl:port name="HTTP_Port"
+			binding="p1:SD0980_WPCS_SOBinding">
+			<soap:address
+				location="http://10.15.4.75:50000/XISOAPAdapter/MessageServlet?senderParty=&amp;senderService=LSTA_PRD&amp;receiverParty=&amp;receiverService=&amp;interface=SD0980_WPCS_SO&amp;interfaceNamespace=http%3A%2F%2Flscns.co.kr%2FSD%2FWPCS&amp;j_username=LGCSD&amp;j_password=lgcsd2"
+				xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

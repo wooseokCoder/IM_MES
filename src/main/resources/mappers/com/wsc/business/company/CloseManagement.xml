@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.business.company.CloseManagement">
+
+	<sql id="pagingColumns">
+        <if test="start == null or end == null">
+				<!-- ,0 AS "rnum" -->
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+ 		 SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM ( 
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                  ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start} 
+         </if>  
+    </sql>
+     
+    <sql id="sortClause">    
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sortValue)">
+		        ${sortValue}
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(sortValue)">
+	  	   	  YEAR ASC
+	  	</if>
+    </sql>
+    
+    <sql id="selectColumns">
+        SYS_ID			AS "sysId"
+        ,YEAR			AS "year"
+        ,MONTH			AS "month"
+        ,CLOSE_YN 		AS "closeYN"
+        ,REMARK			AS "remark"
+        ,REGI_ID		AS "regiID"
+        ,REGI_DATE		AS "regiDate"
+        ,CHNG_ID		AS "chngID"
+        ,CHNG_DATE		AS "chngDate"
+
+
+    </sql>
+    
+    <sql id="insertColumns-fields">
+           SYS_ID 
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty( year )">, YEAR </if>       
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty( month )">, MONTH </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty( closeYN )">, CLOSE_YN </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty( remark )">, REMARK </if>
+        , USE_IDX
+        , REGI_ID 
+        , REGI_DATE 
+        , CHNG_ID 
+        , CHNG_DATE 
+    </sql>
+    
+    <sql id="insertColumns-values">
+           #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty( year )">, #{year} </if> 
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty( month )">, #{month} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty( closeYN )">, #{closeYN} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty( remark )">, #{remark} </if>
+         ,'Y'
+         , #{gsUserId}
+         , NOW()
+         , #{gsUserId}
+         , NOW()
+    </sql>
+
+    <sql id="updateColumns">
+		 YEAR= #{year}
+		, MONTH= #{month}
+		, CLOSE_YN= #{closeYN}
+		, REMARK =#{remark}
+		, CHNG_ID=#{gsUserId}
+		, CHNG_DATE= NOW()
+    </sql>
+    
+    <sql id="whereClause">
+        SYS_ID=#{sysId}	
+
+    </sql>
+    
+    <sql id="whereClause-search">    
+   	     SYS_ID=#{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(closedYear)">
+		    AND YEAR LIKE CONCAT('%',#{closedYear},'%')	  
+   		</if>  		
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM MON_CLOSE A
+           WHERE <include refid="whereClause-search" />
+        ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->    
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM MON_CLOSE  
+           WHERE <include refid="whereClause-search" />
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM MON_CLOSE A
+         WHERE SYS_ID=#{sysId}
+           AND YEAR=#{year}
+           AND MONTH=#{month}
+           AND CLOSE_YN=#{closeYN}
+           AND REMARK=#{remark}
+           AND REGI_ID=#{regiID}
+           AND REGI_DATE=#{regiDate}
+           AND CHNG_ID=#{chngID}
+           AND CHNG_DATE=#{chngDate}
+    </select>
+    <insert id="insert"  parameterType="params">
+        INSERT 
+          INTO MON_CLOSE 
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE MON_CLOSE
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID= #{sysId}
+         AND YEAR=#{year}
+		 AND MONTH=#{month}
+
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM MON_CLOSE
+      	WHERE SYS_ID= #{sysId}
+         AND YEAR=#{year}
+		 AND MONTH=#{month}
+
+    </delete>
+<!--     <select id="getSelectdatas" resultType="record" parameterType="params">
+        SELECT *
+		  FROM SYS_CODE 
+		 WHERE SYS_ID = #{sysId}
+		 AND CODE_GRUP = 'MON_CLOSE'
+		 AND USE_FLAG='Y'
+	</select> -->
+	
+    <select id="getIdxdatas2" resultType="record" parameterType="params">
+		SELECT *
+		  FROM sys_code
+		 WHERE sys_id=#{sysId}
+		   AND CODE_GRUP='USE_IDX'
+		   AND USE_FLAG='Y'
+	</select>
+	
+<!--     <select id="searchAll" resultType="code" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM MON_CLOSE
+    </select> -->
+    <delete id="deleteAll" parameterType="params">
+        DELETE 
+          FROM MON_CLOSE
+         WHERE SYS_ID    = #{sysId}
+           AND CODE_GRUP = #{codeGrup}
+    </delete>
+    <select id="getIdxdatas" resultType="record" parameterType="params">
+		SELECT *
+		  FROM sys_code
+		 WHERE sys_id=#{sysId}
+		   AND CODE_GRUP='USE_IDX'
+		   AND USE_FLAG='Y'
+	</select>
+    
+</mapper>

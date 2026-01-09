@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.app.App">
+   	<!-- 토큰 체크 -->
+   	<select id="mTokenCheck" resultType="string" parameterType="params">
+		CALL SP_VALIDATE_TOKEN2(#{userId},#{ftokenNo})
+    </select>
+    
+   	<select id="versionCheck" parameterType="params" resultType="record">
+		CALL sp_version_check(#{sysId},#{type},#{app},#{and},#{ios})
+	</select>
+    
+    <!-- 로그인시 유저정보 -->
+    <select id="userInfo"  parameterType="params" resultType="record">
+        CALL sp_get_user_info(#{sysId},#{userId},#{userPwd},#{issuUrl},#{rqstUrl})
+    </select>
+    
+    <select id="appCheckPassword" parameterType="params" resultType="string">
+    	CALL sp_check_Password(#{sysId},#{userId},#{userPwd})
+    </select>
+    
+    <!-- 메뉴 체크 -->
+    <select id="menuCheck"  parameterType="params" resultType="record">
+        CALL sp_get_app_menu_check(#{sysId},#{userId},#{userType})
+    </select>
+    
+    <select id="getSucc" parameterType="params" resultType="record">
+		SELECT	"SUCCESS" AS "RESULT"
+	</select>
+	
+	<select id="getFail" parameterType="params" resultType="record">
+		SELECT	"FAIL" AS "RESULT"
+	</select>
+	
+	<select id="ifLsasApp" parameterType="params" resultType="record">
+		CALL SP_IF_LSAS(#{var1},#{var2},#{var3},#{var4},#{var5},#{var6},#{var7},#{var8},#{var9},#{var10},#{var11},#{var12},#{var13},#{var14},#{var15})
+    </select>
+    
+    <!-- creation 페이지 오픈시 정보 -->
+    <select id="openCreation"  parameterType="params" resultType="record">
+        CALL sp_get_open_m_page(#{sysId},#{val1},#{val2},#{val3},#{val4},#{val5},#{val6},#{val7},#{val8},#{val9},#{val10},#{val11},#{val12},#{val13},#{val14},#{val15})
+    </select>
+    
+    <select id="mGetSysCode"  parameterType="params" resultType="record">
+        CALL sp_get_sys_code(#{sysId},#{val2},#{val3},#{val4})
+    </select>
+    
+    <select id="getNameCombo"  parameterType="params" resultType="record">
+        CALL sp_get_user_name(#{sysId})
+    </select>
+    
+    <select id="darDataCheck" parameterType="params" resultType="record">
+		CALL sp_dar_data_check(#{sysId},#{userId},#{oper},#{darNo},#{dealCode},#{dealName},#{dealType},#{assName},#{assDate})
+    </select>
+    
+    <select id="lsasDarSave" parameterType="params" resultType="record">
+		CALL sp_save_sar_eval(#{sysId},#{userId},#{oper},#{darNo},#{darRev},#{evalYear},#{dealCode},#{dealName},#{evalSeq},#{dealType},#{assName},#{assDate},#{evalTot},#{evalGrad},#{histRemk},#{progStat},#{sign1},#{sign2},#{sign3},#{sign4},#{sign5},#{sign6},#{sign7},#{sign8},#{sign9},#{sign10},#{sign11},#{sign12})
+    </select>
+    
+    <select id="openDarEval"  parameterType="params" resultType="record">
+        CALL sp_get_open_dar_eval(#{sysId},#{val1},#{val2},#{val3},#{val4},#{val5},#{val6},#{val7},#{val8},#{val9},#{val10},#{val11},#{val12},#{val13},#{val14},#{val15})
+    </select>
+    
+    <select id="lsasDarEvalSave" parameterType="params" resultType="record">
+		CALL sp_save_dar_eval_rslt(#{sysId},#{userId},#{darNo},#{darRev},#{evalYear},#{dealCode},#{evalSeq},#{dealType},#{clasCode},#{itemNo},#{itemEval},#{rsltRemk},#{delYn},#{rsltYn})
+    </select>
+    
+    <select id="getUUID" parameterType="java.util.Map" resultType="java.lang.String">
+    	CALL SP_SELECT_getUUID()
+    </select>
+    
+    <select id="getIfIdNo" parameterType="params" resultType="java.lang.String">
+	    SELECT fn_get_if_id_no(#{sysId},#{jobId})
+	</select>
+    <!-- LWS_SR -->
+	<update id="IF_SFDC_DEALER_LSTA_040_IFSTS_UPDATE" parameterType="params" statementType="CALLABLE">
+		{CALL IF_SFDC_DEALER_LSTA_040_IFSTS_UPDATE(
+			 #{jobId},#{currDate},#{workSeq}
+			,#{SR_DIST},#{SR_CNTY},#{SR_STAT}
+			,#{DEAL_CODE},#{DEAL_NAME},#{STOR_LOC}
+			,#{BM_CODE},#{BM_NAME},#{SM_NAME}
+			,#{COMI_RECV},#{COMI_RECV_DETL},#{COMI_RECV_CODE}
+			,#{SERI_NO},#{ENGN_NO},#{UNIT_TYPE}
+			,#{MODL_CODE},#{MODL_SERS},#{SERI_DESC}
+			,#{INVO_NO},#{INVO_DATE}
+			,#{SHIP_DATE},#{PROD_DATE},#{RETL_DATE}
+			,#{USER_TYPE},#{FIST_NAME},#{LAST_NAME}
+			,#{USER_MAIL},#{USER_TEL},#{USER_HP}
+			,#{CNTY_FIST},#{STAT_FIST},#{CONT_FIST}
+			,#{PHYS_ADDR},#{PHYS_STAT},#{PHYS_CITY},#{PHYS_ZIP}
+			,#{MAIL_ADDR},#{MAIL_STAT},#{MAIL_CITY},#{MAIL_ZIP}
+			,#{WORK_APPL},#{CROPS},#{PLAN_USAG}
+			,#{LOAD_CODE},#{LOAD_MODL},#{LOAD_DATE}
+			,#{BHOE_CODE},#{BHOE_MODL},#{BHOE_DATE}
+			,#{MOWR_CODE},#{MOWR_MODL},#{MOWR_DATE}
+			,#{SNOW_CODE},#{SNOW_MODL},#{SNOW_DATE}
+			,#{ETC_CODE},#{ETC_MODL},#{ETC_DATE}
+			,#{EXPI_DATE_BT},#{EXPI_DATE_BZ},#{EXPI_DATE_EM}
+			,#{UNIT_COMT},#{COMI_AMOT},#{COMI_TYPE},#{COMI_DATE}
+			,#{UPEQ_NO},#{FINC_REBT},#{CASH_FORM},#{EVET_COPN}
+		)}
+	</update>
+
+	<!-- LWS_WR -->
+	<update id="IF_SFDC_DEALER_LSTA_041_IFSTS_UPDATE" parameterType="params" statementType="CALLABLE">
+		{CALL IF_SFDC_DEALER_LSTA_041_IFSTS_UPDATE(
+			 #{jobId},#{currDate},#{workSeq}
+			,#{REP_NO},#{SERI_NO},#{DEAL_CODE},#{DEAL_NAME}
+			,#{MODL_CODE},#{CLA_TYPE},#{CLAIM_TYPE_NM}
+			,#{WARR_KIND},#{WARR_KIND_NM},#{MODEL_SERIES}
+			,#{SUBM_DATE},#{INVC_NO},#{INVC_DATE},#{WAERS}
+			,#{PART_AMT},#{LABO_AMT},#{EXTR_AMT},#{SUM_AMT}
+		)}
+	</update>
+	
+	<!-- MANUAL_LIST -->
+	<update id="IF_SFDC_DEALER_LSTA_038_IFSTS_UPDATE" parameterType="params" statementType="CALLABLE">
+		{CALL IF_SFDC_DEALER_LSTA_038_IFSTS_UPDATE(
+			 #{jobId},#{currDate},#{workSeq}
+			,#{NO},#{TITLE},#{DESCRIPTION},#{AREA}
+			,#{TYPE},#{LANGUAGE},#{SERISE}
+			,#{MODEL},#{CREATED_BY},#{FILE_NO}
+			,#{FILE_NAME},#{FILE_SIZE},#{FILE_URL},#{FILE_DOWNLOAD_URL}
+		)}
+	</update>
+	
+	<!-- EVAL_LIST -->
+	<update id="IF_SFDC_DEALER_LSTA_044_IFSTS_UPDATE" parameterType="params" statementType="CALLABLE">
+		{CALL IF_SFDC_DEALER_LSTA_044_IFSTS_UPDATE(
+			 #{jobId},#{currDate},#{workSeq}
+			,#{DEAL_ID},#{DEAL_NAME},#{EVAL_DATE},#{EVAL_STAF}
+			,#{EVAL_SCOR},#{EVAL_LINK}
+		)}
+	</update>
+	
+	<!-- ALERT_LIST -->
+	<update id="IF_SFDC_DEALER_LSTA_046_IFSTS_UPDATE" parameterType="params" statementType="CALLABLE">
+		{CALL IF_SFDC_DEALER_LSTA_046_IFSTS_UPDATE(
+			 #{jobId},#{currDate},#{workSeq}
+			,#{ID},#{TITLE},#{BODY},#{LINK_URL},#{USER}
+		)}
+	</update>
+    
+    <update id="IF_SFDC_DEALER_LSTA_ERR_LOG_UPDATE" parameterType="params" statementType="CALLABLE">
+	    {CALL IF_SFDC_DEALER_LSTA_ERR_LOG_UPDATE(#{sysId},#{jobId},#{currDate},#{workSeq},#{jobFile},#{rsltMsg})}
+	</update>
+    
+</mapper>

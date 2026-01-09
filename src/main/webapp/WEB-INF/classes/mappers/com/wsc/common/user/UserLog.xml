@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.user.UserLog">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+         	   A.ACC_TIME DESC
+	  	</if>
+    </sql>
+
+    <sql id="selectColumns">
+         SYS_ID           AS "sysId"
+        ,DATE_FORMAT(ACC_TIME,'%Y-%m-%d %H:%i:%s')     
+                          AS "accTime"
+        ,USER_ID          AS "userId"
+        ,PROG_ID          AS "progId"
+        ,LOGIN_DATE       AS "loginDate"
+        ,CLIENT_IP        AS "clientIp"
+        ,CLIENT_NAME      AS "clientName"
+        ,CLIENT_AGENT     AS "clientAgent"
+        ,LOG_REMK         AS "logRemk"
+    </sql>
+    
+    <sql id="whereClause">
+    	SYS_ID = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userId     )">AND USER_ID      = #{userId}       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progId     )">AND PROG_ID      = #{progId}       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(loginDate  )">AND LOGIN_DATE   = #{loginDate}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientIp   )">AND CLIENT_IP    = #{clientIp}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientName )">AND CLIENT_NAME  = #{clientName}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientAgent)">AND CLIENT_AGENT = #{clientAgent}  </if>
+    </sql>
+    
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_ULOG A
+         WHERE <include refid="whereClause" />
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_ULOG A
+         WHERE <include refid="whereClause" />
+    </select>
+    <insert id="insert" parameterType="params">
+        CALL sp_insert_sys_ulog(#{sysId}, #{userId}, #{progId}, #{loginDate}, #{clientIp}, #{clientName}, #{clientAgent}, #{logRemk})
+        <!-- 
+        INSERT 
+          INTO SYS_ULOG 
+             ( SYS_ID
+             , PROG_ID
+             , USER_ID
+             , ACC_TIME
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(loginDate  )">, LOGIN_DATE   </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientIp   )">, CLIENT_IP    </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientName )">, CLIENT_NAME  </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientAgent)">, CLIENT_AGENT </if>
+             )
+        VALUES
+             ( #{sysId}
+             , #{progId}
+             , #{userId}
+             , NOW()
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(loginDate  )">, #{loginDate}    </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientIp   )">, #{clientIp}     </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientName )">, #{clientName}   </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientAgent)">, #{clientAgent}  </if>
+             )
+        -->
+    </insert>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM SYS_ULOG
+         WHERE SYS_ID    = #{sysId}
+           AND USER_ID   = #{userId}
+           AND PROG_ID   = #{progId}
+           <!-- AND ACC_TIME  = #{accTime} -->
+    </delete>
+
+</mapper>

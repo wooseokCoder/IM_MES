@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.business.item.CommodityMaterialCode">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    
+    <sql id="selectColumns">
+         A.SYS_ID          AS "sysId"
+        ,A.ITEM_CODE       AS "itemCode"
+        ,ifnull(A.ITEM_NAME, CHR(0))
+                           AS "itemName"
+        ,A.ITEM_NAME_ALT   AS "itemNameAlt"
+        ,ifnull(A.ITEM_SPEC, CHR(0)) 
+                           AS "itemSpec"
+        ,ifnull(A.ITEM_UNIT, CHR(0))
+                           AS "itemUnit"
+        ,A.ITEM_UNIT_QTY   AS "itemUnitQty"
+        <!-- ,TO_CHAR(A.BASE_PRCE, 'FM9,999,999,999,990')
+                           AS "basePrce" -->
+        ,ROUND(A.BASE_PRCE)
+                           AS "basePrce"
+        <!-- ,TO_CHAR(A.PURC_PRCE, 'FM9,999,999,999,990')
+                           AS "purcPrce" -->
+        ,ROUND(A.PURC_PRCE)
+                           AS "purcPrce"
+        <!-- ,TO_CHAR(A.SALE_PRCE, 'FM9,999,999,999,990')
+                           AS "salePrce" -->
+        ,ROUND(A.SALE_PRCE)
+                           AS "salePrce"
+        <!-- ,TO_CHAR(A.REF1_PRCE, 'FM9,999,999,999,990')
+                           AS "ref1Prce" -->
+        ,ROUND(A.REF1_PRCE)
+                           AS "ref1Prce"
+        <!-- ,TO_CHAR(A.REF2_PRCE, 'FM9,999,999,999,990')
+                           AS "ref2Prce" -->
+        ,ROUND(A.REF2_PRCE)
+                           AS "ref2Prce"
+        <!-- ,TO_CHAR(A.REF3_PRCE, 'FM9,999,999,999,990')
+                           AS "ref3Prce" -->
+        ,ROUND(A.REF3_PRCE)
+                           AS "ref3Prce"
+        ,A.MNG_TYPE        AS "mngType"
+        ,A.STOC_LOC        AS "stocLoc"
+        ,A.ITEM_BAR        AS "itemBar"
+        ,A.STOC_ADM_IDX    AS "stocAdmIdx"
+        <!-- ,TO_CHAR(A.STOC_ADM_RATE, 'FM9,999,999,999,990')
+                           AS "stocAdmRate" -->
+        ,ROUND(A.STOC_ADM_RATE)
+                           AS "stocAdmRate"
+        <!-- ,TO_CHAR(A.SAFT_QTY, 'FM9,999,999,999,990')
+                           AS "saftQty" -->
+        ,ROUND(A.SAFT_QTY)
+                           AS "saftQty"
+        <!-- ,TO_CHAR(A.ON_HAND_QTY, 'FM9,999,999,999,990')
+                           AS "onHandQty" -->
+        ,ROUND(A.ON_HAND_QTY)
+                           AS "onHandQty"
+        <!-- ,TO_CHAR(A.CARRY_QTY, 'FM9,999,999,999,990')
+                           AS "carryQty" -->
+        ,ROUND(A.CARRY_QTY)
+                           AS "carryQty"
+        ,A.CARRY_DATE      AS "carryDate"
+        ,A.LAST_PURC_DATE  AS "lastPurcDate"
+        ,A.LAST_SALE_DATE  AS "lastSaleDate"
+        ,A.LAST_PURC_DATE1 AS "lastPurcDate1"
+        <!-- ,TO_CHAR(A.LAST_PURC_PRCE1, 'FM9,999,999,999,990')
+                           AS "lastPurcPrce1" -->
+        ,ROUND(A.LAST_PURC_PRCE1)
+                           AS "lastPurcPrce1"
+        ,A.VNDR_CODE1      AS "vndrCode1"
+        ,A.VNDR_NAME1      AS "vndrName1"
+        ,A.LAST_PURC_DATE2 AS "lastPurcDate2"
+        <!-- ,TO_CHAR(A.LAST_PURC_PRCE2, 'FM9,999,999,999,990')
+                           AS "lastPurcPrce2" -->
+        ,ROUND(A.LAST_PURC_PRCE2)
+                           AS "lastPurcPrce2"
+        ,A.VNDR_CODE2      AS "vndrCode2"
+        ,A.VNDR_NAME2      AS "vndrName2"
+        ,A.LAST_PURC_DATE3 AS "lastPurcDate3"
+        <!-- ,TO_CHAR(A.LAST_PURC_PRCE3, 'FM9,999,999,999,990')
+                           AS "lastPurcPrce3" -->
+        ,ROUND(A.LAST_PURC_PRCE3)
+                           AS "lastPurcPrce3"
+        ,A.VNDR_CODE3      AS "vndrCode3"
+        ,A.VNDR_NAME3      AS "vndrName3"
+        ,A.TAX_TYPE        AS "taxType"
+        ,ifnull(A.ITEM_REMK, CHR(0))
+                           AS "itemRemk"
+        ,A.USE_IDX         AS "useIdx"
+        ,A.REGI_DATE       AS "regiDate"
+        ,A.REGI_USER       AS "regiUser"
+        ,A.UPDT_DATE       AS "updtDate"
+        ,A.UPDT_USER       AS "updtUser"
+    </sql>
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , ITEM_CODE
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemName     )">, ITEM_NAME</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNameAlt  )">, ITEM_NAME_ALT</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemSpec     )">, ITEM_SPEC</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemUnit     )">, ITEM_UNIT</if>
+         , ITEM_UNIT_QTY
+         , BASE_PRCE
+         , PURC_PRCE
+         , SALE_PRCE
+         , REF1_PRCE
+         , REF2_PRCE
+         , REF3_PRCE
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(mngType      )">, MNG_TYPE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocLoc      )">, STOC_LOC</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemBar      )">, ITEM_BAR</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocAdmIdx   )">, STOC_ADM_IDX</if>
+         , STOC_ADM_RATE
+         , SAFT_QTY
+         , ON_HAND_QTY
+         , CARRY_QTY
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(carryDate    )">, CARRY_DATE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcDate )">, LAST_PURC_DATE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastSaleDate )">, LAST_SALE_DATE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcDate1)">, LAST_PURC_DATE1</if>
+         , LAST_PURC_PRCE1
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode1    )">, VNDR_CODE1</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName1    )">, VNDR_NAME1</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcDate2)">, LAST_PURC_DATE2</if>
+         , LAST_PURC_PRCE2
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode2    )">, VNDR_CODE2</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName2    )">, VNDR_NAME2</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcDate3)">, LAST_PURC_DATE3</if>
+         , LAST_PURC_PRCE3
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode3    )">, VNDR_CODE3</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName3    )">, VNDR_NAME3</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(taxType      )">, TAX_TYPE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemRemk     )">, ITEM_REMK</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useIdx       )">, USE_IDX</if>
+         , REGI_USER
+         , REGI_DATE
+    </sql>
+    <sql id="insertColumns-values">
+           #{sysId}
+         , #{itemCode}
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemName     )">, #{itemName}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNameAlt  )">, #{itemNameAlt}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemSpec     )">, #{itemSpec}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemUnit     )">, #{itemUnit}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemUnitQty  )">, REGEXP_REPLACE(#{itemUnitQty}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(itemUnitQty     )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(basePrce     )">, REGEXP_REPLACE(#{basePrce}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(basePrce        )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(purcPrce     )">, REGEXP_REPLACE(#{purcPrce}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(purcPrce        )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(salePrce     )">, REGEXP_REPLACE(#{salePrce}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(salePrce        )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref1Prce     )">, REGEXP_REPLACE(#{ref1Prce}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(ref1Prce        )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref2Prce     )">, REGEXP_REPLACE(#{ref2Prce}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(ref2Prce        )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref3Prce     )">, REGEXP_REPLACE(#{ref3Prce}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(ref3Prce        )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(mngType      )">, #{mngType}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocLoc      )">, #{stocLoc}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemBar      )">, #{itemBar}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocAdmIdx   )">, #{stocAdmIdx}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocAdmRate  )">, REGEXP_REPLACE(#{stocAdmRate}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(stocAdmRate     )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saftQty      )">, REGEXP_REPLACE(#{saftQty}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(saftQty         )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(onHandQty    )">, REGEXP_REPLACE(#{onHandQty}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(onHandQty       )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(carryQty     )">, REGEXP_REPLACE(#{carryQty}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(carryQty        )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(carryDate    )">, #{carryDate}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcDate )">, #{lastPurcDate}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastSaleDate )">, #{lastSaleDate}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcDate1)">, #{lastPurcDate1}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcPrce1)">, REGEXP_REPLACE(#{lastPurcPrce1}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(lastPurcPrce1   )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode1    )">, #{vndrCode1}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName1    )">, #{vndrName1}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcDate2)">, #{lastPurcDate2}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcPrce2)">, REGEXP_REPLACE(#{lastPurcPrce2}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(lastPurcPrce2   )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode2    )">, #{vndrCode2}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName2    )">, #{vndrName2}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcDate3)">, #{lastPurcDate3}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcPrce3)">, REGEXP_REPLACE(#{lastPurcPrce3}, ',', '')</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(lastPurcPrce3   )">, 0</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode3    )">, #{vndrCode3}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName3    )">, #{vndrName3}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(taxType      )">, #{taxType}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemRemk     )">, #{itemRemk}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useIdx       )">, #{useIdx}</if>
+         , #{gsUserId}
+         , NOW()
+    </sql>
+    <sql id="updateColumns">
+           UPDT_USER = #{gsUserId}
+         , UPDT_DATE = NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemName     )">, ITEM_NAME       = #{itemName}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(itemName        )">, ITEM_NAME       = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNameAlt  )">, ITEM_NAME_ALT   = #{itemNameAlt}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(itemNameAlt     )">, ITEM_NAME_ALT   = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemSpec     )">, ITEM_SPEC       = #{itemSpec}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(itemSpec        )">, ITEM_SPEC       = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemUnit     )">, ITEM_UNIT       = #{itemUnit}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(itemUnit        )">, ITEM_UNIT       = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemUnitQty  )">, ITEM_UNIT_QTY   = REPLACE(#{itemUnitQty}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(itemUnitQty     )">, ITEM_UNIT_QTY   = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(basePrce     )">, BASE_PRCE       = REPLACE(#{basePrce}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(basePrce        )">, BASE_PRCE       = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(purcPrce     )">, PURC_PRCE       = REPLACE(#{purcPrce}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(purcPrce        )">, PURC_PRCE       = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(salePrce     )">, SALE_PRCE       = REPLACE(#{salePrce}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(salePrce        )">, SALE_PRCE       = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref1Prce     )">, REF1_PRCE       = REPLACE(#{ref1Prce}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(ref1Prce        )">, REF1_PRCE       = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref2Prce     )">, REF2_PRCE       = REPLACE(#{ref2Prce}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(ref2Prce        )">, REF2_PRCE       = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref3Prce     )">, REF3_PRCE       = REPLACE(#{ref3Prce}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(ref3Prce        )">, REF3_PRCE       = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(mngType      )">, MNG_TYPE        = #{mngType}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(mngType         )">, MNG_TYPE        = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocLoc      )">, STOC_LOC        = #{stocLoc}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(stocLoc         )">, STOC_LOC        = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemBar      )">, ITEM_BAR        = #{itemBar}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(itemBar         )">, ITEM_BAR        = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocAdmIdx   )">, STOC_ADM_IDX    = #{stocAdmIdx}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(stocAdmIdx      )">, STOC_ADM_IDX    = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocAdmRate  )">, STOC_ADM_RATE   = REPLACE(#{stocAdmRate}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(stocAdmRate     )">, STOC_ADM_RATE   = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saftQty      )">, SAFT_QTY        = REPLACE(#{saftQty}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(saftQty         )">, SAFT_QTY        = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(onHandQty    )">, ON_HAND_QTY     = REPLACE(#{onHandQty}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(onHandQty       )">, ON_HAND_QTY     = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(carryQty     )">, CARRY_QTY       = REPLACE(#{carryQty}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(carryQty        )">, CARRY_QTY       = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(carryDate    )">, CARRY_DATE      = #{carryDate}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(carryDate       )">, CARRY_DATE      = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcDate )">, LAST_PURC_DATE  = #{lastPurcDate}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(lastPurcDate    )">, LAST_PURC_DATE  = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastSaleDate )">, LAST_SALE_DATE  = #{lastSaleDate}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(lastSaleDate    )">, LAST_SALE_DATE  = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcDate1)">, LAST_PURC_DATE1 = #{lastPurcDate1}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(lastPurcDate1   )">, LAST_PURC_DATE1 = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcPrce1)">, LAST_PURC_PRCE1 = REPLACE(#{lastPurcPrce1}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(lastPurcPrce1   )">, LAST_PURC_PRCE1 = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode1    )">, VNDR_CODE1      = #{vndrCode1}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(vndrCode1       )">, VNDR_CODE1      = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName1    )">, VNDR_NAME1      = #{vndrName1}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(vndrName1       )">, VNDR_NAME1      = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcDate2)">, LAST_PURC_DATE2 = #{lastPurcDate2}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(lastPurcDate2   )">, LAST_PURC_DATE2 = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcPrce2)">, LAST_PURC_PRCE2 = REPLACE(#{lastPurcPrce2}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(lastPurcPrce2   )">, LAST_PURC_PRCE2 = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode2    )">, VNDR_CODE2      = #{vndrCode2}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(vndrCode2       )">, VNDR_CODE2      = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName2    )">, VNDR_NAME2      = #{vndrName2}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(vndrName2       )">, VNDR_NAME2      = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcDate3)">, LAST_PURC_DATE3 = #{lastPurcDate3}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(lastPurcDate3   )">, LAST_PURC_DATE3 = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(lastPurcPrce3)">, LAST_PURC_PRCE3 = REPLACE(#{lastPurcPrce3}, ',', '')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(lastPurcPrce3   )">, LAST_PURC_PRCE3 = 0</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrCode3    )">, VNDR_CODE3      = #{vndrCode3}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(vndrCode3       )">, VNDR_CODE3      = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(vndrName3    )">, VNDR_NAME3      = #{vndrName3}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(vndrName3       )">, VNDR_NAME3      = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(taxType      )">, TAX_TYPE        = #{taxType}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(taxType         )">, TAX_TYPE        = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemRemk     )">, ITEM_REMK       = #{itemRemk}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(itemRemk        )">, ITEM_REMK       = ''</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useIdx       )">, USE_IDX         = #{useIdx}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(useIdx          )">, USE_IDX         = 'Y'</if>
+    </sql>
+    <sql id="whereClause">
+    		A.SYS_ID    = #{sysId}
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemCode  )">AND ITEM_CODE = #{itemCode}</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchText)">AND ITEM_NAME LIKE #{searchText}||'%'</if>
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+        	 , ROUND((A.PURC_PRCE / A.BASE_PRCE) * 100) - 100 AS "purcPrceRate"
+        	 , ROUND((A.SALE_PRCE / A.BASE_PRCE) * 100) - 100 AS "salePrceRate"
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM ITEM_MAST A
+         WHERE <include refid="whereClause" />
+         ORDER
+            BY A.ITEM_NAME ASC, A.ITEM_SPEC ASC
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM ITEM_MAST A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+        	 , ROUND((A.PURC_PRCE / A.BASE_PRCE) * 100) - 100 AS "purcPrceRate"
+        	 , ROUND((A.SALE_PRCE / A.BASE_PRCE) * 100) - 100 AS "salePrceRate"
+        	 , 'N' AS "updateFlag"
+          FROM ITEM_MAST A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="searchAll" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM ITEM_MAST A
+         WHERE SYS_ID = #{sysId}
+    </select>
+    
+    <insert id="insert" parameterType="params">
+    	<selectKey resultType="string" keyProperty="itemCode" order="BEFORE">
+            SELECT CONCAT('P', LPAD(CAST(ifnull(SUBSTR(MAX(ITEM_CODE),2,5),'0') AS UNSIGNED)+1, 5, '0') ) AS "itemCode"
+              FROM ITEM_MAST
+             WHERE SYS_ID    = #{sysId}
+        </selectKey>
+        INSERT 
+          INTO ITEM_MAST
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE ITEM_MAST
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID    = #{sysId}
+           AND ITEM_CODE = #{itemCode}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM ITEM_MAST
+         WHERE SYS_ID    = #{sysId}
+           AND ITEM_CODE = #{itemCode}
+    </delete>
+    <!-- <update id="updatePrceAll" parameterType="params">
+    	UPDATE ITEM_MAST
+    	   SET PURC_PRCE = BASE_PRCE + ((REGEXP_REPLACE(#{purcPrceRate}, ',', '') / 100) * BASE_PRCE)
+    	     , SALE_PRCE = BASE_PRCE + ((REGEXP_REPLACE(#{salePrceRate}, ',', '') / 100) * BASE_PRCE)
+    	     , UPDT_DATE = TO_CHAR(SYSDATE,'YYYY-MM-DD HH24:MI:SS')
+    	     , UPDT_USER = #{gsUserId}
+    	 WHERE SYS_ID    = #{sysId}
+    	   AND ITEM_NAME = #{itemName}
+    </update>
+    <insert id="copyItemAll" parameterType="params">
+    	INSERT
+    	  INTO ITEM_MAST
+    	    (  SYS_ID
+    	     , ITEM_CODE
+    	     , ITEM_NAME
+    	     , ITEM_NAME_ALT
+    	     , ITEM_SPEC
+    	     , ITEM_UNIT 
+    	     , ITEM_UNIT_QTY
+    	     , BASE_PRCE
+    	     , PURC_PRCE
+    	     , SALE_PRCE
+    	     , REF1_PRCE
+    	     , REF2_PRCE
+    	     , REF3_PRCE
+    	     , MNG_TYPE
+    	     , STOC_LOC
+    	     , ITEM_BAR
+    	     , STOC_ADM_IDX
+    	     , STOC_ADM_RATE
+    	     , SAFT_QTY
+    	     , ON_HAND_QTY
+    	     , CARRY_QTY
+    	     , CARRY_DATE
+    	     , LAST_PURC_DATE
+    	     , LAST_SALE_DATE
+    	     , LAST_PURC_DATE1
+    	     , LAST_PURC_PRCE1
+    	     , VNDR_CODE1
+    	     , VNDR_NAME1
+    	     , LAST_PURC_DATE2
+    	     , LAST_PURC_PRCE2
+    	     , VNDR_CODE2
+    	     , VNDR_NAME2
+    	     , LAST_PURC_DATE3
+    	     , LAST_PURC_PRCE3
+    	     , VNDR_CODE3
+    	     , VNDR_NAME3
+    	     , TAX_TYPE
+    	     , ITEM_REMK
+    	     , USE_IDX
+    	     , REGI_DATE
+    	     , REGI_USER
+    	     )
+    	SELECT SYS_ID
+    	     , 'I' || LPAD((SELECT TO_NUMBER(NVL(SUBSTR(MAX(ITEM_CODE),2,5),'0')) FROM ITEM_MAST WHERE SYS_ID = #{sysId})+ROWNUM, 5, '0')
+    	     , #{copyItemName}
+    	     , ITEM_NAME_ALT
+    	     , ITEM_SPEC
+    	     , ITEM_UNIT
+    	     , ITEM_UNIT_QTY
+    	     , BASE_PRCE
+    	     , PURC_PRCE
+    	     , SALE_PRCE
+    	     , REF1_PRCE
+    	     , REF2_PRCE
+    	     , REF3_PRCE
+    	     , MNG_TYPE
+    	     , STOC_LOC
+    	     , ITEM_BAR
+    	     , STOC_ADM_IDX
+    	     , STOC_ADM_RATE
+    	     , SAFT_QTY
+    	     , ON_HAND_QTY
+    	     , CARRY_QTY
+    	     , CARRY_DATE
+    	     , LAST_PURC_DATE
+    	     , LAST_SALE_DATE
+    	     , LAST_PURC_DATE1
+    	     , LAST_PURC_PRCE1
+    	     , VNDR_CODE1
+    	     , VNDR_NAME1
+    	     , LAST_PURC_DATE2
+    	     , LAST_PURC_PRCE2
+    	     , VNDR_CODE2
+    	     , VNDR_NAME2
+    	     , LAST_PURC_DATE3
+    	     , LAST_PURC_PRCE3
+    	     , VNDR_CODE3
+    	     , VNDR_NAME3
+    	     , TAX_TYPE
+    	     , ITEM_REMK
+    	     , USE_IDX
+             , TO_CHAR(SYSDATE,'YYYY-MM-DD HH24:MI:SS')
+    	     , #{gsUserId}
+    	  FROM ITEM_MAST
+    	 WHERE SYS_ID    = #{sysId}
+    	   AND ITEM_NAME = #{itemName}
+    	      
+    </insert> -->
+    
+</mapper>

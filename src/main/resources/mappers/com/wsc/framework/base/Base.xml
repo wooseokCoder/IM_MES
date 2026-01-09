@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.framework.Base">
+ 
+    <sql id="selectColumns">
+	   COL_LVL
+     , COL_VAL
+     , STYLE 
+    </sql>
+    
+    <sql id="whereClause-search">    
+	        SYS_ID = 'IMMES'
+	    AND FILE_NM = #{fileNM}
+    </sql>
+
+    <select id="searchHd" resultType="record" parameterType="params">
+    CALL sp_get_excelInfo(#{sysId},#{gsUserId},#{windId},#{myViewId},#{fileNM},#{excelSelect})
+<!-- 		SELECT <include refid="selectColumns" /> -->
+<!-- 		  FROM SYS_EXCEL_INFO -->
+<!-- 		 WHERE <include refid="whereClause-search" /> -->
+<!-- 		 ORDER BY cast(VIEW_NO as unsigned) -->
+    </select>
+    <!-- 개인화에서 엑셀 저장시 개인화명 가져오는 프로시져 -->
+    <select id="getMyViewName" resultType="record" parameterType="params">
+    		CALL sp_get_view_name(#{sysId},#{gsUserId},#{windId},#{myViewId})
+    </select>
+</mapper>

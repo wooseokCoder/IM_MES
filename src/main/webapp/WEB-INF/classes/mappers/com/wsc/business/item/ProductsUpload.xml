@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.business.item.ProductsUpload">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    
+    <sql id="selectColumns">
+         A.SYS_ID          AS "sysId"
+        ,A.ITEM_CODE       AS "itemCode"
+        ,A.ITEM_NAME       AS "itemName"
+        ,A.ITEM_NAME_ALT   AS "itemNameAlt"
+        ,A.ITEM_TYPE1      AS "itemType1"
+        ,A.ITEM_TYPE1_NAME AS "itemType1Name"
+        ,A.ITEM_TYPE2      AS "itemType2"
+        ,A.ITEM_TYPE2_NAME AS "itemType2Name"
+        ,A.ITEM_SPEC       AS "itemSpec"
+        ,A.ITEM_UNIT       AS "itemUnit"
+        ,A.ITEM_UNIT_QTY   AS "itemUnitQty"
+        ,A.PURC_PRCE       AS "purcPrce"
+        ,A.SALE_PRCE       AS "salePrce"
+        ,A.ITEM_BAR        AS "itemBar"
+        ,A.MODEL_NO        AS "modelNo"
+        ,A.MODEL_NAME      AS "modelName"
+        ,A.SI_NO    	   AS "siNo"        
+        ,A.SAFT_QTY        AS "saftQty"
+        ,A.ON_HAND_QTY     AS "onHandQty"
+        ,A.HAND_QTY        AS "handQty"
+        ,A.STOC_LOC        AS "stocLoc"
+        ,A.GOODS_GP		   AS "goodsGP"
+		,A.AS_GP		   AS "AS_GP"
+        ,A.REGI_ID         AS "regiId"
+        ,A.REGI_DATE       AS "regiDate"
+        ,A.CHNG_ID         AS "chngId"
+        ,A.CHNG_DATE       AS "chngDate"
+        ,A.ITEM_REMK	   AS "itemRemk"
+    </sql>
+    
+        <sql id="insertColumns-fields">
+       	 SYS_ID 
+         ,ITEM_CODE 
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemName)">, ITEM_NAME </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNameAlt)">, ITEM_NAME_ALT </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType1)">, ITEM_TYPE1 </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType1Name)">, ITEM_TYPE1_NAME </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType2)">, ITEM_TYPE2 </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType2Name)">, ITEM_TYPE2_NAME </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemSpec)">, ITEM_SPEC </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemUnit)">, ITEM_UNIT </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemUnitQty)">, ITEM_UNIT_QTY </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(purcPrce)">, PURC_PRCE </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(salePrce)">, SALE_PRCE </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemBar)">, ITEM_BAR </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelNo)">, MODEL_NO </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelName)">, MODEL_NAME </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(siNo)">, SI_NO </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saftQty)">, SAFT_QTY </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(onHandQty)">, ON_HAND_QTY </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(handQty)">, HAND_QTY </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocLoc)">, STOC_LOC </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(goodsGP)">, GOODS_GP </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(AS_GP)">, AS_GP </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemRemk)">, ITEM_REMK </if>
+ 		, USE_IDX
+ 		, REGI_ID 
+ 		, REGI_DATE
+ 		, CHNG_ID
+ 		, CHNG_DATE
+    </sql>
+    
+    <sql id="insertColumns-values">
+           #{sysId}
+         , (select * from (SELECT CONCAT('P', LPAD(CAST(ifnull(SUBSTR(MAX(ITEM_CODE),2,5),'0') AS UNSIGNED)+1, 5, '0') ) AS "itemCode" FROM ITEM_MAST WHERE SYS_ID    =  #{sysId}) as temp) 
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemName)">, #{itemName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNameAlt )">, #{itemNameAlt}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType1  )">, #{itemType1}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType1Name)">, #{itemType1Name}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType2   )">, #{itemType2}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType2Name)">, #{itemType2Name}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemSpec )">, #{itemSpec}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemUnit)">, #{itemUnit}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemUnitQty)">, #{itemUnitQty}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(purcPrce)">, #{purcPrce}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(salePrce)">, #{salePrce}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemBar)">, #{itemBar}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelNo)">, #{modelNo}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelName)">, #{modelName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(siNo)">, #{siNo}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saftQty)">, #{saftQty}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(onHandQty)">, #{onHandQty}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(handQty)">, #{handQty}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocLoc)">, #{stocLoc}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(goodsGP)">, #{goodsGP}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(AS_GP)">, #{AS_GP}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemRemk)">, #{itemRemk} </if>
+		 , 'Y'
+		 , #{gsUserId}        
+         , NOW()                                                          
+         , #{gsUserId}                                                    
+         , NOW()
+    </sql>
+
+    <sql id="updateColumns">       
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemName)">ITEM_NAME = #{itemName}  </if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemNameAlt )">,ITEM_NAME_ALT = #{itemNameAlt}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType1  )">,ITEM_TYPE1 = #{itemType1}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType1Name)">,ITEM_TYPE1_NAME = #{itemType1Name}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType2   )">, ITEM_TYPE2 = #{itemType2}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemType2Name)">, ITEM_TYPE2_NAME = #{itemType2Name}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemSpec )">, ITEM_SPEC = #{itemSpec}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemUnit)">, ITEM_UNIT = #{itemUnit}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemUnit)">, ITEM_UNIT_QTY = #{itemUnitQty}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemUnit)">, PURC_PRCE = #{purcPrce}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(salePrce)">, SALE_PRCE = #{salePrce}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemBar)">, ITEM_BAR = #{itemBar}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelNo)">, MODEL_NO = #{modelNo}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelName)">, MODEL_NAME = #{modelName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(siNo)">, SI_NO = #{siNo}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saftQty)">, SAFT_QTY = #{saftQty}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(onHandQty)">, ON_HAND_QTY = #{onHandQty}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(handQty)">, HAND_QTY = #{handQty}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocLoc)">, STOC_LOC = #{stocLoc}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(goodsGP)">, GOODS_GP = #{goodsGP}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(AS_GP)">, AS_GP = #{AS_GP}  </if> 
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(itemRemk)">, ITEM_REMK = #{itemRemk}  </if>                 
+         , CHNG_ID   = #{gsUserId}
+         , CHNG_DATE = NOW()
+    </sql>
+   
+    <select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM ITEM_MAST A
+         WHERE SYS_ID   = #{sysId}
+         AND ITEM_CODE = #{itemCode}
+         <if test="@com.wsc.framework.utils.MybatisUtils@empty(itemCode  )">AND ITEM_CODE =  (select * from (SELECT CONCAT('P', LPAD(CAST(ifnull(SUBSTR(MAX(ITEM_CODE),2,5),'0') AS UNSIGNED)+1, 5, '0') ) AS "itemCode" FROM ITEM_MAST WHERE SYS_ID    =  #{sysId}) as temp)</if>      
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchitemType1)">AND ITEM_TYPE1 like CONCAT('%',#{searchitemType1},'%')</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchitemType2)">AND ITEM_TYPE2 like CONCAT('%',#{searchitemType2},'%')</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchimodelName  )"> AND (MODEL_NAME LIKE CONCAT('%',#{searchimodelName},'%') OR ITEM_SPEC LIKE CONCAT('%',#{searchimodelName},'%')) 	</if>
+    </select>
+    
+     <insert id="insert" parameterType="params">
+        INSERT 
+          INTO ITEM_MAST
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE ITEM_MAST
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID    = #{sysId}
+         AND ITEM_CODE	= #{itemCode}        
+          
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM ITEM_MAST
+         WHERE SYS_ID    = #{sysId}
+         AND ITEM_CODE	= #{itemCode}         
+    </delete>
+    
+    <sql id="whereClause">
+    		A.SYS_ID    = #{sysId}
+
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchitemName  )">AND ITEM_NAME   like CONCAT('%',#{searchitemName},'%')    </if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchitemSpec  )">AND ITEM_SPEC   like CONCAT('%',#{searchitemSpec},'%')    </if>
+ 	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchitemType1)">AND ITEM_TYPE1 like CONCAT('%',#{searchitemType1},'%')</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchitemType2)">AND ITEM_TYPE2 like CONCAT('%',#{searchitemType2},'%')</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchimodelName  )"> AND (MODEL_NAME LIKE CONCAT('%',#{searchimodelName},'%') OR ITEM_SPEC LIKE CONCAT('%',#{searchimodelName},'%')) 	</if>
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM ITEM_MAST A
+         WHERE <include refid="whereClause" />
+         ORDER
+            BY A.ITEM_NAME ASC, A.ITEM_SPEC ASC
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM ITEM_MAST A
+         WHERE <include refid="whereClause" />
+    </select>
+
+</mapper>

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.business.company.CompanyRegistration">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    
+    <sql id="selectColumns">
+         A.SYS_ID        AS "sysId"
+        ,A.COMP_CODE     AS "compCode"
+        ,A.COMP_NAME     AS "compName"
+        ,A.COMP_NAME_EN  AS "compNameEN"
+        ,A.COMP_NAME_HAN AS "compNameHAN"
+        ,A.COMP_NAME_ALT AS "compNameALT"        
+        ,A.OWN_NAME      AS "ownName"
+        ,A.BIZ_NO        AS "bizNo"
+        ,A.BIZ_CLSS      AS "bizClss"
+        ,A.BIZ_TYPE      AS "bizType"
+        ,A.ADDR_ZIP      AS "addrZip"
+        ,A.ADDR_MAIN     AS "addrMain"
+        ,A.ADDR_SUB      AS "addrSub"
+        ,A.COMP_TEL1     AS "compTel1"
+        ,A.COMP_TEL2     AS "compTel2"
+        ,A.COMP_FAX      AS "compFax"
+        ,A.COMP_HOME	 AS	"compHome"
+        ,A.COMP_MAIL     AS "compMail"
+        ,A.COMP_NOTI     AS "compNoti"
+        ,A.REF1_RATE     AS "ref1Rate"
+        ,A.REF2_RATE     AS "ref2Rate"
+        ,A.REF3_RATE     AS "ref3Rate"
+        ,A.TAX_RATE      AS "taxRate"
+        ,A.PRNT_NAME1    AS "prntName1"
+        ,A.PRNT_NAME2    AS "prntName2"
+        ,A.PRNT_NAME3    AS "prntName3"
+        ,A.STOC_ADM_IDX  AS "stocAdmIdx"
+        ,A.SET_DATE      AS "setDate"
+        ,A.FICS_YEAR     AS "ficsYear"
+        ,A.FICS_JOCK     AS "ficsJock"
+        ,A.SETT_MNTH     AS "settMnth"
+        ,A.CASH_ACCT     AS "cashAcct"
+        ,A.COMP_MARK     AS "compMark"
+        ,A.COMP_SEAL     AS "compSeal"
+        ,A.BOTT_LOGO     AS "bottLogo"
+        ,A.USE_FLAG      AS "useFlag"
+        ,A.REGI_ID       AS "regiId"
+        ,A.REGI_DATE     AS "regiDate"
+        ,A.CHNG_ID       AS "chngId"
+        ,A.CHNG_DATE     AS "chngDate"
+    </sql>
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , COMP_CODE
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compName  )">, COMP_NAME</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compNameEN  )">, COMP_NAME_EN</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compNameHAN  )">, COMP_NAME_HAN</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compNameALT  )">, COMP_NAME_ALT</if>         
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ownName   )">, OWN_NAME</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bizNo     )">, BIZ_NO</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bizClss   )">, BIZ_CLSS</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bizType   )">, BIZ_TYPE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrZip   )">, ADDR_ZIP</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrMain  )">, ADDR_MAIN</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrSub   )">, ADDR_SUB</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compTel1  )">, COMP_TEL1</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compTel2  )">, COMP_TEL2</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compFax   )">, COMP_FAX</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compHome  )">, COMP_HOME</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compMail  )">, COMP_MAIL</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compNoti  )">, COMP_NOTI</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref1Rate  )">, REF1_RATE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref2Rate  )">, REF2_RATE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref3Rate  )">, REF3_RATE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(taxRate   )">, TAX_RATE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(prntName1 )">, PRNT_NAME1</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(prntName2 )">, PRNT_NAME2</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(prntName3 )">, PRNT_NAME3</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocAdmIdx)">, STOC_ADM_IDX</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(setDate   )">, SET_DATE</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ficsYear  )">, FICS_YEAR</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ficsJock  )">, FICS_JOCK</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(settMnth  )">, SETT_MNTH</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(cashAcct  )">, CASH_ACCT</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compMark  )">, COMP_MARK</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compSeal  )">, COMP_SEAL</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bottLogo  )">, BOTT_LOGO</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag   )">, USE_FLAG</if>
+         , REGI_ID
+         , REGI_DATE
+    </sql>
+    <sql id="insertColumns-values">
+           #{sysId}
+         , #{custCode}
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compName  )">, #{compName}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compNameEN  )">, #{compNameEN}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compNameHAN  )">, #{compNameHAN}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compNameALT  )">, #{compNameALT}</if>         
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ownName   )">, #{ownName}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bizNo     )">, #{bizNo}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bizClss   )">, #{bizClss}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bizType   )">, #{bizType}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrZip   )">, #{addrZip}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrMain  )">, #{addrMain}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrSub   )">, #{addrSub}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compTel1  )">, #{compTel1}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compTel2  )">, #{compTel2}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compFax   )">, #{compFax}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compHome  )">, #{compHome}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compMail  )">, #{compMail}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compNoti  )">, #{compNoti}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref1Rate  )">, #{ref1Rate}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref2Rate  )">, #{ref2Rate}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref3Rate  )">, #{ref3Rate}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(taxRate   )">, #{taxRate}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(prntName1 )">, #{prntName1}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(prntName2 )">, #{prntName2}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(prntName3 )">, #{prntName3}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocAdmIdx)">, #{stocAdmIdx}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(setDate   )">, #{setDate}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ficsYear  )">, #{ficsYear}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ficsJock  )">, #{ficsJock}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(settMnth  )">, #{settMnth}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(cashAcct  )">, #{cashAcct}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compMark  )">, #{compMark}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compSeal  )">, #{compSeal}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bottLogo  )">, #{bottLogo}</if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag   )">, #{useFlag}</if>
+         , #{gsUserId}
+         , NOW()
+    </sql>
+    <sql id="updateColumns">
+           CHNG_ID   = #{gsUserId}
+         , CHNG_DATE = NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compCode  )">, COMP_CODE    = #{compCode}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compName  )">, COMP_NAME    = #{compName}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compNameEN  )">,COMP_NAME_EN= #{compNameEN}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compNameHAN)">,COMP_NAME_HAN= #{compNameHAN}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compNameALT)">,COMP_NAME_ALT= #{compNameALT}</if>        
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ownName   )">, OWN_NAME     = #{ownName}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bizNo     )">, BIZ_NO       = #{bizNo}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bizClss   )">, BIZ_CLSS     = #{bizClss}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bizType   )">, BIZ_TYPE     = #{bizType}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrZip   )">, ADDR_ZIP     = #{addrZip}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrMain  )">, ADDR_MAIN    = #{addrMain}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrSub   )">, ADDR_SUB     = #{addrSub}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compTel1  )">, COMP_TEL1    = #{compTel1}</if>
+<!--         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compTel2  )">, COMP_TEL2    = #{compTel2}</if> -->
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compFax   )">, COMP_FAX     = #{compFax}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compHome  )">, COMP_HOME    = #{compHome}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compMail  )">, COMP_MAIL    = #{compMail}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compNoti  )">, COMP_NOTI    = #{compNoti}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref1Rate  )">, REF1_RATE    = #{ref1Rate}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref2Rate  )">, REF2_RATE    = #{ref2Rate}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ref3Rate  )">, REF3_RATE    = #{ref3Rate}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(taxRate   )">, TAX_RATE     = #{taxRate}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(prntName1 )">, PRNT_NAME1   = #{prntName1}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(prntName2 )">, PRNT_NAME2   = #{prntName2}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(prntName3 )">, PRNT_NAME3   = #{prntName3}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stocAdmIdx)">, STOC_ADM_IDX = #{stocAdmIdx}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(setDate   )">, SET_DATE     = #{setDate}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ficsYear  )">, FICS_YEAR    = #{ficsYear}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ficsJock  )">, FICS_JOCK    = #{ficsJock}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(settMnth  )">, SETT_MNTH    = #{settMnth}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(cashAcct  )">, CASH_ACCT    = #{cashAcct}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compMark  )">, COMP_MARK    = #{compMark}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compSeal  )">, COMP_SEAL    = #{compSeal}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bottLogo  )">, BOTT_LOGO    = #{bottLogo}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag   )">, USE_FLAG     = #{useFlag}</if>
+    </sql>
+    <sql id="whereClause">
+    		A.SYS_ID    = #{sysId}
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchCompCode)">AND COMP_CODE = #{searchCompCode}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(searchCompCode   )">AND COMP_CODE = ''</if>
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM COMP_INFO A
+         WHERE <include refid="whereClause" />
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM COMP_INFO A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM COMP_INFO A
+         WHERE <include refid="whereClause" />
+    </select>
+    
+    <insert id="insert" parameterType="params">
+    	<selectKey resultType="string" keyProperty="custCode" order="BEFORE">
+            SELECT CONCAT('C', LPAD(CAST(ifnull(SUBSTR(MAX(COMP_CODE),2,5),'0') AS UNSIGNED)+1, 5, '0') ) AS "compCode"
+              FROM COMP_INFO
+             WHERE SYS_ID    = #{sysId}
+        </selectKey>
+        INSERT 
+          INTO COMP_INFO
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE COMP_INFO
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID    = #{sysId}
+           AND COMP_CODE = #{compCode}
+    </update>
+    
+</mapper>

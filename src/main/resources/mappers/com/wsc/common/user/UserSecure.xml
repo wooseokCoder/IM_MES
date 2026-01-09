@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.user.UserSecure">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+         	   A.REGI_DATE DESC
+         	  ,A.CHNG_DATE DESC
+	  	</if>
+    </sql>
+
+    <sql id="selectColumns">
+         SYS_ID              AS "sysId"
+        ,USER_ID             AS "userId"
+        ,SECURE_KEY          AS "secureKey"
+        ,DATE_FORMAT(LOGIN_DATE,'%Y-%m-%d %H:%i:%s')  
+                             AS "accTime"
+        ,REGI_ID             AS "regiId"
+        ,DATE_FORMAT(REGI_DATE, '%Y-%m-%d %H:%i:%s')
+                             AS "regiDate"
+        ,CHNG_ID             AS "chngId"
+        ,DATE_FORMAT(CHNG_DATE, '%Y-%m-%d %H:%i:%s')
+                             AS "chngDate"
+    </sql>
+    <sql id="whereClause">
+    	SYS_ID = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userId   )">AND USER_ID      = #{userId}       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(secureKey)">AND SECURE_KEY   = #{secureKey}    </if>
+    </sql>
+    
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_USEC A
+         WHERE <include refid="whereClause" />
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_USEC A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM SYS_USEC A
+    	 WHERE SYS_ID     = #{sysId}
+    	   AND USER_ID    = #{userId}
+    	   AND SECURE_KEY = #{secureKey}
+    	   AND LOGIN_DATE IS NULL
+    	   AND REGI_DATE <![CDATA[>]]> (NOW()-1)
+    </select>
+    <insert id="insert" parameterType="params">
+        INSERT 
+          INTO SYS_USEC 
+             ( SYS_ID
+             , USER_ID
+             , SECURE_KEY
+             , LOGIN_DATE
+             , REGI_ID
+             , REGI_DATE
+             , CHNG_ID
+             , CHNG_DATE
+             )
+        VALUES
+             ( #{sysId}
+             , #{userId}
+             , #{secureKey}
+             , NULL
+             , #{gsUserId}
+             , NOW()
+             , #{gsUserId}
+             , NOW()
+             )
+    </insert>
+    <update id="update" parameterType="params">
+    	UPDATE SYS_USEC
+    	   SET LOGIN_DATE = NOW()
+    	      ,CHNG_DATE  = NOW()
+    	      ,CHNG_ID    = #{userId}
+    	 WHERE SYS_ID     = #{sysId}
+    	   AND USER_ID    = #{userId}
+    	   AND SECURE_KEY = #{secureKey}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM SYS_USEC
+    	 WHERE SYS_ID     = #{sysId}
+    	   AND USER_ID    = #{userId}
+    	   AND SECURE_KEY = #{secureKey}
+    </delete>
+
+</mapper>

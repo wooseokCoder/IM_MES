@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.user.Menu">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT *
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+         	   A.PARENT_KEY
+         	  ,A.MENU_SEQ
+         	  ,A.REGI_DATE DESC
+         	  ,A.CHNG_DATE DESC
+	  	</if>
+    </sql>
+    
+    <sql id="selectV_sys_auth">
+    	SELECT a.sys_id  AS sys_id, 
+		       a.user_id AS user_id, 
+		       '10.USER'     AS auth_type, 
+		       a.prog_id AS prog_id, 
+		       a.tran_a  AS tran_a, 
+		       a.tran_c  AS tran_c, 
+		       a.tran_r  AS tran_r, 
+		       a.tran_u  AS tran_u, 
+		       a.tran_d  AS tran_d, 
+		       a.tran_p  AS tran_p, 
+		       a.tran_s  AS tran_s, 
+		       a.tran_1  AS tran_1, 
+		       a.tran_2  AS tran_2, 
+		       a.tran_3  AS tran_3, 
+		       a.tran_4  AS tran_4, 
+		       a.tran_5  AS tran_5 
+		FROM   sys_upgm a 
+		WHERE  a.sys_id = #{sysId}
+		AND    a.user_id = #{userId}
+		UNION 
+		SELECT   a.sys_id      AS sys_id, 
+		         b.user_id     AS user_id, 
+		         '20.GROUP'        AS auth_type, 
+		         a.prog_id     AS prog_id, 
+		         Max(a.tran_a) AS tran_a, 
+		         Max(a.tran_c) AS tran_c, 
+		         Max(a.tran_r) AS tran_r, 
+		         Max(a.tran_u) AS tran_u, 
+		         Max(a.tran_d) AS tran_d, 
+		         Max(a.tran_p) AS tran_p, 
+		         Max(a.tran_s) AS tran_s, 
+		         Max(a.tran_1) AS tran_1, 
+		         Max(a.tran_2) AS tran_2, 
+		         Max(a.tran_3) AS tran_3, 
+		         Max(a.tran_4) AS tran_4, 
+		         Max(a.tran_5) AS tran_5 
+		FROM     sys_gpgm a 
+		JOIN     sys_ugrp b
+		WHERE    a.sys_id = b.sys_id
+		AND      a.group_id = b.group_id
+		AND      b.sys_id = #{sysId}
+		AND      b.user_id = #{userId}
+		GROUP BY a.sys_id, 
+		         b.user_id, 
+		         a.prog_id 
+		UNION 
+		SELECT a.sys_id  AS sys_id, 
+		       b.user_id AS user_id, 
+		       '30.DEFAULT'  AS auth_type, 
+		       a.prog_id AS prog_id, 
+		       '0'           AS tran_a, 
+		       '0'           AS tran_c, 
+		       '0'           AS tran_r, 
+		       '0'           AS tran_u, 
+		       '0'           AS tran_d, 
+		       '0'           AS tran_p, 
+		       '0'           AS tran_s, 
+		       '0'           AS tran_1, 
+		       '0'           AS tran_2, 
+		       '0'           AS tran_3, 
+		       '0'           AS tran_4, 
+		       '0'           AS tran_5 
+		FROM   sys_prog a 
+		JOIN   sys_user b
+		WHERE  a.sys_id = b.sys_id
+		AND    b.sys_id = #{sysId}
+		AND    b.user_id = #{userId}
+    </sql>
+    <sql id="selectV_sys_auth2">
+    	SELECT a.sys_id  AS sys_id, 
+		       a.user_id AS user_id, 
+		       '10.USER'     AS auth_type, 
+		       a.prog_id AS prog_id, 
+		       a.tran_a  AS tran_a, 
+		       a.tran_c  AS tran_c, 
+		       a.tran_r  AS tran_r, 
+		       a.tran_u  AS tran_u, 
+		       a.tran_d  AS tran_d, 
+		       a.tran_p  AS tran_p, 
+		       a.tran_s  AS tran_s, 
+		       a.tran_1  AS tran_1, 
+		       a.tran_2  AS tran_2, 
+		       a.tran_3  AS tran_3, 
+		       a.tran_4  AS tran_4, 
+		       a.tran_5  AS tran_5 
+		FROM   sys_upgm a 
+		WHERE  a.sys_id = #{sysId}
+		AND    a.user_id = #{gsUserId}
+		UNION 
+		SELECT   a.sys_id      AS sys_id, 
+		         b.user_id     AS user_id, 
+		         '20.GROUP'        AS auth_type, 
+		         a.prog_id     AS prog_id, 
+		         Max(a.tran_a) AS tran_a, 
+		         Max(a.tran_c) AS tran_c, 
+		         Max(a.tran_r) AS tran_r, 
+		         Max(a.tran_u) AS tran_u, 
+		         Max(a.tran_d) AS tran_d, 
+		         Max(a.tran_p) AS tran_p, 
+		         Max(a.tran_s) AS tran_s, 
+		         Max(a.tran_1) AS tran_1, 
+		         Max(a.tran_2) AS tran_2, 
+		         Max(a.tran_3) AS tran_3, 
+		         Max(a.tran_4) AS tran_4, 
+		         Max(a.tran_5) AS tran_5 
+		FROM     sys_gpgm a 
+		JOIN     sys_ugrp b
+		WHERE    a.sys_id = b.sys_id
+		AND      a.group_id = b.group_id
+		AND      b.sys_id = #{sysId}
+		AND      b.user_id = #{gsUserId}
+		GROUP BY a.sys_id, 
+		         b.user_id, 
+		         a.prog_id 
+		UNION 
+		SELECT a.sys_id  AS sys_id, 
+		       b.user_id AS user_id, 
+		       '30.DEFAULT'  AS auth_type, 
+		       a.prog_id AS prog_id, 
+		       '0'           AS tran_a, 
+		       '0'           AS tran_c, 
+		       '0'           AS tran_r, 
+		       '0'           AS tran_u, 
+		       '0'           AS tran_d, 
+		       '0'           AS tran_p, 
+		       '0'           AS tran_s, 
+		       '0'           AS tran_1, 
+		       '0'           AS tran_2, 
+		       '0'           AS tran_3, 
+		       '0'           AS tran_4, 
+		       '0'           AS tran_5 
+		FROM   sys_prog a 
+		JOIN   sys_user b
+		WHERE  a.sys_id = b.sys_id
+		AND    b.sys_id = #{sysId}
+		AND    b.user_id = #{gsUserId}
+    </sql>
+
+    <sql id="selectColumns">
+         A.SYS_ID         AS "sysId"
+        ,A.MENU_KEY       AS "menuKey"
+        <!-- ,DECODE(#{gsLang},'ko',A.MENU_DESC,'en',NVL(A.MENU_DESC_EN,A.MENU_DESC),A.MENU_DESC)      AS "menuDesc" -->
+        ,CASE WHEN #{gsLang} = 'ko'
+              THEN ifnull(A.MENU_DESC_KOR, A.MENU_DESC)
+              WHEN #{gsLang} = 'en'
+              THEN ifnull(A.MENU_DESC_EN, A.MENU_DESC)
+              WHEN #{gsLang} = 'vi'
+              THEN ifnull(A.MENU_DESC_VIET, A.MENU_DESC)
+              WHEN #{gsLang} = 'etc'
+              THEN ifnull(A.MENU_DESC_ETC, A.MENU_DESC)
+              WHEN #{gsLang} = 'pt'
+              THEN ifnull(A.MENU_DESC_PORT, A.MENU_DESC)
+              ELSE A.MENU_DESC
+         END              AS "menuDesc"
+        ,A.MENU_DESC      AS "menuDescKr"
+        ,A.MENU_DESC_EN   AS "menuDescEn"
+        ,A.MENU_DESC_VIET AS "menuDescVi"
+        ,A.MENU_DESC_ETC  AS "menuDescEtc"
+        ,A.MENU_DESC_PORT AS "menuDescPort"
+        ,A.MENU_DIR       AS "menuDir"
+        ,A.MOBILE_TYPE    AS "mobileType"
+        ,A.MENU_URL       AS "menuUrl"
+        ,A.PARENT_KEY     AS "parentKey"
+        ,A.PARENT_TYPE    AS "parentType"
+        ,A.CHILD_YN       AS "childYn"
+        ,A.PROC_TYPE      AS "procType"
+        ,A.ACTION_YN      AS "actionYn"
+        ,A.ICON_CLS       AS "iconCls"
+        ,A.SEPA_TEXT      AS "sepaText"
+        ,A.USE_FLAG       AS "useFlag"
+        ,A.ENABLE_YN      AS "enableYn"
+        ,A.SFDC_YN        AS "sfdcYn"
+        ,A.REGI_ID        AS "regiId"
+        ,DATE_FORMAT(A.REGI_DATE ,'%Y-%m-%d %H:%i:%s')
+                          AS "regiDate"
+        ,A.CHNG_ID        AS "chngId"
+        ,DATE_FORMAT(A.CHNG_DATE ,'%Y-%m-%d %H:%i:%s')
+                          AS "chngDate"
+        ,ifnull(A.MENU_LEVEL,0)
+                          AS "menuLevel"
+        ,ifnull(A.MENU_SEQ,0)
+                          AS "menuSeq"
+        <!-- ,(SELECT DECODE(#{gsLang},'ko',SB.MENU_DESC,'en',NVL(SB.MENU_DESC_EN,SB.MENU_DESC),SB.MENU_DESC) FROM SYS_MENU SB WHERE SB.SYS_ID = A.SYS_ID AND SB.MENU_KEY = A.PARENT_KEY) AS "parentDesc" -->
+        <!-- ,(SELECT CASE WHEN #{gsLang} = 'ko'  THEN ifnull(SB.MENU_DESC_KOR, SB.MENU_DESC)
+                      WHEN #{gsLang} = 'en'  THEN ifnull(SB.MENU_DESC_EN, SB.MENU_DESC)
+                      WHEN #{gsLang} = 'vi'  THEN ifnull(SB.MENU_DESC_VIET, SB.MENU_DESC)
+                      WHEN #{gsLang} = 'etc' THEN ifnull(SB.MENU_DESC_ETC, SB.MENU_DESC)
+                      WHEN #{gsLang} = 'pt'  THEN ifnull(SB.MENU_DESC_PORT, SB.MENU_DESC)
+                      ELSE SB.MENU_DESC END
+            FROM SYS_MENU SB
+           WHERE SB.SYS_ID = A.SYS_ID
+             AND SB.MENU_KEY = A.PARENT_KEY)
+                          AS "parentDesc" -->
+        ,fn_get_menu_path(A.MENU_KEY,#{gsLang}) AS "parentDesc"
+        ,'N' AS "menuPath"
+        ,'N' AS "helpYn"
+    </sql>
+
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , MENU_KEY
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuLevel)">, MENU_LEVEL </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescKr)">, MENU_DESC  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescEn)">, MENU_DESC_EN  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescPort)">, MENU_DESC_PORT  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescViet)">, MENU_DESC_VIET  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescEtc)">, MENU_DESC_ETC  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDir  )">, MENU_DIR   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(mobileType  )">, MOBILE_TYPE   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuUrl  )">, MENU_URL   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parentKey)">, PARENT_KEY </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parentType)">, PARENT_TYPE </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(childYn  )">, CHILD_YN   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(procType )">, PROC_TYPE  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(actionYn )">, ACTION_YN  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(iconCls  )">, ICON_CLS   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuSeq  )">, MENU_SEQ   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sepaText )">, SEPA_TEXT  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(enableYn )">, ENABLE_YN  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sfdcYn   )">, SFDC_YN    </if>
+         , USE_FLAG
+         , REGI_ID
+         , REGI_DATE
+         , CHNG_ID
+         , CHNG_DATE
+    </sql>
+
+    <sql id="insertColumns-values">
+           #{sysId}
+         , #{menuKey}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuLevel)">, #{menuLevel}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescKr )">, #{menuDescKr}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescEn )">, #{menuDescEn}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescPort)">, #{menuDescPort}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescViet)">, #{menuDescViet}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescEtc)">, #{menuDescEtc}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDir  )">, #{menuDir}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(mobileType  )">, #{mobileType}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuUrl  )">, #{menuUrl}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parentKey)">, #{parentKey}  </if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parentType)">, #{parentType} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(childYn  )">, #{childYn}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(procType )">, #{procType}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(actionYn )">, #{actionYn}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(iconCls  )">, #{iconCls}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuSeq  )">, #{menuSeq}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sepaText )">, #{sepaText}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(enableYn )">, #{enableYn}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sfdcYn   )">, #{sfdcYn}     </if>
+         , 'Y'
+         , #{gsUserId}
+         , NOW()
+         , #{gsUserId}
+         , NOW()
+    </sql>
+
+    <sql id="updateColumns">
+           CHNG_ID   = #{gsUserId}
+         , CHNG_DATE = NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuLevel)">, MENU_LEVEL = #{menuLevel}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescKr )">, MENU_DESC  = #{menuDescKr}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescEn )">, MENU_DESC_EN  = #{menuDescEn}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescPort)">, MENU_DESC_PORT  = #{menuDescPort}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescViet)">, MENU_DESC_VIET  = #{menuDescViet}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDescEtc)">, MENU_DESC_ETC  = #{menuDescEtc}   </if>
+        , MENU_DIR   = #{menuDir}
+        , MOBILE_TYPE   = #{mobileType}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuUrl  )">, MENU_URL   = #{menuUrl}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parentKey)">, PARENT_KEY = #{parentKey}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parentType)">, PARENT_TYPE = #{parentType}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(childYn  )">, CHILD_YN   = #{childYn}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(procType )">, PROC_TYPE  = #{procType}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(actionYn )">, ACTION_YN  = #{actionYn}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(iconCls  )">, ICON_CLS   = #{iconCls}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(iconCls     )">, ICON_CLS   = null    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuSeq  )">, MENU_SEQ   = #{menuSeq}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sepaText )">, SEPA_TEXT  = #{sepaText}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(enableYn )">, ENABLE_YN  = #{enableYn}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag  )">, USE_FLAG   = #{useFlag}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sfdcYn   )">, SFDC_YN    = #{sfdcYn}     </if>
+    </sql>
+
+    <sql id="whereClause">
+    	SYS_ID   = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuKey  )">AND MENU_KEY   = #{menuKey}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuLevel)">AND MENU_LEVEL = #{menuLevel}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDesc )">AND MENU_DESC  LIKE CONCAT('%',#{menuDesc},'%')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDir  )">AND MENU_DIR   = #{menuDir}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuUrl  )">AND MENU_URL   LIKE CONCAT('%',#{menuUrl},'%')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parentKey)">AND PARENT_KEY LIKE CONCAT('%',#{parentKey},'%')  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parentType)">AND PARENT_TYPE = #{parentType}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(childYn  )">AND CHILD_YN   = #{childYn}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(procType )">AND PROC_TYPE  = #{procType}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(actionYn )">AND ACTION_YN  = #{actionYn}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(iconCls  )">AND ICON_CLS   = #{iconCls}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuSeq  )">AND MENU_SEQ   = #{menuSeq}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sepaText )">AND SEPA_TEXT  = #{sepaText}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag  )">AND USE_FLAG   = #{useFlag}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(enableYn )">AND ENABLE_YN  = #{enableYn}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sfdcYn   )">AND SFDC_YN    = #{sfdcYn}     </if>
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_MENU A
+         WHERE <include refid="whereClause" />
+         ORDER
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM SYS_MENU A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="menu" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM SYS_MENU A
+         WHERE SYS_ID   = #{sysId}
+           AND MENU_KEY = #{menuKey}
+    </select>
+    <insert id="insert" parameterType="params">
+        INSERT
+          INTO SYS_MENU
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE SYS_MENU
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID    = #{sysId}
+           AND MENU_KEY  = #{menuKey}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE
+          FROM SYS_MENU
+         WHERE SYS_ID    = #{sysId}
+           AND MENU_KEY  = #{menuKey}
+    </delete>
+
+    <!-- 권한있는 메뉴 조회 -->
+    <select id="searchAuthorized" resultType="menu" parameterType="params">
+        SELECT *
+        FROM(
+        SELECT <include refid="selectColumns" />
+              ,B.PROG_AUTH    AS "progAuth"
+              ,(CASE A.MENU_LEVEL
+                WHEN '1' THEN (SELECT COUNT(C.MENU_KEY)
+                               FROM (SELECT D.MENU_KEY
+                                           ,D.SYS_ID
+                                           ,D.PARENT_KEY
+                                       FROM SYS_MENU D
+                              INNER JOIN 
+                              (<include refid="selectV_sys_auth2" />) E
+                                          ON D.SYS_ID   = E.SYS_ID
+                                         AND D.MENU_URL = E.PROG_ID
+                                      WHERE E.USER_ID   = #{gsUserId}
+                                        AND TRAN_A      = '1'
+                                        ) C
+                              WHERE C.SYS_ID     = A.SYS_ID
+                                AND C.PARENT_KEY = A.MENU_KEY
+                            )
+                WHEN '2' THEN 1
+                ELSE 1 END
+              )               AS "childCnt"
+          FROM SYS_MENU   A
+		  LEFT OUTER JOIN
+		      (SELECT PROG_ID AS PROG_ID
+		             ,TRAN_A  AS PROG_AUTH
+		         FROM (  SELECT x.sys_id, x.user_id,
+                                CASE x.auth_type
+                                     WHEN  '10.USER'   THEN 'USER'
+                                     WHEN  '20.GROUP'  THEN 'GROUP'
+                                     ELSE  'DEFAULT'   END  auth_type,
+                                x.prog_id, x.tran_a, x.tran_c, x.tran_r, x.tran_u, x.tran_d,
+                                x.tran_p, x.tran_s, x.tran_1, x.tran_2, x.tran_3, x.tran_4,
+                                x.tran_5
+                         FROM ( SELECT a.*
+                                FROM  (SELECT (CASE @vjob WHEN a.prog_id THEN @rownum:=@rownum+1 ELSE @rownum:=1 END) auth_seq,
+                                              (@vjob:=a.prog_id) vjob,
+                                               a.*
+                                       FROM    (<include refid="selectV_sys_auth2" />) a, (SELECT @vjob:='', @rownum:=0 FROM DUAL) b
+                                       ORDER BY a.sys_id, a.user_id, a.prog_id, a.auth_type ) a
+                                WHERE a.auth_seq = 1) x ) x
+		        WHERE SYS_ID  = #{sysId}
+		          AND USER_ID = #{gsUserId}
+		      )           B
+		    ON A.MENU_URL = B.PROG_ID
+         WHERE A.SYS_ID   = #{sysId}
+
+         	<choose>
+		        <when test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsMobileType)">
+		           AND A.MOBILE_TYPE = #{gsMobileType}
+		        </when>
+		        <otherwise>
+
+							<choose>
+					        <when test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsMenuType)">
+<!-- 					           AND A.MENU_DIR LIKE CONCAT('%',#{gsMenuType},'%') -->
+								AND FIND_IN_SET(#{gsMenuType}, REPLACE(A.MENU_DIR, ' ', '')) > 0
+					        </when>
+					        <otherwise>
+					           AND A.MENU_DIR LIKE '%Z%'
+					        </otherwise>
+					      </choose>
+
+		        </otherwise>
+		      </choose>
+
+      	   <!-- Dealer Application -->
+           AND   CASE WHEN (SELECT COUNT(1)
+                            FROM   nda_mast_info
+                            WHERE  sys_id    = #{sysId}
+                            AND    deal_code = #{gsUserId}
+                            AND    use_yn    = 'Y') = 0 AND #{gsMenuType} = 'A' THEN A.MENU_KEY NOT IN ('LS011', 'LS120')
+                 ELSE 1 = 1
+                 END 
+           AND A.USE_FLAG = 'Y'
+      <!-- ORDER BY A.MENU_LEVEL
+              ,A.MENU_SEQ -->
+              
+              
+		UNION ALL
+		SELECT 
+		   C.SYS_ID				AS "sysId"
+		  ,C.COMU_ID			AS "menuKey"
+		  ,C.COMU_NAME			AS "menuDesc"
+		  ,C.COMU_NAME      	AS "menuDescKr"
+		  ,C.COMU_NAME	   		AS "menuDescEn"
+		  ,C.COMU_NAME		   	AS "menuDescVi"
+		  ,C.COMU_NAME		   	AS "menuDescEtc"
+		  ,C.COMU_NAME          AS "menuDescPort"
+		  ,'Z,M'		       	AS "menuDir"
+		  ,'M'			      	AS "mobileType"
+		  ,'/common/board/alter/alter.do'
+		  				       	AS "menuUrl"
+		  ,'동호회'		     	AS "parentKey"
+		  ,'SHOOT'		      	AS "parentType"
+		  ,'N'		       		AS "childYn"
+		  ,'T'		      		AS "procType"
+		  ,'N'		      		AS "actionYn"
+		  ,'fa-print'       	AS "iconCls"
+		  ,''			      	AS "sepaText"
+		  ,'Y'		       		AS "useFlag"
+		  ,'Y'		      		AS "enableYn"
+		  ,C.REGI_ID        	AS "regiId"
+		  ,DATE_FORMAT(C.REGI_DATE ,'%Y-%m-%d %H:%i:%s')
+		                    	AS "regiDate"
+		  ,C.CHNG_ID        	AS "chngId"
+		  ,DATE_FORMAT(C.CHNG_DATE ,'%Y-%m-%d %H:%i:%s')
+		                    	AS "chngDate"
+		  ,3					AS "menuLevel"
+		  ,C.COMU_SEQ      		AS "menuSeq"
+		  ,'동호회2'				AS "parentDesc"
+		  ,'1'					AS "progAuth"
+		  ,6					AS "childCnt"
+		  ,'N'                  AS "sfdcYn"
+		  ,'N'                  AS "menuPath"
+          ,'N'                  AS "helpYn"
+		  FROM COMU_INFO C
+		 WHERE C.SYS_ID = #{sysId}
+		   AND C.USE_YN = 'Y'
+		UNION ALL
+		SELECT 
+		   D.SYS_ID				AS "sysId"
+		  ,CONCAT(D.COMU_ID,D.MENU_ID)
+		  						AS "menuKey"
+		  ,D.MENU_NAME			AS "menuDesc"
+		  ,D.MENU_NAME      	AS "menuDescKr"
+		  ,D.MENU_NAME	   		AS "menuDescEn"
+		  ,D.MENU_NAME		   	AS "menuDescVi"
+		  ,D.MENU_NAME		   	AS "menuDescEtc"
+		  ,D.MENU_NAME		   	AS "menuDescPort"
+		  ,'Z,M'		       	AS "menuDir"
+		  ,'M'			      	AS "mobileType"
+		  ,'/common/board/reference/reference.do'
+		  				       	AS "menuUrl"
+		  ,D.COMU_ID	     	AS "parentKey"
+		  ,'SHOOT'		      	AS "parentType"
+		  ,'N'		       		AS "childYn"
+		  ,'T'		      		AS "procType"
+		  ,'N'		      		AS "actionYn"
+		  ,'fa-print'       	AS "iconCls"
+		  ,''			      	AS "sepaText"
+		  ,'Y'		       		AS "useFlag"
+		  ,'Y'		      		AS "enableYn"
+		  ,D.REGI_ID        	AS "regiId"
+		  ,DATE_FORMAT(D.REGI_DATE ,'%Y-%m-%d %H:%i:%s')
+		                    	AS "regiDate"
+		  ,D.CHNG_ID        	AS "chngId"
+		  ,DATE_FORMAT(D.CHNG_DATE ,'%Y-%m-%d %H:%i:%s')
+		                    	AS "chngDate"
+		  ,4					AS "menuLevel"
+		  ,SUBSTRING(D.BORD_NO,2,9)+0
+		  				       	AS "menuSeq"
+		  ,(SELECT COMU_NAME FROM COMU_INFO A WHERE A.SYS_ID = D.SYS_ID AND A.COMU_ID = D.COMU_ID)
+		  						AS "parentDesc"
+		  ,'1'					AS "progAuth"
+		  ,1					AS "childCnt"
+		  ,'N'                  AS "sfdcYn"
+		  ,'N'                  AS "menuPath"
+          ,'N'                  AS "helpYn"
+		 FROM COMU_MENU D
+		WHERE D.SYS_ID = #{sysId}
+		  AND D.USE_YN = 'Y'
+		 ) M
+		 ORDER BY M.menuLevel, CAST(M.menuSeq AS DECIMAL(5,0))
+    </select>
+
+    <!-- ========================================================== -->
+    <!--   Menu Hot Management                                      -->
+    <!-- ========================================================== -->
+    <sql id="selectColumns-hot">
+         A.SYS_ID        AS "sysId"
+        ,A.USER_ID       AS "userId"
+        ,A.MENU_KEY      AS "menuKey"
+        <!-- ,B.MENU_DESC     AS "menuDesc" -->
+        <!-- ,DECODE(#{gsLang},'ko',B.MENU_DESC,'en',NVL(B.MENU_DESC_EN,B.MENU_DESC),B.MENU_DESC)      AS "menuDesc" -->
+        ,CASE WHEN #{gsLang} = 'ko'
+              THEN ifnull(B.MENU_DESC_KOR, B.MENU_DESC)
+              WHEN #{gsLang} = 'en'
+              THEN ifnull(B.MENU_DESC_EN, B.MENU_DESC)
+              WHEN #{gsLang} = 'vi'
+              THEN ifnull(B.MENU_DESC_VIET, B.MENU_DESC)
+              WHEN #{gsLang} = 'etc'
+              THEN ifnull(B.MENU_DESC_ETC, B.MENU_DESC)
+              WHEN #{gsLang} = 'pt'
+              THEN ifnull(B.MENU_DESC_PORT, B.MENU_DESC)
+              ELSE B.MENU_DESC END            AS "menuDesc"
+        ,B.MENU_URL      AS "menuUrl"
+        ,B.ICON_CLS      AS "iconCls"
+        ,B.ENABLE_YN     AS "enableYn"
+        ,A.SORT_SEQ      AS "sortSeq"
+        ,A.REGI_ID       AS "regiId"
+        ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')
+                         AS "regiDate"
+        ,A.CHNG_ID       AS "chngId"
+        ,DATE_FORMAT(A.CHNG_DATE,'%Y-%m-%d %H:%i:%s')
+                         AS "chngDate"
+    </sql>
+    <select id="searchHot" resultType="menu" parameterType="params">
+        SELECT <include refid="selectColumns-hot" />
+              ,ifnull(C.PROG_AUTH, '0')    AS "progAuth"
+          FROM SYS_MENU_HOT A
+         INNER JOIN
+               SYS_MENU     B
+            ON A.SYS_ID   = B.SYS_ID
+           AND A.MENU_KEY = B.MENU_KEY
+          LEFT OUTER JOIN
+              (SELECT PROG_ID AS PROG_ID
+                     ,TRAN_A  AS PROG_AUTH
+                 FROM (  SELECT x.sys_id, x.user_id,
+                                CASE x.auth_type
+                                     WHEN  '10.USER'   THEN 'USER'
+                                     WHEN  '20.GROUP'  THEN 'GROUP'
+                                     ELSE  'DEFAULT'   END  auth_type,
+                                x.prog_id, x.tran_a, x.tran_c, x.tran_r, x.tran_u, x.tran_d,
+                                x.tran_p, x.tran_s, x.tran_1, x.tran_2, x.tran_3, x.tran_4,
+                                x.tran_5
+                         FROM ( SELECT a.*
+                                FROM  (SELECT (CASE @vjob WHEN a.prog_id THEN @rownum:=@rownum+1 ELSE @rownum:=1 END) auth_seq,
+                                              (@vjob:=a.prog_id) vjob,
+                                               a.*
+                                       FROM    (<include refid="selectV_sys_auth" />) a, (SELECT @vjob:='', @rownum:=0 FROM DUAL) b
+                                       ORDER BY a.sys_id, a.user_id, a.prog_id, a.auth_type ) a
+                                WHERE a.auth_seq = 1) x ) x
+                WHERE SYS_ID   = #{sysId}
+           		  AND USER_ID  = #{userId}
+              )             C
+            ON B.MENU_URL = C.PROG_ID
+         WHERE A.SYS_ID   = #{sysId}
+           AND A.USER_ID  = #{userId}
+
+	      <choose>
+	        <when test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsMobileType)">
+	           AND B.MOBILE_TYPE = #{gsMobileType}
+	        </when>
+	        <otherwise>
+
+					<choose>
+				        <when test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsMenuType)">
+				           AND (B.MENU_DIR LIKE '%Z%'  OR B.MENU_DIR LIKE CONCAT('%',#{gsMenuType},'%'))
+				        </when>
+				        <otherwise>
+				           AND B.MENU_DIR LIKE '%Z%'
+				        </otherwise>
+				      </choose>
+
+	        </otherwise>
+	      </choose>
+         ORDER
+            BY A.SORT_SEQ
+              ,A.REGI_DATE
+              ,A.CHNG_DATE
+    </select>
+    <select id="searchHotCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM SYS_MENU_HOT A
+         INNER JOIN
+               SYS_MENU     B
+            ON A.SYS_ID   = B.SYS_ID
+           AND A.MENU_KEY = B.MENU_KEY
+         WHERE A.SYS_ID   = #{sysId}
+           AND A.USER_ID  = #{userId}
+    </select>
+    <select id="selectHot" resultType="menu" parameterType="params">
+        SELECT <include refid="selectColumns-hot" />
+          FROM SYS_MENU_HOT A
+         INNER JOIN
+               SYS_MENU     B
+            ON A.SYS_ID   = B.SYS_ID
+           AND A.MENU_KEY = B.MENU_KEY
+         WHERE A.SYS_ID   = #{sysId}
+           AND A.USER_ID  = #{userId}
+           AND A.MENU_KEY = #{menuKey}
+    </select>
+    <insert id="insertHot" parameterType="params">
+        INSERT
+          INTO SYS_MENU_HOT 
+             ( SYS_ID
+             , MENU_KEY
+             , USER_ID
+             , SORT_SEQ
+             , REGI_ID
+             , REGI_DATE
+             , CHNG_ID
+             , CHNG_DATE
+             )
+        VALUES
+             ( #{sysId}
+             , #{menuKey}
+             , #{userId}
+             , ifnull((SELECT MAX(A.SORT_SEQ)
+                      FROM SYS_MENU_HOT A
+                     WHERE A.SYS_ID  = #{sysId}
+                       AND A.USER_ID = #{userId}
+                   ),0
+               ) + 1
+             , #{gsUserId}
+             , NOW()
+             , #{gsUserId}
+             , NOW()
+             )
+    </insert>
+    <update id="updateHot" parameterType="params">
+        UPDATE SYS_MENU_HOT
+           SET CHNG_ID   = #{gsUserId}
+             , CHNG_DATE = NOW()
+             , SORT_SEQ  = #{sortSeq}
+         WHERE SYS_ID    = #{sysId}
+           AND USER_ID   = #{userId}
+           AND MENU_KEY  = #{menuKey}
+    </update>
+    <delete id="deleteHot" parameterType="params">
+        DELETE
+          FROM SYS_MENU_HOT
+         WHERE SYS_ID    = #{sysId}
+           AND USER_ID   = #{userId}
+           AND MENU_KEY  = #{menuKey}
+    </delete>
+
+	 <select id="searchType" resultType="record" parameterType="params">
+        SELECT CODE_CD		AS "menuType"
+        		 , CODE_NAME	AS "menuTypeName"
+		  FROM SYS_CODE
+		 WHERE SYS_ID = #{sysId}
+		     AND CODE_GRUP = 'MENU_GB'
+		     AND USE_FLAG = 'Y'
+		ORDER BY SORT_SEQ
+    </select>
+
+</mapper>

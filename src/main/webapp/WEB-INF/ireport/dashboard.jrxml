@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="dashboard01" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="29903745-0505-4c84-ae08-0c565c3af977">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.layers" value="##Tue Jul 04 10:51:11 KST 2017\nlayer.0.name=Background\nlayer.0.visible=true\nlayer.0.id=0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\PJT\\인천측기\\Report\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT '주간' AS S_GROUP, '전주' AS S_TYPE, COUNT(*) AS CNT
+FROM   SHET_MAST
+WHERE  SYS_ID    = 'WSC'
+AND    SHET_TYPE = 'S'
+AND    SHET_DATE BETWEEN DATE_FORMAT( ADDDATE(NOW(), -WEEKDAY(NOW()) -7 ), '%Y-%m-%d')
+                     AND DATE_FORMAT( ADDDATE(NOW(), -WEEKDAY(NOW()) -1 ), '%Y-%m-%d')
+UNION
+SELECT '주간' AS S_GROUP, '금주' AS S_TYPE, COUNT(*) AS CNT
+FROM   SHET_MAST
+WHERE  SYS_ID    = 'WSC'
+AND    SHET_TYPE = 'S'
+AND    SHET_DATE BETWEEN DATE_FORMAT( ADDDATE(NOW(), -WEEKDAY(NOW()) -0 ), '%Y-%m-%d')
+                     AND DATE_FORMAT( ADDDATE(NOW(), -WEEKDAY(NOW()) +6 ), '%Y-%m-%d')
+;]]>
+	</queryString>
+	<field name="S_GROUP" class="java.lang.String"/>
+	<field name="S_TYPE" class="java.lang.String"/>
+	<field name="CNT" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="147" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="222" height="147" uuid="54a4fa53-3438-4974-bf75-bcb411fdf26f"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:dashboard01.jrxml"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="241" y="0" width="174" height="147" uuid="ee2029ea-6766-456a-b508-c42840723631"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:dashboard02.jrxml"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch">
+			<elementGroup/>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

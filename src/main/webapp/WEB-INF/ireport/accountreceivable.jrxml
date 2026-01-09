@@ -1,0 +1,893 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="accountreceivable" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" uuid="9674e3f5-c5fa-4b50-91ff-3692bdf3ad8c">
+	<property name="ireport.zoom" value="1.2100000000000002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#FFBFBF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="6571b63b-037e-4ef0-ad54-aa270f913b77"/>
+	<subDataset name="Table Dataset 2" uuid="0a0fdee0-251f-4822-8f84-bb018724fbb6"/>
+	<parameter name="date1" class="java.lang.String"/>
+	<parameter name="date2" class="java.lang.String"/>
+	<parameter name="SYS_ID" class="java.lang.String"/>
+	<parameter name="salEply" class="java.lang.String"/>
+	<parameter name="t_custCode" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="t_custName" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="custType" class="java.lang.String"/>
+	<parameter name="GsearchVat" class="java.lang.String">
+		<defaultValueExpression><![CDATA[3]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+         a.sysID
+        ,a.custCode
+        ,a.custName AS "custName"
+        ,SUM(a.shetAmt) AS "shetAmt"
+        ,SUM(a.shetTax) AS "shetTax"
+        ,SUM(a.shetTot) AS "shetTot"
+        ,SUM(a.TaxshetAmt) as "c_shetTot"
+        ,B.COMP_TEL1 AS "compTel"
+        ,B.COMP_STAF_HP AS "compHp"
+        ,B.STAF_NAME AS "stafName"
+        ,B.COMP_FAX  AS "compFax"
+        ,0 AS "null2"
+        ,SUM(ifnull(a.shetTot,0))-SUM(ifnull(a.TaxshetAmt,0)) AS "null3"
+        ,(SELECT SB.CODE_NAME
+          FROM SYS_CODE SB
+          WHERE     SB.SYS_ID = a.sysID
+                AND SB.CODE_CD =  b.CUST_TYPE
+                AND SB.CODE_GRUP = 'CUST_TYPE') AS "custType"
+        ,CASE WHEN $P{GsearchVat} = '1' THEN ifnull(fn_get_base_misu($P{SYS_ID},a.custCode,DATE_FORMAT($P{date1},'%Y-%m-%d')),0)*1
+              WHEN $P{GsearchVat} = '2' THEN ifnull(fn_get_base_miji($P{SYS_ID},a.custCode,DATE_FORMAT($P{date1},'%Y-%m-%d')),0)*1
+              ELSE (ifnull(fn_get_base_misu($P{SYS_ID},a.custCode,DATE_FORMAT($P{date1},'%Y-%m-%d')),0)
+                   -ifnull(fn_get_base_miji($P{SYS_ID},a.custCode,DATE_FORMAT($P{date1},'%Y-%m-%d')),0))*1
+               END AS "blacCari"
+        ,CASE WHEN $P{GsearchVat} = '1' THEN ifnull(fn_get_base_misu($P{SYS_ID},a.custCode,DATE_FORMAT($P{date2},'%Y-%m-%d')),0)*1
+              WHEN $P{GsearchVat} = '2' THEN ifnull(fn_get_base_miji($P{SYS_ID},a.custCode,DATE_FORMAT($P{date2},'%Y-%m-%d')),0)*1
+              ELSE (ifnull(fn_get_base_misu($P{SYS_ID},a.custCode,DATE_FORMAT($P{date2},'%Y-%m-%d')),0)
+                    -ifnull(fn_get_base_miji($P{SYS_ID},a.custCode,DATE_FORMAT($P{date2},'%Y-%m-%d')),0))*1
+               END AS "unBlac"
+        ,CASE WHEN $P{GsearchVat} = '1' THEN '매출액'
+              WHEN $P{GsearchVat} = '2' THEN '매입액'
+              ELSE '매출액/매입액'
+              END AS "TEXT"
+  FROM (
+        SELECT A.SYS_ID AS sysId,
+               A.CUST_CODE  AS custCode ,
+               A.CUST_NAME as custName,
+               SUM(IFNULL(B.TOT_PRCE,0)) AS "shetAmt",
+               SUM(IFNULL(B.TOT_TAX,0)) AS "shetTax",
+               SUM(IFNULL(B.TOT_AMT,0)) AS "shetTot",
+               0 as "TaxshetAmt"
+         FROM SHET_MAST A, SHET_DETL B
+        WHERE  A.SYS_ID = $P{SYS_ID}
+          AND
+
+
+              (CASE WHEN $P{GsearchVat} = "1" THEN   A.SHET_TYPE ='S'
+                      WHEN $P{GsearchVat}  = "2" THEN   A.SHET_TYPE ='P'
+                      WHEN $P{GsearchVat}  = "3" THEN   A.SHET_TYPE IN ('S','P')
+              END)
+          AND A.SYS_ID = B.SYS_ID
+          AND A.SHET_TYPE = B.SHET_TYPE
+          AND A.SHET_NO = B.SHET_NO
+          AND A.SHET_DATE BETWEEN $P{date1} AND $P{date2}
+
+          AND A.CUST_CODE LIKE CONCAT('%',$P{t_custCode},'%')
+          AND A.CUST_NAME LIKE CONCAT('%',$P{t_custName},'%')
+
+
+
+    GROUP BY  sysID,custCode
+             UNION ALL
+              SELECT b.SYS_ID AS sysId,
+               b.CUST_CODE AS custCode,
+               b.CUST_NAME as custName,
+               0 AS "shetAmt",
+               0 AS "shetTax",
+               0 AS "shetTot",
+               CASE WHEN $P{GsearchVat}='1' THEN SUM(ifnull(b.REFER_AMT, 0))
+                    WHEN $P{GsearchVat}='2' THEN SUM(ifnull(b.TOT_AMT, 0))
+                    WHEN $P{GsearchVat}='3' THEN SUM(ifnull(b.REFER_AMT, 0))+SUM(ifnull(b.TOT_AMT, 0)) END AS "TaxshetAmt"
+         FROM shet_detl b, shet_mast a
+        WHERE     B.SYS_ID = A.SYS_ID
+              AND B.SHET_TYPE =A.SHET_TYPE
+              AND B.SHET_NO = A.SHET_NO
+              AND b.SYS_ID = $P{SYS_ID}
+              AND b.SHET_TYPE = 'C'
+              AND b.ACC_CODE in ('978','1365')
+              AND a.remk5  BETWEEN $P{date1} AND $P{date2}
+
+               AND b.CUST_CODE LIKE CONCAT('%',$P{t_custCode},'%')
+              AND b.CUST_NAME LIKE CONCAT('%',$P{t_custName},'%')
+
+
+               GROUP BY  sysID,custCode
+
+              UNION ALL
+               SELECT SYS_ID AS sysId,
+                 CUST_CD AS custCode,
+                 CUST_NAME as custName,
+                 SUM(IFNULL(AS_COST,0)) AS "shetAmt",
+                 SUM(IFNULL(TOT_TAX,0)) AS "shetTax",
+                 SUM(IFNULL(TOT_AMT,0)) AS "shetTot",
+                 0 as "TaxshetAmt"
+                FROM as_mast
+               WHERE $P{GsearchVat} != '2'
+                AND SYS_ID = $P{SYS_ID}
+                AND DIST_DATE BETWEEN $P{date1} AND $P{date2}
+
+                AND CUST_CD LIKE CONCAT('%',$P{t_custCode},'%')
+                AND CUST_NAME LIKE CONCAT('%',$P{t_custName},'%')
+                AND SEV_CHARGE LIKE CONCAT('%',$P{salEply},'%')
+
+
+            GROUP BY  SYS_ID,CUST_CD
+
+              ) a ,CUST_MAST B
+          WHERE A.sysID=B.SYS_ID
+          AND A.custCode = B.CUST_CODE
+
+          AND B.STAF_NAME LIKE CONCAT('%',$P{salEply},'%')
+          AND B.CUST_TYPE LIKE CONCAT('%',$P{custType},'%')
+
+          GROUP BY  custCode,custName
+     ORDER BY custName]]>
+	</queryString>
+	<field name="sysID" class="java.lang.String"/>
+	<field name="custCode" class="java.lang.String"/>
+	<field name="custName" class="java.lang.String"/>
+	<field name="shetAmt" class="java.math.BigDecimal"/>
+	<field name="shetTax" class="java.math.BigDecimal"/>
+	<field name="shetTot" class="java.math.BigDecimal"/>
+	<field name="c_shetTot" class="java.lang.Double"/>
+	<field name="compTel" class="java.lang.String"/>
+	<field name="compHp" class="java.lang.String"/>
+	<field name="stafName" class="java.lang.String"/>
+	<field name="compFax" class="java.lang.String"/>
+	<field name="null2" class="java.lang.Long"/>
+	<field name="null3" class="java.lang.Double"/>
+	<field name="custType" class="java.lang.String"/>
+	<field name="blacCari" class="java.lang.Double"/>
+	<field name="unBlac" class="java.lang.Double"/>
+	<field name="TEXT" class="java.lang.String"/>
+	<variable name="No" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$V{COLUMN_NUMBER}]]></variableExpression>
+		<initialValueExpression><![CDATA[1]]></initialValueExpression>
+	</variable>
+	<variable name="SumBlacCari" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{blacCari}]]></variableExpression>
+	</variable>
+	<variable name="SumShetAmt" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{shetAmt}]]></variableExpression>
+	</variable>
+	<variable name="SumShetTax" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{shetTax}]]></variableExpression>
+	</variable>
+	<variable name="SumShetTot" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{shetTot}]]></variableExpression>
+	</variable>
+	<variable name="SumNull1" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{c_shetTot}]]></variableExpression>
+	</variable>
+	<variable name="SumNull2" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{null2}]]></variableExpression>
+	</variable>
+	<variable name="SumUnBlac" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{unBlac}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="78" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Transparent" x="220" y="0" width="364" height="38" uuid="a8445ceb-1bdd-4735-927b-325d0638473f"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="24" isUnderline="true" isStrikeThrough="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[거래처별 미수금 집계]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="661" y="0" width="141" height="20" uuid="51cbab6d-c306-467c-bd6f-823b24a17ed3"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[결재]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="661" y="20" width="47" height="20" uuid="8563bd8f-4c21-47e9-8fc6-78f38ecc4eef"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[작성]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="708" y="20" width="47" height="20" uuid="6cc77624-309b-4202-a8d3-837793a5de3a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[검토]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="755" y="20" width="47" height="20" uuid="943a5664-a0f3-48b4-97c9-5a9f64e8523f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[승인]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="708" y="38" width="47" height="40" uuid="ae3044ca-e03c-4d8d-b981-b27b09db9b35"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="661" y="38" width="47" height="40" uuid="597afd5c-321b-4a37-8825-1ff2cbb80d95"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="755" y="38" width="47" height="40" uuid="5d094e54-5e8d-4f37-bc93-79909f9bded5"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="47" y="0" width="76" height="20" uuid="0213175a-9744-4fc6-9796-53e845fd3e66"/>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{date1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="47" height="20" uuid="ed0b51e3-3b5d-4a32-8c1d-dbe59111ecd9"/>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[기준일자:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="123" y="0" width="13" height="20" uuid="9c5af8dd-228c-4059-9e3c-df65527a4fe1"/>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[~]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="136" y="0" width="76" height="20" uuid="db2ef9cc-e0dd-4854-84b2-b8d4d273a2aa"/>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{date2}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="317" y="0" width="47" height="20" uuid="97294f8f-1270-4f7b-8414-5f042b79ecf9"/>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[영업사원:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="364" y="0" width="100" height="20" uuid="0ba9df7a-14bf-4bf2-bb77-6f2baba1b9c6"/>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{salEply}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="40" height="44" uuid="546c762d-5730-4e7f-ab6a-9fa477de5265"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="40" y="0" width="138" height="24" uuid="1bada748-fc1e-440e-9f35-e1074768968c"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[거래처명]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="317" y="24" width="80" height="20" uuid="6fb6dc83-fc0a-4db2-bbf8-b9c092234266"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[공급가]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="397" y="24" width="80" height="20" uuid="abed2556-d66a-4d41-8b2c-668485fd74ef"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[부가세]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="477" y="24" width="83" height="20" uuid="1bea7ead-83b4-40e0-ba21-d91c0ca9c260"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[합계]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="560" y="24" width="80" height="20" uuid="b11147ab-ff89-4a2a-ab32-4e75e45a85ed"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[실지급액]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="640" y="24" width="80" height="20" uuid="4eaed3ca-adf6-4ce1-88bf-13c1ab9cb96c"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[지불공제]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="720" y="0" width="82" height="44" uuid="c25f2d46-1ffb-4c03-85af-503edb4470b9"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[미지급 잔액]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="178" y="0" width="139" height="24" uuid="4ca45bb8-01b8-4d44-a7d1-d471f1c384c0"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[이월잔액]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="560" y="0" width="160" height="24" uuid="acdc8169-f3d2-4136-b26f-b38882fcc8bc"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[지불액]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="178" y="24" width="139" height="20" uuid="bf2a7683-13ad-43a0-a206-a47d02833124"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[담장자]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="40" y="24" width="138" height="20" uuid="41ce18df-4b93-484f-afd6-9763b184c0df"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[전화번호]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="317" y="0" width="243" height="24" uuid="c5385394-adcc-4dd2-86e3-0d0ec8700ad9"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="SansSerif" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TEXT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="40" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="40" height="40" uuid="cd2da693-8f06-4042-a0ce-8d6e4e73558b"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{No}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="560" y="0" width="80" height="40" uuid="8bf3323a-bc55-41b7-bac3-85346d391332"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{c_shetTot}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="397" y="0" width="80" height="40" uuid="ec29e37b-d75e-4c73-aaba-fbca11c24000"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{shetTax}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="178" y="20" width="139" height="20" uuid="0cdb9d9d-bd81-4dfd-a5db-a8ecbbf3adbf"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{stafName}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="640" y="0" width="80" height="40" uuid="d3ca0541-e559-433c-8d07-0d47380c22df"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{null2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="317" y="0" width="80" height="40" uuid="cfb5ca1e-f2d5-46bc-84b6-e08def06f913"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{shetAmt}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="40" y="0" width="138" height="20" uuid="ffa8c08a-7897-4d17-bc09-268c96746801"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{custName}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="477" y="0" width="83" height="40" uuid="edfe01fb-bc8c-427f-9132-1028fb4b5136"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{shetTot}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="178" y="0" width="139" height="20" uuid="91653106-dcfa-42bf-8220-62616452e528"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{blacCari}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="720" y="0" width="82" height="40" uuid="d88fb1ee-a2dd-488f-bc04-2b106f183502"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{unBlac}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="40" y="20" width="138" height="20" uuid="c4af97d1-38c8-49f8-bd91-e27536d3980b"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font pdfFontName="HYSMyeongJo-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{compTel}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="685" y="0" width="80" height="20" uuid="b4d6e715-db95-4801-abdd-b69ac8700f9b"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="765" y="0" width="40" height="20" uuid="e7b6181c-2d18-41d4-800d-d1e855fac142"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="21" splitType="Stretch">
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="178" y="0" width="139" height="20" uuid="1e377f66-a305-4782-80ef-5aa941407317"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SumBlacCari}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="397" y="0" width="80" height="20" uuid="cb70f5d1-47ac-4400-b953-f3b62376c66a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SumShetTax}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="317" y="0" width="80" height="20" uuid="271cc250-3863-48c2-b7d6-9da56117d454"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SumShetAmt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="477" y="0" width="83" height="20" uuid="b6af418b-c524-4e46-bb18-5537fdba55d5"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SumShetTot}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="640" y="0" width="80" height="20" uuid="f12b8de8-85b7-43f1-b686-8bdd9e638767"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SumNull2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="560" y="0" width="80" height="20" uuid="c8d6707a-b064-41ee-91d5-32e7970f23e0"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SumNull1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="720" y="0" width="82" height="20" uuid="7dde38a2-5d32-4b90-b8ad-1792065be634"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SumUnBlac}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="178" height="20" uuid="2d33bb49-169b-4855-a228-fe734158b18f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="10" isBold="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[[합	계]]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

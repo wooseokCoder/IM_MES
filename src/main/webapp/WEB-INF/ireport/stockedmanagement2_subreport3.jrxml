@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="stockedmanagement2_subreport3" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="bd0aadb7-912f-4e08-8756-c3861fdc7472">
+	<queryString language="SQL">
+		<![CDATA[SELECT * FROM SYS_CODE
+]]>
+	</queryString>
+	<field name="SYS_ID" class="java.lang.String">
+		<fieldDescription><![CDATA[시스템ID]]></fieldDescription>
+	</field>
+	<field name="CODE_GRUP" class="java.lang.String">
+		<fieldDescription><![CDATA[코드그룹]]></fieldDescription>
+	</field>
+	<field name="CODE_CD" class="java.lang.String">
+		<fieldDescription><![CDATA[코드]]></fieldDescription>
+	</field>
+	<field name="CODE_NAME" class="java.lang.String">
+		<fieldDescription><![CDATA[코드명칭]]></fieldDescription>
+	</field>
+	<field name="CODE_NAME_EN" class="java.lang.String">
+		<fieldDescription><![CDATA[코드명칭영문]]></fieldDescription>
+	</field>
+	<field name="CODE_DESC" class="java.lang.String">
+		<fieldDescription><![CDATA[코드설명]]></fieldDescription>
+	</field>
+	<field name="SORT_SEQ" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[순서]]></fieldDescription>
+	</field>
+	<field name="USE_FLAG" class="java.lang.String">
+		<fieldDescription><![CDATA[사용유무]]></fieldDescription>
+	</field>
+	<field name="EXT_CHR01" class="java.lang.String">
+		<fieldDescription><![CDATA[문자속성01]]></fieldDescription>
+	</field>
+	<field name="EXT_CHR02" class="java.lang.String">
+		<fieldDescription><![CDATA[문자속성02]]></fieldDescription>
+	</field>
+	<field name="EXT_CHR03" class="java.lang.String">
+		<fieldDescription><![CDATA[문자속성03]]></fieldDescription>
+	</field>
+	<field name="EXT_CHR04" class="java.lang.String">
+		<fieldDescription><![CDATA[문자속성04]]></fieldDescription>
+	</field>
+	<field name="EXT_CHR05" class="java.lang.String">
+		<fieldDescription><![CDATA[문자속성05]]></fieldDescription>
+	</field>
+	<field name="EXT_CHR06" class="java.lang.String">
+		<fieldDescription><![CDATA[문자속성06]]></fieldDescription>
+	</field>
+	<field name="EXT_CHR07" class="java.lang.String">
+		<fieldDescription><![CDATA[문자속성07]]></fieldDescription>
+	</field>
+	<field name="EXT_CHR08" class="java.lang.String">
+		<fieldDescription><![CDATA[문자속성08]]></fieldDescription>
+	</field>
+	<field name="EXT_CHR09" class="java.lang.String">
+		<fieldDescription><![CDATA[문자속성09]]></fieldDescription>
+	</field>
+	<field name="EXT_CHR10" class="java.lang.String">
+		<fieldDescription><![CDATA[문자속성10]]></fieldDescription>
+	</field>
+	<field name="EXT_NUM01" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[숫자속성01]]></fieldDescription>
+	</field>
+	<field name="EXT_NUM02" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[숫자속성02]]></fieldDescription>
+	</field>
+	<field name="EXT_NUM03" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[숫자속성03]]></fieldDescription>
+	</field>
+	<field name="EXT_NUM04" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[숫자속성04]]></fieldDescription>
+	</field>
+	<field name="EXT_NUM05" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[숫자속성05]]></fieldDescription>
+	</field>
+	<field name="EXT_TEXT" class="java.lang.String">
+		<fieldDescription><![CDATA[기타정보]]></fieldDescription>
+	</field>
+	<field name="REGI_ID" class="java.lang.String">
+		<fieldDescription><![CDATA[등록자]]></fieldDescription>
+	</field>
+	<field name="REGI_DATE" class="java.lang.String">
+		<fieldDescription><![CDATA[등록일자]]></fieldDescription>
+	</field>
+	<field name="CHNG_ID" class="java.lang.String">
+		<fieldDescription><![CDATA[수정자]]></fieldDescription>
+	</field>
+	<field name="CHNG_DATE" class="java.lang.String">
+		<fieldDescription><![CDATA[수정일자]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

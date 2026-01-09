@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="dashboard01" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="29903745-0505-4c84-ae08-0c565c3af977">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.layers" value="##Tue Jul 04 10:51:11 KST 2017\nlayer.0.name=Background\nlayer.0.visible=true\nlayer.0.id=0"/>
+	<queryString>
+		<![CDATA[SELECT '월간' AS S_GROUP, '전년당월' AS S_TYPE, COUNT(*) AS CNT
+FROM   SHET_MAST
+WHERE  SYS_ID    = 'WSC'
+AND    SHET_TYPE = 'S'
+AND    SHET_DATE LIKE CONCAT( DATE_FORMAT( DATE_ADD(NOW(), INTERVAL -12 MONTH ), '%Y-%m'), '%')
+UNION
+SELECT '월간' AS S_GROUP, '전월' AS S_TYPE, COUNT(*) AS CNT
+FROM   SHET_MAST
+WHERE  SYS_ID    = 'WSC'
+AND    SHET_TYPE = 'S'
+AND    SHET_DATE LIKE CONCAT( DATE_FORMAT( DATE_ADD(NOW(), INTERVAL -1 MONTH ), '%Y-%m'), '%')
+UNION
+SELECT '월간' AS S_GROUP, '당월' AS S_TYPE, COUNT(*) AS CNT
+FROM   SHET_MAST
+WHERE  SYS_ID    = 'WSC'
+AND    SHET_TYPE = 'S'
+AND    SHET_DATE LIKE CONCAT( DATE_FORMAT( DATE_ADD(NOW(), INTERVAL -0 MONTH ), '%Y-%m'), '%')
+;]]>
+	</queryString>
+	<field name="S_GROUP" class="java.lang.String"/>
+	<field name="S_TYPE" class="java.lang.String"/>
+	<field name="CNT" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch">
+			<elementGroup/>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="147" splitType="Stretch">
+			<barChart>
+				<chart>
+					<reportElement x="0" y="0" width="221" height="147" uuid="6a88e3e1-8a94-4084-af11-62e13cece65a"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{S_TYPE}]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{S_GROUP}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{CNT}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot>
+						<seriesColor seriesOrder="0" color="#0000FF"/>
+						<seriesColor seriesOrder="1" color="#00CC00"/>
+						<seriesColor seriesOrder="2" color="#FF0000"/>
+					</plot>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</summary>
+</jasperReport>

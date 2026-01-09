@@ -1,0 +1,747 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.user2.User2">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT *
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+         	   A.REGI_DATE DESC
+         	  ,A.CHNG_DATE DESC
+	  	</if>
+    </sql>
+
+    <sql id="selectColumns">
+         SYS_ID              AS "sysId"
+        ,USER_ID             AS "userId"
+        ,USER_NAME           AS "userName"
+        ,USER_PWD            AS "userPwd"
+        ,USER_TYPE           AS "userType"
+        ,MENU_TYPE           AS "menuType"
+        ,DASH_TYPE           AS "dashType"
+        ,MENU_SET           AS "menuSet"
+        ,MOBILE_TYPE AS "mobileType"
+        ,ORG_AUTH_CODE       AS "orgAuthCode"
+        ,SPC_AUTH_CODE       AS "spcAuthCode"
+        ,COM_CODE            AS "comCode"
+        ,COM_NAME            AS "comName"
+        ,EMPL_NO             AS "emplNo"
+        ,DEPT_CODE           AS "deptCode"
+        ,ifnull(DEPT_NAME,
+                fn_get_code_name('DEPT_CODE',A.DEPT_CODE, #{gsLang})
+            )                AS "deptName"
+        ,UPPR_DEPT_CODE      AS "upprDeptCode"
+        ,USER_TEL            AS "userTel"
+        ,USER_HP             AS "userHp"
+        ,USER_MAIL           AS "userMail"
+        ,SALE_GRUP			 AS "saleGrup"
+        ,REGN_MAGR           AS "regnMagr"
+        ,REGN_GB             AS "regnGb"
+        ,APPL_LIST           AS "applList"
+        ,SHIP_LOC		     AS "shipLoc"
+        ,ID_LSPO			 AS "idLspo"
+        ,ID_LWS				 AS "idLws"
+        ,ID_MERC			 AS "idMerc"
+        ,ID_SERV			 AS "idServ"
+        ,ID_WGBC			 AS "idWgbc"
+        ,ID_MTS              AS "idMts"
+        ,ID_ACB              AS "idAcb"
+        ,ID_SPROUTLOUD       AS "idSproutLoud"
+        ,ID_SFDC			 AS "idSfdc"
+<!--         ,TYPE                AS "type"
+        ,FIRST_NAME          AS "FirstName"
+        ,LAST_NAME           AS "LastName"
+        ,USER_ADDRESS1       AS "userAddress1"
+        ,USER_CITY           AS "userCity"
+        ,USER_REGN_CODE      AS "userRegnCode"
+        ,USER_POST_CODE      AS "userPostCode"
+        ,TP_ACCOUNT_ID       AS "tpAccountId" -->
+        ,CREATE_MAIL_FLAG    AS 'createMailFlag'
+        ,REVIEW_MAIL_FLAG    AS 'reviewMailFlag'
+        ,CONF_MAIL_FLAG      AS 'confMailFlag'
+        ,READY_MAIL_FLAG     AS 'readyMailFlag'
+        ,SHIP_MAIL_FLAG      AS 'shipMailFlag'
+        ,COMP_MAIL_FLAG      AS 'compMailFlag'
+        ,RETURN_MAIL_FLAG    AS 'returnMailFlag'
+        ,SFDC_FLAG			 AS 'sfdcFlag'
+        ,NOTI_ALLREAD_YN	 AS 'notiAllreadYn'
+        ,SMTP_MAIL           AS 'smtpId'
+        ,SMTP_PW             AS 'smtpPw'
+        ,USER_REMK           AS "userRemk"
+        ,USE_FLAG            AS "useFlag"
+        ,REGI_ID             AS "regiId"
+        ,DATE_FORMAT(REGI_DATE      ,'%Y-%m-%d %H:%i:%s')
+                             AS "regiDate"
+        ,CHNG_ID             AS "chngId"
+        ,DATE_FORMAT(CHNG_DATE      ,'%Y-%m-%d %H:%i:%s')
+                             AS "chngDate"
+        ,DATE_FORMAT(PWD_CHNG_DATE  ,'%Y-%m-%d %H:%i:%s')
+                             AS "pwdChngDate"
+        ,DATE_FORMAT(LAST_LOGIN_DATE,'%Y-%m-%d %H:%i:%s')
+                             AS "lastLoginDate"
+        ,LOGIN_FAIL_CNT      AS "loginFailCnt"
+        ,(SELECT CODE_NAME
+            FROM SYS_CODE
+           WHERE SYS_ID    =A.SYS_ID
+             AND CODE_GRUP = 'USER_TYPE'
+             AND CODE_CD   =A.USER_TYPE
+             AND USE_FLAG  = 'Y'
+         )                   AS "userTypeDesc"
+
+    </sql>
+    <sql id="whereClause">
+        SYS_ID = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userIdList)">
+        AND USER_ID IN
+            <foreach collection="userIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+            </foreach>
+        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userId) and @com.wsc.framework.utils.MybatisUtils@empty(userIdList)">AND USER_ID      LIKE CONCAT('%',#{userId},'%')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userName    )">AND USER_NAME    LIKE CONCAT('%',#{userName},'%')</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userType    )">AND USER_TYPE       = #{userType}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuSet    )">AND MENU_SET       = #{menuSet}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuType    )">AND MENU_TYPE       = #{menuType}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(orgAuthCode )">AND ORG_AUTH_CODE   = #{orgAuthCode}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(spcAuthCode )">AND SPC_AUTH_CODE   = #{spcAuthCode}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comCode     )">AND COM_CODE        = #{comCode}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comName     )">AND COM_NAME        = #{comName}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNo      )">AND EMPL_NO         = #{emplNo}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode    )">AND DEPT_CODE       = #{deptCode}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptName    )">AND DEPT_NAME       = #{deptName}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(upprDeptCode)">AND UPPR_DEPT_CODE  = #{upprDeptCode}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userTel     )">AND USER_TEL        = #{userTel}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userHp      )">AND USER_HP         = #{userHp}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userMail    )">AND USER_MAIL       = #{userMail}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userRemk    )">AND USER_REMK       = #{userRemk}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag     )">AND USE_FLAG        = CASE WHEN #{useFlag} = 'ALL' THEN   USE_FLAG ELSE #{useFlag} END       </if>
+<!--         and USE_FLAG = 'Y' -->
+    </sql>
+
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , USER_ID
+         , USER_NAME
+         , USER_PWD
+         , USER_TYPE
+         , MENU_SET     
+         , MENU_TYPE
+         , MOBILE_TYPE
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(orgAuthCode )">, ORG_AUTH_CODE   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dashType    )">, DASH_TYPE       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(spcAuthCode )">, SPC_AUTH_CODE   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(applList    )">, APPL_LIST       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comCode     )">, COM_CODE        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comName     )">, COM_NAME        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNo      )">, EMPL_NO         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode    )">, DEPT_CODE       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode    )">, DEPT_NAME       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(upprDeptCode)">, UPPR_DEPT_CODE  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userTel     )">, USER_TEL        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userHp      )">, USER_HP         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userMail    )">, USER_MAIL       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saleGrup    )">, SALE_GRUP       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(regnMagr    )">, REGN_MAGR       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(regnGb    )">, REGN_GB         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(shipLoc     )">, SHIP_LOC       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idLspo      )">, ID_LSPO         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idLws       )">, ID_LWS          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idMerc	     )">, ID_MERC         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idServ      )">, ID_SERV         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idWgbc      )">, ID_WGBC         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idMts       )">, ID_MTS          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idAcb       )">, ID_ACB          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idSproutLoud    )">, ID_SPROUTLOUD   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idSfdc   )">,    ID_SFDC   </if>
+<!--         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(type       )">, TYPE             </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(FirstName       )">, FIRST_NAME  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(LastName       )">, LAST_NAME    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userAddress1       )">, USER_ADDRESS1  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userCity       )">, USER_CITY          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userRegnCode       )">, USER_REGN_CODE </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userPostCode       )">, USER_POST_CODE  </if>
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tpAccountId       )">, TP_ACCOUNT_ID   </if> -->
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(createMailFlag   )">, CREATE_MAIL_FLAG </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(reviewMailFlag	  )">, REVIEW_MAIL_FLAG </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(confMailFlag     )">, CONF_MAIL_FLAG   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(readyMailFlag    )">, READY_MAIL_FLAG  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(shipMailFlag     )">, SHIP_MAIL_FLAG   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compMailFlag     )">, COMP_MAIL_FLAG   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(returnMailFlag   )">, RETURN_MAIL_FLAG </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sfdcFlag)">, 		   SFDC_FLAG </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(notiAllreadYn    )">, NOTI_ALLREAD_YN </if>
+        ,SMTP_MAIL
+        ,SMTP_PW  
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userRemk    )">, USER_REMK       </if>
+         , USE_FLAG
+         , REGI_ID
+         , REGI_DATE
+         , CHNG_ID
+         , CHNG_DATE
+         , PWD_CHNG_DATE
+    </sql>
+
+    <sql id="insertColumns-values">
+           #{sysId}
+         , #{userId}
+         , #{userName}
+         , HEX( AES_ENCRYPT( #{userId},(SELECT fn_get_init_user_pwd())))
+         , #{userType}
+         , #{menuSet}
+         , #{menuType}
+         , #{mobileType}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(orgAuthCode )">, #{orgAuthCode}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(dashType    )">, #{dashType}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(spcAuthCode )">, #{spcAuthCode}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(applList    )">, #{applList}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comCode     )">, #{comCode}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comName     )">, #{comName}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emplNo      )">, #{emplNo}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode    )">, #{deptCode}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(deptCode    )">, (SELECT CODE_NAME  FROM SYS_CODE WHERE SYS_ID = #{sysId} AND CODE_GRUP = 'DEPT_CODE' AND USE_FLAG = 'Y' AND CODE_CD =#{deptCode})</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(upprDeptCode)">, #{upprDeptCode}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userTel     )">, #{userTel}         </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userHp      )">, #{userHp}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userMail    )">, #{userMail}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saleGrup    )">, #{saleGrup}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(regnMagr    )">, #{regnMagr}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(regnGb      )">, #{regnGb}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(shipLoc     )">, #{shipLoc}        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idLspo	     )">, #{idLspo}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idLws	     )">, #{idLws}           </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idMerc	     )">, #{idMerc}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idServ	     )">, #{idServ}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idWgbc      )">, #{idWgbc}          </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idMts       )">, #{idMts}           </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idAcb       )">, #{idAcb}           </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idSproutLoud       )">, #{idSproutLoud}           </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idSfdc       )">, #{idSfdc}           </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(createMailFlag   )">, #{createMailFlag} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(reviewMailFlag	  )">, #{reviewMailFlag} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(confMailFlag     )">, #{confMailFlag}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(readyMailFlag    )">, #{readyMailFlag}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(shipMailFlag     )">, #{shipMailFlag}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(compMailFlag     )">, #{compMailFlag}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(returnMailFlag   )">, #{returnMailFlag} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sfdcFlag   )">, #{sfdcFlag} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(notiAllreadYn   )">, #{notiAllreadYn} </if>
+        ,#{SMTP_MAIL}           
+        ,#{SMTP_PW}  
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userRemk    )">, #{userRemk}        </if>
+         , 'Y'
+         , #{gsUserId}
+         , NOW()
+         , #{gsUserId}
+         , NOW()
+         , NOW()
+    </sql>
+
+    <sql id="updateColumns">
+          A.CHNG_ID   = #{gsUserId}
+        , A.CHNG_DATE = NOW()
+        , A.USER_NAME       = #{userName}
+        , A.USER_TYPE       = #{userType}
+        , A.MENU_SET        = #{menuSet}
+        , A.MENU_TYPE       = #{menuType}
+        , A.DASH_TYPE       = #{dashType}
+        , A.MOBILE_TYPE     = #{mobileType}
+        , A.ORG_AUTH_CODE   = #{orgAuthCode}
+        , A.SPC_AUTH_CODE   = #{spcAuthCode}
+        , A.APPL_LIST       = #{applList}
+        , A.COM_CODE        = #{comCode}
+        , A.COM_NAME        = #{comName}
+        , A.EMPL_NO         = #{emplNo}
+        , A.DEPT_CODE       = #{deptCode}
+        , A.DEPT_NAME       = (SELECT CODE_NAME
+                    FROM SYS_CODE
+                   WHERE SYS_ID    = #{sysId}
+                     AND CODE_GRUP = 'DEPT_CODE'
+                     AND USE_FLAG  = 'Y'
+                     AND CODE_CD   = #{deptCode})
+        , A.UPPR_DEPT_CODE  = #{upprDeptCode}
+        , A.USER_TEL        = #{userTel}
+        , A.USER_HP         = #{userHp}
+        , A.USER_MAIL       = #{userMail}
+        , A.SALE_GRUP       = #{saleGrup}
+        , A.REGN_MAGR       = IFNULL(#{regnMagr}, '')
+        , A.REGN_GB         = IFNULL(#{regnGb}, '')
+        , A.SHIP_LOC		= #{shipLoc}
+        , A.ID_LSPO         = #{idLspo}
+        , A.ID_LWS          = #{idLws}
+        , A.ID_MERC         = #{idMerc}
+        , A.ID_SERV         = #{idServ}
+        , A.ID_WGBC         = #{idWgbc}
+        , A.ID_MTS          = #{idMts}
+        , A.ID_ACB          = #{idAcb}
+        , A.ID_SPROUTLOUD   = #{idSproutLoud}
+        , A.ID_SFDC   		= #{idSfdc}
+<!--         , A.TYPE            = #{type}
+        , A.FIRST_NAME      = #{FirstName}
+        , A.LAST_NAME       = #{LastName}
+        , A.USER_ADDRESS1   = #{userAddress1}
+        , A.USER_CITY       = #{userCity}
+        , A.USER_REGN_CODE  = #{userRegnCode}
+        , A.USER_POST_CODE  = #{userPostCode}
+        , A.TP_ACCOUNT_ID   = #{tpAccountId} -->
+        , A.CREATE_MAIL_FLAG = #{createMailFlag}
+        , A.REVIEW_MAIL_FLAG = #{reviewMailFlag}
+        , A.CONF_MAIL_FLAG   = #{confMailFlag}
+        , A.READY_MAIL_FLAG  = #{readyMailFlag}
+        , A.SHIP_MAIL_FLAG   = #{shipMailFlag}
+        , A.COMP_MAIL_FLAG   = #{compMailFlag}
+        , A.RETURN_MAIL_FLAG = #{returnMailFlag}
+        , A.SFDC_FLAG 		 = #{sfdcFlag}
+        , A.NOTI_ALLREAD_YN  = #{notiAllreadYn}
+        , A.SMTP_MAIL        = #{smtpId}
+        , A.SMTP_PW          = #{smtpPw}
+        , A.USER_REMK        = #{userRemk}
+        , A.USE_FLAG         = fn_dealer_sync(#{useFlag},#{userType},#{saleGrup},#{shipLoc},#{userId})
+        , A.LOGIN_FAIL_CNT   = CASE WHEN #{useFlag} = 'Y' THEN '0'
+                                   ELSE LOGIN_FAIL_CNT END
+    </sql>
+
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_USER A
+         WHERE <include refid="whereClause" />
+         ORDER
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM SYS_USER A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="user" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM SYS_USER A
+         WHERE SYS_ID   = #{sysId}
+           AND USER_ID  = #{userId}
+    </select>
+
+    <insert id="insert" parameterType="params">
+        INSERT
+          INTO SYS_USER
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE SYS_USER A
+           SET <include refid="updateColumns" />
+         WHERE A.SYS_ID  = #{sysId}
+           AND A.USER_ID = #{userId}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE
+          FROM SYS_USER
+         WHERE SYS_ID   = #{sysId}
+           AND USER_ID  = #{userId}
+    </delete>
+
+    <!-- 인증 체크 -->
+    <select id="checkPassword" parameterType="params" resultType="string">
+        SELECT CASE COUNT(1) WHEN 0 THEN 'X' ELSE 'O' END
+          FROM SYS_USER
+         WHERE SYS_ID   = #{sysId}
+           AND USER_ID  = #{userId}
+           AND USER_PWD = HEX( AES_ENCRYPT( #{userId},#{userPwd}))
+    </select>
+
+    <!-- 비밀번호 변경시 변경일시 업데이트 -->
+    <update id="updatePassword" parameterType="params">
+        UPDATE SYS_USER
+           SET CHNG_ID   = #{gsUserId}
+              ,CHNG_DATE = NOW()
+              ,USER_PWD  = HEX( AES_ENCRYPT( #{userId},#{userPwd}))
+         WHERE SYS_ID    = #{sysId}
+           AND USER_ID   = #{userId}
+    </update>
+
+    <!-- 로그인 실패시 실패카운트 증가 -->
+    <update id="updateFailure" parameterType="params">
+        UPDATE SYS_USER
+           SET LOGIN_FAIL_CNT = LOGIN_FAIL_CNT + 1
+         WHERE SYS_ID         = #{sysId}
+           AND USER_ID        = #{userId}
+    </update>
+
+    <!-- 로그인 성공시 실패카운트 리셋 및 최종로그인일시 업데이트 -->
+    <update id="updateSuccess" parameterType="params">
+        UPDATE SYS_USER
+           SET LOGIN_FAIL_CNT  = 0
+              ,LAST_LOGIN_DATE = NOW()
+         WHERE SYS_ID          = #{sysId}
+           AND USER_ID         = #{userId}
+    </update>
+    <select id="selectUserType" resultType="record" parameterType="params">
+        SELECT CODE_CD   AS "codeCd"
+             , CODE_NAME AS "codeNm"
+          FROM SYS_CODE
+         WHERE SYS_ID    = #{sysId}
+           AND CODE_GRUP = 'USER_TYPE'
+    </select>
+    
+    <select id="selectUserBm" resultType="record" parameterType="params">
+        CALL sp_get_service_user_list(#{sysId})
+    </select>
+    
+    <select id="selectCodeName" resultType="record" parameterType="params">
+        SELECT CODE_CD   AS "codeCd"
+             , CODE_NAME AS "codeNm"
+             , EXT_TEXT AS "extText"
+          FROM SYS_CODE
+         WHERE SYS_ID    = #{sysId}
+           AND CODE_GRUP = #{codeGrup}
+           AND CODE_CD	 = #{codeCd}
+    </select>
+    
+    <select id="selectDealerCdf" resultType="record" parameterType="params">
+        SELECT LPAD(IFNULL(CASE WHEN GE_CDF_NO = '' THEN 'XXXXXX' ELSE GE_CDF_NO END,'XXXXXX'),6,0) AS GE_CDF_NO
+          FROM DEAL_MAST
+         WHERE SYS_ID    = #{sysId}
+           AND DEAL_CODE = #{DEAL_CODE}
+    </select>
+    
+    <!--  Dealer Select -->
+    <select id="selectDealerInfo" resultType="record" parameterType="params">
+        SELECT CHAR_BM   	AS "respBm"
+             , HEAD_DEAL	AS "headDeal"
+             , WARE_HOUS 	AS "wareHous"
+             , SHIP_LOC 	AS "shipLoc"
+             , SALE_GRUP 	AS "saleGrup"
+             , ADDR_STR  	AS "addrStr"
+             , ADDR_BOX  	AS "addrBox"
+             , POST_CODE 	AS	"postCode"
+             , ADDR_CITY 	AS "addrCity"
+             , ADDR_CNTY 	AS "addrCnty"
+             , ADDR_REGN 	AS "addrRegn"
+             , TRANS_ZONE	AS "transZone"
+             , TEL_NO		AS "telNo"
+             , FAX_NO		AS "faxNo"
+             , MOB_NO		AS "moNo"
+             , E_MAIL		AS "email"
+             , E_MAIL_LIST	AS "emailList"
+             , E_MAIL_RECV	AS "emailRecv"
+             , PAY_TYPE     AS "payType"
+             , CURR_UNIT	AS "currUnit"
+          FROM DEAL_MAST
+         WHERE SYS_ID    = #{sysId}
+           AND DEAL_CODE = #{userId}
+    </select>
+    
+    <select id="dashBoardCurrUnit" resultType="record" parameterType="params">
+        SELECT CURR_UNIT	AS "currUnit"
+          FROM DEAL_MAST
+         WHERE SYS_ID    = #{sysId}
+           AND DEAL_CODE = #{gsUserId}
+    </select>
+    
+    <!--  Dealer Save -->
+    <insert id="saveDealer" parameterType="params">
+        INSERT INTO DEAL_MAST
+        (
+			  SYS_ID
+			, DEAL_CODE
+			, DEAL_NAME
+			, DEAL_TYPE
+			, CHAR_BM
+			, HEAD_DEAL
+			, WARE_HOUS
+			, SHIP_LOC
+			, SALE_GRUP
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(telNo    )">, TEL_NO	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(faxNo    )">, FAX_NO	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(moNo    )">, MOB_NO	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(email    )">, E_MAIL	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emailList)">, E_MAIL_LIST	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emailRecv)">, E_MAIL_RECV	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(payType  )">, PAY_TYPE	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrStr  )">, ADDR_STR	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrBox  )">, ADDR_BOX	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrCity )">, ADDR_CITY	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrCnty )">, ADDR_CNTY	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrRegn )">, ADDR_REGN	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(transZone)">, TRANS_ZONE	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(postCode )">, POST_CODE	</if>
+			, CURR_UNIT
+			, CRE_DATE
+			, USE_IDX
+			, REGI_ID
+			, REGI_DATE
+		)
+        VALUES
+        (
+              #{sysId}
+         	, #{userId}
+         	, #{userName}
+         	, #{userType}
+         	, #{respBm}
+         	, #{headDeal}
+         	, #{wareHous}
+         	, #{shipLoc}
+         	, #{saleGrup}
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(telNo    )">, #{telNo}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(faxNo    )">, #{faxNo}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(moNo    )">, #{moNo}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(email    )">, #{email}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emailList)">, #{emailList}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emailRecv)">, #{emailRecv}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(payType  )">, #{payType}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrStr  )">, #{addrStr}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrBox  )">, #{addrBox}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrCity )">, #{addrCity}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrCnty )">, #{addrCnty}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(addrRegn )">, #{addrRegn}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(transZone)">, #{transZone}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(postCode )">, #{postCode}	</if>
+        	, #{currUnit}
+        	, NOW()
+        	, 'Y'
+        	, #{gsUserId}
+         	, NOW()
+         )
+    </insert>
+    
+    <!--  Dealer User Save -->
+    <insert id="saveDealerUser" parameterType="params">
+        INSERT INTO SYS_USER
+        (
+			  SYS_ID
+			, USER_ID
+			, USER_NAME
+			, USER_PWD
+			, USER_TYPE
+			, MENU_SET
+			, MENU_TYPE
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saleGrup )">, SALE_GRUP	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(wareHous )">, SHIP_LOC	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(telNo    )">, USER_TEL	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(email    )">, USER_MAIL	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emailList)">, USER_MAIL_LIST	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idLspo   )">, ID_LSPO	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idLws    )">, ID_LWS	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idMerc   )">, ID_MERC	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idServ   )">, ID_SERV	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idWgbc   )">, ID_WGBC	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idMts    )">, ID_MTS   </if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idAcb    )">, ID_ACB   </if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idSproutLoud    )">, ID_SPROUTLOUD   </if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idSfdc    )">, ID_SFDC   </if>
+<!--        		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(type       )">, TYPE             </if>
+       		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(FirstName       )">, FIRST_NAME  </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(LastName       )">, LAST_NAME    </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userAddress1       )">, USER_ADDRESS1  </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userCity       )">, USER_CITY          </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userRegnCode       )">, USER_REGN_CODE </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userPostCode       )">, USER_POST_CODE  </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tpAccountId       )">, TP_ACCOUNT_ID   </if>	 -->
+			,USE_FLAG
+			,REGI_ID
+			,REGI_DATE
+			,PWD_CHNG_DATE
+		)
+        VALUES
+        (
+              #{sysId}
+         	, #{userId}
+         	, #{userName}
+         	, HEX( AES_ENCRYPT( #{userId},(SELECT fn_get_init_user_pwd())))
+         	, 'C'
+         	, 'LSTA'
+         	, 'A'
+         	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saleGrup )">, #{saleGrup}	</if>
+			<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(wareHous )">, #{wareHous}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(telNo    )">, #{telNo}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(email    )">, #{email}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(emailList)">, #{emailList}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idLspo   )">, #{idLspo}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idLws    )">, #{idLws}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idMerc   )">, #{idMerc}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idServ   )">, #{idServ}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idWgbc   )">, #{idWgbc}	</if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idMts    )">, #{idMts}    </if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idAcb    )">, #{idAcb}   </if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idSproutLoud )">,#{idSproutLoud}  </if>
+        	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(idSfdc )">, #{idSfdc}  </if>
+        	, 'Y'
+        	, #{gsUserId}
+         	, NOW()
+         	, NOW()
+         )
+    </insert>
+    
+    <!--  Dealer Update -->
+    <update id="updateDealer" parameterType="params">
+    	UPDATE DEAL_MAST
+    	   SET DEAL_NAME   = IFNULL(#{userName},'')
+    	 	 , CHAR_BM	   = IFNULL(#{headDeal},'')
+    	  	 , HEAD_DEAL   = IFNULL(#{respBm},'')
+    	     , TEL_NO      = IFNULL(#{telNo},'')
+    	     , FAX_NO	   = IFNULL(#{faxNo},'')
+    	     , MOB_NO	   = IFNULL(#{moNo},'')
+    	     , E_MAIL	   = IFNULL(#{email},'')
+    	     , E_MAIL_LIST = IFNULL(#{emailList},'')
+    	     , E_MAIL_RECV = IFNULL(#{emailRecv},'')
+    	     , PAY_TYPE	   = IFNULL(#{payType},'')
+    	     , CURR_UNIT   = IFNULL(#{currUnit},'')
+    	     , ADDR_STR    = IFNULL(#{addrStr},'')
+    	     , ADDR_BOX    = IFNULL(#{addrBox},'')
+    	     , ADDR_CITY   = IFNULL(#{addrCity},'')
+    	     , ADDR_CNTY   = IFNULL(#{addrCnty},'')
+    	     , ADDR_REGN   = IFNULL(#{addrRegn},'')
+    	     , TRANS_ZONE  = IFNULL(#{transZone},'')
+    	     , POST_CODE   = IFNULL(#{postCode},'')
+    	     , SALE_GRUP   = IFNULL(#{saleGrup},'')
+    	     , CHAR_BM	   = IFNULL(#{respBm},'')
+    	     , HEAD_DEAL   = IFNULL(#{headDeal},'')
+    	     , WARE_HOUS   = IFNULL(#{wareHous},'')
+    	     , SHIP_LOC    = IFNULL(#{wareHous},'')
+    	     , CHNG_ID	   = #{gsUserId}
+    	     , CHNG_DATE   = NOW()
+    	 WHERE SYS_ID    = #{sysId}
+    	   AND DEAL_CODE = #{userId}
+    </update>
+    
+    <!--  Dealer User Update -->
+    <update id="updateDealerUser" parameterType="params">
+    	UPDATE SYS_USER
+    	   SET SALE_GRUP  = IFNULL(#{saleGrup},'')
+    	   	 , SHIP_LOC   = IFNULL(#{wareHous},'')
+    	   	 , USER_TEL   = IFNULL(#{telNo},'')
+    	   	 , USER_MAIL  = IFNULL(#{email},'')
+    	     , ID_LSPO    = IFNULL(#{idLspo},'')
+    	     , ID_LWS	  = IFNULL(#{idLws},'')
+    	     , ID_MERC	  = IFNULL(#{idMerc},'')
+    	     , ID_SERV    = IFNULL(#{idServ},'')
+    	     , ID_WGBC    = IFNULL(#{idWgbc},'')
+    	     , ID_MTS     = IFNULL(#{idMts},'')
+    	     , ID_ACB     = IFNULL(#{idAcb},'')
+    	     , ID_SPROUTLOUT      = IFNULL(#{idSproutLoud},'')
+    	     , ID_SFDC		      = IFNULL(#{idSfdc},'')
+    	     , TYPE               = IFNULL(#{type},'')
+    	     , FIRST_NAME         = IFNULL(#{FirstName},'')
+    	     , LAST_NAME          = IFNULL(#{LastName},'')
+    	     , USER_ADDRESS1      = IFNULL(#{userAddress1},'')
+    	     , USER_CITY          = IFNULL(#{userCity},'')
+    	     , USER_REGN_CODE     = IFNULL(#{userRegnCode},'')
+    	     , USER_POST_CODE     = IFNULL(#{userPostCode},'')
+    	     , TP_ACCOUNT_ID      = IFNULL(#{tpAccountId},'')	     
+    	     , CHNG_ID	  = #{gsUserId}
+    	     , CHNG_DATE  = NOW()
+    	 WHERE SYS_ID  = #{sysId}
+    	   AND USER_ID = #{userId}
+    </update>
+    
+    <!--  Dealer Update Sink -->
+    <update id="updateDealerSink" parameterType="params">
+    	UPDATE DEAL_MAST
+    	   SET SALE_GRUP  = IFNULL(#{saleGrup},'')
+    	   	 , SHIP_LOC   = IFNULL(#{shipLoc},'')
+    	   	 , WARE_HOUS  = IFNULL(#{shipLoc},'')
+    	 WHERE SYS_ID  = #{sysId}
+    	   AND USER_ID = #{userId}
+    </update>
+    
+    <select id="selectBmList" resultType="record" parameterType="params">
+		SELECT SYS_ID
+		     , USER_ID
+		     , USER_NAME
+		  FROM SYS_USER
+		 WHERE SYS_ID = #{sysId}
+		   AND USE_FLAG ='Y'
+		   AND ORG_AUTH_CODE = 'BM'
+		 ORDER
+		    BY USER_NAME
+    </select>
+    
+       <select id="selectBmList1" resultType="record" parameterType="params">
+		SELECT SYS_ID
+		     , USER_ID
+		     , USER_NAME
+		  FROM SYS_USER
+		 WHERE SYS_ID = #{sysId}
+		   AND USE_FLAG ='Y'
+		   AND ORG_AUTH_CODE = 'BM'
+		   AND USER_ID NOT IN('devbmrd','devbm','Ed.Acus','jim.startz','mindy.hamer','Steve.Schulte','melissa.steidlmayer','Bob.Michael','Inside.Sales1','Inside.Sales2')
+		 ORDER
+		    BY USER_NAME
+    </select>
+    
+    <select id="selectHeadDealList" resultType="record" parameterType="params">
+		SELECT SYS_ID
+		     , USER_ID
+		     , USER_NAME
+		  FROM SYS_USER
+		 WHERE SYS_ID = #{sysId}
+		   AND USE_FLAG ='Y'
+		   AND ORG_AUTH_CODE = 'DEAL'
+		 ORDER
+		    BY USER_NAME
+    </select>
+    
+    <select id="selectAuto" resultType="record" parameterType="params">
+        SELECT IFNULL(SALE_GRUP,'') AS SALE_GRUP
+             , IFNULL(SHIP_LOC,'') AS SHIP_LOC
+          FROM SYS_USER
+         WHERE USER_ID = #{deal_id}
+    </select>
+    
+    
+     <select id="searchType" resultType="record" parameterType="params">
+        SELECT CODE_CD		AS "menuType"
+        		 , CODE_NAME	AS "menuTypeName"
+		  FROM SYS_CODE
+		 WHERE SYS_ID = #{sysId}
+		     AND CODE_GRUP = 'SP_AUTH'
+		     AND USE_FLAG = 'Y'
+		ORDER BY SORT_SEQ
+    </select>
+    
+    <select id="searchApplList" resultType="record" parameterType="params">
+    	CALL sp_get_search_appl_list_code(#{sysId},#{userId})
+    </select>
+    
+
+    
+    
+    
+
+</mapper>

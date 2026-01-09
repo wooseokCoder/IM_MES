@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Daum에디터 - 이미지 첨부</title> 
+<script src="../../js/popup.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="../../css/popup.css" type="text/css"  charset="utf-8"/>
+<script type="text/javascript" src="../../../easyui-1.4/jquery.min.js""></script>
+<script type="text/javascript" src="../../../jquery.form-3.51.js"></script>
+
+<script type="text/javascript">
+// <![CDATA[
+
+function done() {
+	var fileinfo = new Object();
+	var strFileExt = "Y";
+	$('#upload-form').ajaxForm({
+		async:false,
+		url:"/lsbas/common/board/boardaddimage.json",
+        beforeSubmit: function (data,form,option) {
+            //validation체크 
+            //막기위해서는 return false를 잡아주면됨
+            return true;
+        },
+		success: function(response,status){
+			if(response.fileInfo.strFileExt == "N"){
+				//에러발생을 위한 code페이지
+				strFileExt = response.fileInfo;
+	            alert("Not JPG, PNG, BMP, GIF, JPEG extensions.!!");
+	            return;
+			}else{
+				fileinfo = response.fileInfo;	
+				strFileExt = "Y";
+			}
+			
+		},
+        error: function(){
+            //에러발생을 위한 code페이지
+            alert("error!!");
+            strFileExt = "E";
+        }  
+	}).submit();
+	
+	if (typeof(execAttach) == 'undefined') { //Virtual Function
+        return;
+    }
+	/* var _mockdata = {
+		'imageurl': 'http://img.naver.net/static/www/u/2013/0731/nmms_224940510.gif',
+		'filename': 'editor_bi.gif',
+		'filesize': 640,
+		'imagealign': 'C',
+		'originalurl': 'http://cfile284.uf.daum.net/original/116E89154AA4F4E2838948',
+		'thumburl': 'http://cfile284.uf.daum.net/P150x100/116E89154AA4F4E2838948'
+	}; */
+	
+	var _mockdata = fileinfo;
+
+	if(strFileExt == "Y"){
+		execAttach(_mockdata);
+		window.opener.$("#tx_attach_div").css('display','none');
+	}
+	
+	closeWindow();
+}
+
+function initUploader(){
+    var _opener = PopupUtil.getOpener();
+    if (!_opener) {
+        alert('Have access to the wrong path.');
+        return;
+    }
+    
+    var _attacher = getAttacher('image', _opener);
+    registerAction(_attacher);
+}
+
+function fn_InRealFileName(fileObj, orgObj) 
+{
+	var fileValue 	= fileObj.value;
+	var realFName 	= fileValue.substring(fileValue.lastIndexOf("\\")+1, fileValue.length);
+	
+	// 파일확장자 제한
+	var fileExt  = realFName.substring(realFName.lastIndexOf('.')+1);
+
+	if (fileValue != null && fileValue !=""){
+		if(!fileExtVal(fileExt))
+		{
+			alert("The selected [ "+fileExt+" ] is an unregistered file extension. ");
+			$("#image_"+orgObj).val("");
+			//$("#txt"+orgObj).textbox('setValue', "");
+		} 
+		else {
+			//$("#txt" + orgObj).textbox('setValue', realFName);
+		}
+	}
+}
+
+function fileExtVal(ext)
+{
+	var exts = new Array("JPG","PNG","BMP","GIF","JPEG");
+	if(ext == null || ext =="") return false;
+	for(var i=0; i<exts.length; i++)
+	{
+		if(exts[i] == ext.toUpperCase()) return true;
+	}
+	return false;
+}
+// ]]>
+</script>
+</head>
+<body onload="initUploader();">
+<div class="wrapper">
+	<div class="header">
+		<h1>Insert Image</h1>
+	</div>	
+	<div class="body">
+		<dl class="alert">
+		    <dt>Insert Image confirm</dt>
+		    <dd>
+		    <form id="upload-form"  method="post" enctype="multipart/form-data">
+                <input type="file" name="image_file" id="image_File" onchange="fn_InRealFileName(this, 'File')"/>
+            </form>
+
+			</dd>
+		</dl>
+	</div>
+	<div class="footer">
+		<p><a href="#" onclick="closeWindow();" title="close" class="close">close</a></p>
+		<ul>
+			<li class="submit"><a href="#" onclick="done();" title="upload" class="btnlink">upload</a> </li>
+			<li class="cancel"><a href="#" onclick="closeWindow();" title="close" class="btnlink">close</a></li>
+		</ul>
+	</div>
+</div>
+</body>
+</html>

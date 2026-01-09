@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reportView" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="dcf7f8eb-f005-43a4-802e-b7019f445b48">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="P_SYS_ID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_CODE_GRUP" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_CODE_CD" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT SYS_ID AS "sysId"
+       ,CODE_GRUP AS "codeGrup"
+       ,CODE_CD AS "codeCd"
+       ,CODE_NAME AS "codeName"
+       ,CODE_DESC AS "codeDesc"
+       ,SORT_SEQ AS "sortSeq"
+       ,USE_FLAG AS "useFlag"
+       ,REGI_ID AS "regiId"
+       ,REGI_DATE AS "regiDate"
+       ,CHNG_ID AS "chngId"
+       ,CHNG_DATE AS "chngDate"
+  FROM SYS_CODE
+ WHERE SYS_ID = $P{P_SYS_ID}
+   AND CODE_GRUP = $P{P_CODE_GRUP}
+   AND CODE_CD = $P{P_CODE_CD}]]>
+	</queryString>
+	<field name="sysId" class="java.lang.String"/>
+	<field name="codeGrup" class="java.lang.String"/>
+	<field name="codeCd" class="java.lang.String"/>
+	<field name="codeName" class="java.lang.String"/>
+	<field name="codeDesc" class="java.lang.String"/>
+	<field name="sortSeq" class="java.math.BigDecimal"/>
+	<field name="useFlag" class="java.lang.String"/>
+	<field name="regiId" class="java.lang.String"/>
+	<field name="regiDate" class="java.sql.Timestamp"/>
+	<field name="chngId" class="java.lang.String"/>
+	<field name="chngDate" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="96" y="0" width="570" height="79" uuid="37845cb5-8418-4ec5-b63a-4bf33cb0758d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="36" isBold="true" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[코드 상세 조회]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="216" splitType="Stretch">
+			<line>
+				<reportElement x="95" y="48" width="571" height="1" uuid="62c76d66-e599-43e1-b214-9d3ae532f864"/>
+			</line>
+			<line>
+				<reportElement x="279" y="0" width="1" height="50" uuid="814e9ded-8caf-449c-b490-20bf09cb4de2"/>
+			</line>
+			<line>
+				<reportElement x="95" y="0" width="1" height="211" uuid="10e1e227-f62f-4c8c-8315-deb39f5d3cc7"/>
+			</line>
+			<line>
+				<reportElement x="94" y="1" width="573" height="1" uuid="e6390b4a-cd73-44df-877c-8a712afecf9b"/>
+			</line>
+			<line>
+				<reportElement x="666" y="1" width="1" height="210" uuid="8e8c9176-ba00-4e81-a13f-d1446c36c933"/>
+			</line>
+			<line>
+				<reportElement x="481" y="0" width="1" height="47" uuid="8c24e310-a98d-44eb-ad28-deed96f2f5ba"/>
+			</line>
+			<line>
+				<reportElement x="96" y="100" width="570" height="1" uuid="8f6fae1b-1fce-42d9-81f2-079e17e7efac"/>
+			</line>
+			<line>
+				<reportElement x="279" y="50" width="1" height="160" uuid="43c71430-4924-4ccd-9c2e-654f1a012572"/>
+			</line>
+			<line>
+				<reportElement x="96" y="154" width="570" height="1" uuid="71357557-e57a-476b-b987-b621f6533ff6"/>
+			</line>
+			<line>
+				<reportElement x="96" y="210" width="571" height="1" uuid="9ecf5c1a-dbca-42ee-be72-4bcba31427ae"/>
+			</line>
+			<line>
+				<reportElement x="157" y="49" width="1" height="52" uuid="3c0cbfb7-f2d7-406e-8630-e629c07c9b1b"/>
+			</line>
+			<textField>
+				<reportElement x="105" y="8" width="166" height="34" uuid="b93d64f8-0d0b-413a-b039-266a074c3108"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codeGrup}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="289" y="8" width="184" height="33" uuid="5e726091-b6c6-4b21-b6cc-1193a6522d68"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codeCd}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="489" y="10" width="169" height="29" uuid="68a070f2-1b96-4e68-938b-49a7c0c3797a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codeName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="102" y="51" width="50" height="46" uuid="01f675b4-979c-4da1-8079-83dd70e460b4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sortSeq}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="163" y="54" width="110" height="40" uuid="d6b8eb01-eac9-4dab-abaf-0ef3aebaf32a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{useFlag}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="285" y="55" width="375" height="40" uuid="46e40d65-dda9-4b0c-b4a0-934169a04b66"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codeDesc}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="107" width="175" height="41" uuid="7e3d7094-4fd7-4866-b5f6-5807951438fd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{regiId}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="286" y="106" width="374" height="44" uuid="6716a398-2343-4010-9960-3e7742f8f296"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{regiDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="103" y="160" width="168" height="45" uuid="b9e79d9b-fd0f-45b7-8e45-f160e20796ea"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{chngId}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="289" y="160" width="369" height="44" uuid="9c1d4410-35cd-479c-88a2-7605b658a85a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{chngDate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

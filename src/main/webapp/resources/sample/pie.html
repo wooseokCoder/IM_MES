@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<meta charset="utf-8">
+<head>
+	<title>Pie Chart</title>
+	<script src="Chart.bundle.js"></script>
+	<script src="utils.js"></script>
+</head>
+
+<body>
+	<div id="canvas-holder" style="width:100%;padding-top:30px;">
+		<canvas id="chart-area"></canvas>
+	</div>
+	<script>
+		var randomScalingFactor = function() {
+			return Math.round(Math.random() * 100) + 1;
+		};
+
+		var config = {
+			type: 'pie',
+			data: {
+				datasets: [{
+					data: [
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+					],
+					backgroundColor: [
+						window.chartColors.red,
+						window.chartColors.orange,
+						window.chartColors.yellow,
+						window.chartColors.blue,
+					],
+					label: 'Dataset 1'
+				}],
+				labels: [
+					'전년당월',
+					'전전월',
+					'전월',
+					'당월'
+				]
+			},
+			options: {
+				responsive: true,
+				legend: {position: 'bottom'}
+			}
+		};
+
+		window.onload = function() {
+			var ctx = document.getElementById('chart-area').getContext('2d');
+			window.myPie = new Chart(ctx, config);
+		};
+
+	</script>
+</body>
+
+</html>

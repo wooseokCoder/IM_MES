@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.ftk.Token">
+
+	<select id="createToken" parameterType="params" resultType="record">
+		CALL SP_CREATE_TOKEN(#{sysId},#{userId},#{issuUrl},#{rqstUrl})
+	</select>
+	
+	<select id="selectToken" resultType="string" parameterType="params">
+		SELECT FN_MAKE_TOKEN()
+	</select>
+	
+	<select id="validateToken" resultType="string" parameterType="params">
+		CALL SP_VALIDATE_TOKEN(#{userId},#{ftokenNo})
+    </select>
+
+	<select id="validateToken2" resultType="string" parameterType="params">
+		CALL SP_VALIDATE_TOKEN2(#{userId},#{ftokenNo})
+    </select>
+    
+	<select id="seriNoUpdate" resultType="record" parameterType="params">
+		CALL SP_IF_PDI('SERI_NO',#{ordrNo},#{itemCode},#{userId},#{seriNo},'','','','')
+    </select>
+    
+    <select id="outBoundUpdate" resultType="record" parameterType="params">
+		CALL SP_IF_PDI('OUTBOUND','','',#{userId},#{bolNo},#{actShipDate},'','','')
+    </select>
+
+	<select id="outBoundCancelUpdate" resultType="record" parameterType="params">
+		CALL SP_IF_PDI('OUTBOUND_CNSL','','',#{userId},#{poNo},'','','','')
+    </select>
+
+	<select id="assyNoUpdate" resultType="record" parameterType="params">
+		CALL SP_IF_PDI('ASSY_NO',#{ordrNo},'',#{userId},#{assyNo},#{assyDate},'','','')
+    </select>
+    <select id="ifOrdrUpdate" resultType="record" parameterType="params">
+		CALL SP_IF_PDI(#{type},#{ordrNo},#{itemCode},#{userId},#{var1},#{var2},#{var3},#{var4},#{var5},#{var6},#{var7},#{var8},#{var9},#{var10},#{var11})
+    </select>
+    
+    <select id="outboundBolImgUpdate" resultType="record" parameterType="params">
+		CALL SP_IF_PDI(#{type},#{ordrNo},#{itemCode},#{userId},#{var1},#{var2},#{var3},#{var4},#{var5},#{var6},#{var7},#{var8},#{var9},#{var10},#{var11})
+    </select>
+    
+    <select id="ifLsas" resultType="record" parameterType="params">
+		CALL SP_IF_LSAS(#{var1},#{var2},#{var3},#{var4},#{var5},#{var6},#{var7},#{var8},#{var9},#{var10},#{var11},#{var12},#{var13},#{var14},#{var15})
+    </select>
+    
+    <sql id="insertLog-fields">
+           SYS_ID
+        , SEQ
+        , USER_ID
+        , TOKEN_NO
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ordr_no)">, LOG_1     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(assy_no)">, LOG_2     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(type )">  , LOG_3     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val )">   , LOG_4     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val2 )">  , LOG_5     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val3 )">  , LOG_6     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val4 )">  , LOG_7     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val5 )">  , LOG_8     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val6 )">  , LOG_9     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val7 )">  , LOG_10    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val8 )">  , LOG_11    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val9 )">  , LOG_12    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val10 )"> , LOG_13    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val11 )"> , LOG_14    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val12 )"> , LOG_15    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val13 )"> , LOG_16    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val14 )"> , LOG_17    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val15 )"> , LOG_18    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val16 )"> , LOG_19    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val17 )"> , LOG_20    </if>
+        , RET
+        , CON_DATE
+    </sql>
+    <sql id="insertLog-values">
+           'IMMES'
+         , fn_get_next_seq_d('TL','10')
+         , #{userId}
+         , #{token}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ordr_no)">, #{ordr_no} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(assy_no)">, #{assy_no} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(type )">  , #{type}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val  )">,  #{val}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val2 )">,  #{val2}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val3 )">,  #{val3}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val4 )">,  #{val4}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val5 )">,  #{val5}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val6 )">,  #{val6}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val7 )">,  #{val7}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val8 )">,  #{val8}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val9 )">,  #{val9}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val10 )">, #{val10} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val11 )">, #{val11} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val12 )">, #{val12} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val13 )">, #{val13} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val14 )">, #{val14} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val15 )">, #{val15} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val16 )">, #{val16} </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val17 )">, #{val17} </if>
+         , NULL
+         , NOW()
+    </sql>
+    <insert id="TmpLogInsert" parameterType="params">
+        INSERT 
+          INTO SYS_API_TEMP_LOG 
+             ( <include refid="insertLog-fields" /> )
+        VALUES
+             ( <include refid="insertLog-values" /> )
+    </insert>
+    <update id="TmpLogUpdate" parameterType="params">
+        UPDATE SYS_API_TEMP_LOG
+           SET RET      = #{ret}
+             , CON_DATE = NOW()
+         WHERE SYS_ID   = 'IMMES'
+           AND USER_ID  = #{userId}
+           AND TOKEN_NO = #{token}
+    </update>
+    
+    <select id="getApiKey" parameterType="params" resultType="record">
+		SELECT FN_API_KEY_GET(#{sysId}) AS API_KEY
+	</select>
+</mapper>

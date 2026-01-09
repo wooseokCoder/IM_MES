@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.user.BatchStatus">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+         	   A.REGI_DATE, A.JOB_ID DESC
+	  	</if>
+    </sql>
+
+    <sql id="selectColumns">
+         A.JOB_ID          AS "jobId"
+        ,JOB_DESC		   AS "jobDesc"
+        ,JOB_TERM          AS "jobTerm"
+        ,JOB_TIME          AS "jobTime"
+        ,BGN_DATE          AS "bgnDate"
+        ,END_DATE          AS "endDate"
+        ,FILE_SEQ          AS "fileSeq"
+        ,JOB_RSLT          AS "jobRslt"
+        ,RSLT_DESC         AS "rsltDesc"
+        ,JOB_FILE          AS "jobFile"
+        ,JOB_REMK          AS "jobRemk"
+        
+    </sql>
+    
+    <sql id="whereClause">
+    	A.SYS_ID = #{sysId}
+    	AND A.JOB_ID=B.JOB_ID
+    	AND A.SYS_ID = B.SYS_ID
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobId)"   >AND A.JOB_ID      = #{jobId}       </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(succFail)">AND B.JOB_RSLT    = #{succFail}    </if>
+        
+        <choose>
+        	<when test="@com.wsc.framework.utils.MybatisUtils@notEmpty(accTimeBgn) or @com.wsc.framework.utils.MybatisUtils@notEmpty(accTimeEnd)">
+        		AND (B.BGN_DATE <![CDATA[>= ]]> #{accTimeBgn} AND B.END_DATE <![CDATA[<= ]]> #{accTimeEnd})
+        	</when>
+        	<otherwise>
+        		AND (B.BGN_DATE <![CDATA[>= ]]> DATE_FORMAT(NOW()-INTERVAL 1 DAY,'%Y-%m-%d') AND B.END_DATE <![CDATA[<= ]]> DATE_FORMAT(NOW(),'%Y-%m-%d'))     
+        	</otherwise>
+        </choose>
+    </sql>
+    
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_JOB_MAST AS A                                                                                                                                                    
+          JOIN SYS_JOB_HIST AS B 
+         WHERE <include refid="whereClause" />
+         
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_JOB_MAST AS A
+          JOIN SYS_JOB_HIST AS B
+         WHERE <include refid="whereClause" />
+    </select>
+    
+    <select id="getSelectJobId" resultType="record" parameterType="params">
+		SELECT JOB_ID 
+		  FROM SYS_JOB_MAST
+		 WHERE SYS_ID = #{sysId}		 
+		 
+	</select>
+    
+    <!-- <insert id="insert" parameterType="params">
+        INSERT 
+          INTO SYS_ULOG 
+             ( SYS_ID
+             , PROG_ID
+             , USER_ID
+             , ACC_TIME
+             , LOGIN_DATE
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientIp   )">, CLIENT_IP    </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientName )">, CLIENT_NAME  </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientAgent)">, CLIENT_AGENT </if>
+             )
+        VALUES
+             ( #{sysId}
+             , #{progId}
+             , #{userId}
+             , DATE_FORMAT(NOW(),'%Y-%m-%d %H:%i:%s')
+             , DATE_FORMAT(NOW(),'%Y%m%d') 
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientIp   )">, #{clientIp}     </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientName )">, #{clientName}   </if>
+            <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientAgent)">, #{clientAgent}  </if>
+             )
+    </insert>
+    
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM SYS_ULOG
+         WHERE SYS_ID    = #{sysId}
+           AND USER_ID   = #{userId}
+           AND PROG_ID   = #{progId}
+           AND ACC_TIME  = #{accTime}
+    </delete> -->
+
+</mapper>

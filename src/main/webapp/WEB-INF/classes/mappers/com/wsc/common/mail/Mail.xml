@@ -1,0 +1,706 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.mail.Mail">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT *
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+	  		   DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s') DESC
+	  	</if>
+    </sql>
+
+    <sql id="selectColumns-Max">
+         A.SYS_ID        AS "sysId"
+        ,A.BORD_NO       AS "bordNo"
+        ,A.BORD_GRUP     AS "bordGrup"
+        ,A.BORD_TITLE    AS "bordTitle"
+        <!-- ,(SELECT BORD_TITLE
+           FROM SYS_BORD
+          WHERE SYS_ID    = A.SYS_ID
+            AND BORD_NO   = A.BORD_NO
+            AND BORD_GRUP = A.BORD_GRUP)
+                         AS "bordTitle" -->
+        ,A.REGI_ID       AS "regiId"
+        ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')
+                         AS "regiDate"
+		,(SELECT COUNT(Atch_No)
+		    FROM SYS_FILE
+		   WHERE SYS_ID    = A.SYS_ID
+		     AND ATCH_NO   = A.BORD_NO
+		     AND ATCH_GRUP = A.BORD_GRUP
+		)                AS "fileCnt"
+		<!-- ,MAX(DECODE((SELECT COUNT(*)-1
+		               FROM SYS_BORD_TGT
+		              WHERE SYS_ID    = A.SYS_ID
+		                AND BORD_NO   = A.BORD_NO
+		                AND BORD_GRUP = A.BORD_GRUP
+		                AND USE_FLAG  = 'Y')
+                    ,0
+                    ,B.TGT_USER_ID
+                    ,B.TGT_USER_ID||'외'||(SELECT COUNT(*)-1
+		                             FROM SYS_BORD_TGT
+		                            WHERE SYS_ID    = A.SYS_ID
+		                              AND BORD_NO   = A.BORD_NO
+		                              AND BORD_GRUP = A.BORD_GRUP
+		                              AND USE_FLAG  = 'Y')||'명'))
+		                 AS "tgtUserId" -->
+		,MAX(CASE WHEN (SELECT COUNT(*)-1
+		                  FROM SYS_BORD_TGT
+		                 WHERE SYS_ID    = A.SYS_ID
+		                   AND BORD_NO   = A.BORD_NO
+		                   AND BORD_GRUP = A.BORD_GRUP
+		                   AND USE_FLAG  = 'Y') = 0
+		          THEN B.TGT_USER_ID
+		          ELSE CONCAT(B.TGT_USER_ID, '외', (SELECT COUNT(*)-1
+		                                             FROM SYS_BORD_TGT
+		                                            WHERE SYS_ID    = A.SYS_ID
+		                                              AND BORD_NO   = A.BORD_NO
+		                                              AND BORD_GRUP = A.BORD_GRUP
+		                                              AND USE_FLAG  = 'Y'), '명') END)
+		                 AS "tgtUserId"
+        ,MAX((CASE B.USE_FLAG WHEN 'E' THEN 'ERROR'
+              ELSE DATE_FORMAT(B.READ_DATE,'%Y-%m-%d %H:%i:%s')
+              END))      AS "readDate"
+        ,'A'             AS "mailType"
+    </sql>
+    <sql id="selectColumns-Send">
+         A.SYS_ID        AS "sysId"
+        ,A.BORD_NO       AS "bordNo"
+        ,A.BORD_GRUP     AS "bordGrup"
+        <!-- ,A.BORD_TITLE    AS "bordTitle" -->
+        ,(SELECT BORD_TITLE
+           FROM SYS_BORD
+          WHERE SYS_ID    = A.SYS_ID
+            AND BORD_NO   = A.BORD_NO
+            AND BORD_GRUP = A.BORD_GRUP)
+                         AS "bordTitle"
+        ,A.REGI_ID       AS "regiId"
+        ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')
+                         AS "regiDate"
+		,(SELECT COUNT(Atch_No)
+		    FROM SYS_FILE
+		   WHERE SYS_ID    = A.SYS_ID
+		     AND ATCH_NO   = A.BORD_NO
+		     AND ATCH_GRUP = A.BORD_GRUP
+		)                AS "fileCnt"
+		<!-- ,LISTAGG(TGT_USER_ID, ',') WITHIN GROUP(ORDER BY BORD_NO)
+		                 AS "tgtUserId" -->
+		,GROUP_CONCAT(TGT_USER_ID ORDER BY BORD_NO)
+		                 AS "tgtUserId"
+        ,MAX((CASE A.USE_FLAG WHEN 'E' THEN 'ERROR'
+              ELSE DATE_FORMAT(A.READ_DATE,'%Y-%m-%d %H:%i:%s')
+              END))      AS "readDate"
+    </sql>
+    <sql id="selectColumns">
+         A.SYS_ID        AS "sysId"
+        ,A.BORD_NO       AS "bordNo"
+        ,A.BORD_GRUP     AS "bordGrup"
+        ,A.BORD_TITLE    AS "bordTitle"
+        <!-- ,(SELECT BORD_TITLE
+           FROM SYS_BORD
+          WHERE SYS_ID    = A.SYS_ID
+            AND BORD_NO   = A.BORD_NO
+            AND BORD_GRUP = A.BORD_GRUP)
+                         AS "bordTitle" -->
+        ,A.REGI_ID       AS "regiId"
+        ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')
+                         AS "regiDate"
+		,(SELECT COUNT(Atch_No)
+		    FROM SYS_FILE
+		   WHERE SYS_ID    = A.SYS_ID
+		     AND ATCH_NO   = A.BORD_NO
+		     AND ATCH_GRUP = A.BORD_GRUP
+		)                AS "fileCnt"
+		<!-- ,DECODE((SELECT COUNT(*)-1
+		               FROM SYS_BORD_TGT
+		              WHERE SYS_ID    = A.SYS_ID
+		                AND BORD_NO   = A.BORD_NO
+		                AND BORD_GRUP = A.BORD_GRUP
+		                AND USE_FLAG  = 'Y')
+                    ,0
+                    ,B.TGT_USER_ID
+                    ,B.TGT_USER_ID||'외'||(SELECT COUNT(*)-1
+		                             FROM SYS_BORD_TGT
+		                            WHERE SYS_ID    = A.SYS_ID
+		                              AND BORD_NO   = A.BORD_NO
+		                              AND BORD_GRUP = A.BORD_GRUP
+		                              AND USE_FLAG  = 'Y')||'명')
+		                 AS "tgtUserId" -->
+		,MAX(CASE WHEN (SELECT COUNT(*)-1
+		                  FROM SYS_BORD_TGT
+		                 WHERE SYS_ID    = A.SYS_ID
+		                   AND BORD_NO   = A.BORD_NO
+		                   AND BORD_GRUP = A.BORD_GRUP
+		                   AND USE_FLAG  = 'Y') = 0
+		          THEN B.TGT_USER_ID
+		          ELSE CONCAT(B.TGT_USER_ID, '외', (SELECT COUNT(*)-1
+		                                             FROM SYS_BORD_TGT
+		                                            WHERE SYS_ID    = A.SYS_ID
+		                                              AND BORD_NO   = A.BORD_NO
+		                                              AND BORD_GRUP = A.BORD_GRUP
+		                                              AND USE_FLAG  = 'Y'), '명') END)
+		                 AS "tgtUserId"
+        ,(CASE B.USE_FLAG WHEN 'E' THEN 'ERROR'
+          ELSE DATE_FORMAT(B.READ_DATE,'%Y-%m-%d %H:%i:%s')
+           END)          AS "readDate"
+        ,'B'             AS "mailType"
+    </sql>
+    <sql id="insertColumns-fields">
+           SYS_ID
+         , BORD_NO
+         , BORD_GRUP
+         , BORD_TITLE
+         , USE_FLAG
+         , REGI_ID
+         , REGI_DATE
+         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordType )">, BORD_TYPE  </if>
+         , BORD_TEXT
+    </sql>
+    <sql id="insertColumns-values">
+           #{sysId}
+         , #{bordNo}
+         , #{bordGrup}
+         , #{bordTitle}
+         , 'Y'
+         , #{gsUserId}
+         , NOW()
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordType )">, #{bordType}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordText )">, #{bordText}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(bordText   )">, null</if>
+    </sql>
+    <sql id="selectColumns-target">
+         A.SYS_ID        AS "sysId"
+        ,A.USE_FLAG      AS "useFlag"
+        ,A.REGI_ID       AS "regiId"
+        ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')
+                         AS "regiDate"
+        ,A.CHNG_ID       AS "chngId"
+        ,DATE_FORMAT(A.CHNG_DATE,'%Y-%m-%d %H:%i:%s')
+                         AS "chngDate"
+        ,A.BORD_TITLE    AS "bordTitle"
+        ,A.BORD_NO       AS "bordNo"
+        ,A.BORD_GRUP     AS "bordGrup"
+        ,A.BORD_TYPE     AS "bordType"
+        ,A.BORD_BGN      AS "bordBgn"
+        ,A.BORD_END      AS "bordEnd"
+        ,A.READ_CNT      AS "readCnt"
+        ,A.BORD_SEQ      AS "bordSeq"
+		,(SELECT USER_NAME
+		    FROM SYS_USER
+		   WHERE SYS_ID  = A.SYS_ID
+		     AND USER_ID = A.REGI_ID
+		 )               AS "regiName"
+		,(SELECT USER_NAME
+		    FROM SYS_USER
+		   WHERE SYS_ID  = A.SYS_ID
+		     AND USER_ID = A.CHNG_ID
+		 )               AS "chngName"
+		<!-- ,(SELECT LISTAGG(TGT_USER_ID, ',') WITHIN GROUP(ORDER BY BORD_NO)
+		    FROM SYS_BORD_TGT
+		   WHERE SYS_ID    = A.SYS_ID
+		     AND BORD_GRUP = A.BORD_GRUP
+		     AND BORD_NO   = A.BORD_NO
+		 )               AS "tgtUserId" -->
+		,(SELECT GROUP_CONCAT(TGT_USER_ID ORDER BY BORD_NO)
+		    FROM SYS_BORD_TGT
+		   WHERE SYS_ID    = A.SYS_ID
+		     AND BORD_GRUP = A.BORD_GRUP
+		     AND BORD_NO   = A.BORD_NO
+		 )               AS "tgtUserId"
+    </sql>
+    <sql id="whereClause-target">
+    	    A.SYS_ID    = #{sysId}
+    	AND A.BORD_GRUP = #{bordGrup}
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag  )">AND A.USE_FLAG    = #{useFlag}     </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bordNo   )">AND A.BORD_NO     = #{bordNo}      </if>
+        <if test='"R".equals(pageType)'> AND A.TGT_USER_ID = #{gsUserId} </if><!-- 받은메일함인 경우 -->
+	    <if test='"S".equals(pageType)'> AND A.REGI_ID     = #{gsUserId} </if><!-- 보낸메일함인 경우 -->
+    </sql>
+    <sql id="whereClause">
+    		A.SYS_ID    = #{sysId}
+        AND A.SYS_ID    = B.SYS_ID
+    	AND A.BORD_GRUP = #{bordGrup}
+    	AND A.BORD_GRUP = B.BORD_GRUP
+    	AND A.BORD_NO   = B.BORD_NO
+    	AND A.REGI_ID   = #{gsUserId}
+    	AND A.USE_FLAG != 'N'
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchText) and @com.wsc.framework.utils.MybatisUtils@notEmpty(searchKey)">
+			<choose>
+	    		<when test="searchKey == 'S01'">
+	    			AND A.BORD_TITLE LIKE CONCAT('%', #{searchText}, '%')
+	    		</when>
+	    		<when test="searchKey == 'S02'">
+	    			AND A.BORD_TEXT LIKE CONCAT('%', #{searchText}, '%')
+	    		</when>
+	    		<when test="searchKey == 'S03'">
+	    			AND B.TGT_USER_ID LIKE CONCAT('%', #{searchText}, '%')
+	    		</when>
+	    		<otherwise>
+	    		</otherwise>
+			</choose>
+	    </if>
+    </sql>
+    <sql id="whereClause-Internal">
+    		A.SYS_ID      = #{sysId}
+    	AND A.SYS_ID      = B.SYS_ID
+    	AND A.BORD_GRUP   = #{bordGrup}
+    	AND A.BORD_GRUP   = B.BORD_GRUP
+    	AND A.BORD_NO     = B.BORD_NO
+    	AND B.TGT_USER_ID = #{gsUserId}
+    	AND B.USE_FLAG   != 'N'
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchText) and @com.wsc.framework.utils.MybatisUtils@notEmpty(searchKey)">
+			<choose>
+	    		<when test="searchKey == 'S01'">
+	    			AND A.BORD_TITLE LIKE CONCAT('%', #{searchText}, '%')
+	    		</when>
+	    		<when test="searchKey == 'S02'">
+	    			AND A.BORD_TEXT  LIKE CONCAT('%', #{searchText}, '%')
+	    		</when>
+	    		<when test="searchKey == 'S03'">
+	    			AND B.REGI_ID    LIKE CONCAT('%', #{searchText}, '%')
+	    		</when>
+	    		<otherwise>
+	    		</otherwise>
+			</choose>
+	    </if>
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns-Max" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_BORD A, SYS_BORD_TGT B
+         WHERE <include refid="whereClause" />
+         GROUP
+            BY A.SYS_ID
+              ,A.BORD_NO
+              ,A.BORD_GRUP
+              ,A.BORD_TITLE
+		      ,A.REGI_ID
+	          ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')
+         ORDER
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM SYS_BORD A, SYS_BORD_TGT B
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns-Send" />
+          FROM SYS_BORD_TGT A
+         WHERE A.SYS_ID    = #{sysId}
+           AND A.BORD_NO   = #{bordNo}
+           AND A.BORD_GRUP = #{bordGrup}
+         GROUP
+            BY A.SYS_ID
+              ,A.BORD_NO
+              ,A.BORD_GRUP
+		      ,A.REGI_ID
+	          ,DATE_FORMAT(A.REGI_DATE,'%Y-%m-%d %H:%i:%s')
+    </select>
+    <!-- <resultMap id="resultmap" type="record">
+    	<result propert="resy"/>
+    </resultMap> -->
+    <select id="mailNo" resultType="record" parameterType="params">
+    	SELECT <!-- 'B' || LPAD(TO_NUMBER(NVL(SUBSTR(MAX(BORD_NO),2,9),'0'))+1, 9, '0') AS "bordNo" -->
+    	       CONCAT('B', LPAD(CAST(ifnull(SUBSTR(MAX(BORD_NO),2,9),'0') AS UNSIGNED)+1, 9, '0') ) AS "bordNo"
+          FROM SYS_BORD
+         WHERE SYS_ID    = #{sysId}
+           AND BORD_GRUP = #{bordGrup}
+    </select>
+    <insert id="insert" parameterType="params">
+    	<selectKey resultType="string" keyProperty="bordNo" order="BEFORE">
+            SELECT CONCAT('B', LPAD(CAST(ifnull(SUBSTR(MAX(BORD_NO),2,9),'0') AS UNSIGNED)+1, 9, '0') )
+                AS "bordNo"
+              FROM SYS_BORD
+             WHERE SYS_ID    = #{sysId}
+               AND BORD_GRUP = #{bordGrup}
+        </selectKey>
+        INSERT
+          INTO SYS_BORD
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+
+    <update id="delete" parameterType="params">
+        UPDATE SYS_BORD
+           SET USE_FLAG  = 'N'
+         WHERE SYS_ID    = #{sysId}
+           AND BORD_NO   = #{bordNo}
+           AND BORD_GRUP = #{bordGrup}
+           AND #{mailType} != 'B'
+    </update>
+
+    <update id="deleteTargetAll" parameterType="params">
+        UPDATE SYS_BORD_TGT
+           SET USE_FLAG  = 'N'
+         WHERE SYS_ID    = #{sysId}
+           AND BORD_NO   = #{bordNo}
+           AND BORD_GRUP = #{bordGrup}
+           AND #{mailType} != 'A'
+    </update>
+
+    <update id="mailTgtDelete" parameterType="params">
+        DELETE SYS_BORD_TGT
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+    </update>
+
+    <insert id="insertTarget" parameterType="params">
+    	<selectKey resultType="string" keyProperty="inserTarget" order="BEFORE">
+            SELECT INSERT_TARGET(#{targets}, #{sysId}, #{bordNo}, #{bordGrup}, #{gsUserId})
+                AS "inserTarget"
+              FROM DUAL
+        </selectKey>
+        INSERT
+          INTO SYS_BORD_TGT
+             ( SYS_ID
+	         , BORD_NO
+	         , BORD_GRUP
+	         , TGT_USER_ID
+	         , USE_FLAG
+	         , REGI_ID
+	         , REGI_DATE
+             )
+        <!-- SELECT #{sysId}
+             , #{bordNo}
+             , #{bordGrup}
+             , A.TXT
+             , 'Y'
+             , #{gsUserId}
+             , NOW()
+          FROM (SELECT #{targets} AS TXT FROM DUAL) A
+       CONNECT BY LEVEL &lt;= LENGTH(regexp_replace(A.TXT, '[^,|^;]+', ''))+1 -->
+       VALUES ${inserTarget}
+    </insert>
+    <!-- <insert id="mailSend" statementType="CALLABLE" parameterType="params">
+    	{ call SP_SYS_BORD_INS02
+    		(
+    			#{sysId},
+    			#{bordGrup},
+    			#{mail_subject},
+    			#{bordText},
+    			#{bordType},
+    			#{gsUserId},
+    			#{mail_to},
+    			#{mail_cc}
+    		)
+    	}
+    </insert> -->
+    <!-- <insert id="insert" parameterType="params">
+        <selectKey resultType="string" keyProperty="bordNo" order="BEFORE">
+            SELECT 'B' || LPAD(TO_NUMBER(NVL(SUBSTR(MAX(BORD_NO),2,9),'0'))+1, 9, '0')
+                AS "bordNo"
+              FROM SYS_BORD
+             WHERE SYS_ID    = #{sysId}
+               AND BORD_GRUP = 'B09'
+        </selectKey>
+        INSERT
+          INTO SYS_BORD
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> );
+
+        INSERT
+          INTO SYS_BORD_TGT
+             ( <include refid="insertTgtColumns-fields" /> )
+        SELECT DISTINCT #{sysId} AS "SYS_ID"
+               , #{bordNo} AS "BORD_NO"
+               , 'B09' AS "BORD_GRUP"
+        	   , TRIM(regexp_substr(A.TXT, '[^,|^;]+', 1, LEVEL)) AS "TGT_USER_ID"
+        	   , #{gsUserId} AS "REGI_ID"
+        	   , SYSDATE AS "REGI_DATE"
+          FROM (SELECT #{mailTo} AS TXT FROM dual) A
+       CONNECT BY LEVEL &lt;= length(regexp_replace(A.TXT, '[^,|^;]+',''))+1;
+
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(mailCc )">
+        INSERT
+          INTO SYS_BORD_TGT
+             ( <include refid="insertTgtColumns-fields" /> )
+        SELECT DISTINCT #{sysId} AS "SYS_ID"
+               , #{bordNo} AS "BORD_NO"
+               , 'B09' AS "BORD_GRUP"
+        	   , TRIM(regexp_substr(A.TXT, '[^,|^;]+', 1, LEVEL)) AS "TGT_USER_ID"
+        	   , #{gsUserId} AS "REGI_ID"
+        	   , SYSDATE AS "REGI_DATE"
+          FROM (SELECT #{mailCc} AS TXT FROM dual) A
+       CONNECT BY LEVEL &lt;= length(regexp_replace(A.TXT, '[^,|^;]+',''))+1;
+       </if>
+    </insert> -->
+    <update id="updateReadMail" parameterType="params">
+        UPDATE SYS_BORD_TGT
+           SET READ_DATE   = NOW()
+             , CHNG_ID     = #{userId}
+             , CHNG_DATE   = NOW()
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+           AND TGT_USER_ID = #{userId}
+           AND READ_DATE IS NULL
+    </update>
+    <update id="updateFailMail" parameterType="params">
+        UPDATE SYS_BORD_TGT
+           SET USE_FLAG    = 'E'
+         WHERE SYS_ID      = #{sysId}
+           AND BORD_NO     = #{bordNo}
+           AND BORD_GRUP   = #{bordGrup}
+    </update>
+    <select id="selectTarget" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns-target" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+              ,A.BORD_TEXT  AS "bordText"
+          FROM SYS_BORD  A
+         WHERE A.SYS_ID      = #{sysId}
+           AND A.BORD_NO     = #{bordNo}
+           AND A.BORD_GRUP   = #{bordGrup}
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchUserAddress" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+    	SELECT A.TGT_USER_ID   AS "tgtUserId"
+    	      ,A.TGT_USER_NAME AS "tgtUserName"
+        <include refid="pagingColumns" /><!-- PAGING -->
+    	  FROM SYS_BORD_ADDR A
+    	 WHERE A.SYS_ID    = #{sysId}
+    	   AND A.BORD_GRUP = #{bordGrup}
+    	   AND A.USER_ID   = #{gsUserId}
+    	   <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchText) and @com.wsc.framework.utils.MybatisUtils@notEmpty(searchKey)">
+				<choose>
+		    		<when test="searchKey == 'S01'">
+		    			AND (SELECT TGT_USER_ID
+					           FROM SYS_BORD_ADDR
+					          WHERE SYS_ID      = A.SYS_ID
+					            AND USER_ID     = A.USER_ID
+					            AND TGT_USER_ID = A.TGT_USER_ID
+					            AND BORD_GRUP   = A.BORD_GRUP) LIKE CONCAT('%', #{searchText}, '%')
+		    		</when>
+		    		<when test="searchKey == 'S02'">
+		    			AND (SELECT TGT_USER_NAME
+					           FROM SYS_BORD_ADDR
+					          WHERE SYS_ID      = A.SYS_ID
+					            AND USER_ID     = A.USER_ID
+					            AND TGT_USER_ID = A.TGT_USER_ID
+					            AND BORD_GRUP   = A.BORD_GRUP) LIKE CONCAT('%', #{searchText}, '%')
+		    		</when>
+		    		<otherwise>
+		    		</otherwise>
+			    </choose>
+		   </if>
+    	 ORDER
+    	    BY A.TGT_USER_ID ASC, A.TGT_USER_NAME ASC
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchUserAddressCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM SYS_BORD_ADDR A
+         WHERE A.SYS_ID    = #{sysId}
+    	   AND A.BORD_GRUP = #{bordGrup}
+    	   AND A.USER_ID   = #{gsUserId}
+    </select>
+    <select id="selectUserAddress" resultType="record" parameterType="params">
+        SELECT A.TGT_USER_ID   AS "tgtUserId"
+    	      ,A.TGT_USER_NAME AS "tgtUserName"
+          FROM SYS_BORD_ADDR A
+    	 WHERE A.SYS_ID      = #{sysId}
+    	   AND A.BORD_GRUP   = 'B09'
+    	   AND A.USER_ID     = #{gsUserId}
+    	   AND A.TGT_USER_ID = #{tgtUserId}
+    </select>
+    <insert id="insertUserAddress" parameterType="params">
+        INSERT
+          INTO SYS_BORD_ADDR
+             ( SYS_ID
+             , BORD_GRUP
+             , USER_ID
+             , TGT_USER_ID
+             , TGT_USER_NAME
+             , REGI_ID
+             , REGI_DATE
+             )
+        VALUES
+             ( #{sysId}
+             , 'B09'
+             , #{gsUserId}
+             , #{tgtUserId}
+             , #{tgtUserName}
+             , #{gsUserId}
+             , NOW()
+             )
+    </insert>
+    <update id="updateUserAddress" parameterType="params">
+        UPDATE SYS_BORD_ADDR
+           SET CHNG_ID       = #{gsUserId}
+             , CHNG_DATE     = NOW()
+             , TGT_USER_NAME = #{tgtUserName}
+         WHERE SYS_ID        = #{sysId}
+           AND USER_ID       = #{gsUserId}
+           AND BORD_GRUP     = 'B09'
+    	   AND TGT_USER_ID   = #{tgtUserId}
+    </update>
+    <delete id="deleteUserAddress" parameterType="params">
+        DELETE
+          FROM SYS_BORD_ADDR
+         WHERE SYS_ID      = #{sysId}
+           AND USER_ID     = #{gsUserId}
+           AND BORD_GRUP   = 'B09'
+    	   AND TGT_USER_ID = #{tgtUserId}
+    </delete>
+    <select id="searchUserInternalList" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+    	SELECT A.USER_ID   AS "userId"
+    	      ,A.USER_NAME AS "userName"
+        <include refid="pagingColumns" /><!-- PAGING -->
+    	  FROM SYS_USER A
+    	 WHERE A.SYS_ID    = #{sysId}
+    	   <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchText) and @com.wsc.framework.utils.MybatisUtils@notEmpty(searchKey)">
+				<choose>
+		    		<when test="searchKey == 'S01'">
+		    			AND (SELECT USER_ID
+					           FROM SYS_USER
+					          WHERE SYS_ID      = A.SYS_ID
+					            AND USER_ID     = A.USER_ID) LIKE CONCAT('%', #{searchText}, '%')
+		    		</when>
+		    		<when test="searchKey == 'S02'">
+		    			AND (SELECT USER_NAME
+					           FROM SYS_USER
+					          WHERE SYS_ID      = A.SYS_ID
+					            AND USER_ID     = A.USER_ID) LIKE CONCAT('%', #{searchText}, '%')
+		    		</when>
+		    		<otherwise>
+		    		</otherwise>
+			    </choose>
+		   </if>
+    	 ORDER
+    	    BY A.USER_ID ASC, A.USER_NAME ASC
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchInternalList" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_BORD A, SYS_BORD_TGT B
+         WHERE <include refid="whereClause-Internal" />
+         ORDER
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchInternalListCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM SYS_BORD A, SYS_BORD_TGT B
+         WHERE <include refid="whereClause-Internal" />
+    </select>
+    <select id="searchMailViewsList" resultType="record" parameterType="params">
+    	SELECT A.TGT_USER_ID AS "tgtUserId"
+    	      ,DATE_FORMAT(A.READ_DATE,'%Y-%m-%d %H:%i:%s')
+    	                     AS "readDate"
+          FROM SYS_BORD_TGT A
+         WHERE A.SYS_ID    = #{sysId}
+           AND A.BORD_GRUP = #{bordGrup}
+           AND A.BORD_NO   = #{bordNo}
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchText)">
+		    			AND (SELECT TGT_USER_ID
+					           FROM SYS_BORD_TGT
+					          WHERE SYS_ID      = A.SYS_ID
+					            AND BORD_NO     = A.BORD_NO
+					            AND TGT_USER_ID = A.TGT_USER_ID
+					            AND BORD_GRUP   = A.BORD_GRUP) LIKE CONCAT('%', #{searchText}, '%')
+		   </if>
+    	 ORDER
+    	    BY A.READ_DATE ASC, A.TGT_USER_ID ASC
+	</select>
+    <select id="searchMailViewsListCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM SYS_BORD_TGT A
+         WHERE A.SYS_ID    = #{sysId}
+           AND A.BORD_GRUP = #{bordGrup}
+           AND A.BORD_NO   = #{bordNo}
+    </select>
+    
+    <!-- 2021-04-16 메일 플래그 -->
+    <select id="returnMailYnCheck" resultType="string" parameterType="params">
+        SELECT REVIEW_MAIL_FLAG AS flag
+		FROM   SYS_USER
+		WHERE  1=1
+		AND    SYS_ID  = #{sysId}
+		AND    USER_ID = #{gsUserId}
+    </select>
+    <select id="confirmMailYnCheck" resultType="string" parameterType="params">
+        SELECT CONF_MAIL_FLAG AS flag
+		FROM   SYS_USER
+		WHERE  1=1
+		AND    SYS_ID  = #{sysId}
+		AND    USER_ID = #{gsUserId}
+    </select>
+    <select id="bolMailYnCheck" resultType="string" parameterType="params">
+        SELECT BOL_MAIL_FLAG AS flag
+		FROM   SYS_USER
+		WHERE  1=1
+		AND    SYS_ID  = #{sysId}
+		AND    USER_ID = #{gsUserId}
+    </select>
+    <select id="reviewMailYnCheck" resultType="string" parameterType="params">
+        SELECT REVIEW_MAIL_FLAG AS flag
+		FROM   SYS_USER
+		WHERE  1=1
+		AND    SYS_ID  = #{sysId}
+		AND    USER_ID = #{gsUserId}
+    </select>
+    <select id="monthlyMailYnCheck" resultType="string" parameterType="params">
+        SELECT MON_MAIL_FLAG AS flag
+		FROM   SYS_USER
+		WHERE  1=1
+		AND    SYS_ID  = #{sysId}
+		AND    USER_ID = #{gsUserId}
+    </select>
+    <select id="ordrClMailYnCheck" resultType="string" parameterType="params">
+        SELECT ORDRCL_MAIL_FLAG AS flag
+		FROM   SYS_USER
+		WHERE  1=1
+		AND    SYS_ID  = #{sysId}
+		AND    USER_ID = #{gsUserId}
+    </select>
+    
+    <select id="selectSmtpMailCheck" resultType="hashmap" parameterType="params">
+    	CALL select_smtp_mail_check(#{sysId}, #{gsUserId})
+    </select>
+    
+</mapper>

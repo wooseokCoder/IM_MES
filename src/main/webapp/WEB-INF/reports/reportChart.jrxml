@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="satus12" language="groovy" pageWidth="84200" pageHeight="595" orientation="Landscape" columnWidth="84200" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="5bcff977-cc4f-431a-9620-b965e4b3f461">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="29414723-aacb-4e24-ae7d-739cae7ee8c3"/>
+	<subDataset name="Table Dataset 2" uuid="1907fe68-b6f9-406c-95e7-f9f51fb5d484"/>
+	<parameter name="P_SYS_ID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_USER_ID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_USER_NAME" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_USER_TYPE" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_USE_FLAG" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT A.GROUP_ID AS "groupId",
+        COUNT(*)   AS "userCnt"
+  FROM (
+       SELECT (SELECT C.GROUP_ID
+                  FROM SYS_UGRP C
+                 WHERE C.SYS_ID = B.SYS_ID
+                   AND C.USER_ID = B.USER_ID
+               ) AS "GROUP_ID"
+         FROM SYS_USER B
+        WHERE B.SYS_ID = $P{P_SYS_ID}
+          AND B.USER_ID LIKE '%'||$P{P_USER_ID}||'%'
+          AND B.USER_NAME LIKE '%'||$P{P_USER_NAME}||'%'
+          AND B.USER_TYPE LIKE '%'||$P{P_USER_TYPE}||'%'
+          AND B.USE_FLAG = CASE WHEN $P{P_USE_FLAG} = 'ALL' THEN B.USE_FLAG ELSE $P{P_USE_FLAG} END
+      ) A
+ WHERE A.GROUP_ID IS NOT NULL
+ GROUP BY A.GROUP_ID]]>
+	</queryString>
+	<field name="groupId" class="java.lang.String"/>
+	<field name="userCnt" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="28" splitType="Stretch"/>
+	</title>
+	<summary>
+		<band height="300" splitType="Stretch">
+			<barChart>
+				<chart>
+					<reportElement x="0" y="0" width="471" height="300" uuid="5813baef-625d-4327-acc8-33365818018f"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{groupId}]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{groupId}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{userCnt}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</summary>
+</jasperReport>

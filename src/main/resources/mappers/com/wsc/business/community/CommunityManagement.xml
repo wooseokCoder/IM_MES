@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.business.community.CommunityManagement">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    
+    <sql id="selectColumns">
+         A.SYS_ID         	AS "sysId"
+        ,A.COMU_ID	      	AS "comuId"
+        ,A.COMU_SEQ			AS "comuSeq"
+        ,A.COMU_NAME		AS "comuName"
+        ,A.COMU_GB			AS "comuGb"
+      	,A.COMU_SLOG		AS "comuSlog" 
+        ,A.COMU_JOIN_COND   AS "comuJoinCond"
+        ,A.COMU_TERM		AS "comuTerm"
+        ,A.COMU_FOND_DAY    AS "comuFondDay"
+        ,A.USE_YN		    AS "useYn"  
+        ,A.REGI_ID        	AS "regiId"
+        ,A.REGI_DATE      	AS "regiDate"
+        ,A.CHNG_ID        	AS "chngId"
+        ,A.CHNG_DATE      	AS "chngDate"
+        ,A.COMU_ID	 		AS "hdfComuId"
+    </sql>
+    <sql id="insertColumns-fields">
+          SYS_ID
+        , COMU_ID
+        , COMU_SEQ
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuName    )">, COMU_NAME</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuGb      )">, COMU_GB</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuSlog    )">, COMU_SLOG</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuJoinCond)">, COMU_JOIN_COND</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuTerm    )">, COMU_TERM</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuFondDay )">, COMU_FOND_DAY</if>
+		, USE_YN
+        , REGI_ID
+        , REGI_DATE
+    </sql>
+    <sql id="insertColumns-values">
+          #{sysId}
+        , #{comuId}
+        , (SELECT A.COMU_SEQ FROM (SELECT IFNULL(MAX(X.COMU_SEQ)+1,1) AS COMU_SEQ FROM COMU_INFO X WHERE X.SYS_ID = 'WSC') AS A)
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuName    )">, #{comuName}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuGb	     )">, #{comuGb}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuSlog    )">, #{comuSlog}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuJoinCond)">, #{comuJoinCond}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuTerm    )">, #{comuTerm}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuFondDay )">, #{comuFondDay}</if>
+        , 'Y'
+        , #{gsUserId}
+        , NOW()
+    </sql>
+    <sql id="updateColumns">
+          CHNG_ID   = #{gsUserId}
+        , CHNG_DATE = NOW()
+		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuName    )">, COMU_NAME = #{comuName}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuGb		 )">, COMU_GB = #{comuGb}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuSlog    )">, COMU_SLOG = #{comuSlog}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuJoinCond)">, COMU_JOIN_COND = #{comuJoinCond}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuTerm    )">, COMU_TERM = #{comuTerm}</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(comuFondDay )">, COMU_FOND_DAY = #{comuFondDay}</if>
+    </sql>
+    <sql id="whereClause">
+    		A.SYS_ID = #{sysId}
+    	AND A.USE_YN = 'Y'
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchComuName)">AND (A.COMU_NAME LIKE CONCAT('%',#{searchComuName},'%'))	</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchComuId)">AND A.COMU_ID = #{searchComuId}	</if>   	
+    </sql>
+	 <sql id="sortClause">
+		  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+			  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+			        ${sort}
+			  	</foreach>
+		  	</if>
+		  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+		  		A.COMU_ID ASC, A.COMU_NAME ASC
+		  	</if>
+	    </sql>
+    
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM COMU_INFO A
+         WHERE <include refid="whereClause" />
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM COMU_INFO A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM COMU_INFO A
+         WHERE <include refid="whereClause" />
+    </select>
+    <select id="getCustCode" resultType="record" parameterType="params">
+    	SELECT CONCAT('C', LPAD(CAST(ifnull(SUBSTR(MAX(CUST_CODE),2,5),'0') AS UNSIGNED)+1, 5, '0') ) AS "custCode"
+          FROM CUST_MAST
+         WHERE SYS_ID    = #{sysId}
+    </select>
+    
+    <insert id="comuInsert" parameterType="params">
+        INSERT 
+          INTO COMU_INFO
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="comuUpdate" parameterType="params">
+        UPDATE COMU_INFO
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID  = #{sysId}
+           AND COMU_ID = #{comuId}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM COMU_INFO
+         WHERE SYS_ID  = #{sysId}
+           AND COMU_ID = #{comuId}
+    </delete>
+    
+    <select id="getComuId" resultType="String" parameterType="params">
+		SELECT CONCAT('CM', LPAD(CAST(ifnull(SUBSTR(MAX(COMU_ID),3,6),'0') AS UNSIGNED)+1, 5, '0') )
+		  FROM COMU_INFO
+		 WHERE SYS_ID = #{sysId}
+	</select>
+	<select id="getBordNo" resultType="String" parameterType="params">
+		SELECT CONCAT('B', LPAD(CAST(ifnull(SUBSTR(MAX(BORD_NO),2,9),'0') AS UNSIGNED)+1, 9, '0') )
+		  FROM COMU_MENU
+		 WHERE SYS_ID = #{sysId}
+           AND COMU_ID = #{comuId}
+	</select>
+	<select id="getComuMenu" resultType="record" parameterType="params">
+		SELECT COMU_ID		AS "comuId"
+			  ,MENU_ID		AS "menuId"
+			  ,MENU_NAME	AS "menuName"
+			  ,MENU_TYPE	AS "menuType"
+			  ,BORD_TYPE	AS "bordType"
+			  ,BORD_NO		AS "bordNo"
+			  ,USE_YN		AS "useYn"
+		  FROM COMU_MENU
+		 WHERE SYS_ID  = #{sysId}
+		   AND COMU_ID = #{comuId}
+	</select>
+    
+    <insert id="comuMenu1Insert" parameterType="params">
+    	<selectKey resultType="string" keyProperty="comuMemuId1" order="BEFORE">
+            SELECT CONCAT('MU', LPAD(CAST(ifnull(SUBSTR(MAX(MENU_ID),3,6),'0') AS UNSIGNED)+1, 5, '0') ) AS "comuMemuId1"
+              FROM COMU_MENU
+             WHERE SYS_ID = #{sysId}
+               AND COMU_ID = #{comuId}
+        </selectKey>
+    	INSERT INTO COMU_MENU
+    		   (SYS_ID, COMU_ID, MENU_ID, MENU_NAME, MENU_TYPE, BORD_TYPE, BORD_NO, USE_YN, REGI_DATE, REGI_ID)
+        VALUES (#{sysId}, #{comuId}, #{comuMemuId1}, #{comuMenu1}, '일반', '일반', #{bordNo}, #{comuMenu1Yn}, NOW(), #{gsUserId})
+    </insert>
+    <insert id="comuMenu2Insert" parameterType="params">
+    	<selectKey resultType="string" keyProperty="comuMemuId2" order="BEFORE">
+            SELECT CONCAT('MU', LPAD(CAST(ifnull(SUBSTR(MAX(MENU_ID),3,6),'0') AS UNSIGNED)+1, 5, '0') ) AS "comuMemuId2"
+              FROM COMU_MENU
+             WHERE SYS_ID = #{sysId}
+               AND COMU_ID = #{comuId}
+        </selectKey>
+    	INSERT INTO COMU_MENU
+    		   (SYS_ID, COMU_ID, MENU_ID, MENU_NAME, MENU_TYPE, BORD_TYPE, BORD_NO, USE_YN, REGI_DATE, REGI_ID)
+        VALUES (#{sysId}, #{comuId}, #{comuMemuId2}, #{comuMenu2}, '게시판', '공지', #{bordNo}, #{comuMenu2Yn}, NOW(), #{gsUserId})
+    </insert>
+    <insert id="comuMenu3Insert" parameterType="params">
+    	<selectKey resultType="string" keyProperty="comuMemuId3" order="BEFORE">
+            SELECT CONCAT('MU', LPAD(CAST(ifnull(SUBSTR(MAX(MENU_ID),3,6),'0') AS UNSIGNED)+1, 5, '0') ) AS "comuMemuId3"
+              FROM COMU_MENU
+             WHERE SYS_ID = #{sysId}
+               AND COMU_ID = #{comuId}
+        </selectKey>
+    	INSERT INTO COMU_MENU
+    		   (SYS_ID, COMU_ID, MENU_ID, MENU_NAME, MENU_TYPE, BORD_TYPE, BORD_NO, USE_YN, REGI_DATE, REGI_ID)
+        VALUES (#{sysId}, #{comuId}, #{comuMemuId3}, #{comuMenu3}, '게시판', '게시판', #{bordNo}, #{comuMenu3Yn}, NOW(), #{gsUserId})
+    </insert>
+    <insert id="comuMenu4Insert" parameterType="params">
+    	<selectKey resultType="string" keyProperty="comuMemuId4" order="BEFORE">
+            SELECT CONCAT('MU', LPAD(CAST(ifnull(SUBSTR(MAX(MENU_ID),3,6),'0') AS UNSIGNED)+1, 5, '0') ) AS "comuMemuId4"
+              FROM COMU_MENU
+             WHERE SYS_ID = #{sysId}
+               AND COMU_ID = #{comuId}
+        </selectKey>
+    	INSERT INTO COMU_MENU
+    		   (SYS_ID, COMU_ID, MENU_ID, MENU_NAME, MENU_TYPE, BORD_TYPE, BORD_NO, USE_YN, REGI_DATE, REGI_ID)
+        VALUES (#{sysId}, #{comuId}, #{comuMemuId4}, #{comuMenu4}, '게시판', '앨범', #{bordNo}, #{comuMenu4Yn}, NOW(), #{gsUserId})
+    </insert>
+    <insert id="comuMenu5Insert" parameterType="params">
+    	<selectKey resultType="string" keyProperty="comuMemuId5" order="BEFORE">
+            SELECT CONCAT('MU', LPAD(CAST(ifnull(SUBSTR(MAX(MENU_ID),3,6),'0') AS UNSIGNED)+1, 5, '0') ) AS "comuMemuId5"
+              FROM COMU_MENU
+             WHERE SYS_ID = #{sysId}
+               AND COMU_ID = #{comuId}
+        </selectKey>
+    	INSERT INTO COMU_MENU
+    		   (SYS_ID, COMU_ID, MENU_ID, MENU_NAME, MENU_TYPE, BORD_TYPE, BORD_NO, USE_YN, REGI_DATE, REGI_ID)
+        VALUES (#{sysId}, #{comuId}, #{comuMemuId5}, #{comuMenu5}, '게시판', '동영상', #{bordNo}, #{comuMenu5Yn}, NOW(), #{gsUserId})
+    </insert>
+    <insert id="comuMenu6Insert" parameterType="params">
+    	<selectKey resultType="string" keyProperty="comuMemuId6" order="BEFORE">
+            SELECT CONCAT('MU', LPAD(CAST(ifnull(SUBSTR(MAX(MENU_ID),3,6),'0') AS UNSIGNED)+1, 5, '0') ) AS "comuMemuId6"
+              FROM COMU_MENU
+             WHERE SYS_ID = #{sysId}
+               AND COMU_ID = #{comuId}
+        </selectKey>
+    	INSERT INTO COMU_MENU
+    		   (SYS_ID, COMU_ID, MENU_ID, MENU_NAME, MENU_TYPE, BORD_TYPE, BORD_NO, USE_YN, REGI_DATE, REGI_ID)
+        VALUES (#{sysId}, #{comuId}, #{comuMemuId6}, #{comuMenu6}, '게시판', '장터', #{bordNo}, #{comuMenu6Yn}, NOW(), #{gsUserId})
+    </insert>
+    
+    <update id="comuMenu1Update" parameterType="params">
+        UPDATE COMU_MENU
+           SET CHNG_ID   = #{gsUserId}
+        	 , CHNG_DATE = NOW()
+			 , MENU_NAME = #{comuMenu1}
+			 , USE_YN	 = #{comuMenu1Yn}
+         WHERE SYS_ID  = #{sysId}
+           AND COMU_ID = #{comuId}
+           AND MENU_ID = #{comuMenuId1}
+    </update>
+    <update id="comuMenu2Update" parameterType="params">
+        UPDATE COMU_MENU
+           SET CHNG_ID   = #{gsUserId}
+        	 , CHNG_DATE = NOW()
+			 , MENU_NAME = #{comuMenu2}
+			 , USE_YN	 = #{comuMenu2Yn}
+         WHERE SYS_ID  = #{sysId}
+           AND COMU_ID = #{comuId}
+           AND MENU_ID = #{comuMenuId2}
+    </update>
+    <update id="comuMenu3Update" parameterType="params">
+        UPDATE COMU_MENU
+           SET CHNG_ID   = #{gsUserId}
+        	 , CHNG_DATE = NOW()
+			 , MENU_NAME = #{comuMenu3}
+			 , USE_YN	 = #{comuMenu3Yn}
+         WHERE SYS_ID  = #{sysId}
+           AND COMU_ID = #{comuId}
+           AND MENU_ID = #{comuMenuId3}
+    </update>
+    <update id="comuMenu4Update" parameterType="params">
+        UPDATE COMU_MENU
+           SET CHNG_ID   = #{gsUserId}
+        	 , CHNG_DATE = NOW()
+			 , MENU_NAME = #{comuMenu4}
+			 , USE_YN	 = #{comuMenu4Yn}
+         WHERE SYS_ID  = #{sysId}
+           AND COMU_ID = #{comuId}
+           AND MENU_ID = #{comuMenuId4}
+    </update>
+    <update id="comuMenu5Update" parameterType="params">
+        UPDATE COMU_MENU
+           SET CHNG_ID   = #{gsUserId}
+        	 , CHNG_DATE = NOW()
+			 , MENU_NAME = #{comuMenu5}
+			 , USE_YN	 = #{comuMenu5Yn}
+         WHERE SYS_ID  = #{sysId}
+           AND COMU_ID = #{comuId}
+           AND MENU_ID = #{comuMenuId5}
+    </update>
+    <update id="comuMenu6Update" parameterType="params">
+        UPDATE COMU_MENU
+           SET CHNG_ID   = #{gsUserId}
+        	 , CHNG_DATE = NOW()
+			 , MENU_NAME = #{comuMenu6}
+			 , USE_YN	 = #{comuMenu6Yn}
+         WHERE SYS_ID  = #{sysId}
+           AND COMU_ID = #{comuId}
+           AND MENU_ID = #{comuMenuId6}
+    </update>
+    
+    <delete id="comuDelete" parameterType="params">
+        DELETE 
+          FROM COMU_INFO
+         WHERE SYS_ID  = #{sysId}
+           AND COMU_ID = #{comuId}
+    </delete>
+    <delete id="comuMenuDelete" parameterType="params">
+        DELETE 
+          FROM COMU_MENU
+         WHERE SYS_ID  = #{sysId}
+           AND COMU_ID = #{comuId}
+    </delete>
+
+</mapper>

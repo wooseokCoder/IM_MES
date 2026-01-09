@@ -1,0 +1,85 @@
+<!doctype html>
+<meta charset="utf-8">
+<html>
+
+<head>
+	<title>Bar Chart</title>
+	<script src="Chart.bundle.js"></script>
+	<script src="utils.js"></script>
+	<style>
+	canvas {
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+	}
+	</style>
+</head>
+
+<body>
+	<div id="container" style="width: 100%;padding-top:30px">
+		<canvas id="canvas"></canvas>
+	</div>
+	<script>
+
+		var randomScalingFactor = function() {
+			return Math.round(Math.random() * 100) + 1;
+		};
+
+		var color = Chart.helpers.color;
+		var barChartData = {
+			labels: [''],
+			datasets: [{
+				label: '전년당월',
+				backgroundColor: color(window.chartColors.red).rgbString(),
+				borderColor: window.chartColors.red,
+				borderWidth: 1,
+				data: [
+					randomScalingFactor()
+				]
+			}, {
+				label: '전전월',
+				backgroundColor: color(window.chartColors.orange).rgbString(),
+				borderColor: window.chartColors.orange,
+				borderWidth: 1,
+				data: [
+					randomScalingFactor()
+				]
+			}, {
+				label: '전월',
+				backgroundColor: color(window.chartColors.yellow).rgbString(),
+				borderColor: window.chartColors.yellow,
+				borderWidth: 1,
+				data: [
+					randomScalingFactor()
+				]
+			}, {
+				label: '당월',
+				backgroundColor: color(window.chartColors.blue).rgbString(),
+				borderColor: window.chartColors.blue,
+				borderWidth: 1,
+				data: [
+					randomScalingFactor()
+				]
+			}]
+
+		};
+
+		window.onload = function() {
+			var ctx = document.getElementById('canvas').getContext('2d');
+			window.myBar = new Chart(ctx, {
+				type: 'bar',
+				data: barChartData,
+				options: {
+					responsive: true,
+					legend: {position: 'bottom'},
+					title: {
+						display: false
+					}
+				}
+			});
+		};
+
+	</script>
+</body>
+
+</html>

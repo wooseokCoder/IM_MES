@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.wsc.common.excel.ExcelDownloadMgt">
+	<!-- save : select 후 update -->
+	<select id="select" parameterType="params" resultType="record">
+    	CALL sp_select_excel_download_mgt(#{sysId}, #{userId}, #{windId}, #{rqstDateFr}, #{rqstDateTo}, #{start}, #{end})
+    </select>
+    <update id="update" parameterType="params">
+
+    </update>
+	<!-- 검색 -->
+    <select id="search" resultType="record" parameterType="params">
+    	CALL sp_select_excel_download_mgt(#{sysId}, #{userId}, #{windId}, #{rqstDateFr}, #{rqstDateTo}, #{start}, #{end})
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+		CALL sp_select_excel_download_mgt_count(#{sysId}, #{userId}, #{windId}, #{rqstDateFr}, #{rqstDateTo})
+    </select>
+    
+<!--     <select id="formfile" resultType="record" parameterType="params">
+		CALL sp_get_nda_form_file(#{sysId},#{codeGrup},#{codeCd})
+    </select>
+    
+    <select id="getNdaAtchNo3" resultType="String" parameterType="params">
+        CALL sp_get_nda_atch_no3(#{sysId},#{codeCd},#{codeGrup})
+    </select>
+    
+    <insert id="insert" parameterType="file">
+    CALL sp_select_conf_for_appl_stat_file_insert(#{sysId}, #{atchGrup}, #{atchNo}, #{fileName}, #{saveName}, #{filePath}, #{fileType}, #{fileSize}, #{gsUserId})
+    </insert>
+    
+    <delete id="delete" parameterType="file">
+    CALL sp_select_conf_for_appl_stat_file_delete(#{sysId}, #{atchGrup}, #{atchNo})
+    </delete> -->
+</mapper>

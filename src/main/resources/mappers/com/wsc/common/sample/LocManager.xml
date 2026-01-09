@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.sample.LocManager">
+
+    <!-- 검색 -->
+    <select id="search" resultType="record" parameterType="params">
+        CALL sp_search_loc_mast(#{sysId}, #{wareHous}, #{useFlag}, #{locNo}, #{start}, #{end}, NULL)
+    </select>
+    
+    <!-- 카운트 -->
+    <select id="searchCount" resultType="int" parameterType="params">
+        CALL sp_search_count_loc_mast(#{sysId}, #{wareHous}, #{useFlag}, #{locNo})
+    </select>
+    
+    <!-- 단건 조회 -->
+    <select id="select" resultType="record" parameterType="params">
+        CALL sp_select_loc_mast(#{sysId}, #{locNo})
+    </select>
+    
+    <!-- 등록 -->
+    <insert id="insert" parameterType="params">
+        CALL sp_insert_loc_mast(#{sysId}, #{locNo}, #{wareHous}, #{latitude}, #{longitude}, #{signImg}, #{useFlag}, #{gsUserId})
+    </insert>
+    
+    <!-- 수정 -->
+    <update id="update" parameterType="params">
+        CALL sp_update_loc_mast(#{sysId}, #{locNo}, #{wareHous}, #{latitude}, #{longitude}, #{signImg}, #{useFlag}, #{gsUserId})
+    </update>
+    
+    <!-- 삭제 -->
+    <delete id="delete" parameterType="params">
+        CALL sp_delete_loc_mast(#{sysId}, #{locNo})
+    </delete>
+    
+    <!-- 저장된 사인 조회 -->
+    <select id="checkSign" resultType="record" parameterType="params" statementType="CALLABLE">
+        CALL sp_check_sign_loc_mast(#{sysId}, #{wareHous})
+    </select>
+
+</mapper>
+

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.user2.Group2">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    <sql id="sortClause">
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
+		        ${sort}
+		  	</foreach>
+	  	</if>
+	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+         	   A.REGI_DATE DESC
+         	  ,A.CHNG_DATE DESC
+	  	</if>
+    </sql>
+
+    <!-- ========================================================== -->
+    <!--   Common Group Column Information                          -->
+    <!-- ========================================================== -->
+    <sql id="selectColumns">
+         A.SYS_ID         AS "sysId"
+        ,A.GROUP_ID       AS "groupId"
+        ,A.REGI_ID        AS "regiId"
+        ,DATE_FORMAT(A.REGI_DATE ,'%Y-%m-%d %H:%i:%s')
+                          AS "regiDate"
+        ,A.CHNG_ID        AS "chngId"
+        ,DATE_FORMAT(A.CHNG_DATE ,'%Y-%m-%d %H:%i:%s') 
+                          AS "chngDate"
+    </sql>
+
+    <!-- ========================================================== -->
+    <!--   Group Management                                         -->
+    <!-- ========================================================== -->
+    <select id="search" resultType="group" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+              ,GROUP_NAME AS "groupName"
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_GRUP   A
+         WHERE SYS_ID     = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(groupId  )">AND GROUP_ID   LIKE CONCAT('%',#{groupId},'%')    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(groupName)">AND GROUP_NAME LIKE CONCAT('%',#{groupName},'%')  </if>
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_GRUP   A
+         WHERE SYS_ID     = #{sysId}
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(groupId  )">AND GROUP_ID   LIKE CONCAT('%',#{groupId},'%')    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(groupName)">AND GROUP_NAME LIKE CONCAT('%',#{groupName},'%')  </if>
+    </select>
+    <select id="select" resultType="group" parameterType="params">
+        SELECT <include refid="selectColumns" />
+              ,GROUP_NAME AS "groupName"
+          FROM SYS_GRUP   A
+         WHERE SYS_ID     = #{sysId}
+           AND GROUP_ID   = #{groupId}
+    </select>
+    <insert id="insert" parameterType="params">
+        INSERT 
+          INTO SYS_GRUP 
+             ( SYS_ID
+             , GROUP_ID
+             , GROUP_NAME  
+             , REGI_ID
+             , REGI_DATE
+             , CHNG_ID
+             , CHNG_DATE
+             )
+        VALUES
+             ( #{sysId}
+             , #{groupId}
+             , #{groupName} 
+             , #{gsUserId}
+             , NOW()
+             , #{gsUserId}
+             , NOW()
+             )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE SYS_GRUP
+           SET CHNG_ID    = #{gsUserId}
+             , CHNG_DATE  = NOW()
+             , GROUP_NAME = #{groupName}
+         WHERE SYS_ID     = #{sysId}
+           AND GROUP_ID   = #{groupId}
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM SYS_GRUP
+         WHERE SYS_ID     = #{sysId}
+           AND GROUP_ID   = #{groupId}
+    </delete> 
+
+    <!-- ========================================================== -->
+    <!--   User Group Management                                    -->
+    <!-- ========================================================== -->
+    <sql id="selectColumns-usergroup">
+    	<include refid="selectColumns" />
+        ,A.USER_ID AS "userId"
+        ,(SELECT GROUP_NAME
+            FROM SYS_GRUP
+           WHERE SYS_ID   = A.SYS_ID
+             AND GROUP_ID = A.GROUP_ID
+         )         AS "groupName"
+        ,(SELECT USER_NAME
+            FROM SYS_USER
+           WHERE SYS_ID   = A.SYS_ID
+             AND USER_ID  = A.USER_ID
+         )         AS "userName"
+    </sql>
+    
+    <select id="searchUserGroup" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns-usergroup" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM SYS_UGRP A
+         WHERE SYS_ID   = #{sysId}
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userId )">AND USER_ID  = #{userId}  </if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(groupId)">AND GROUP_ID = #{groupId} </if>
+         ORDER 
+            BY <include refid="sortClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchUserGroupCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM SYS_UGRP A
+         WHERE SYS_ID   = #{sysId}
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userId )">AND USER_ID  = #{userId}  </if>
+           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(groupId)">AND GROUP_ID = #{groupId} </if>
+    </select>
+    <select id="selectUserGroup" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns-usergroup" />
+          FROM SYS_UGRP A
+         WHERE SYS_ID   = #{sysId}
+           AND USER_ID  = #{userId}
+           AND GROUP_ID = #{groupId}
+    </select>
+    <insert id="insertUserGroup" parameterType="params">
+        INSERT 
+          INTO SYS_UGRP 
+             ( SYS_ID
+             , GROUP_ID
+             , USER_ID  
+             , REGI_ID
+             , REGI_DATE
+             , CHNG_ID
+             , CHNG_DATE
+             )
+        VALUES
+             ( #{sysId}
+             , #{groupId}
+             , #{userId} 
+             , #{gsUserId}
+             , NOW()
+             , #{gsUserId}
+             , NOW()
+             )
+    </insert>
+    <update id="updateUserGroup" parameterType="params">
+        UPDATE SYS_UGRP
+           SET CHNG_ID   = #{gsUserId}
+             , CHNG_DATE = NOW()
+         WHERE SYS_ID    = #{sysId}
+           AND USER_ID   = #{userId}
+           AND GROUP_ID  = #{groupId}
+    </update>
+    <delete id="deleteUserGroup" parameterType="params">
+        DELETE 
+          FROM SYS_UGRP
+         WHERE SYS_ID    = #{sysId}
+           AND USER_ID   = #{userId}
+           AND GROUP_ID  = #{groupId}
+    </delete>
+    
+</mapper>

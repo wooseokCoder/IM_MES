@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="statusofproductionmaterialsforproduction_subreport1" language="groovy" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="beeda2a0-7fc1-483f-8b6b-2fc774251dfc">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="itemType1" class="java.lang.String"/>
+	<parameter name="date1" class="java.lang.String"/>
+	<parameter name="date2" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+		 B.STAF_DEPT AS "stafDept"
+		,C.ITEM_TYPE1 AS "itemType1"
+		,C.ITEM_TYPE2 AS "itemType2"
+		,A.ITEM_NAME AS "itemName"
+		,A.ITEM_SPEC AS "itemSpec"
+		,A.ITEM_UNIT AS "itemUnit"
+		,A.ITEM_QTY AS "itemQty"
+		,A.ITEM_PRCE AS "itemPrce"
+		,A.TOT_AMT AS "totAmt"
+		,(SELECT B.CODE_NAME
+		  FROM SYS_CODE B
+		 WHERE SYS_ID = 'WSC'
+		   AND B.CODE_GRUP = 'DEPT_CODE'
+		   AND B.CODE_CD = B.STAF_DEPT) AS "stafDeptName"
+		FROM SHET_DETL A,SHET_MAST B,ITEM_MAST C
+		WHERE A.SYS_ID = 'WSC'
+		AND A.SHET_NO=B.SHET_NO
+		AND A.ITEM_CODE=C.ITEM_CODE
+		AND B.SHET_TYPE='D'
+		AND C.ITEM_TYPE1=$P{itemType1}
+ORDER BY C.ITEM_TYPE1,C.ITEM_TYPE2]]>
+	</queryString>
+	<field name="stafDept" class="java.lang.String"/>
+	<field name="itemType1" class="java.lang.String"/>
+	<field name="itemType2" class="java.lang.String"/>
+	<field name="itemName" class="java.lang.String"/>
+	<field name="itemSpec" class="java.lang.String"/>
+	<field name="itemUnit" class="java.lang.String"/>
+	<field name="itemQty" class="java.math.BigDecimal"/>
+	<field name="itemPrce" class="java.math.BigDecimal"/>
+	<field name="totAmt" class="java.math.BigDecimal"/>
+	<field name="stafDeptName" class="java.lang.String"/>
+	<variable name="totAmt" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{totAmt}]]></variableExpression>
+	</variable>
+	<variable name="itemQty" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{itemQty}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="624" y="0" width="78" height="20" uuid="d8f9800a-968b-4c8c-8ca2-4e9c82879a56"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="10" rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemPrce}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="506" y="0" width="70" height="20" uuid="6840d3a3-ccf7-4730-8d31-40ac83b97cdc"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="10" rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemUnit}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="76" height="20" uuid="8e027ab5-c5b2-49e7-a469-cf72de9dceea"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="10" rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemType1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="702" y="0" width="100" height="20" uuid="63a4957d-3602-4bf7-8ed8-d2fb828233dc"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="10" rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{totAmt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="576" y="0" width="48" height="20" uuid="ca4fc18c-fa47-4cca-a356-d5cd6e0d763f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="10" rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemQty}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="76" y="0" width="76" height="20" uuid="cc37ec01-88d4-47f4-b488-b26513c8d48a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="10" rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemType2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="152" y="0" width="190" height="20" uuid="73c0f662-0bf3-4277-8e89-62da00134c55"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="10" rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemName}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="342" y="0" width="164" height="20" uuid="393db4d4-6ce0-4f4e-a85a-7a1715f9e022"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="10" rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemSpec}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="576" height="20" uuid="dceb4493-5ce5-4fa3-b3a0-f219165a2d60"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="10" rightIndent="10"/>
+				</textElement>
+				<text><![CDATA[[ 합계 ]]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement x="624" y="0" width="178" height="20" uuid="a3588610-20e1-4742-b820-277291fd7c99"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="10" rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{totAmt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="576" y="0" width="48" height="20" uuid="780b689a-f8b8-43e1-b798-2b01f96a3369"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="10" rightIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{itemQty}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

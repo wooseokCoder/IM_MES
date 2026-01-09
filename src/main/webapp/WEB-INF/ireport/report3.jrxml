@@ -1,0 +1,686 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report3" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7d8521a9-4152-480a-80b8-d9f51b370128">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/easyICS/report3"/>
+	<property name="ireport.jasperserver.url" value="http://180.70.123.37:8080/jasperserver/services/repository"/>
+	<parameter name="SYS_ID" class="java.lang.String"/>
+	<parameter name="hdfincomeSeq" class="java.lang.String"/>
+	<parameter name="hdfincomeDate" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\root\\Desktop\\인천측기\\ICNbackup\\IREPORT\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+  A.INCOME_DATE		AS "incomeDate"
+        ,A.SEQ          	AS "incomeSeq"
+        ,A.CUST_NAME		AS "custName"
+        ,A.CUST_CD			AS "custCd"
+        ,A.ITEM_CD			AS "itemCode"
+        ,A.ITEM_NAME		AS "itemName"
+        ,A.ITEM_SPEC		AS "itemSpec"
+        ,A.PROG_STATE		AS "progState"
+        ,A.CMPLT_YN			AS "cmpltYn"
+        ,A.REQUEST_REASON	AS "requestReason"
+        ,A.REMARK			AS "remark"
+        ,A.INCOME_PLACE		AS "incomePlace"
+        ,A.INCOME_TYPE		AS "incomeType"
+        ,A.INCOME_DEPT		AS "incomeDept"
+        ,A.BIZ_GP			AS "bizGp"
+        ,A.TAX_YN			AS "taxYn"
+        ,A.SERIAL			AS "serial"
+        ,A.SEV_CHARGE		AS "sevCharge"
+        ,A.CUST_STAF_TEL	AS "custStafTel"
+        ,A.CUST_STAF_FAX	AS "custStafFax"
+        ,A.CUST_STAF		AS "custStaf"
+        ,A.CUST_STAF_HP		AS "custStafHp"
+        ,A.DIST_DATE   		AS "distDate"
+        ,A.DIST_PLACE  		AS "distPlace"
+        ,A.AS_COST			AS "asCost"
+        ,A.TOT_TAX			AS "totTax"
+        ,A.TOT_AMT			AS "totAmt"
+        ,A.ISSUER			AS "issuer"
+        ,(SELECT SB2.USER_NAME FROM SYS_USER SB2 WHERE SB2.USER_ID = A.REGI_ID  AND SB2.SYS_ID = A.SYS_ID) AS "userName"
+  FROM AS_MAST A
+WHERE A.SYS_ID=$P{SYS_ID}
+AND A.SEQ= $P{hdfincomeSeq}
+AND A.INCOME_DATE= $P{hdfincomeDate}]]>
+	</queryString>
+	<field name="incomeDate" class="java.lang.String"/>
+	<field name="incomeSeq" class="java.lang.String"/>
+	<field name="custName" class="java.lang.String"/>
+	<field name="custCd" class="java.lang.String"/>
+	<field name="itemCode" class="java.lang.String"/>
+	<field name="itemName" class="java.lang.String"/>
+	<field name="itemSpec" class="java.lang.String"/>
+	<field name="progState" class="java.lang.String"/>
+	<field name="cmpltYn" class="java.lang.String"/>
+	<field name="requestReason" class="java.lang.String"/>
+	<field name="remark" class="java.lang.String">
+		<fieldDescription><![CDATA[비고]]></fieldDescription>
+	</field>
+	<field name="incomePlace" class="java.lang.String"/>
+	<field name="incomeType" class="java.lang.String"/>
+	<field name="incomeDept" class="java.lang.String"/>
+	<field name="bizGp" class="java.lang.String"/>
+	<field name="taxYn" class="java.lang.String"/>
+	<field name="serial" class="java.lang.String">
+		<fieldDescription><![CDATA[시리얼번호]]></fieldDescription>
+	</field>
+	<field name="sevCharge" class="java.lang.String"/>
+	<field name="custStafTel" class="java.lang.String"/>
+	<field name="custStafFax" class="java.lang.String"/>
+	<field name="custStaf" class="java.lang.String"/>
+	<field name="custStafHp" class="java.lang.String"/>
+	<field name="distDate" class="java.lang.String"/>
+	<field name="distPlace" class="java.lang.String"/>
+	<field name="asCost" class="java.math.BigDecimal"/>
+	<field name="totTax" class="java.math.BigDecimal"/>
+	<field name="totAmt" class="java.math.BigDecimal"/>
+	<field name="issuer" class="java.lang.String">
+		<fieldDescription><![CDATA[발행사]]></fieldDescription>
+	</field>
+	<field name="userName" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="38" splitType="Stretch">
+			<staticText>
+				<reportElement x="121" y="0" width="314" height="36" uuid="74c8517e-3336-4bab-9e5c-3ffdf51c1fbe"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="24" isUnderline="true" pdfFontName="HYGoThic-Medium" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[수리내역서3]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="360" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="220" y="103" width="100" height="20" uuid="4558f6a9-669d-463e-b83b-3d460df71dfc"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{custStafTel}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="220" y="83" width="100" height="20" uuid="c26d6a4d-9dbd-4872-9061-147327eb7548"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{distPlace}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="337" y="133" width="218" height="30" uuid="ec5dd305-0ed9-4d07-9f46-d59c44746fda"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[측량기,토목시험기,측량기 렌탈 / 건설계측기 판매,제작 수리]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="103" width="60" height="20" uuid="ecf805ce-3d2a-4c95-b9be-e876aaecc1b3"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[고 객 명]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="220" y="123" width="100" height="20" uuid="b748402d-6ca7-466f-8fed-0122f7d91798"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemSpec}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="160" y="143" width="60" height="20" uuid="395dce8c-1428-4984-836a-ad170ba2292d"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[담 당 자]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="123" width="60" height="20" uuid="72a95872-e5d3-4b38-9dae-ea8604890aec"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[제 품 명]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="220" y="143" width="100" height="20" uuid="36309326-7180-4bab-a2c8-cad04dfe8a04"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sevCharge}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="160" y="83" width="60" height="20" uuid="8327822e-2083-4620-af8e-b204b33fd182"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[출 고 지]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="123" width="60" height="20" uuid="2ef9fe5f-fd2b-49a5-a83a-ee951baab300"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[규    격]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="337" y="112" width="99" height="20" uuid="e58b71c0-9c08-413a-9171-6fc4cc71264e"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[http://www.ic-survey.com]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="143" width="60" height="20" uuid="af0d1f9c-8f20-44c0-a510-3acbeae0cd24"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[S  /  N]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="83" width="60" height="20" uuid="c8213230-673b-4684-b7c2-551080309137"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[출 고 일]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="60" y="143" width="100" height="20" uuid="44a69393-76fb-4bb9-aee6-48441efe91cc"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{serial}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="453" y="92" width="102" height="20" uuid="aeb8693c-4d33-453f-83b8-0ecb71a6d38d"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[FAX:032 ) 584-3820]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="63" width="60" height="20" uuid="4cc0a1f0-a67f-4ac6-9955-33017d8246f8"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[입 고 일]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="336" y="63" width="219" height="29" uuid="22d53c03-fa3f-4f4a-8c7e-9ad1c67373d0"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[주소:인천광역시 동구 송림동 294번지 산업용품 유통센터 41동 106호]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="103" width="60" height="20" uuid="633c55d0-a6be-44a8-b509-b6c9025d5a13"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[연 락 처]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="453" y="112" width="102" height="20" uuid="62c7979a-3506-4f59-b304-db59ac698ce9"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[ http://www.zeus-survey.com]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="220" y="63" width="100" height="20" uuid="6b446975-3829-4d9e-9da4-028ee0ccea60"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{incomePlace}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="336" y="92" width="100" height="20" uuid="211d6c6d-a2dd-4e03-9275-2f16d9f19fa9"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[TEL: 032 ) 584-3816]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="60" y="63" width="100" height="20" uuid="fa023bbd-c6f0-404a-b7c3-5322445ff567"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{incomeDate}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="60" y="83" width="100" height="20" uuid="41c133f2-d4de-42f6-a693-6729569a184f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{distDate}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="60" y="103" width="100" height="20" uuid="1839da6f-0a58-412d-9a24-2195e811880d"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{custName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="160" y="63" width="60" height="20" uuid="087cb1db-f6df-4f71-b785-8fcbce6cc5d7"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[입 고 지]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="60" y="123" width="100" height="20" uuid="8180ce9f-c504-482d-b5c1-cd4d8ba7fc5e"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemName}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="207" width="555" height="62" uuid="ffae16b5-d613-4918-be4a-8b8e4e4d2953"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{requestReason}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="187" width="160" height="20" uuid="b1abc0bc-33f1-4e9f-a0fc-c6d5484a5f8d"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[요 청 사 항(입고시 상태)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="287" width="101" height="20" uuid="5f88d621-f426-44f3-9593-1c534eba53e8"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[측량기 수리내역]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="0" y="307" width="555" height="40" uuid="bd562959-87d8-4f14-b9ac-f16ae49be3c4"/>
+				<subreportParameter name="SYS_ID">
+					<subreportParameterExpression><![CDATA[$P{SYS_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="hdfincomeDate">
+					<subreportParameterExpression><![CDATA[$P{hdfincomeDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="hdfincomeSeq">
+					<subreportParameterExpression><![CDATA[$P{hdfincomeSeq}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:receiptmanagement2_subreport1.jrxml"]]></subreportExpression>
+			</subreport>
+			<image>
+				<reportElement x="393" y="0" width="150" height="60" uuid="ca45028b-a447-4696-858c-e75b16f3657a"/>
+				<imageExpression><![CDATA["repo:/images/ICS_logo"]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="98" splitType="Stretch">
+			<staticText>
+				<reportElement x="393" y="0" width="60" height="20" uuid="8a3341d3-f628-4842-98d9-8c7116513635"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[합계]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="248" y="0" width="61" height="20" uuid="5ac7a03a-0aad-4277-9bc6-df540c8928a2"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[부가세]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="309" y="0" width="84" height="20" uuid="2df383d6-c40f-42f6-9b22-287d32f800e1"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{totTax}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="35" width="101" height="20" uuid="e61633e0-5f27-4ef4-b654-68b36b8d25cf"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[수리 부속품 내역]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="101" y="0" width="60" height="20" uuid="97b03c4f-6441-498e-89e3-fa3a6b21b0f7"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[공급가]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="161" y="0" width="87" height="20" uuid="af86048f-91eb-469a-8921-021b8a1aed1f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{asCost}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="453" y="0" width="102" height="20" uuid="a9da2559-2abc-4689-9a1a-7f6f1e07bb9d"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{totAmt}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="101" height="20" uuid="f3cf33d5-690e-43b9-8805-915901772d62"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="12"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[수리 금액]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="0" y="55" width="555" height="33" uuid="17f4191f-c6e6-4488-b424-8c408c1c9bb9"/>
+				<subreportParameter name="SYS_ID">
+					<subreportParameterExpression><![CDATA[$P{SYS_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="hdfincomeDate">
+					<subreportParameterExpression><![CDATA[$P{hdfincomeDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="hdfincomeSeq">
+					<subreportParameterExpression><![CDATA[$P{hdfincomeSeq}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["repo:receiptmanagement2_subreport2.jrxml"]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

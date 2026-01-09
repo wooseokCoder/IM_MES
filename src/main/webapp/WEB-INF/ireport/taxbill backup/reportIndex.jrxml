@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reportIndex" language="groovy" pageWidth="545" pageHeight="200" orientation="Landscape" columnWidth="505" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2da4a6af-d557-4c82-9027-488f5d73f992">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT ROUND(DBMS_RANDOM.VALUE(1, 50), 0) AS "USER_CNT"
+       ,'오늘' AS "CHAT_DATE"
+       ,'대상생성' AS "CAGT_CATE"
+  FROM DUAL
+ UNION ALL
+SELECT ROUND(DBMS_RANDOM.VALUE(50, 150), 0) AS "USER_CNT"
+       ,'이번주' AS "CHAT_DATE"
+       ,'대상생성' AS "CAGT_CATE"
+  FROM DUAL
+ UNION ALL
+SELECT ROUND(DBMS_RANDOM.VALUE(150, 500), 0) AS "USER_CNT"
+       ,'이번달' AS "CHAT_DATE"
+       ,'대상생성' AS "CAGT_CATE"
+  FROM DUAL
+ UNION ALL
+SELECT ROUND(DBMS_RANDOM.VALUE(150, 500), 0) AS "USER_CNT"
+       ,'지난달' AS "CHAT_DATE"
+       ,'대상생성' AS "CAGT_CATE"
+  FROM DUAL
+ UNION ALL
+SELECT ROUND(DBMS_RANDOM.VALUE(1, 50), 0) AS "USER_CNT"
+       ,'오늘' AS "CHAT_DATE"
+       ,'메일발송' AS "CAGT_CATE"
+  FROM DUAL
+ UNION ALL
+SELECT ROUND(DBMS_RANDOM.VALUE(50, 150), 0) AS "USER_CNT"
+       ,'이번주' AS "CHAT_DATE"
+       ,'메일발송' AS "CAGT_CATE"
+  FROM DUAL
+ UNION ALL
+SELECT ROUND(DBMS_RANDOM.VALUE(150, 500), 0) AS "USER_CNT"
+       ,'이번달' AS "CHAT_DATE"
+       ,'메일발송' AS "CAGT_CATE"
+  FROM DUAL
+ UNION ALL
+SELECT ROUND(DBMS_RANDOM.VALUE(150, 500), 0) AS "USER_CNT"
+       ,'지난달' AS "CHAT_DATE"
+       ,'메일발송' AS "CAGT_CATE"
+  FROM DUAL
+ UNION ALL
+SELECT ROUND(DBMS_RANDOM.VALUE(1, 50), 0) AS "USER_CNT"
+       ,'오늘' AS "CHAT_DATE"
+       ,'발송오류' AS "CAGT_CATE"
+  FROM DUAL
+ UNION ALL
+SELECT ROUND(DBMS_RANDOM.VALUE(50, 150), 0) AS "USER_CNT"
+       ,'이번주' AS "CHAT_DATE"
+       ,'발송오류' AS "CAGT_CATE"
+  FROM DUAL
+ UNION ALL
+SELECT ROUND(DBMS_RANDOM.VALUE(150, 500), 0) AS "USER_CNT"
+       ,'이번달' AS "CHAT_DATE"
+       ,'발송오류' AS "CAGT_CATE"
+  FROM DUAL
+ UNION ALL
+SELECT ROUND(DBMS_RANDOM.VALUE(150, 500), 0) AS "USER_CNT"
+       ,'지난달' AS "CHAT_DATE"
+       ,'발송오류' AS "CAGT_CATE"
+  FROM DUAL]]>
+	</queryString>
+	<field name="USER_CNT" class="java.math.BigDecimal"/>
+	<field name="CHAT_DATE" class="java.lang.String"/>
+	<field name="CAGT_CATE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="160" splitType="Stretch">
+			<barChart>
+				<chart>
+					<reportElement x="0" y="0" width="505" height="160" uuid="77a12629-5b33-4b76-9af8-718b6ff76543"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{CHAT_DATE}]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{CAGT_CATE}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{USER_CNT}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

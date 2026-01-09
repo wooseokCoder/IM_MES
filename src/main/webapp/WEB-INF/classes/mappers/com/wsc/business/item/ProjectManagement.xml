@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.business.item.ProjectManagement">
+
+    <!-- ========================================================== -->
+    <!--   Oracle Paging Clause                                     -->
+    <!-- ========================================================== -->
+    <sql id="pagingColumns">
+        <if test="start == null or end == null">
+            ,0 AS RNUM
+        </if>
+    </sql>
+    <sql id="pagingOpen">
+        <if test="start != null and end != null">
+            SELECT * 
+              FROM (
+                    SELECT X.*
+                      FROM (
+                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
+                              FROM (
+        </if>
+    </sql>
+    <sql id="pagingClose">
+        <if test="start != null and end != null">
+                                   ) Z1, (SELECT @rownum:=0 ) Z2
+                           ) X
+                     WHERE RNUM <![CDATA[< ]]> #{end}
+                   ) X
+             WHERE RNUM <![CDATA[>= ]]> #{start}
+        </if>  
+    </sql>
+    
+    <sql id="selectColumns">
+         A.SYS_ID		   AS "sysId"
+        ,A.PJT_CODE        AS "pjtNo"
+        ,A.PJT_NAME        AS "pjtName"
+        ,A.PJT_YEAR   	   AS "pjtYear"
+        ,A.PJT_GB      	   AS "pjtGb"
+        ,A.MODEL_NO        AS "modelNo"
+        ,A.MODEL_NAME      AS "modelName"
+        ,A.MODEL_SPEC  	   AS "modelSpec"        
+        ,A.MODEL_VER       AS "modelVer"
+        ,A.START_DATE      AS "startDate"
+        ,A.END_DATE        AS "endDate"
+        ,A.STAF_NAME       AS "stafName"
+        ,A.CURT_STAT	   AS "curtStat"
+  		,fn_get_code_name('PJT_CURT_STAT',A.CURT_STAT, #{gsLang}) AS "curtStatName"
+	    ,A.REMK	  	 	   AS "pjtRemk"
+        ,A.REGI_ID         AS "regiId"
+        ,A.REGI_DATE       AS "regiDate"
+        ,A.CHNG_ID         AS "chngId"
+        ,A.CHNG_DATE       AS "chngDate"
+    </sql>
+    
+	<sql id="insertColumns-fields">
+       	 SYS_ID 
+         ,PJT_CODE 
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pjtName)">, PJT_NAME </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pjtYear)">, PJT_YEAR </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pjtGb)">, PJT_GB </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelNo)">, MODEL_NO </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelName)">, MODEL_NAME </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelSpec)">, MODEL_SPEC </if>
+ 		, MODEL_VER
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(startDate)">, START_DATE </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(endDate)">, END_DATE </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafName)">, STAF_NAME </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(curtStat)">, CURT_STAT </if>
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pjtRemk)">, REMK </if>
+ 		, REGI_ID 
+ 		, REGI_DATE
+ 		, CHNG_ID
+ 		, CHNG_DATE
+    </sql>
+    
+    <sql id="insertColumns-values">
+           #{sysId}
+         , (select * from (SELECT CONCAT('P', LPAD(CAST(ifnull(SUBSTR(MAX(PJT_CODE),2,5),'0') AS UNSIGNED)+1, 5, '0') ) AS "pjtCode" FROM PJT_MAST WHERE SYS_ID    =  #{sysId}) as temp) 
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pjtName)">, #{pjtName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pjtYear)">, #{pjtYear}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pjtGb)">, #{pjtGb}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelNo)">, #{modelNo}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelName)">, #{modelName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelSpec)">, #{modelSpec}  </if>
+         , (select * from (select ifnull(MAX(MODEL_VER),'0')+1 from PJT_MAST) AS modelVer)
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(startDate)">, #{startDate}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(endDate)">, #{endDate}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafName)">, #{stafName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(curtStat)">, #{curtStat}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pjtRemk)">, #{pjtRemk}  </if>
+		 , #{gsUserId}        
+         , NOW()                                                          
+         , #{gsUserId}                                                    
+         , NOW()
+    </sql>
+
+    <sql id="updateColumns">       
+ 		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pjtName)">PJT_NAME = #{pjtName}  </if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pjtYear)">,PJT_YEAR = #{pjtYear}   </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pjtGb)">,PJT_GB = #{pjtGb}    </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelNo)">, MODEL_NO = #{modelNo}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelName)">, MODEL_NAME = #{modelName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(modelSpec)">, MODEL_SPEC = #{modelSpec}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(startDate)">, START_DATE = #{startDate}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(endDate)">, END_DATE = #{endDate}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(stafName)">, STAF_NAME = #{stafName}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(curtStat)">, CURT_STAT = #{curtStat}  </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pjtRemk)">, REMK = #{pjtRemk}  </if>                 
+         , CHNG_ID   = #{gsUserId}
+         , CHNG_DATE = NOW()
+    </sql>
+   
+	<select id="select" resultType="record" parameterType="params">
+        SELECT <include refid="selectColumns" />
+          FROM PJT_MAST A
+         WHERE SYS_ID   = #{sysId}
+           AND PJT_CODE = #{pjtNo}
+           <if test="@com.wsc.framework.utils.MybatisUtils@empty(pjtNo)">AND PJT_CODE = (select * from (SELECT CONCAT('P', LPAD(CAST(ifnull(SUBSTR(MAX(PJT_CODE),2,5),'0') AS UNSIGNED)+1, 5, '0') ) AS "pjtCode" FROM PJT_MAST WHERE SYS_ID = #{sysId}) as temp)</if>      
+    </select>
+    
+    <insert id="insert" parameterType="params">
+        INSERT 
+          INTO PJT_MAST
+             ( <include refid="insertColumns-fields" /> )
+        VALUES
+             ( <include refid="insertColumns-values" /> )
+    </insert>
+    <update id="update" parameterType="params">
+        UPDATE PJT_MAST
+           SET <include refid="updateColumns" />
+         WHERE SYS_ID   = #{sysId}
+           AND PJT_CODE = #{pjtNo}        
+          
+    </update>
+    <delete id="delete" parameterType="params">
+        DELETE 
+          FROM PJT_MAST
+         WHERE SYS_ID   = #{sysId}
+           AND PJT_CODE = #{pjtNo}
+    </delete>
+    
+    <sql id="whereClause">
+    	A.SYS_ID    = #{sysId}
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchPjtNo)">	AND PJT_CODE like CONCAT('%',#{searchPjtNo},'%')	</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchModel)">	AND MODEL_NO like CONCAT('%',#{searchModel},'%')	</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchmodelName)">	AND MODEL_NAME like CONCAT('%',#{searchmodelName},'%')    </if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchmodelSpec)">	AND MODEL_SPEC like CONCAT('%',#{searchmodelSpec},'%')    </if>
+ 	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchPjtYear)">	AND PJT_YEAR = #{searchPjtYear}	</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchPjtGb)">	AND PJT_GB = #{searchPjtGb}</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchStafName)">	AND STAF_NAME like CONCAT('%',#{searchStafName},'%') 	</if>
+    </sql>
+
+    <select id="search" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM PJT_MAST A
+         WHERE <include refid="whereClause" />
+         ORDER
+            BY A.PJT_NAME ASC
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+    <select id="searchCount" resultType="int" parameterType="params">
+        SELECT COUNT(1) 
+          FROM PJT_MAST A
+         WHERE <include refid="whereClause" />
+    </select>
+
+    <!-- 모델조회 -->
+    <select id="model" resultType="record" parameterType="params">
+        <include refid="pagingOpen"  /><!-- PAGING -->
+        SELECT <include refid="selectModelColumns" />
+               <include refid="pagingColumns" /><!-- PAGING -->
+          FROM MODEL_MAST A
+         WHERE <include refid="whereModelClause" />
+         ORDER 
+            BY <include refid="sortModelClause" /><!-- SORT -->
+        <include refid="pagingClose" /><!-- PAGING -->
+    </select>
+     <select id="modelCount" resultType="int" parameterType="params">
+        SELECT COUNT(1)
+          FROM MODEL_MAST A
+         WHERE <include refid="whereModelClause" />
+    </select>	
+    
+    <sql id="selectModelColumns">
+	   MODEL_NO	    AS "modelNo"
+     , MODEL_NAME   AS "modelName"
+     , MODEL_SPEC   AS "modelSpec"
+    </sql>
+    <sql id="whereModelClause">
+       	SYS_ID = #{sysId}
+   	   	AND USE_IDX = 'Y'
+   	   	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pModelName)">	AND MODEL_NAME   like CONCAT('%',#{pModelName},'%')	</if>
+    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(pModelSpec)">	AND MODEL_SPEC   like CONCAT('%',#{pModelSpec},'%')	</if>
+    </sql>
+    <sql id="sortModelClause">
+    	SYS_ID, MODEL_NO, MODEL_NAME, MODEL_SPEC
+    </sql>  
+
+</mapper>

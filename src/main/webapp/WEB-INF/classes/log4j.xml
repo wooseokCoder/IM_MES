@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<!-- Appenders -->
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!--
+			<param name="ConversionPattern" value="%-5p: %c - %m%n" />
+			 -->
+			<param name="ConversionPattern" value="%d [%t] %p - %C{1}.%M(%L) | %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="wscapp" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="/mnt/logs/wsc/wscapp.log" />
+		<param name="Append" value="true" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!--
+			<param name="ConversionPattern" value="%d [%t] %p - %C.%M(%L) | %m%n" />
+			 -->
+			<param name="ConversionPattern" value="%5p [%d{yyyy-MM-dd HH:mm:ss}] %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="wscsql" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="/mnt/logs/wsc/wscsql.log" />
+		<param name="Append" value="true" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!--
+			<param name="ConversionPattern" value="%d [%t] %p - %C{1}.%M(%L) | %m%n" />
+			 -->
+			<param name="ConversionPattern" value="%5p [%d{yyyy-MM-dd HH:mm:ss}] %m%n" />
+		</layout>
+	</appender>
+
+	<!--  log4jdbc 를 위한 설정 -->
+
+    <!-- Query Loggers -->
+    <logger name="jdbc.sqlonly">
+        <level value="debug"/>
+    </logger>
+
+    <!-- Query Loggers -->
+    <logger name="net.sf.log4jdbc" additivity="false">
+        <level value="info"/>
+    </logger>
+
+ 	<!-- log4jdbc 를 위한 설정 -->
+
+
+    <!-- 3rdparty Loggers -->
+    <logger name="org.springframework.core">
+		<level value="info" />
+    </logger>
+
+    <logger name="org.springframework.beans">
+        <level value="warn" />
+    </logger>
+
+    <logger name="org.springframework.context">
+        <level value="warn" />
+    </logger>
+
+    <logger name="org.springframework.web">
+        <level value="warn" />
+    </logger>
+
+    <logger name="com.wsc">
+        <level value="trace" />
+        <appender-ref ref="wscsql" />
+    </logger>
+    <logger name="org.apache.jasper.compiler.TldLocationsCache">
+        <level value="FINE" />
+    </logger>
+
+	<!-- Root Logger -->
+	<root>
+		<priority value="warn" />
+		<appender-ref ref="console" />
+		<appender-ref ref="wscapp"/>
+	</root>
+
+</log4j:configuration>

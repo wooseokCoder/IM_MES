@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TaxBill_subreport1" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="18971587-ef45-4bc2-9cae-f83be69a9326">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="hShetNo" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SYS_ID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT   SYS_ID       AS "sysId"
+     , SHET_TYPE    AS "shetType"
+     , SHET_NO      AS "shetNo"
+     , SHET_SEQ     AS "shetSeq"
+     , SHET_DATE    AS "shetDate"
+      ,SUBSTR(SHET_DATE,6,2) AS "month"
+     ,SUBSTR(SHET_DATE,9,2) AS "day"
+     , ITEM_CODE    AS "itemCode"
+     , ITEM_NAME    AS "itemName"
+     , ITEM_SPEC    AS "itemSpec"
+     , ITEM_UNIT    AS "itemUnit"
+     , ITEM_QTY     AS "itemQty"
+     , ITEM_PRCE    AS "itemPrce_org"
+     , FN_SHET_PRCE(SHET_TYPE,'WSC',SHET_NO,ITEM_CODE)  as "itemPrce"
+     , ITEM_COST    AS "itemCost"
+     , TOT_TAX      AS "totTax"
+     , TOT_AMT      AS "totAmt"
+     , base_prce    AS "basePrce"
+     , DISC_RATE    AS "discRate"
+     , PURC_PRCE    AS "purcPrce"
+     , SALE_PRCE    AS "salePrce"
+     , ON_HAND_QTY  AS "onHandQty"
+     , LAST_TRAD    AS "lastTrad"
+     , LAST_PRCE    AS "lastPrce"
+     , MARGIN_RATE  AS "marginRate"
+     , CUST_CODE    AS "custCode"
+     , SHOP_NAME    AS "shopName"
+     , REMK         AS "remk"
+     , USE_IDX      AS "useIdx"
+     , REGI_DATE	AS "regiDate"
+     , REGI_ID	AS "regiUser"
+     , CHNG_DATE	AS "updtDate"
+     , CHNG_ID	AS "updtUser"
+     , 'R'          AS "rowStat"
+     , CONCAT(SHET_NO,'::',SHET_SEQ) AS "shetNoSeq"
+     , UNSTOR_DEPOT AS "unstorDepot"
+     , ITEM_PRCE 	AS "itemPrceTemp"
+
+		  FROM SHET_DETL
+		 WHERE SYS_ID = $P{SYS_ID}
+		AND SHET_NO=$P{hShetNo}
+]]>
+	</queryString>
+	<field name="sysId" class="java.lang.String"/>
+	<field name="shetType" class="java.lang.String"/>
+	<field name="shetNo" class="java.lang.String"/>
+	<field name="shetSeq" class="java.math.BigDecimal"/>
+	<field name="shetDate" class="java.lang.String"/>
+	<field name="month" class="java.lang.String">
+		<fieldDescription><![CDATA[마감월]]></fieldDescription>
+	</field>
+	<field name="day" class="java.lang.String"/>
+	<field name="itemCode" class="java.lang.String"/>
+	<field name="itemName" class="java.lang.String"/>
+	<field name="itemSpec" class="java.lang.String"/>
+	<field name="itemUnit" class="java.lang.String"/>
+	<field name="itemQty" class="java.math.BigDecimal"/>
+	<field name="itemPrce_org" class="java.math.BigDecimal"/>
+	<field name="itemPrce" class="java.math.BigDecimal"/>
+	<field name="itemCost" class="java.math.BigDecimal"/>
+	<field name="totTax" class="java.math.BigDecimal"/>
+	<field name="totAmt" class="java.math.BigDecimal"/>
+	<field name="basePrce" class="java.math.BigDecimal"/>
+	<field name="discRate" class="java.math.BigDecimal"/>
+	<field name="purcPrce" class="java.math.BigDecimal"/>
+	<field name="salePrce" class="java.math.BigDecimal"/>
+	<field name="onHandQty" class="java.math.BigDecimal"/>
+	<field name="lastTrad" class="java.lang.String"/>
+	<field name="lastPrce" class="java.lang.String"/>
+	<field name="marginRate" class="java.math.BigDecimal"/>
+	<field name="custCode" class="java.lang.String"/>
+	<field name="shopName" class="java.lang.String"/>
+	<field name="remk" class="java.lang.String">
+		<fieldDescription><![CDATA[비고]]></fieldDescription>
+	</field>
+	<field name="useIdx" class="java.lang.String"/>
+	<field name="regiDate" class="java.lang.String"/>
+	<field name="regiUser" class="java.lang.String"/>
+	<field name="updtDate" class="java.lang.String"/>
+	<field name="updtUser" class="java.lang.String"/>
+	<field name="rowStat" class="java.lang.String"/>
+	<field name="shetNoSeq" class="java.lang.String"/>
+	<field name="unstorDepot" class="java.lang.String"/>
+	<field name="itemPrceTemp" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="1" width="30" height="20" uuid="3131593d-e580-4a23-8e2e-b102f103cbc1"/>
+				<textElement textAlignment="Center">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{month}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="29" y="1" width="34" height="20" uuid="63ce6f10-b40d-4a43-947d-a4a81a99e002"/>
+				<textElement textAlignment="Center">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{day}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="63" y="0" width="154" height="20" uuid="7e60fcf3-751b-4f80-876f-17a27458aff0"/>
+				<textElement>
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemName}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="268" y="1" width="34" height="20" uuid="f0c44699-94cc-447a-989a-1064c7acd443"/>
+				<textElement textAlignment="Right">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemQty}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="0" width="51" height="20" uuid="03c72f6b-e6ee-4bb8-8e98-062a40184f99"/>
+				<textElement>
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemSpec}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="302" y="1" width="56" height="20" uuid="8b9a6ba4-d785-4e71-b349-024624732f9f"/>
+				<textElement textAlignment="Right">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemPrce_org}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="426" y="1" width="68" height="20" uuid="62ef3490-2438-4db1-8fd6-3b30ffa8e5fc"/>
+				<textElement textAlignment="Right">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{totTax}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement x="358" y="0" width="68" height="20" uuid="9503f68f-2f00-44eb-8e4e-1b229e107a2e"/>
+				<textElement textAlignment="Right">
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemPrce}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="494" y="0" width="61" height="20" uuid="3504a440-d41f-4bc0-867d-23b910c6ede6"/>
+				<textElement>
+					<font pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{remk}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
