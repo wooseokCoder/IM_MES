@@ -27,7 +27,7 @@ var consts = {
 	}
 };
 
-$(function() { debugger;
+$(function() {
 	consts.init();
 });
 

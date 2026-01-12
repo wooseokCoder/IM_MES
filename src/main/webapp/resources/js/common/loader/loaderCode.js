@@ -12,6 +12,10 @@ var consts = {
 		if (id.indexOf("cform-") >= 0)
 			return true;
 		return false;
+		
+		
+		
+		
 	},
 	isitemgrid: function(id) {
 		if (id.indexOf("citem-") >= 0)
