@@ -214,7 +214,7 @@ var jwidget = {
 			        type: 'post',
 					success: function(data) {
 
-			        	if (!data)
+					if (!data || !data.menus)
 			        		return;
 
 			        	//메뉴데이터 저장
@@ -240,6 +240,9 @@ var jwidget = {
 		           			//중앙탭패널 생성
 		        			jwidget.tabs.create(args);
 		        		}
+					},
+					error: function() {
+						console.error("Failed to load menu data");
 					}
 				});
 			},
@@ -820,6 +823,9 @@ var jwidget = {
 				data = jmenus.MENUS;
 			}
 			
+			//데이터가 유효하지 않으면 중단
+			if (!data) return;
+
 			var menu = this.menu;
 			//동일한 메뉴그룹인 경우 SKIP
 			if (data && menu && data.menuKey == menu.menuKey)
@@ -942,6 +948,10 @@ var jwidget = {
 					mctx.menu('show',{left: e.pageX,top: e.pageY});
 				},
 				onLoadSuccess: function() {
+					//메뉴 권한 없을 경우 설정
+					$(".fa-angle-right").parent().removeClass("noAuth");
+					$("#left-menu > li > div:not(.tree-level3, .tree-level4)").removeClass("noAuth").addClass("tree-level2");
+
 					//메뉴에 마우스를 올렸을 때, 메뉴의 텍스트가 잘렸다면 다 보여주기
 					//툴팁형
 					/*
@@ -1071,8 +1081,13 @@ var jwidget = {
 			console.log(menus);
 			var p   = this;
 			var arr = [];
+
+			if (!menus) return;
+
 			if(menus.length == 1) {
 				$.each(menus, function(ii,d) {
+					if (!d || !Array.isArray(d)) return; // 데이터 유효성 체크
+
 					//2016/12/12 김영진 -- 좌측메뉴 구분자시 표시안함
 					d.forEach(function(c,i) {
 						if(c.enableYn == "Y") { 

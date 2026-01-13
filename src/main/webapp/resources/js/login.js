@@ -257,12 +257,29 @@ function bindEvent() {
 }
 
 /**
+ * 로딩 오버레이 표시
+ */
+function showLoginLoading() {
+	$('#login-loading-overlay').addClass('show');
+}
+
+/**
+ * 로딩 오버레이 숨기기
+ */
+function hideLoginLoading() {
+	$('#login-loading-overlay').removeClass('show');
+}
+
+/**
  * 로그인을 처리한다.
  */
 function doLogin() {
 
 	if (doValidation() == false)
 		return;
+
+	// 로딩 오버레이 표시
+	showLoginLoading();
 
 	setCookie("reportLogin", "N", 30);
 	
@@ -292,10 +309,12 @@ function doLogin() {
         	}
         },
         error: function(){
+        	hideLoginLoading();
         }
     });
 	
 	if(errMsg == 'NoID'){
+		hideLoginLoading();
 		if($('#language').val() == 'en'){
 			$.messager.alert('Warning',"This is an unregistered ID.",'Warning');
     	}else{
@@ -310,6 +329,7 @@ function doLogin() {
 	}
 	
 	if(errMsg != 'Y' && errMsg != 'OldID'){
+		hideLoginLoading();
 		if($('#language').val() == 'en'){
 			$.messager.alert('Warning',"Please contact your System Manager.",'Warning');
     	}else{
@@ -350,6 +370,7 @@ function doLogin() {
         	        url:  "/security_check.do"
         	    });
         	}else {
+        		hideLoginLoading();
         		if($('#language').val() == 'en'){
         			$.messager.alert('Warning',"Password doesn't match.",'Warning');
             	}else{
@@ -358,6 +379,7 @@ function doLogin() {
         	}
         },
         error: function(){
+        	hideLoginLoading();
         }
     });
 }

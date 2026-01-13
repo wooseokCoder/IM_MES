@@ -409,10 +409,59 @@ input[type=button]:hover, button:hover, button:focus, button:active {
     }
 }
 
+/* 로그인 로딩 오버레이 스타일 */
+.login-loading-overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 38, 88, 0.85);
+	z-index: 9999;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+
+.login-loading-overlay.show {
+	display: flex;
+}
+
+.login-loading-tractor {
+	width: 200px;
+	height: auto;
+	margin-bottom: 20px;
+	animation: tractorMove 2s ease-in-out infinite;
+}
+
+.login-loading-spinner {
+	width: 48px;
+	height: 48px;
+	margin-bottom: 15px;
+}
+
+.login-loading-text {
+	color: #ffffff;
+	font-size: 18px;
+	font-weight: 600;
+	letter-spacing: 1px;
+}
+
+@keyframes tractorMove {
+	0%, 100% { transform: translateX(0); }
+	50% { transform: translateX(10px); }
+}
 </style>
 </head>
 
 <body class="login-body">
+	<!-- 로그인 로딩 오버레이 -->
+	<div id="login-loading-overlay" class="login-loading-overlay">
+		<img class="login-loading-tractor" src="<%=request.getContextPath()%>/resources/images/tractor.png" alt="Loading...">
+		<img class="login-loading-spinner" src="<%=request.getContextPath()%>/resources/images/loading.gif" alt="Loading...">
+		<span class="login-loading-text">Logging in...</span>
+	</div>
 	<div class="bg-video">
 		<video id="mainVideo" class="bg-video_content" autoplay muted loop>
 			<!-- <source src="https://monitoring.lstractor.co.kr/lsmd_data/upload/real/DASH/20250915_79057f20-023d-49e8-852f-34b587dad760.mp4" type="video/mp4" /> -->

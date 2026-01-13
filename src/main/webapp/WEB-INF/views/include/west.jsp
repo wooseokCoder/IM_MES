@@ -291,9 +291,9 @@ window.onload = function(){
 		$(".top-buttons").addClass("pdl-260");
 	}
 	
-	//메뉴 권한 없을 경우 설정
-	$(".fa-angle-right").parent().removeClass("noAuth");
-	$("#left-menu > li > div:not(.tree-level3, .tree-level4)").removeClass("noAuth").addClass("tree-level2");
+	//메뉴 권한 없을 경우 설정 tree create onLoadSuccess 함수로 로직 이동
+	//$(".fa-angle-right").parent().removeClass("noAuth");
+	//$("#left-menu > li > div:not(.tree-level3, .tree-level4)").removeClass("noAuth").addClass("tree-level2");
 };
 
 $(document).ready(function() {

@@ -9,11 +9,29 @@ var jgrid  = {};
 var consts2 = {};
 //그리드 설정
 var jgrid2  = {};
+var _menuLoaded = false;
+var _scriptsLoaded = false;
+
+function checkAndGo() {
+    if (_menuLoaded && _scriptsLoaded) {
+         var pdiMenu = getCookie("im_mesMenu");
+         if( pdiMenu != "" ){
+             deleteCookie("im_mesMenu");
+             jmenus.go(pdiMenu);
+         }
+    }
+}
+
 $(function() {
 
 	//상단메뉴 로딩
 	//alert("111");
-	jwidget.menu.load();
+	jwidget.menu.load({
+        callback: function() {
+            _menuLoaded = true;
+            checkAndGo();
+        }
+    });
 	
 	//alert("222");
 	//핫메뉴 로딩
@@ -33,12 +51,16 @@ $(function() {
 				//consts2.init();
 				
 				//LSDP에서 이동하믄 화면이 지정되경우 index->지정화면 으로 이동
+				/*
 				var pdiMenu = getCookie("im_mesMenu");
 				if( pdiMenu != "" ){
 					deleteCookie("im_mesMenu");
 					jmenus.go(pdiMenu);
 					return;
 				}
+				*/
+                _scriptsLoaded = true;
+                checkAndGo();
 			});
 		});
 	});
