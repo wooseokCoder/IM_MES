@@ -155,7 +155,7 @@ $(function() {
 	});
 
 	$('#pdf-dialog').dialog({
-	    title: tit.TITLE0029,
+	    title: tit.TITLE0002,
 	    iconCls: 'icon-search',
 	    top:     10,
 	    bottom:  10,
@@ -181,7 +181,7 @@ $(function() {
 	});
 
 	$('#progress-popup').dialog({
-	       title: tit.TITLE0009,
+	       title: tit.TITLE0003,
 	       top:     100,
 	       width: 200,
 	       height: 200,

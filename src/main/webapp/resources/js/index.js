@@ -504,7 +504,7 @@ function doBord(){
     if(window.innerWidth<900){
 
     	$('#bord-popup-dialog').dialog({
-    	    title: tit.TITLE0036,
+    	    title: tit.TITLE0014,
     	    iconCls: 'icon-search',
     	    width: 355,
     	    height: 700,
@@ -519,7 +519,7 @@ function doBord(){
     	/* 팝업창 초기화 */
 
     	$('#bord-popup-dialog').dialog({
-    	    title: tit.TITLE0036,
+    	    title: tit.TITLE0014,
     	    iconCls: 'icon-search',
     	    width: 800,
     	    height: 700,
@@ -540,11 +540,11 @@ function doBordDetail(grup, no){
 
 	if($("#h_atchGrup").val() == 'B08'){
     	$('#bord-popup-dialog').dialog({
-    	    title: tit.TITLE0036
+    	    title: tit.TITLE0014
     	});
 	}else{
     	$('#bord-popup-dialog').dialog({
-    	    title: tit.TITLE0036
+    	    title: tit.TITLE0015
     	});
 	}
 
@@ -644,7 +644,7 @@ var fileuploadForm = {
 						var row  = rows[index];
 
 						if (row.exist != true) {
-							$.messager.alert("Error", msg.MSG0113, 'error');
+							$.messager.alert("Error", msg.MSG0083, 'error');
 							return;
 						}
 						//obj.download(row.index);   //파일 다운
@@ -721,9 +721,9 @@ function doCheckDealStatus(key){
 	        complete : function () {   // 정상이든 비정상인든 실행이 완료될 경우 실행될 함수
 	        	if(!Utils.isNull(rows)){
 	        		if(rows.DEAL_STAT == "Block"){
-		        		alert(msg.MSG0139);
+		        		alert(msg.MSG0075);
 		        	}else if($("#hOrgAuthCode").val() == 'DEAL' && rows.WGO_IDX == "N"){
-		        		alert(msg.MSG0139);
+		        		alert(msg.MSG0055);
 		        	}
 	        		else{
 	        			jmenus.go(key);

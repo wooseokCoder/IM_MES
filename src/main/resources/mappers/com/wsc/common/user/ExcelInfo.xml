@@ -6,152 +6,89 @@
 <mapper namespace="com.wsc.common.user.ExcelInfo">
 
     <!-- ========================================================== -->
-    <!--   Oracle Paging Clause                                     -->
+    <!--   getSelectExcelGroup - 엑셀 그룹 목록 조회                  -->
     <!-- ========================================================== -->
-    <sql id="pagingColumns">
-        <if test="start == null or end == null">
-            ,0 AS RNUM
-        </if>
-    </sql>
-    <sql id="pagingOpen">
-        <if test="start != null and end != null">
-            SELECT * 
-              FROM (
-                    SELECT X.*
-                      FROM (
-                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
-                              FROM (
-        </if>
-    </sql>
-    <sql id="pagingClose">
-        <if test="start != null and end != null">
-                                   ) Z1, (SELECT @rownum:=0 ) Z2
-                           ) X
-                     WHERE RNUM <![CDATA[< ]]> #{end}
-                   ) X
-             WHERE RNUM <![CDATA[>= ]]> #{start}
-        </if>  
-    </sql>
-    <sql id="sortClause">
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
-            <foreach item="sort" collection="gsSorts" open="" separator="," close="">
-                ${sort}
-            </foreach>
-        </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
-               A.FILE_NM DESC
-              ,CAST(A.VIEW_NO AS UNSIGNED) 
-        </if>
-    </sql>
-
-
-    <select id="getSelectExcelGroup" resultType="record" parameterType="params">
-        SELECT DISTINCT FILE_NM AS fileNm
-          FROM SYS_EXCEL_INFO
-         WHERE SYS_ID = #{sysId}
+    <select id="getSelectExcelGroup" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_excelinfo_get_select_excel_group(
+            #{sysId, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    
-    
-    <!-- ========================================================== -->
-    <!--   Common Group Column Information                          -->
-    <!-- ========================================================== -->
-    <sql id="selectColumns">
-         A.SYS_ID         AS "sysId"
-        ,A.FILE_NM        AS "fileNm"
-        ,A.SEQ            AS "seq"
-        ,A.VIEW_NO        AS "viewNo"
-        ,A.COL_LVL        AS "colLvl"
-        ,A.COL_VAL        AS "colVal"
-        ,A.STYLE          AS "align"
-    </sql>
 
     <!-- ========================================================== -->
-    <!--   Group Management                                         -->
+    <!--   search - 엑셀 정보 목록 조회 (페이징)                       -->
     <!-- ========================================================== -->
-    <select id="search" resultType="record" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectColumns" />
-               <include refid="pagingColumns" /><!-- PAGING -->
-          FROM SYS_EXCEL_INFO   A
-         WHERE SYS_ID    = #{sysId}
-           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(s_fileNm)">
-           AND FILE_NM   = #{s_fileNm}
-           </if>
-         ORDER 
-            BY <include refid="sortClause" /><!-- SORT -->
-        <include refid="pagingClose" /><!-- PAGING -->
+    <select id="search" statementType="CALLABLE" resultType="record" parameterType="params">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_excelinfo_search(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{s_fileNm, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=INTEGER},
+            #{end, mode=IN, jdbcType=INTEGER},
+            #{sortStr, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="searchCount" resultType="int" parameterType="params">
-        SELECT COUNT(1) 
-          FROM SYS_EXCEL_INFO   A
-         WHERE SYS_ID    = #{sysId}
-           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(s_fileNm)">
-           AND FILE_NM   = #{s_fileNm}
-           </if>
+
+    <!-- ========================================================== -->
+    <!--   searchCount - 엑셀 정보 건수 조회                          -->
+    <!-- ========================================================== -->
+    <select id="searchCount" statementType="CALLABLE" resultType="int" parameterType="params">
+        {CALL sp_excelinfo_search_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{s_fileNm, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="select" resultType="record" parameterType="params">
-        SELECT <include refid="selectColumns" />
-          FROM SYS_EXCEL_INFO   A
-         WHERE SYS_ID    = #{sysId}
-           AND FILE_NM   = #{fileNm}
-           AND SEQ       = #{seq}
+
+    <!-- ========================================================== -->
+    <!--   select - 엑셀 정보 상세 조회                               -->
+    <!-- ========================================================== -->
+    <select id="select" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_excelinfo_select(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{fileNm, mode=IN, jdbcType=VARCHAR},
+            #{seq, mode=IN, jdbcType=INTEGER}
+        )}
     </select>
-    <insert id="insert" parameterType="params">
-        <selectKey resultType="string" keyProperty="seq" order="BEFORE">
-            SELECT IFNULL(MAX(seq),0) +1  AS "seq"
-              FROM SYS_EXCEL_INFO
-             WHERE SYS_ID     = #{sysId}
-               AND FILE_NM    = #{fileNm}
-        </selectKey>
-        INSERT 
-          INTO SYS_EXCEL_INFO 
-             ( SYS_ID
-             , SEQ  
-             , FILE_NM
-             , VIEW_NO
-             , COL_LVL
-             , COL_VAL
-             , STYLE
-             , USE_IDX
-             , REGI_ID
-             , REGI_DATE
-             , CHNG_ID
-             , CHNG_DATE
-             )
-        VALUES
-             ( #{sysId}
-             , #{seq} 
-             , #{fileNm}
-             , #{viewNo} 
-             , #{colLvl}
-             , #{colVal}
-             , #{align}
-             , 'Y'
-             , #{gsUserId}
-             , NOW()
-             , #{gsUserId}
-             , NOW()
-             )
+
+    <!-- ========================================================== -->
+    <!--   insert - 엑셀 정보 등록                                    -->
+    <!-- ========================================================== -->
+    <insert id="insert" statementType="CALLABLE" parameterType="params">
+        {CALL sp_excelinfo_insert(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{fileNm, mode=IN, jdbcType=VARCHAR},
+            #{viewNo, mode=IN, jdbcType=VARCHAR},
+            #{colLvl, mode=IN, jdbcType=VARCHAR},
+            #{colVal, mode=IN, jdbcType=VARCHAR},
+            #{align, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </insert>
-    <update id="update" parameterType="params">
-        UPDATE SYS_EXCEL_INFO
-           SET 
-               VIEW_NO    = #{viewNo}
-             , COL_LVL    = #{colLvl}
-             , COL_VAL    = #{colVal}
-             , STYLE      = #{align}
-             , CHNG_ID    = #{gsUserId}
-             , CHNG_DATE  = NOW()
-         WHERE SYS_ID     = #{sysId}
-           AND FILE_NM    = #{fileNm}
-           AND SEQ        = #{seq}
+
+    <!-- ========================================================== -->
+    <!--   update - 엑셀 정보 수정                                    -->
+    <!-- ========================================================== -->
+    <update id="update" statementType="CALLABLE" parameterType="params">
+        {CALL sp_excelinfo_update(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{fileNm, mode=IN, jdbcType=VARCHAR},
+            #{seq, mode=IN, jdbcType=INTEGER},
+            #{viewNo, mode=IN, jdbcType=VARCHAR},
+            #{colLvl, mode=IN, jdbcType=VARCHAR},
+            #{colVal, mode=IN, jdbcType=VARCHAR},
+            #{align, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </update>
-    <delete id="delete" parameterType="params">
-        DELETE 
-          FROM SYS_EXCEL_INFO
-         WHERE SYS_ID     = #{sysId}
-           AND FILE_NM    = #{fileNm}
-           AND SEQ        = #{seq}
-    </delete> 
+
+    <!-- ========================================================== -->
+    <!--   delete - 엑셀 정보 삭제                                    -->
+    <!-- ========================================================== -->
+    <delete id="delete" statementType="CALLABLE" parameterType="params">
+        {CALL sp_excelinfo_delete(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{fileNm, mode=IN, jdbcType=VARCHAR},
+            #{seq, mode=IN, jdbcType=INTEGER}
+        )}
+    </delete>
 
 </mapper>

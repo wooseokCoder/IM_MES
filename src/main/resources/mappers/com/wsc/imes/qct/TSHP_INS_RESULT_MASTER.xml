@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+ * ==========================================================================
+ * 화면명: QCT08A - 자주검사 현황
+ * ==========================================================================
+ * 설명: 자주검사 결과 마스터 CRUD 매퍼
+ *       QMS 전송 상태 갱신
+ * 테이블: TSHP_INS_RESULT_MASTER
+ * 작성일: 2026-03-17
+ * @author 송우석
+ * ==========================================================================
+-->
+<mapper namespace="com.wsc.imes.qct.TSHP_INS_RESULT_MASTER">
+
+    <!-- QMS 전송 (변환+INSERT+상태갱신 일괄) -->
+    <update id="TSHP_INS_RESULT_MASTER_QMS_SEND" parameterType="map" statementType="CALLABLE">
+        {CALL sp_imes_tshp_ins_result_master_qms_send(
+            #{gsPltCode},
+            #{insmNo},
+            #{gsUserId}
+        )}
+    </update>
+
+</mapper>

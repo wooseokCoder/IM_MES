@@ -124,9 +124,6 @@ public class MailService extends BaseService {
         	String regiId = result.getRegiId();
         	String userId = params.getString(ParamsMap.GS_USER_ID);
         	boolean admin = params.getBoolean(ParamsMap.GS_ADMIN);
-        	
-        	
-        	String hngId = result.getChngId();
 
         	if (admin)
         		result.put("editable", true);
@@ -296,15 +293,215 @@ public class MailService extends BaseService {
 
 		if(params.getString("mailType").equals("address")){
 			//메일발송
-//			try {
-//				sendMail(params);
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+			try {
+				sendMail(params);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
+	public void sendMail(ParamsMap params) throws IOException {
+		System.out.println("!!!!!!!!!!!!!!!!!!!!!");
+	 // 메일 관련 정보
+        String host = "smtp.naver.com";
+        int port=465;
+        String sendFrom = "";
 
+        Properties props = System.getProperties();
+
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.debug", "true");
+        props.put("mail.smtp.socketFactory.port", port);
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.socketFactory.fallback", "false");
+
+        Authenticator auth = new SMTPAuthenticatior(smtp_id, smtp_pw);
+        Session ses = Session.getInstance(props, auth);
+
+        ses.setDebug(true); //for debug
+
+        if(smtp_read.equals("N")){
+	        Message mimeMessage = new MimeMessage(ses);
+	        try {
+	            // 메일 내용
+	        	Address[] recipient = InternetAddress.parse(params.get("mail_to").toString().replaceAll(";", ","));
+	            String subject = params.get("bordTitle").toString();
+	            String body = "";
+	            //body = "<img style='display:none;' width='0' height='0' src='http://192.168.0.64:2020/wsc/common/mail/read.do?bordNo="+params.get("bordNo")+"' />";
+	            body = params.get("mail_text").toString();
+	            Address[] cc = InternetAddress.parse(params.get("mail_cc").toString().replaceAll(";", ","));
+
+				mimeMessage.setFrom(new InternetAddress(smtp_id + "@naver.com"));
+		        mimeMessage.setRecipients(Message.RecipientType.TO, recipient);
+		        mimeMessage.addRecipients(Message.RecipientType.CC,cc);
+		        mimeMessage.setSubject(subject);
+		        mimeMessage.setText(body);
+		        //mimeMessage.setContent(body, "text/html; charset=utf-8");
+
+		        MimeBodyPart mbp1 = new MimeBodyPart();
+		        mbp1.setContent(body, "text/html; charset=utf-8");
+
+		        Multipart mp = new MimeMultipart();
+		        mp.addBodyPart(mbp1);
+		        int fileCnt = Integer.parseInt(params.get("fileCnt").toString());
+		        if(fileCnt > 0){
+				        //fileName = fileSize(fileName);
+				        MimeBodyPart[] mbp2 = new MimeBodyPart[fileCnt];
+				        FileDataSource[] fds = new FileDataSource[fileCnt];
+			        	for(int j = 0; j < Integer.parseInt(params.get("fileCnt").toString()); j++){
+			        		String upPath = params.get("filePath"+j).toString() + "/";
+			        		String fileName = params.get("fileName"+j).toString();
+					        String filePath = upPath + fileName;
+			        		mbp2[j] = new MimeBodyPart();
+			        		fds[j] = new FileDataSource(filePath);
+
+					        mbp2[j].setDataHandler(new DataHandler(fds[j]));
+					        mbp2[j].setFileName(params.get("saveName"+j).toString());
+				        	mp.addBodyPart(mbp2[j]);
+			        	}
+
+		        }
+
+		        mimeMessage.setContent(mp);
+
+		        Transport.send(mimeMessage);  //메일 발송
+			} catch (AddressException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (MessagingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }else{
+	        try {
+	            // 메일 내용
+	        	String[] recipient = params.get("mail_to").toString().replaceAll(";", ",").split(",");
+	            String subject = params.get("bordTitle").toString();
+	            String[] cc = params.get("mail_cc").toString().replaceAll(";", ",").split(",");
+	            int ln = 0;
+	            if(cc[0].equals("") || cc[0] == null){
+	            	ln = 1;
+	            }
+	            System.out.println("mail_to1 ::"+recipient.length);
+	            System.out.println("mail_cc1 ::"+cc.length);
+
+	            String[] sendTo = new String[recipient.length + cc.length];
+	            System.arraycopy(recipient, 0, sendTo, 0, recipient.length);
+	            System.arraycopy(cc, 0, sendTo, recipient.length, cc.length);
+	            System.out.println("sendTo1 ::"+sendTo.length);
+	            System.out.println("length1 ::"+ln);
+
+	            for(int i = 0; i < sendTo.length-ln; i++){
+		            //System.out.println("send ID::"+sendTo[i].toString());
+	            	sendFrom = sendTo[i];
+
+	            	Message mimeMessage = new MimeMessage(ses);
+		            String body = "";
+		            body = "<img style='display:none;' width='0' height='0' src='http://180.70.123.37:2020/wsc/common/mail/read.do?bordNo="+params.get("bordNo")+"&userId="+sendTo[i]+"&bordGrup="+ params.getString("bordGrup") +"' />";
+		            body += params.get("bordText").toString();
+
+					mimeMessage.setFrom(new InternetAddress(smtp_id + "@naver.com"));
+			        mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(sendTo[i]));
+			        //mimeMessage.addRecipients(Message.RecipientType.CC, cc);
+			        mimeMessage.setSubject(subject);
+			        //mimeMessage.setText(body);
+			       // mimeMessage.setContent(body, "text/html; charset=utf-8");
+
+			        /*Multipart multiPart = new MimeMultipart();
+			        BodyPart bodyPart = new MimeBodyPart();
+
+			        bodyPart.setText(body);
+			        multiPart.addBodyPart(bodyPart);
+
+			        MimeBodyPart[] mbp = new MimeBodyPart[2];*/
+
+			        MimeBodyPart mbp1 = new MimeBodyPart();
+			        mbp1.setContent(body, "text/html; charset=utf-8");
+
+			        Multipart mp = new MimeMultipart();
+			        mp.addBodyPart(mbp1);
+			        //int fileCnt = Integer.parseInt(params.get("fileCnt").toString());
+			        int fileCnt = params.get("files").toString().length();
+			        if(fileCnt > 0){
+					        //fileName = fileSize(fileName);
+					       /* MimeBodyPart[] mbp2 = new MimeBodyPart[fileCnt];
+					        FileDataSource[] fds = new FileDataSource[fileCnt];
+				        	for(int j = 0; j < Integer.parseInt(params.get("fileCnt").toString()); j++){
+				        		String upPath = params.get("filePath"+j).toString() + "/";
+				        		String fileName = params.get("fileName"+j).toString();
+						        String filePath = upPath + fileName;
+				        		mbp2[j] = new MimeBodyPart();
+				        		fds[j] = new FileDataSource(filePath);
+
+						        mbp2[j].setDataHandler(new DataHandler(fds[j]));
+						        mbp2[j].setFileName(params.get("saveName"+j).toString());
+					        	mp.addBodyPart(mbp2[j]);
+				        	}*/
+			        	List<Map> files = BaseUtils.getJsonList(params, "files");
+			        	List<FileInfo> list = new ArrayList<FileInfo>();
+			        	MimeBodyPart[] mbp2 = new MimeBodyPart[fileCnt];
+				        FileDataSource[] fds = new FileDataSource[fileCnt];
+				        int j = 0;
+
+			        	for (Map map : files) {
+			    			/*file.setFileSize(BaseUtils.getLong(map, "fileSize"));
+			    			file.setFileType((String)map.get("fileType"));
+			    			file.setFilePath((String)map.get("filePath"));
+			    			file.setFileName((String)map.get("fileName"));
+			    			file.setSaveName((String)map.get("saveName"));
+			    			file.setOper    ((String)map.get("oper"));
+			    			file.setFileNo  ((String)map.get("fileNo"));
+			    			file.setSysId   (params.getString("sysId"));
+			    			file.setAtchNo  (params.getString("atchNo"));
+			    			file.setAtchGrup(params.getString("atchGrup"));
+			    			file.setGsUserId(params.getString("gsUserId"));
+			    			file.setAtchDirectory();*/
+
+			        		String filePath = "C:/" + path + map.get("filePath").toString() + "/" + map.get("saveName").toString();
+			        		//String filePath = "C:/" + path + "/" + map.get("saveName").toString();
+			        		mbp2[j] = new MimeBodyPart();
+			        		fds[j] = new FileDataSource(filePath);
+
+					        mbp2[j].setDataHandler(new DataHandler(fds[j]));
+					        mbp2[j].setFileName(map.get("fileName").toString());
+				        	mp.addBodyPart(mbp2[j]);
+
+			        		j++;
+			    		}
+			        }
+
+			        mimeMessage.setContent(mp);
+
+			        Transport.send(mimeMessage);  //메일 발송
+	            }
+			} catch (AddressException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				ParamsMap failParams = new ParamsMap();
+				failParams.put("sysId", systemID);
+				failParams.put("bordNo", params.getString("bordNo"));
+				failParams.put("bordGrup", params.getString("bordGrup"));
+				failParams.put("userId", sendFrom);
+				failMail(failParams);
+			} catch (MessagingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				ParamsMap failParams = new ParamsMap();
+				failParams.put("sysId", systemID);
+				failParams.put("bordNo", params.getString("bordNo"));
+				failParams.put("bordGrup", params.getString("bordGrup"));
+				failParams.put("userId", sendFrom);
+				failMail(failParams);
+			}
+        }
+	}
+	public void failMail(ParamsMap params){
+		Object result = update("updateFailMail", params);
+	}
 	//게시판 비활성처리(보낸메일함에서 삭제시 사용됨)
 	@Transactional
 	public int updateDisable(Map params) {

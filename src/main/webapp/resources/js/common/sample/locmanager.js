@@ -359,7 +359,7 @@ function initEventListeners() {
 				var boxIndex = i;
 				var boxLabel = box.label;
 				// 확인 메시지
-				$.messager.confirm(msg.MSG0123, msg.MSG0099 + ' "' + boxLabel + '"?', function(r) {
+				$.messager.confirm(msg.MSG0053, msg.MSG0080 + ' "' + boxLabel + '"?', function(r) {
 					if (!r) return;
 					// 박스 제거
 					numBox.splice(boxIndex, 1);
@@ -372,7 +372,7 @@ function initEventListeners() {
 							box.draw();
 						});
 					}
-					$.messager.alert(msg.MSG0122, msg.MSG0100 + ' "' + boxLabel + '" ' + msg.MSG0101 + '.', msg.MSG0122);
+					$.messager.alert(msg.MSG0052, msg.MSG0081 + ' "' + boxLabel + '" ' + msg.MSG0084 + '.', msg.MSG0052);
 				});
 				break;
 			}
@@ -443,7 +443,7 @@ function doSaveSign() {
 	var canvasImg = window.signCanvas.toDataURL('image/png');
 	
 	if (canvasImg == window.signEmptyImg) {
-		$.messager.alert(msg.MSG0121, msg.MSG0094, msg.MSG0121);
+		$.messager.alert(msg.MSG0051, msg.MSG0103, msg.MSG0051);
 		return;
 	}
 	
@@ -454,7 +454,7 @@ function doSaveSign() {
 	// 현재 캔버스에 있는 모든 박스 데이터 수집
 	var wareHous = $("#WARE_HOUS").combobox("getValue");
 	if (!wareHous || wareHous.trim() === '') {
-		$.messager.alert(msg.MSG0121, msg.MSG0047, msg.MSG0121);
+		$.messager.alert(msg.MSG0051, msg.MSG0043, msg.MSG0051);
 		return;
 	}
 	
@@ -483,11 +483,11 @@ function doSaveSign() {
 		data: formData,
 		dataType: 'json',
 		success: function(result) {
-			$.messager.alert(msg.MSG0122, msg.MSG0096, msg.MSG0122);
+			$.messager.alert(msg.MSG0052, msg.MSG0104, msg.MSG0052);
 			doCloseSign();
 		},
 		error: function(xhr, status, error) {
-			$.messager.alert(msg.MSG0121, msg.MSG0097 + ': ' + error, msg.MSG0121);
+			$.messager.alert(msg.MSG0051, msg.MSG0079 + ': ' + error, msg.MSG0051);
 		}
 	});
 }
@@ -558,7 +558,7 @@ function doSearch() {
 			}
 		},
 		error: function(xhr, status, error) {
-			$.messager.alert(msg.MSG0121, msg.MSG0098 + ': ' + error, msg.MSG0121);
+			$.messager.alert(msg.MSG0051, msg.MSG0102 + ': ' + error, msg.MSG0051);
 		}
 	});
 }
@@ -567,7 +567,7 @@ function doSearch() {
 function doAddBox() {
 	var wareHous = $("#WARE_HOUS").combobox("getValue");
 	if (!wareHous || wareHous.trim() === '') {
-		$.messager.alert(msg.MSG0121, msg.MSG0047, msg.MSG0121);
+		$.messager.alert(msg.MSG0051, msg.MSG0043, msg.MSG0051);
 		return;
 	}
 	
@@ -620,7 +620,7 @@ function initCheckSignDialog() {
 function doCheckSign() {
 	var wareHous = $("#WARE_HOUS").combobox("getValue");
 	if (!wareHous || wareHous.trim() === '') {
-		$.messager.alert(msg.MSG0121, msg.MSG0047, msg.MSG0121);
+		$.messager.alert(msg.MSG0051, msg.MSG0043, msg.MSG0051);
 		return;
 	}
 	
@@ -640,11 +640,11 @@ function doCheckSign() {
 				$("#check-sign-dialog").dialog('center');
 				$("#check-sign-dialog").dialog('open');
 			} else {
-				$.messager.alert(msg.MSG0121, msg.MSG0102, msg.MSG0121);
+				$.messager.alert(msg.MSG0051, msg.MSG0083, msg.MSG0051);
 			}
 		},
 		error: function(xhr, status, error) {
-			$.messager.alert(msg.MSG0121, msg.MSG0098 + ': ' + error, msg.MSG0121);
+			$.messager.alert(msg.MSG0051, msg.MSG0102 + ': ' + error, msg.MSG0051);
 		}
 	});
 }

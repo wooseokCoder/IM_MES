@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSAP_STOCK_COMM_QUERY.xml
+설명: 재고정보 조회 - 일반재고 매퍼 (TSAP_STOCK_COMM 테이블)
+원본: ProActive TSAP_STOCK_COMM_QUERY.cs
+작성일: 2026-03-03
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.mat.TSAP_STOCK_COMM_QUERY">
+
+    <!--
+    ============================================================
+    TSAP_STOCK_COMM_QUERY1: 일반재고 조회
+    용도: MAT02A 일반재고 조회
+    원본: TSAP_STOCK_COMM_QUERY.TSAP_STOCK_COMM_QUERY1
+    ============================================================
+    -->
+    <select id="TSAP_STOCK_COMM_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tsap_stock_comm_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{partLike,  mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+
+</mapper>

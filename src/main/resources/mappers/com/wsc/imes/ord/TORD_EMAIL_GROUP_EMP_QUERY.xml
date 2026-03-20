@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TORD_EMAIL_GROUP_EMP_QUERY.xml
+설명: 이메일 수신자그룹 사원 조회 매퍼 (TORD_EMAIL_GROUP_EMP 테이블)
+작성자: 송우석
+작성일: 2026-02-10
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TORD_EMAIL_GROUP_EMP_QUERY">
+
+    <!--
+    ============================================================
+    TORD_EMAIL_GROUP_EMP_QUERY1: 그룹별 사원 목록 조회
+    용도: 메인 그리드2 (우측 사원 목록)
+    JOIN: TSTD_EMPLOYEE E (사원명), TSTD_ORG O (부서명)
+    ============================================================
+    -->
+    <select id="TORD_EMAIL_GROUP_EMP_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tord_email_group_emp_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER},
+            #{mcode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

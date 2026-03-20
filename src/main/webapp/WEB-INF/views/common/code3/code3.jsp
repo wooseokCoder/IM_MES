@@ -27,13 +27,12 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/common/code3/code3.js?v=1103A" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/code3/code3.js?v=260310A" />"></script>
 
 <style>
 #report-button-pdf .l-btn-text{
 	width: 100px;
 }
-.search-label-h {width:10%;}
 </style>
 </head>
 
@@ -92,9 +91,20 @@
 <div id="search-toolbar" class="wui-toolbar">
 	<form id="search-form">
 		<fieldset class="div-line3-new Remake-div-line-new" >
-	        <table cellpadding="4" class="search-table tableSearch-c wd-100" style="margin-top: 0;"  >
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100" style="margin-top: 0;"  >
+	        	<colgroup>
+	        		<col width="70px">
+	        		<col width="150px">
+	        		<col width="43px">
+	        		<col width="120px">
+	        		<col width="43px">
+	        		<col width="120px">
+	        		<col width="70px">
+	        		<col width="120px">
+	        		<col width="*">
+	        	</colgroup>
 	        	<tr class="topnav_sty">
-            		<td colspan="8" >
+            		<td colspan="9" >
             			<div>
 	            			<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
 	            			<div>
@@ -107,7 +117,7 @@
             	</tr>
 
 	            <tr>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_001"><span>Code Group </span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>Code Group </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="codeGrup" ID="s_codeGrup" >
 							<option value="ALL">ALL</option>
@@ -117,15 +127,15 @@
 							<option value="0" selected>Code Group</option>
 						</select>
 					</td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_003"><span>Code </span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_003"><span>Code </span></th>
 					<td class="d">
 						<input class="easyui-textbox" name="codeCd" id="s_codeCd"  />
 					</td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_003"><span>Code Desc </span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_003"><span>Code Desc </span></th>
 					<td class="d">
 						<input class="easyui-textbox" name="codeDesc" id="s_codeDesc"/>
 					</td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_002"><span>Use Flag </span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>Use Flag </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="useFlag" ID="s_useFlag" data-options="panelHeight:'auto'">
 						<option value="ALL">ALL</option>
@@ -135,26 +145,8 @@
 										</c:if>
 							</c:forEach>
 						</select>
-					<!-- span class 추가 20160928 박소현 -->
-						<!-- <span class="radio-span">
-							<input name="useFlag" type="radio" value="Y" id="s_useFlag1"/><label for="s_useFlag1">사용중</label>
-							<input name="useFlag" type="radio" value="N" id="s_useFlag2"/><label for="s_useFlag2">중지</label>
-						</span> -->
 					</td>
-					<%-- <th class="h" data-item="LAB_003"><span>정렬선택 </span></th>
-					<td class="d">
-						<select class="easyui-combobox" name="sort" ID="s_sort" data-options="mode:'remote',width:85,onChange:doGrupChange">
-							<c:forEach var="selectCodeSort" items="${selectCodeSort}">
-								<option value="${selectCodeSort.codeCd}" <c:if test="${selectCodeSort.codeCd eq 'codeName'}">selected</c:if>>${selectCodeSort.codeName}</option>
-							</c:forEach>
-						</select>
-					<!-- <input class="easyui-combobox" name="sort" id="s_sort" codeGrup="CODE_SORT" data-options="mode:'remote',width:100,loader:jcombo.loader"/> -->
-					</td> --%>
-					<%-- <td class="b">
-						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001" data-options="disabled:${RET}">Search</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton cgray" id="sort-button"  data-item="BTN_002">Sort</a>
-						<input type="hidden" name="sortValue" id="sortValue" value=""/>
-					</td> --%>
+					<td></td>
 	            </tr>
 	        </table>
 	   </fieldset>
@@ -197,7 +189,7 @@
 </div>
 
 <!-- 정렬팝업창 -->
-<%-- 
+<%--
 <div id="sort-dialog" class="wui-dialog" style="border-top-width:1px;display:none">
 	<div id = "sort-div" class="sortlistLeft">
 	</div>
@@ -214,7 +206,7 @@
 	</div>
 </div>
  --%>
- 
+
 <!-- 정렬팝업창 -->
 <div id="sort-dialog" class="wui-dialog" style="border-top-width:1px;display:none">
 	<div id = "sort-div" class="sortlistLeft">
@@ -253,7 +245,7 @@
 <%@ include file="/WEB-INF/views/include/body.foot.jsp" %>
 
 <!-- 등록화면 -->
-<div id="regist-dialog" class="wui-dialog" style="border-top-width:1px;">
+<div id="regist-dialog" class="wui-dialog" style="border-top-width:1px;display:none;">
 	<form id="search-create-form">
 		<input type="hidden" id="r_codeGrup" name="codeGrup" value="" />
 		<input type="hidden" id="r_codeCd" name="codeCd" value="" />
@@ -333,7 +325,7 @@
 		</fieldset>
 	</form>
 </div>
-<div id="regist-dialog2" class="wui-dialog" style="border-top-width:1px;">
+<div id="regist-dialog2" class="wui-dialog" style="border-top-width:1px;display:none;">
 	<form id="search-create-form2">
 		<input type="hidden" id="r_codeGrup2" name="codeGrup" value="" />
 		<input type="hidden" id="r_codeCd2" name="codeCd" value="" />

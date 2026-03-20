@@ -5,89 +5,61 @@
 
 <mapper namespace="com.wsc.common.test.Test">
 
-    <!-- Paging Columns -->
-    <sql id="pagingColumns">
-        <if test="start == null or end == null">
-            ,0 AS RNUM
-        </if>
-    </sql>
-    <sql id="pagingOpen">
-        <if test="start != null and end != null">
-            SELECT *
-              FROM (
-                    SELECT X.*
-                      FROM (
-                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
-                              FROM (
-        </if>
-    </sql>
-    <sql id="pagingClose">
-        <if test="start != null and end != null">
-                                   ) Z1, (SELECT @rownum:=0 ) Z2
-                           ) X
-                     WHERE RNUM <![CDATA[< ]]> #{end}
-                   ) X
-             WHERE RNUM <![CDATA[>= ]]> #{start}
-        </if>
-    </sql>
+    <!-- ========================================================== -->
+    <!--   Test 메뉴 관리 (SYS_MENU) - 프로시저 호출                   -->
+    <!-- ========================================================== -->
 
-    <sql id="selectColumns">
-         A.SYS_ID         AS "sysId"
-        ,A.MENU_KEY       AS "menuKey"
-        ,A.MENU_DESC      AS "menuDesc"
-        ,A.MENU_URL       AS "menuUrl"
-        ,A.PARENT_KEY     AS "parentKey"
-        ,A.MENU_LEVEL     AS "menuLevel"
-        ,A.MENU_SEQ       AS "menuSeq"
-        ,A.USE_FLAG       AS "useFlag"
-        ,A.REGI_ID        AS "regiId"
-        ,DATE_FORMAT(A.REGI_DATE ,'%Y-%m-%d %H:%i:%s') AS "regiDate"
-    </sql>
-
-    <sql id="whereClause">
-        SYS_ID = #{sysId}
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuKey)">AND MENU_KEY = #{menuKey}</if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(menuDesc)">AND MENU_DESC LIKE CONCAT('%',#{menuDesc},'%')</if>
-    </sql>
-
-    <select id="search" resultType="record" parameterType="params">
-        <include refid="pagingOpen" />
-        SELECT <include refid="selectColumns" />
-               <include refid="pagingColumns" />
-          FROM SYS_MENU A
-         WHERE <include refid="whereClause" />
-         ORDER BY A.MENU_KEY
-        <include refid="pagingClose" />
+    <!-- [search] 메뉴 목록 조회 (페이징 및 동적 검색) -->
+    <select id="search" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_test_search(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{menuKey, mode=IN, jdbcType=VARCHAR},
+            #{menuDesc, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=INTEGER},
+            #{end, mode=IN, jdbcType=INTEGER}
+        )}
     </select>
 
-    <select id="searchCount" resultType="int" parameterType="params">
-        SELECT COUNT(1)
-          FROM SYS_MENU A
-         WHERE <include refid="whereClause" />
+    <!-- [searchCount] 메뉴 카운트 -->
+    <select id="searchCount" statementType="CALLABLE" parameterType="params" resultType="int">
+        {CALL sp_test_search_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{menuKey, mode=IN, jdbcType=VARCHAR},
+            #{menuDesc, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-    <insert id="insert" parameterType="params">
-        INSERT INTO SYS_MENU (
-            SYS_ID, MENU_KEY, MENU_DESC, MENU_URL, PARENT_KEY, MENU_LEVEL, MENU_SEQ, USE_FLAG, REGI_ID, REGI_DATE
-        ) VALUES (
-            #{sysId}, #{menuKey}, #{menuDesc}, #{menuUrl}, #{parentKey}, #{menuLevel}, #{menuSeq}, 'Y', #{gsUserId}, NOW()
-        )
+    <!-- [insert] 메뉴 등록 -->
+    <insert id="insert" statementType="CALLABLE" parameterType="params">
+        {CALL sp_test_insert(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{menuKey, mode=IN, jdbcType=VARCHAR},
+            #{menuDesc, mode=IN, jdbcType=VARCHAR},
+            #{menuUrl, mode=IN, jdbcType=VARCHAR},
+            #{parentKey, mode=IN, jdbcType=VARCHAR},
+            #{menuLevel, mode=IN, jdbcType=INTEGER},
+            #{menuSeq, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </insert>
 
-    <update id="update" parameterType="params">
-        UPDATE SYS_MENU
-           SET MENU_DESC = #{menuDesc}
-             , MENU_URL  = #{menuUrl}
-             , CHNG_ID   = #{gsUserId}
-             , CHNG_DATE = NOW()
-         WHERE SYS_ID    = #{sysId}
-           AND MENU_KEY  = #{menuKey}
+    <!-- [update] 메뉴 수정 -->
+    <update id="update" statementType="CALLABLE" parameterType="params">
+        {CALL sp_test_update(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{menuKey, mode=IN, jdbcType=VARCHAR},
+            #{menuDesc, mode=IN, jdbcType=VARCHAR},
+            #{menuUrl, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </update>
 
-    <delete id="delete" parameterType="params">
-        DELETE FROM SYS_MENU
-         WHERE SYS_ID    = #{sysId}
-           AND MENU_KEY  = #{menuKey}
+    <!-- [delete] 메뉴 삭제 -->
+    <delete id="delete" statementType="CALLABLE" parameterType="params">
+        {CALL sp_test_delete(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{menuKey, mode=IN, jdbcType=VARCHAR}
+        )}
     </delete>
 
 </mapper>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_PROC_INS_QUERY.xml
+설명: 자주검사 항목 조회 매퍼 (TSTD_PROC_INS 테이블)
+작성자: 송우석
+작성일: 2026-02-27
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.qct.TSTD_PROC_INS_QUERY">
+
+    <!--
+    ============================================================
+    TSTD_PROC_INS_QUERY1: 검사항목 목록 조회 (메인 그리드)
+    ============================================================
+    -->
+    <select id="TSTD_PROC_INS_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_proc_ins_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_PROC_INS_IMG: 검사항목 이미지 base64 단건 조회
+    SP 내부 TO_BASE64()로 문자열 반환 (RecordMap byte[]→String 변환 회피)
+    ============================================================
+    -->
+    <select id="TSTD_PROC_INS_IMG" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_proc_ins_img_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_PROC_INS_IMG_BATCH: 검사항목 이미지 base64 일괄 조회
+    쉼표 구분 insCode 목록으로 1회 요청 (성능 개선)
+    ============================================================
+    -->
+    <select id="TSTD_PROC_INS_IMG_BATCH" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_proc_ins_img_batch_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insCodes, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    LSE_STD_PROC_SER2: 공정코드 콤보박스 조회
+    LPROC_CODE 기반 필터 (ASSY/PROC 분기)
+    ============================================================
+    -->
+    <select id="LSE_STD_PROC_SER2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_std_proc_ser2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{lprocCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

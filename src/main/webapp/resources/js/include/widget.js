@@ -196,7 +196,20 @@ var jwidget = {
 				URL: "/menu.json",
 				buttons: [],
 				linkHtml: '',
-				menuHtml: ''
+				menuHtml: '',
+				// ── 헤더 드롭다운 메뉴 설정 ──────────────────────────
+				// submenuKey     : 좌측 메뉴에서 숨기고, 헤더 드롭다운의 소스로 사용할 메뉴 KEY
+				// myAccountMenuKey : 드롭다운 목록에서 숨길 메뉴 KEY (사용자 아이콘 클릭으로 직접 열림)
+				//   - DEAL   : 딜러 사용자가 아이콘 클릭 시 열리는 메뉴
+				//   - NODEAL : 딜러 외 사용자가 아이콘 클릭 시 열리는 메뉴
+				// 관련 코드: north.jsp - buildAccountDropdown(), myAccountMenu()
+				//           widget.js - submenu.rebuild()
+				// ─────────────────────────────────────────────────────
+				submenuKey : "LS007",
+				myAccountMenuKey : {
+					DEAL : "LS603",
+					NODEAL : "LS605"
+				}
 			},
 			//메뉴 로딩 및 탭패널 생성
 			load: function( args ) {
@@ -222,6 +235,11 @@ var jwidget = {
 
 			        	//상단메뉴패널 생성
 		        		m.create();
+
+		        		//계정 드롭다운 메뉴 생성
+		        		if (typeof buildAccountDropdown === 'function') {
+		        			buildAccountDropdown();
+		        		}
 
 		        		if (!args){
 		        			//jwidget.submenu.load('LS001');
@@ -451,6 +469,25 @@ var jwidget = {
 				return true;
 			return false;
 		},
+		//Home 탭 생성 (닫기 불가, /homeContent.do를 iframe으로 로딩)
+		createHome: function() {
+			// 탭 위젯 초기화 (create 호출로 위임)
+			this.create({});
+
+			if (!this.tab) return;
+
+			// Home 탭이 이미 있으면 무시
+			if (this.tab.tabs('exists', 'Home')) return;
+
+			var iframeUrl = getUrl('/homeContent.do');
+			this.tab.tabs('add', {
+				id:       'HOME',
+				title:    'Home',
+				content:  '<iframe scrolling="yes" frameborder="0" id="iframe-HOME" name="iframe-HOME" src="' + iframeUrl + '" class="wui-iframe tap-iframe" onload="windowResizing();"></iframe>',
+				cls:      'wui-tab',
+				closable: false
+			});
+		},
 		//중앙탭 패널추가
 		create: function( args ) {
 			if ($(this.consts.KEY).length <= 0)
@@ -467,10 +504,29 @@ var jwidget = {
 						var popts = panel.panel('options');
 						//좌측서브메뉴 트리 생성
 						jwidget.submenu.load(popts.id);
-						//console.log("Select");
-						var tab12 = $(this).tabs('getSelected');
-						var index12 = $(this).tabs('getTabIndex',tab12);
-						//console.log(index12);
+
+						// 새로고침 복원용: 활성 탭 저장 (Home이면 제거)
+						if (popts.id === 'HOME') {
+							sessionStorage.removeItem('activeTab');
+							// Home 탭 팝업 re-center (hidden 상태에서 열린 팝업 보정)
+							setTimeout(function() {
+								try {
+									var f = document.getElementById('iframe-HOME');
+									if (f && f.contentWindow && f.contentWindow.$) {
+										var $f = f.contentWindow.$;
+										$f('[id^="popup-"]').each(function() {
+											try {
+												if (!$f(this).dialog('options').closed) {
+													$f(this).dialog('center');
+												}
+											} catch(e) {}
+										});
+									}
+								} catch(e) {}
+							}, 100);
+						} else {
+							sessionStorage.setItem('activeTab', popts.id);
+						}
 					},
 					//탭을 모두 닫을시에 메인 index로 가게해준다. 2017 05-31 박상후
 					onClose: function(title,index){
@@ -655,19 +711,36 @@ var jwidget = {
 			
 			console.log("tt : " + tabsMenuDesc);
 			
+			// 이미 즐겨찾기에 있는 메뉴인지 확인 → 없을 때만 추가 버튼 표시
+			var _hotTools = [];
+			var _isHot = false;
+			try {
+				$.ajax({
+					url: jwidget.hotmenu.consts.URL.select,
+					dataType: 'json', type: 'post',
+					data: {menuKey: args.menuKey},
+					async: false,
+					success: function(d) {
+						if (d && d.rows && d.rows.menuKey) _isHot = true;
+					}
+				});
+			} catch(e) {}
+			if (!_isHot) {
+				_hotTools = [{
+					iconCls:'icon-mini-add',
+					handler:function() {
+						jwidget.hotmenu.add(args.menuKey);
+					}
+				}];
+			}
+
 			this.tab.tabs('add', {
 				id:       args.menuKey,
 				title:    args.menuDesc,
 				content:  content,
 				cls:      'wui-tab',
-				closable: true/*,
-				tools:[{
-					iconCls:'icon-mini-add',
-					handler:function() {
-				    	//Hot Menu 추가
-				    	jwidget.hotmenu.add(args.menuKey);
-					}
-				}]*/
+				closable: true,
+				tools:    _hotTools
 			});
 			
 			// Add language link inside tabs-wrap (only for LANG_ADMIN group)
@@ -888,8 +961,8 @@ var jwidget = {
 				fit: true,
 				data: data,
 				onSelect: function(node) {
-					console.log(node);
-					
+					if(!node) return;
+
 					//홈버튼을 누르면 index로 이동
 					if(node.text == 'Home') {
 						goHome();
@@ -897,10 +970,12 @@ var jwidget = {
 						return;
 					}
 					
-					//열려있는 것 닫기 - 본인 제외
+					//열려있는 것 닫기 - 본인 및 즐겨찾기 제외
 					if($('#'+node.domId).find(".fa-angle-left").length > 0) {
-						$(".fa-angle-left").each(function() { 
+						$(".fa-angle-left").each(function() {
 							let ele = $(this).parents(".tree-node");
+							// 즐겨찾기 상위메뉴는 접지 않음
+							if (ele.attr("id") === '_hotmenu_parent') return;
 							
 							let levelNum = ele.attr("class").match(/tree-level(\d+)/);
 
@@ -944,13 +1019,26 @@ var jwidget = {
 
 				onContextMenu: function(e,node) {
 					e.preventDefault();
-					$(this).tree('select',node.target);
+					// 즐겨찾기 하위메뉴(직접 삽입 HTML)는 easyui tree 노드가 아니므로 node=null
+					if (!node) return;
+					// submenuYn='Y'인 상위메뉴는 제외
+					var attr = node.attributes || {};
+					if (attr.submenuYn === 'Y') return;
+
+					// 기존 하이라이트 제거 후 현재 노드만 하이라이트
+					$(this).find('.tree-node-selected').removeClass('tree-node-selected');
+					$(node.target).addClass('tree-node-selected');
+					// 컨텍스트 메뉴에서 선택한 노드 참조 저장
+					jwidget.submenu._contextNode = node;
 					mctx.menu('show',{left: e.pageX,top: e.pageY});
 				},
 				onLoadSuccess: function() {
 					//메뉴 권한 없을 경우 설정
 					$(".fa-angle-right").parent().removeClass("noAuth");
 					$("#left-menu > li > div:not(.tree-level3, .tree-level4)").removeClass("noAuth").addClass("tree-level2");
+
+					// 메뉴 트리 로드 완료 후 즐겨찾기(LS099) 하위 로드
+					jwidget.hotmenu.load();
 
 					//메뉴에 마우스를 올렸을 때, 메뉴의 텍스트가 잘렸다면 다 보여주기
 					//툴팁형
@@ -1090,7 +1178,9 @@ var jwidget = {
 
 					//2016/12/12 김영진 -- 좌측메뉴 구분자시 표시안함
 					d.forEach(function(c,i) {
-						if(c.enableYn == "Y") { 
+						// 드롭다운 전용 메뉴는 좌측 메뉴에서 숨김 (설정: jwidget.menu.consts.submenuKey)
+						if(c.menuKey == jwidget.menu.consts.submenuKey) return;
+						if(c.enableYn == "Y") {
 							if(c.menuLevel == "1" || c.progAuth == "1") {
 							if(c.sepaText != "-"){
 								//3단메뉴
@@ -1202,235 +1292,190 @@ var jwidget = {
 			//return this.tree.tree('getSelected');
 			return this.get().tree('getSelected');
 		},
-		//선택된 메뉴노드의 ID 반환
+		//선택된 메뉴노드의 ID 반환 (컨텍스트 메뉴에서 우클릭한 노드 우선)
+		_contextNode: null,
 		getSelectedId: function() {
-			var node = this.getSelected();
-			return node.id;
+			var node = this._contextNode || this.getSelected();
+			this._contextNode = null; // 사용 후 초기화
+			return node ? node.id : null;
 		}
 	},
 	//-----------------------------------------//
-	//좌측 핫메뉴
+	//좌측 핫메뉴 (#left-menu 트리 내부에 동일 구조로 삽입)
 	hotmenu: {
 		consts: {
-			TITLE: 'Hot Menu',
-			//20160929 박소현
-			//ICON:  'ui-icon ui-icon-star',
-			ICON : 'ui-icon ui-icon-circle-triangle-e',
-			PKEY:  "#left-hotmenu", //패널KEY
-			TKEY:  "#hot-menu",     //트리KEY
-			CKEY:  "#hot-context",  //컨텍스트메뉴KEY
-			HEIGHT:300,
-			WIDTH: 200,
+			PARENT_ID: 'HOTMENU',   // 즐겨찾기 상위메뉴 DOM용 ID
 			URL: {
 				search: getUrl("/common/user/hotmenu/search.json"),
 				select: getUrl("/common/user/hotmenu/select.json"),
 				save:   getUrl("/common/user/hotmenu/save.json")
 			}
 		},
-		//메뉴객체
-		get: function() {
-			return $(this.consts.TKEY);
-		},
-		_filterRows: function(rows) {
-			if (rows.length == 0)
-				return [];
-
-			var arr = [];
-			$.each(rows, function(i,c) {
-				//2016/12/12 김영진 -- 핫메뉴 구분자시 표시안함
-				if(c.sepaText != "-"){
-					arr.push({menuKey: c.id,menuDesc: c.text});
-				}
-			});
-			return arr;
-		},
-		//저장목록
-		getSaveRows: function() {
-			var rows = this.get().tree('getRoots');
-			return this._filterRows(rows);
-		},
-		//선택목록
-		getCheckRows: function() {
-			var row = this.get().tree('getSelected');
-			return this._filterRows([row]);
-		},
-		//핫메뉴 검색
+		// 핫메뉴 조회 → #left-menu 첫 번째 <li> 앞에 삽입
 		load: function() {
-			var p   = this;
-			var url = this.consts.URL;
-
-			//패널생성
-			$(this.consts.PKEY).panel({
-				title:   this.consts.TITLE,
-				iconCls: this.consts.ICON,
-				//height:  this.consts.HEIGHT,
-				//width:   this.consts.WIDTH,
-				collapsible:true,
-				fit:true
-			});
-
+			var p = this;
 			$.ajax({
-				url: url.search,
-		        dataType: 'json',
-		        type: 'post',
+				url: this.consts.URL.search,
+				dataType: 'json',
+				type: 'post',
 				success: function(data) {
-		        	if (data && data.rows) {
-		        		//
-		    			var arr = [];
-		    			$.each(data.rows, function(i,c) {
-		    				arr.push( p.filter(c) );
-		    			});
-
-		    			//트리생성
-		    			p.create(arr);
-		        	}
-				}
-			});
-		},
-		//메뉴트리 생성
-		create: function(data) {
-			//
-			var jobj = this;
-			var mctx = $(this.consts.CKEY);
-
-			jobj.get().tree({
-				fit: true,
-				dnd: true,
-				data: data,
-				onSelect: function(node) {
-					if(!node.children && node.enableYn == "Y" && node.progAuth == "1") {
-						var a = node.attributes;
-						jmenus.go(a.menuKey);
+					if (data && data.rows) {
+						p._render(data.rows);
+					} else {
+						p._render([]);
 					}
-				},
-				onContextMenu: function(e,node) {
-					e.preventDefault();
-					$(this).tree('select',node.target);
-					mctx.menu('show',{left: e.pageX,top: e.pageY});
-				},
-				onDrop:function(target,source,point){
-					//순서를 저장한다.
-					jobj.sort();
-                },
-                onBeforeDrop: function(target,source,point) {
-                	if (point == 'append')
-                		return false;
-                	return true;
-                }
-			});
-		},
-		//트리형태 데이터 생성
-		filter: function(menu) {
-			var obj = {
-				id  : menu.menuKey,
-				text: menu.menuDesc,
-				iconCls: menu.iconCls,
-				enableYn: menu.enableYn,
-				progAuth: menu.progAuth,
-				attributes: {
-					menuKey: menu.menuKey,
-					menuUrl: menu.menuUrl,
-					menuDesc: menu.menuDesc,
-					parentDesc:menu.parentDesc
 				}
-			};
-			return obj;
-		},
-		//핫메뉴 순서저장
-		sort: function() {
-			var p     = this;
-			var url   = this.consts.URL;
-			var rows  = this.getSaveRows();
-			var data  = {};
-			data['models'] = $.toJSON(rows);
-			//수정상태
-			jstatus.update(data);
-
-			$.ajax({
-				url: url.save,
-		        dataType: 'json',
-		        type: 'post',
-		        data: data
 			});
 		},
-		//핫메뉴 삭제
-		remove: function() {
-			var p     = this;
-			var url   = this.consts.URL;
-			var rows = this.getCheckRows();
-			if (rows.length == 0) {
-				$.messager.alert(msg.MSG0121,msg.MSG0139,msg.MSG0121);
-				return;
+		// #left-menu 내부에 즐겨찾기 상위+하위 메뉴 <li> 삽입
+		_render: function(rows) {
+			var pid = this.consts.PARENT_ID;
+			var $tree = $('#left-menu');
+
+			// 메뉴 트리가 아직 생성되지 않았으면 무시
+			if ($tree.children('li').length === 0) return;
+
+			// 기존 펼침 상태 저장 (fa-angle-left = 펼침)
+			var wasOpen = $('#_hotmenu_parent .tree-submenu-icon-angle-right').hasClass('fa-angle-left');
+
+			// 기존 즐겨찾기 노드 제거
+			$tree.find('.' + pid + '-item').remove();
+
+			// 상위메뉴 <li> (tree-level2 스타일, submenuOpen 연동)
+			var arrowCls = wasOpen ? 'fa-angle-left' : 'fa-angle-right';
+			var parentHtml =
+				'<li class="' + pid + '-item" style="background-color:#0d121e;">' +
+					'<div id="_hotmenu_parent" onclick="submenuOpen(\'' + pid + '\',\'_hotmenu_parent\')" class="tree-node tree-level2">' +
+						'<span class="tree-indent"></span>' +
+						'<span class="tree-icon" style="width:18px;"><img src="' + context + '/resources/images/tit_icons/bookmark.png" style="width:16px;height:16px;vertical-align:middle;"></span>' +
+						'<span class="tree-title">즐겨찾기</span>' +
+						'<span class="tree-icon fa ' + arrowCls + ' tree-submenu-icon-angle-right"></span>' +
+					'</div>' +
+				'</li>';
+			$tree.prepend(parentHtml);
+
+			// 하위메뉴 <li> (tree-level3 스타일, 클래스에 PARENT_ID 부여)
+			var childDisplay = wasOpen ? 'display:block;' : '';
+			for (var i = 0; i < rows.length; i++) {
+				var c = rows[i];
+				var menuKey = c.menuKey || '';
+				var menuDesc = c.menuDesc || '';
+
+				var childHtml =
+					'<li class="' + pid + '-item" style="background-color:#0d121e;">' +
+						'<div class="tree-node tree-level3 ' + pid + '" data-menukey="' + menuKey + '" style="' + childDisplay + '">' +
+							'<span class="tree-indent"></span>' +
+							'<span class="tree-icon fa " style="display:none;"></span>' +
+							'<span class="tree-title">' + menuDesc + '</span>' +
+						'</div>' +
+					'</li>';
+
+				// 상위메뉴 바로 뒤에 순서대로 삽입
+				$tree.find('.' + pid + '-item:last').after(childHtml);
 			}
 
-			var fn = function(r) {
-				if (!r)
-					return;
+			// 하위메뉴 클릭 이벤트 바인딩
+			$tree.find('div.tree-node.' + pid).off('click').on('click', function() {
+				var key = $(this).data('menukey');
+				if (key) jmenus.go(key);
+			});
 
-				var data  = {};
-				data['models'] = $.toJSON(rows);
-				//삭제상태
-				jstatus.remove(data);
+			// 마우스 오버/아웃
+			$tree.find('div.tree-node.' + pid)
+				.off('mouseenter mouseleave')
+				.on('mouseenter', function() { $(this).addClass('tree-node-hover'); })
+				.on('mouseleave', function() { $(this).removeClass('tree-node-hover'); });
 
-				$.ajax({
-					url: url.save,
-			        dataType: 'json',
-			        type: 'post',
-			        data: data,
-			        success: function(data) {
-						p.load();
-					}
-				});
-			};
-			$.messager.confirm(msg.MSG0123, msg.MSG0123, fn);
+			// 하위메뉴 우클릭 → 즐겨찾기 삭제 컨텍스트 메뉴
+			$tree.find('div.tree-node.' + pid).off('contextmenu').on('contextmenu', function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				jwidget.hotmenu._contextMenuKey = $(this).data('menukey');
+				$('#hotmenu-context').menu('show', {left: e.pageX, top: e.pageY});
+			});
 		},
-		//핫메뉴 추가
+		_contextMenuKey: null,
+		// 핫메뉴 추가
 		add: function(key) {
-
-			var p     = this;
-			var url   = this.consts.URL;
-			var data  = {menuKey: key};
+			var p = this;
+			var url = this.consts.URL;
+			var data = {menuKey: key};
 			var title = false;
 
-			//이미 있는 메뉴인지 확인
+			// 이미 있는 메뉴인지 확인
 			$.ajax({
 				url: url.select,
-		        dataType: 'json',
-		        type: 'post',
-		        data: data,
-		        async: false,
+				dataType: 'json',
+				type: 'post',
+				data: data,
+				async: false,
 				success: function(data) {
-		        	if (data && data.rows && data.rows.menuKey) {
-		        		title = data.rows.menuDesc;
-		        	}
+					if (data && data.rows && data.rows.menuKey) {
+						title = data.rows.menuDesc;
+					}
 				}
 			});
 
 			if (title) {
-				$.messager.alert(msg.MSG0121,'['+title+']은 이미 핫메뉴에 존재합니다.',msg.MSG0121);
+				$.messager.alert(msg.MSG0051, '[' + title + ']은 이미 즐겨찾기에 존재합니다.', msg.MSG0051);
 				return;
 			}
-			//등록상태
+
+			// 등록상태
 			jstatus.insert(data);
 
 			$.ajax({
 				url: url.save,
-		        dataType: 'json',
-		        type: 'post',
-		        data: data,
-				success: function(data) {
+				dataType: 'json',
+				type: 'post',
+				data: data,
+				success: function(result) {
+					// 추가 후 펼침 상태 보장 (load→_render에서 wasOpen 감지)
+					$('#_hotmenu_parent .tree-submenu-icon-angle-right')
+						.removeClass('fa-angle-right').addClass('fa-angle-left');
+					// 즐겨찾기 재조회
+					p.load();
+					// 해당 탭의 즐겨찾기 미니버튼 숨김
+					var $tabs = jwidget.tabs.tab;
+					if ($tabs) {
+						var selTab = $tabs.tabs('getSelected');
+						if (selTab) {
+							var idx = $tabs.tabs('getTabIndex', selTab);
+							$tabs.find('.tabs-header li').eq(idx).find('.tabs-p-tool').hide();
+						}
+					}
+				}
+			});
+		},
+		// 좌측메뉴 컨텍스트에서 메뉴추가
+		addByMenu: function() {
+			var id = jwidget.submenu.getSelectedId();
+			if (id) this.add(id);
+		},
+		// 즐겨찾기 삭제 (컨텍스트 메뉴에서 호출)
+		delByContext: function() {
+			var p = this;
+			var key = this._contextMenuKey;
+			if (!key) return;
+			this._contextMenuKey = null;
+
+			var rows = [{menuKey: key, menuDesc: key}];
+			var data = {};
+			data['models'] = $.toJSON(rows);
+			jstatus.remove(data);
+
+			$.ajax({
+				url: p.consts.URL.save,
+				dataType: 'json',
+				type: 'post',
+				data: data,
+				success: function(result) {
 					p.load();
 				}
 			});
 		},
-		//좌측메뉴의 컨텍스트에서 메뉴추가시 사용(submenu.jsp)
-		addByMenu: function() {
-			var id = jwidget.submenu.getSelectedId();
-			this.add(id);
-		},
-		//핫메뉴의 컨텍스트에서 메뉴삭제시 사용(hotmenu.jsp)
 		delByMenu: function() {
-			this.remove();
+			this.delByContext();
 		}
 	},
 	//-----------------------------------------//
@@ -1610,33 +1655,21 @@ var jwidget = {
 					$("#"+pre).dialog('close');
 				}
 			});
-			if(row.pointX == 0 && row.pointY == 0){
-				$("#"+pre).dialog({
-					closed:  false,
-					cache:   false,
-					modal:    true,
-					width:   (row.width  ? row.width  : 100),
-					height:  (row.height ? row.height : 100),
-					title:    title,
-					content:  content,
-					onResize:function(){
-						$(this).dialog("center");
-					}
-				});
-			}else{
-				$("#"+pre).dialog({
-					closed:  false,
-					cache:   false,
-					modal:    true,
-					width:   (row.width  ? row.width  : 100),
-					height:  (row.height ? row.height : 100),
-					left:    (row.pointX ? row.pointX : 100),
-					top:     (row.pointY ? row.pointY : 100),
-					title:    title,
-					content:  content/*,
-					buttons:  buttons*/
-				});
-			}
+			$("#"+pre).dialog({
+				closed:  false,
+				cache:   false,
+				modal:    true,
+				width:   (row.width  ? row.width  : 100),
+				height:  (row.height ? row.height : 100),
+				title:    title,
+				content:  content,
+				onOpen: function(){
+					$(this).dialog("center");
+				},
+				onResize: function(){
+					$(this).dialog("center");
+				}
+			});
 		}
 	}
 
@@ -1673,4 +1706,606 @@ function fnMenuKeyReplace(strName) {
 	let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
 	let iframeNm = strName.replace(reg, "");
 	return iframeNm;
+}
+
+// ============================================================================
+// GridHeaderMenu — datagrid/treegrid 헤더 컨텍스트 메뉴 공통 모듈
+// ============================================================================
+//
+// 사용법:
+//   GridHeaderMenu('#my-grid');                                     // datagrid 기본
+//   GridHeaderMenu('#my-grid', { exportFileName: '사원목록' });      // 파일명 지정
+//   GridHeaderMenu('#my-tree', { type: 'treegrid', excel: false }); // treegrid
+//
+// 옵션:
+//   type           : 'datagrid' — 'datagrid' 또는 'treegrid'
+//   sort           : true  — 오름차순/내림차순/정렬초기화
+//   columnToggle   : true  — 컬럼 숨기기/표시
+//   autoFit        : true  — 전체 컬럼 자동크기
+//   rownumbers     : true  — 행번호 표시/숨김
+//   excel          : true  — 엑셀(CSV)로 저장
+//   reset          : true  — 초기화
+//   exportFileName : '데이터' — CSV 파일명 접두어
+// ============================================================================
+function GridHeaderMenu(selector, opts) {
+    opts = $.extend({
+        type: 'datagrid',
+        sort: true,
+        columnToggle: true,
+        autoFit: true,
+        rownumbers: true,
+        excel: true,
+        reset: true,
+        exportFileName: '데이터'
+    }, opts);
+
+    var $grid = $(selector);
+    if (!$grid.length) return;
+
+    var type = opts.type;  // 'datagrid' 또는 'treegrid'
+
+    // 인스턴스별 고유 ID (여러 그리드 동시 사용 시 충돌 방지)
+    var menuId = selector.replace(/[^a-zA-Z0-9]/g, '') + '-hctx';
+
+    // 상태
+    var currentField = '';
+    var hiddenColumns = {};
+    var originalWidths = null;
+    var _originalData = null;
+    var _internalLoad = false;
+    var _rownumbersHidden = false;
+    var _sortDataRef = null;  // 정렬 시 사용된 data 객체 참조 (페이징 이벤트 구분용)
+    var _autoFitActive = false;     // autoFit 적용 상태 플래그
+    var _originalFitColumns = null; // autoFit 전 fitColumns 설정 (resetGrid에서 복원용)
+
+    // --------------------------------------------------
+    // 기존 콜백 체이닝 (사용자 콜백 보존)
+    // --------------------------------------------------
+    var dgOpts = $grid[type]('options');
+    var _origOnLoadSuccess = dgOpts.onLoadSuccess;
+    var _origOnResizeColumn = dgOpts.onResizeColumn;
+
+    // 헤더 우클릭: DOM 직접 바인딩 (datagrid/treegrid 모두 동작)
+    $grid[type]('getPanel').on('contextmenu.ghm', '.datagrid-header td[field]', function(e) {
+        e.preventDefault();
+        currentField = $(this).attr('field');
+        showMenu(e.pageX, e.pageY);
+    });
+
+    dgOpts.onLoadSuccess = function(data) {
+        // 행번호 숨김 상태 유지
+        if (_rownumbersHidden) {
+            $grid[type]('getPanel').find('.datagrid-td-rownumber').hide();
+        }
+        // 정렬/초기화 내부 loadData 시에는 원본 유지
+        if (_internalLoad) {
+            _internalLoad = false;
+        } else if (_originalData) {
+            // 페이징 이벤트(동일 data 객체)는 _originalData 유지,
+            // 새로운 검색(다른 data 객체)은 _originalData 초기화
+            var currentData = $grid[type]('getData');
+            if (_sortDataRef !== currentData) {
+                _originalData = null;
+                _sortDataRef = null;
+            }
+        }
+        // autoFit 적용 상태이면 table width auto + overflow-x 재적용
+        // (셀 너비는 EasyUI stylesheet가 유지하므로 재적용 불필요)
+        if (_autoFitActive) {
+            var _panel = $grid[type]('getPanel');
+            _panel.find('.datagrid-header table, .datagrid-body table').css('width', 'auto');
+            var _dgData = $.data($grid[0], 'datagrid');
+            if (_dgData && _dgData.dc && _dgData.dc.body2) {
+                _dgData.dc.body2.css('overflow-x', '');
+            }
+        }
+        // 기존 콜백 호출
+        if (_origOnLoadSuccess) _origOnLoadSuccess.apply(this, arguments);
+    };
+
+    dgOpts.onResizeColumn = function(field, width) {
+        // 수동 리사이즈 시 autoFit 상태 해제 (stale 캐시 방지)
+        _autoFitActive = false;
+        if (_origOnResizeColumn) _origOnResizeColumn.apply(this, arguments);
+    };
+
+    // --------------------------------------------------
+    // 공통 비교 함수
+    // --------------------------------------------------
+    function compareValues(a, b, field, order) {
+        var va = a[field], vb = b[field];
+        if (va == null) va = '';
+        if (vb == null) vb = '';
+        if (va !== '' && vb !== '' && !isNaN(va) && !isNaN(vb)) {
+            return order === 'asc' ? Number(va) - Number(vb) : Number(vb) - Number(va);
+        }
+        va = String(va).toLowerCase();
+        vb = String(vb).toLowerCase();
+        if (va < vb) return order === 'asc' ? -1 : 1;
+        if (va > vb) return order === 'asc' ? 1 : -1;
+        return 0;
+    }
+
+    // --------------------------------------------------
+    // 트리 데이터 유틸리티
+    // --------------------------------------------------
+    // 깊은 복사 (정렬 전 원본 보존용)
+    function deepCloneTree(arr) {
+        return JSON.parse(JSON.stringify(arr));
+    }
+
+    // 재귀 정렬 (형제 노드끼리만 정렬, 부모-자식 관계 유지)
+    function sortTreeRecursive(nodes, field, order) {
+        if (!nodes || !nodes.length) return;
+        nodes.sort(function(a, b) { return compareValues(a, b, field, order); });
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].children) sortTreeRecursive(nodes[i].children, field, order);
+        }
+    }
+
+    // 트리를 flat 행 배열로 변환 (엑셀 내보내기용)
+    function flattenTree(nodes, result, depth) {
+        if (!nodes) return;
+        depth = depth || 0;
+        for (var i = 0; i < nodes.length; i++) {
+            var row = $.extend({}, nodes[i]);
+            row._depth = depth;
+            result.push(row);
+            if (nodes[i].children) flattenTree(nodes[i].children, result, depth + 1);
+        }
+    }
+
+    // datagrid: flat rows 가져오기, treegrid: flat rows 가져오기
+    function getAllRows() {
+        if (type === 'treegrid') {
+            var data = $grid[type]('getData');
+            var rows = [];
+            flattenTree(data, rows, 0);
+            return rows;
+        } else {
+            var data = $grid[type]('getData');
+            // clientPagerFilter 사용 시 originalRows에 전체 데이터 보관됨
+            return data.originalRows || data.rows || [];
+        }
+    }
+
+    // --------------------------------------------------
+    // 메뉴 표시
+    // --------------------------------------------------
+    function showMenu(x, y) {
+        var $old = $('#' + menuId);
+        if ($old.length) {
+            try { $old.menu('destroy'); } catch(e) {}
+            $old.remove();
+        }
+
+        var h = '<div id="' + menuId + '" style="width:170px;">';
+
+        // 정렬 
+        // 정렬 기능은 헤더 클릭으로 대체함으로 
+        if (false && opts.sort) {
+            h += '<div id="' + menuId + '-sort-asc">오름차순 정렬</div>';
+            h += '<div id="' + menuId + '-sort-desc">내림차순 정렬</div>';
+            h += '<div id="' + menuId + '-sort-reset">정렬 초기화</div>';
+            h += '<div class="menu-sep"></div>';
+        }
+
+        // 컬럼 숨기기/표시
+        if (opts.columnToggle) {
+            h += '<div id="' + menuId + '-hide-col">컬럼 숨기기</div>';
+            h += '<div class="menu-sep"></div>';
+            h += '<div><span>컬럼 표시</span><div>';
+            var columns = $grid[type]('getColumnFields');
+            for (var i = 0; i < columns.length; i++) {
+                var f = columns[i];
+                var colOpt = $grid[type]('getColumnOption', f);
+                if (!colOpt) continue;
+                var isHidden = colOpt.hidden === true;
+                var check = isHidden ? '&nbsp;&nbsp;&nbsp;&nbsp;' : '&#10003; ';
+                h += '<div id="' + menuId + '-col-' + f + '">' + check + (colOpt.title || f) + '</div>';
+            }
+            h += '</div></div>';
+            h += '<div class="menu-sep"></div>';
+        }
+
+        // 자동크기
+        if (opts.autoFit) {
+            h += '<div id="' + menuId + '-fit-columns">전체 컬럼 자동크기</div>';
+        }
+
+        // 행번호
+        if (false && opts.rownumbers) {
+            h += '<div id="' + menuId + '-toggle-rownumbers">' + (_rownumbersHidden ? '행번호 표시' : '행번호 숨기기') + '</div>';
+        }
+
+        if (opts.autoFit || opts.rownumbers) {
+            h += '<div class="menu-sep"></div>';
+        }
+
+        // 엑셀
+        if (opts.excel) {
+            h += '<div id="' + menuId + '-excel">엑셀로 저장</div>';
+            h += '<div class="menu-sep"></div>';
+        }
+
+        // 초기화
+        if (opts.reset) {
+            h += '<div id="' + menuId + '-reset">초기화</div>';
+        }
+
+        h += '</div>';
+        $('body').append(h);
+
+        var colPrefix = menuId + '-col-';
+
+        $('#' + menuId).menu({
+            onClick: function(item) {
+                var id = item.target.id || '';
+                if      (id === menuId + '-sort-asc')            sortColumn('asc');
+                else if (id === menuId + '-sort-desc')           sortColumn('desc');
+                else if (id === menuId + '-sort-reset')          sortReset();
+                else if (id === menuId + '-hide-col')            hideColumn();
+                else if (id === menuId + '-fit-columns')         autoFitColumns();
+                else if (id === menuId + '-toggle-rownumbers')   toggleRownumbers();
+                else if (id === menuId + '-excel')               exportExcel();
+                else if (id === menuId + '-reset')               resetGrid();
+                else if (id.indexOf(colPrefix) === 0)            toggleColumn(id.substring(colPrefix.length));
+            }
+        });
+
+        $('#' + menuId).menu('show', { left: x, top: y });
+    }
+
+    // --------------------------------------------------
+    // 클라이언트 정렬
+    // --------------------------------------------------
+    function sortColumn(order) {
+        if (!currentField) return;
+        var field = currentField;
+
+        if (type === 'treegrid') {
+            var data = $grid[type]('getData');
+            // 원본 보존 (최초 1회, 깊은 복사)
+            if (!_originalData) _originalData = deepCloneTree(data);
+            sortTreeRecursive(data, field, order);
+            _internalLoad = true;
+            $grid[type]('loadData', data);
+        } else {
+            var data = $grid[type]('getData');
+            // clientPagerFilter 사용 시 originalRows에 전체 데이터 보관됨
+            var allRows = data.originalRows || data.rows;
+            if (!_originalData) {
+                _originalData = [];
+                for (var k = 0; k < allRows.length; k++) _originalData.push(allRows[k]);
+            }
+            allRows.sort(function(a, b) { return compareValues(a, b, field, order); });
+            _sortDataRef = data;
+            _internalLoad = true;
+            $grid[type]('loadData', data);
+        }
+    }
+
+    // --------------------------------------------------
+    // 정렬 초기화
+    // --------------------------------------------------
+    function sortReset() {
+        if (!_originalData) return;
+        _internalLoad = true;
+        if (type === 'treegrid') {
+            $grid[type]('loadData', _originalData);
+        } else {
+            var data = $grid[type]('getData');
+            if (data.originalRows) {
+                // clientPagerFilter 사용 시: originalRows를 정렬 전 상태로 복원
+                data.originalRows = _originalData;
+                $grid[type]('loadData', data);
+            } else {
+                $grid[type]('loadData', { total: _originalData.length, rows: _originalData });
+            }
+        }
+        _sortDataRef = null;
+        _originalData = null;
+    }
+
+    // --------------------------------------------------
+    // 컬럼 숨기기/표시
+    // --------------------------------------------------
+    function hideColumn() {
+        if (!currentField) return;
+        $grid[type]('hideColumn', currentField);
+        hiddenColumns[currentField] = true;
+    }
+
+    function toggleColumn(field) {
+        var colOpt = $grid[type]('getColumnOption', field);
+        if (colOpt && colOpt.hidden) {
+            $grid[type]('showColumn', field);
+            delete hiddenColumns[field];
+        } else {
+            $grid[type]('hideColumn', field);
+            hiddenColumns[field] = true;
+        }
+    }
+
+    // --------------------------------------------------
+    // 전체 컬럼 자동크기 (로우 데이터 기준)
+    // --------------------------------------------------
+    function autoFitColumns() {
+        var panel = $grid[type]('getPanel');
+        var rows = getAllRows();
+        var columns = $grid[type]('getColumnFields');
+        var _dgOpts = $grid[type]('options');
+
+        // EasyUI 내부 스타일시트 접근 (datagrid 기준 — treegrid도 datagrid 상속)
+        var dgData = $.data($grid[0], 'datagrid');
+        var ss = dgData.ss;
+
+        // 원본 폭 + fitColumns 설정 저장 (최초 1회)
+        if (!originalWidths) {
+            originalWidths = {};
+            for (var k = 0; k < columns.length; k++) {
+                var o = $grid[type]('getColumnOption', columns[k]);
+                if (o) originalWidths[columns[k]] = { width: o.width, boxWidth: o.boxWidth, deltaWidth: o.deltaWidth };
+            }
+            _originalFitColumns = _dgOpts.fitColumns;
+        }
+
+        // Phase 1: 너비 계산 (측정용 span — ord14a calcColumnWidths 패턴)
+        var $m = $('<span>').css({
+            visibility: 'hidden', position: 'absolute',
+            whiteSpace: 'nowrap', fontSize: '14px'
+        }).appendTo('body');
+
+        for (var i = 0; i < columns.length; i++) {
+            var field = columns[i];
+            var opt = $grid[type]('getColumnOption', field);
+            if (!opt || opt.hidden) continue;
+
+            // 헤더 너비 (bold, +24px 여유)
+            $m.css('fontWeight', '700').text(opt.title || field);
+            var maxW = $m.outerWidth() + 24;
+
+            // 데이터 너비 (normal, +16px 여유) — 포맷터 적용
+            $m.css('fontWeight', 'normal');
+            for (var j = 0; j < rows.length; j++) {
+                var val = rows[j][field];
+                if (val == null) continue;
+                var display = opt.formatter ? opt.formatter(val, rows[j], j) : String(val);
+                // HTML 포맷터 (체크박스 등): 렌더링 후 측정 / 일반 텍스트: 텍스트로 측정
+                if (display.indexOf('<') >= 0) {
+                    $m.html(display);
+                } else {
+                    $m.text(display);
+                }
+                var w = $m.outerWidth() + 16;
+                if (w > maxW) maxW = w;
+            }
+
+            // 컬럼 옵션 업데이트
+            var newW = Math.max(maxW, 50);
+            var delta = opt.deltaWidth || ((opt.boxWidth != null) ? (opt.width - opt.boxWidth) : 0);
+            opt.width = newW;
+            opt.boxWidth = newW - delta;
+            opt.deltaWidth = delta;
+        }
+
+        $m.remove();
+
+        // Phase 2: 너비 적용 (EasyUI _5f5 내부 패턴)
+        // fitColumns 비활성화 (비례 재분배 방지)
+        _dgOpts.fitColumns = false;
+
+        // ★ table-layout: fixed → ss.set() → table-layout: auto 토글
+        // body/footer 테이블에 이 토글이 있어야 stylesheet 변경이 즉시 반영됨
+        var btables = dgData.dc.view.find('table.datagrid-btable, table.datagrid-ftable');
+        btables.css('table-layout', 'fixed');
+        for (var i = 0; i < columns.length; i++) {
+            var opt = $grid[type]('getColumnOption', columns[i]);
+            if (opt && !opt.hidden && opt.cellClass) {
+                ss.set('.' + opt.cellClass, opt.boxWidth ? opt.boxWidth + 'px' : 'auto');
+            }
+        }
+        btables.css('table-layout', 'auto');
+
+        // table width auto (ord14a 패턴 — EasyUI 100% 스트레칭 방지)
+        panel.find('.datagrid-header table, .datagrid-body table').css('width', 'auto');
+        // 가로 스크롤 활성화 (fitColumns 그리드에서 overflow-x:hidden 해제)
+        if (dgData.dc && dgData.dc.body2) {
+            dgData.dc.body2.css('overflow-x', '');
+        }
+        _autoFitActive = true;
+    }
+
+    // --------------------------------------------------
+    // 행번호 표시/숨김
+    // --------------------------------------------------
+    function toggleRownumbers() {
+        var panel = $grid[type]('getPanel');
+        if (_rownumbersHidden) {
+            panel.find('.datagrid-td-rownumber').show();
+            _rownumbersHidden = false;
+        } else {
+            panel.find('.datagrid-td-rownumber').hide();
+            _rownumbersHidden = true;
+        }
+    }
+
+    // --------------------------------------------------
+    // 엑셀(CSV)로 저장
+    // --------------------------------------------------
+    function exportExcel() {
+        if (typeof XLSX === 'undefined') {
+            alert('엑셀 라이브러리가 로드되지 않았습니다.');
+            return;
+        }
+
+        var rows = getAllRows();
+
+        // frozen 컬럼 + non-frozen 컬럼 모두 수집
+        var frozenCols = $grid[type]('getColumnFields', true) || [];
+        var normalCols = $grid[type]('getColumnFields', false) || [];
+        var columns = frozenCols.concat(normalCols);
+
+        // 표시 중인 컬럼만 수집
+        var visibleCols = [];
+        for (var i = 0; i < columns.length; i++) {
+            var colOpt = $grid[type]('getColumnOption', columns[i]);
+            if (colOpt && !colOpt.hidden) {
+                visibleCols.push({ field: columns[i], title: colOpt.title || columns[i], formatter: colOpt.formatter });
+            }
+        }
+        if (visibleCols.length === 0) return;
+
+        // 표시 너비 계산 (한글 2배)
+        function getDisplayWidth(str) {
+            var w = 0;
+            str = String(str);
+            for (var i = 0; i < str.length; i++) {
+                w += str.charCodeAt(i) > 127 ? 2 : 1;
+            }
+            return w;
+        }
+
+        // 워크시트 생성
+        var ws = {};
+        var colWidths = [];
+
+        // 헤더 (s:1 = 볼드 흰색 글자 + 파란 배경 + 테두리)
+        for (var c = 0; c < visibleCols.length; c++) {
+            var cellRef = XLSX.utils.encode_cell({ r: 0, c: c });
+            // <br>, <br/>, <br /> 태그를 줄바꿈으로 변환
+            var headerTitle = visibleCols[c].title.replace(/<br\s*\/?>/gi, '\n');
+            ws[cellRef] = { v: headerTitle, t: 's', s: 1 };
+            // 너비 계산은 가장 긴 줄 기준
+            var lines = headerTitle.split('\n');
+            var maxLineWidth = 0;
+            for (var li = 0; li < lines.length; li++) {
+                var lw = getDisplayWidth(lines[li]);
+                if (lw > maxLineWidth) maxLineWidth = lw;
+            }
+            colWidths[c] = maxLineWidth;
+        }
+
+        // 데이터
+        for (var r = 0; r < rows.length; r++) {
+            for (var c = 0; c < visibleCols.length; c++) {
+                var raw = rows[r][visibleCols[c].field];
+                var val = raw;
+                // formatter 적용 후 HTML이면 원본값, 텍스트면 변환값
+                if (visibleCols[c].formatter && raw != null) {
+                    var formatted = String(visibleCols[c].formatter(raw, rows[r], r));
+                    val = (formatted.indexOf('<') !== -1) ? raw : formatted;
+                }
+                if (val == null) val = '';
+
+                var cellRef = XLSX.utils.encode_cell({ r: r + 1, c: c });
+                if (typeof val === 'number') {
+                    ws[cellRef] = { v: val, t: 'n' };
+                } else {
+                    ws[cellRef] = { v: String(val), t: 's' };
+                }
+
+                // 너비 계산 (성능: 최대 100행 샘플링)
+                if (r < 100) {
+                    var dw = getDisplayWidth(val);
+                    if (dw > colWidths[c]) colWidths[c] = dw;
+                }
+            }
+        }
+
+        // 범위 설정
+        ws['!ref'] = XLSX.utils.encode_range({
+            s: { r: 0, c: 0 },
+            e: { r: rows.length, c: visibleCols.length - 1 }
+        });
+
+        // 컬럼 너비 설정 (최소 8, 최대 50)
+        ws['!cols'] = [];
+        for (var c = 0; c < colWidths.length; c++) {
+            ws['!cols'].push({ wch: Math.max(8, Math.min(50, colWidths[c] + 2)) });
+        }
+
+        // 워크북 생성 및 다운로드
+        var wb = { SheetNames: ['Sheet1'], Sheets: { 'Sheet1': ws } };
+        var fileName = opts.exportFileName + '_' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '.xlsx';
+        var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+        function s2ab(s) {
+            var buf = new ArrayBuffer(s.length);
+            var view = new Uint8Array(buf);
+            for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+            return buf;
+        }
+
+        saveAs(new Blob([s2ab(wbout)], { type: 'application/octet-stream' }), fileName);
+    }
+
+    // --------------------------------------------------
+    // 초기화
+    // --------------------------------------------------
+    function resetGrid() {
+        var panel = $grid[type]('getPanel');
+
+        // 숨긴 컬럼 복원
+        for (var field in hiddenColumns) {
+            if (hiddenColumns.hasOwnProperty(field)) {
+                $grid[type]('showColumn', field);
+            }
+        }
+        hiddenColumns = {};
+
+        // 원본 컬럼 폭 + fitColumns 설정 복원
+        if (originalWidths) {
+            var dgData = $.data($grid[0], 'datagrid');
+            var ss = dgData.ss;
+            var columns = $grid[type]('getColumnFields');
+            // 컬럼 옵션 복원
+            for (var i = 0; i < columns.length; i++) {
+                var opt = $grid[type]('getColumnOption', columns[i]);
+                var orig = originalWidths[columns[i]];
+                if (opt && orig) {
+                    opt.width = orig.width;
+                    opt.boxWidth = orig.boxWidth;
+                    opt.deltaWidth = orig.deltaWidth;
+                }
+            }
+            // ★ table-layout 토글로 stylesheet 즉시 반영 (EasyUI _5f5 패턴)
+            var btables = dgData.dc.view.find('table.datagrid-btable, table.datagrid-ftable');
+            btables.css('table-layout', 'fixed');
+            for (var i = 0; i < columns.length; i++) {
+                var opt = $grid[type]('getColumnOption', columns[i]);
+                if (opt && opt.cellClass) {
+                    ss.set('.' + opt.cellClass, opt.boxWidth ? opt.boxWidth + 'px' : 'auto');
+                }
+            }
+            btables.css('table-layout', 'auto');
+            originalWidths = null;
+            // fitColumns 원본 설정 복원
+            var _dgOpts = $grid[type]('options');
+            if (_originalFitColumns !== null) {
+                _dgOpts.fitColumns = _originalFitColumns;
+                _originalFitColumns = null;
+            }
+            // table width 원복 + fitColumns 재적용
+            panel.find('.datagrid-header table, .datagrid-body table').css('width', '');
+            if (_dgOpts.fitColumns) {
+                $grid[type]('fixColumnSize');
+            }
+            _autoFitActive = false;
+        }
+
+        // 정렬 원본 복원
+        if (_originalData) {
+            if (type === 'treegrid') {
+                $grid[type]('loadData', _originalData);
+            } else {
+                $grid[type]('loadData', { total: _originalData.length, rows: _originalData });
+            }
+            _originalData = null;
+        }
+
+        // 행번호 표시
+        panel.find('.datagrid-td-rownumber').show();
+        _rownumbersHidden = false;
+    }
 }

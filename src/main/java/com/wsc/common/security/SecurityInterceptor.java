@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -27,6 +29,7 @@ import com.wsc.common.user.ProgramService;
 import com.wsc.common.user.UserLogService;
 import com.wsc.common.user.UserSecureService;
 import com.wsc.common.user.UserService;
+import com.wsc.imes.common.SysConfigService;
 import com.wsc.framework.base.BaseConstants;
 import com.wsc.framework.base.BaseInterceptor;
 import com.wsc.framework.model.ParamsMap;
@@ -40,6 +43,8 @@ import com.wsc.framework.utils.BaseUtils;
  */
 public class SecurityInterceptor extends BaseInterceptor {
 
+    private static final Log logger = LogFactory.getLog(SecurityInterceptor.class);
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -50,6 +55,8 @@ public class SecurityInterceptor extends BaseInterceptor {
     private UserLogService userLogService;
     @Autowired
     private UserSecureService userSecureService;
+    @Autowired
+    private SysConfigService sysConfigService;
     @Autowired
 	private Provider<SessionComponent> sessionObject;
 
@@ -184,6 +191,13 @@ public class SecurityInterceptor extends BaseInterceptor {
 			response.sendRedirect(response.encodeRedirectURL(ctx + LOGIN));
 			return false;
 		}
+		// login.do 접근 시 기존 세션 삭제 (세션 고정 공격 방지)
+		else if (url.endsWith(LOGIN)) {
+			if (sessionObject.get().isLoggedIn()) {
+				sessionObject.get().remove();
+			}
+			return true;
+		}
 
 		Program security = null;
 		Program program  = null;
@@ -199,8 +213,28 @@ public class SecurityInterceptor extends BaseInterceptor {
 		//비인증사용자의 경우 관리화면인지 확인
 		if (sessionObject.get().isLoggedIn() == false) {
 
-			if (program == null)
+			if (program == null) {
+				// 공개 URL은 세션 체크 없이 통과 (로그인 페이지에서 사용하는 API 등)
+				if (isPublicUrl(url)) {
+					return true;
+				}
+
+				// 인증이 필요한 URL 패턴 (.do, .json) - 세션 만료 시 처리
+				if (url.endsWith(".do") || url.endsWith(".json")) {
+					// AJAX 요청 (.json)은 401 응답 - 클라이언트에서 로그인 페이지로 리다이렉트 처리
+					if (url.endsWith(".json")) {
+						response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+						response.setContentType("application/json;charset=UTF-8");
+						String sessionExpiredMsg = getSessionExpiredMessage(request);
+						response.getWriter().write("{\"error\":\"" + sessionExpiredMsg + "\",\"code\":401}");
+						return false;
+					}
+					// 페이지 요청 (.do)은 로그인 페이지로 리다이렉트
+					response.sendRedirect(response.encodeRedirectURL(ctx + LOGIN));
+					return false;
+				}
 				return true;
+			}
 
 			params.put("userId", GUEST);
 		}
@@ -381,6 +415,57 @@ public class SecurityInterceptor extends BaseInterceptor {
         request.setAttribute(BaseConstants.TABPANEL,  USABLE_TABPANEL ? "Y" : "N");
     }
 
+    /**
+     * 쿠키에서 로케일을 확인하여 세션 만료 메시지 반환 (다국어 지원)
+     * - properties 파일에서 메시지 조회 (error.authority.session.expired)
+     * - 기본 언어: 한국어
+     */
+    private String getSessionExpiredMessage(HttpServletRequest request) {
+        String localeStr = getCookieValue(request, "culture");
+        java.util.Locale locale = (localeStr != null) ? new java.util.Locale(localeStr) : java.util.Locale.KOREAN;
+        return getMessageSource().getMessage("error.authority.session.expired", null, "세션이 만료되었습니다.", locale);
+    }
+
+    /**
+     * 쿠키 값 조회
+     */
+    private String getCookieValue(HttpServletRequest request, String cookieName) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookieName.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 공개 URL 여부 확인 (로그인 없이 접근 가능한 URL)
+     * - 로그인 페이지에서 사용하는 API
+     * - 비밀번호 변경/찾기 관련 페이지
+     */
+    private boolean isPublicUrl(String url) {
+        // 로그인 관련 API (비밀번호 체크, 사용자 확인 등)
+        if (url.startsWith("/common/password/")) {
+            return true;
+        }
+        // 비밀번호 변경/ID 변경 페이지
+        if (url.startsWith("/changeoldid") || url.startsWith("/changepassword") || url.startsWith("/changePassword")) {
+            return true;
+        }
+        // 전시회 등록, 메일 수신거부 등 외부 공개 페이지
+        if (url.startsWith("/exhibitionRegist") || url.startsWith("/unsubscribe")) {
+            return true;
+        }
+        // SSO 관련
+        if (url.startsWith("/login_sso") || url.startsWith("/retnEmail") || url.startsWith("/ndaEmail") || url.startsWith("/retailEmail")) {
+            return true;
+        }
+        return false;
+    }
+
     //로그인 처리
 	private boolean processLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -440,6 +525,8 @@ public class SecurityInterceptor extends BaseInterceptor {
 
     		//사용자정보 세션 저장
             sessionObject.get().saveUser(user);
+            //시스템 설정 로딩 (AS-IS: MAINFORM_INIT_SYSTEM → SYS_CONF)
+            loadSysConfig(user);
 
             //로그인 성공
         	return true;
@@ -478,7 +565,9 @@ public class SecurityInterceptor extends BaseInterceptor {
 
 		    		//사용자정보 세션 저장
 		            sessionObject.get().saveUser(user);
-		            
+		            //시스템 설정 로딩 (AS-IS: MAINFORM_INIT_SYSTEM → SYS_CONF)
+		            loadSysConfig(user);
+
 		          //SSO 처리
 		            String rtnValue2 = "";
 		            String rtnValue3 = "";
@@ -565,5 +654,22 @@ public class SecurityInterceptor extends BaseInterceptor {
 
 		return false;
 		//throw new AuthorityException( getMessage("error.authority.login.failure") );
+	}
+
+	/**
+	 * 시스템 설정 로딩 (AS-IS: MAINFORM_INIT_SYSTEM → acInfo.SysConfig)
+	 * 로그인 성공 시 TSYS_CONF 테이블에서 설정값을 세션에 저장
+	 */
+	private void loadSysConfig(User user) {
+		try {
+			String pltCode = user.getPltCode();
+			if (pltCode != null && !pltCode.isEmpty()) {
+				java.util.Map<String, String> sysConfig = sysConfigService.searchSysConfig(pltCode);
+				sessionObject.get().saveSysConfig(sysConfig);
+			}
+		} catch (Exception e) {
+			// 설정 로딩 실패해도 로그인은 진행
+			logger.warn("시스템 설정 로딩 실패: " + e.getMessage());
+		}
 	}
 }

@@ -66,32 +66,45 @@
 		<div id="search-toolbar" class="wui-toolbar">
 			<form id="search-form">
 				<fieldset class="div-line-new" >
-			        <table cellpadding="5" class="search-table tableSearch-c" >
-			            <tr><th class="h table-Search-h" data-item="LAB_001"><span>Project Year</span></th>
+			        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+			            <colgroup>
+			                <col width="90px">
+			                <col width="150px">
+			                <col width="80px">
+			                <col width="120px">
+			                <col width="80px">
+			                <col width="220px">
+			                <col width="45px">
+			                <col width="150px">
+			                <col width="55px">
+			                <col width="120px">
+			                <col width="*">
+			            </colgroup>
+			            <tr><th class="h table-Search-h search-label-h" data-item="LAB_001"><span>Project Year</span></th>
 							<td class="d">
 								<input class="easyui-combobox" name="searchPjtYear" id="searchPjtYear" codeGrup="PJT_YEAR" data-options="mode:'remote',editable:false,loader:jcombo.loader,width:90"/>
 							</td>
 
-							<th class="h" data-item="LAB_002"><span>Project No</span></th>
+							<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>Project No</span></th>
 							<td class="d">
 								<input class="easyui-textbox" name="searchPjtNo" id="searchPjtNo" style="width:120px"/>
 								<input type="hidden" name="searchModel" id="searchModel" />
 			            	</td>
-							<th class="h" data-item="LAB_003"><span>모델명/규격</span></th>
+							<th class="h table-Search-h search-label-h" data-item="LAB_003"><span>모델명/규격</span></th>
 			            	<td class="d">
 			            		<input class="easyui-textbox" name="searchmodelName" id="searchmodelName"  data-options="width:90"/>
 								<input class="easyui-textbox" name="searchmodelSpec" id="searchmodelSpec" data-options="width:90"/>
 								<a onclick="javascript:void(0)"><img id="search-model-button" style="cursor: pointer;" src="<c:url value="/resources/images/searchCust.png"/>"/></a>
 			            	</td>
-							<th class="h" data-item="LAB_004"><span>구분</span></th>
+							<th class="h table-Search-h search-label-h" data-item="LAB_004"><span>구분</span></th>
 			            	<td class="d">
 			            		<input class="easyui-combobox" name="searchPjtGb" id="searchPjtGb" codeGrup="PJT_GB" data-options="mode:'remote',editable:false,loader:jcombo.loader,width:90"/>
 			            	</td>
-			            	<th class="h" data-item="LAB_005"><span>담당자</span></th>
+			            	<th class="h table-Search-h search-label-h" data-item="LAB_005"><span>담당자</span></th>
 			            	<td class="d">
 				            	<input class="easyui-textbox"  name="searchStafName" id="searchStafName" style="width:100px"/>
 			            	</td>
-			            	<td class="b"><a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001" data-options="disabled:${RET}" >검색</a></td>
+			            	<td class="b"><a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001" data-options="disabled:${RET}" >조회</a></td>
 						</tr>
 					</table>
 				</fieldset>
@@ -235,18 +248,25 @@
 		<form id="search-model-form">
 			<fieldset class="div-line-new" >
 				<input type="hidden" name="pModelType" id="pModelType" value="0" />
-		        <table cellpadding="5" class="search-table tableSearch-c" >
+		        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+		            <colgroup>
+		                <col width="55px">
+		                <col width="120px">
+		                <col width="45px">
+		                <col width="150px">
+		                <col width="*">
+		            </colgroup>
 		            <tr>
-						<th class="h table-Search-h" data-item="LAB_018"><span>모델명 </span></th>
+						<th class="h table-Search-h search-label-h" data-item="LAB_018"><span>모델명 </span></th>
 						<td class="d">
 							<input class="easyui-textbox" name="pModelName" id="pModelName" style="width:120px"/>
 						</td>
-						<th class="h table-Search-h" data-item="LAB_019"><span>규격 </span></th>
+						<th class="h table-Search-h search-label-h" data-item="LAB_019"><span>규격 </span></th>
 						<td class="d">
 							<input class="easyui-textbox" name="pModelSpec" id="pModelSpec" style="width:150px"/>
 						</td>
 						<td class="b">
-							<a href="javascript:void(0)" id="search-model-pop-button" class="easyui-linkbutton cgray" data-item="BTN_007">검색</a>
+							<a href="javascript:void(0)" id="search-model-pop-button" class="easyui-linkbutton cgray" data-item="BTN_007">조회</a>
 						</td>
 		            </tr>
 		        </table>

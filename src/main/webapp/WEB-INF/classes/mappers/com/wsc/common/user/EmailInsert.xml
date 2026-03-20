@@ -5,19 +5,22 @@
 
 <mapper namespace="com.wsc.common.user.EmailInsert">
 
-        <update id="EmailInsert" parameterType="params">
-        UPDATE SYS_USER
-           SET SMTP_MAIL = #{SMTP_MAIL}
-              ,SMTP_PW = #{SMTP_PW}
-         WHERE SYS_ID   = #{sysId}
-           AND USER_ID  = #{gsUserId}          
-       </update>
-    
-        <select id="gsSmtpMail" resultType="String" parameterType="params">
-        SELECT replace(SMTP_MAIL,'@lstractorusa.com','')as SMTP_MAIL
-        FROM   SYS_USER
-        WHERE  USER_ID  = #{gsUserId}
-        AND SYS_ID      = #{sysId}      
-       </select>
-    
+    <!-- 이메일 정보 업데이트 -->
+    <update id="EmailInsert" statementType="CALLABLE" parameterType="params">
+        {CALL sp_emailinsert_update(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR},
+            #{SMTP_MAIL, mode=IN, jdbcType=VARCHAR},
+            #{SMTP_PW, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- SMTP 메일 조회 -->
+    <select id="gsSmtpMail" statementType="CALLABLE" resultType="String" parameterType="params">
+        {CALL sp_emailinsert_get_smtp_mail(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
 </mapper>

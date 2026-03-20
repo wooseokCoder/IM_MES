@@ -41,11 +41,14 @@ ALL RIGHTS RESERVED.
 	<div id="search-toolbar" class="wui-toolbar">
 		<form id="save-form">
 			<fieldset class="div-line-new-sub" style="margin-bottom: 0px;padding:0px">
-		        <table cellpadding="5" class="search-table tableSearch-c" >
+		        <table cellpadding="0" class="search-table tableSearch-c" >
+		            <colgroup>
+		                <col width="*" />
+		            </colgroup>
 		            <tr>
 						<td class="b">
 							<a href="javascript:void(0)" id="ehelp-save-button" class="easyui-linkbutton c6" style="margin-left: 10px" data-popup="POP_BTN_001">저장</a>
-							<a href="javascript:void(0)" id="ehelp-delete-button" class="easyui-linkbutton c6" data-popup="POP_BTN_003">DELETE</a> 
+							<a href="javascript:void(0)" id="ehelp-delete-button" class="easyui-linkbutton c6" data-popup="POP_BTN_003">DELETE</a>
 							<%-- <c:if test="${groupIdC eq 'DEVADMIN'}">
 								<a href="javascript:langTextPopSave();">언어저장</a>
 							</c:if> --%>

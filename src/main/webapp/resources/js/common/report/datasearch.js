@@ -117,7 +117,7 @@ $(function() {
 	consts_sub.init();
 
 	$('#progress-popup').dialog({
-	       title: tit.TITLE0009,
+	       title: tit.TITLE0003,
 	       top:     100,
 	       width: 200,
 	       height: 200,
@@ -344,7 +344,7 @@ function doClickButton(index, field, value) {
 	         + ' 로 자동 로그인하시겠습니까?';
 	var win  = 'userwin';
 
-	$.messager.confirm(msg.MSG0123, msg, function(r) {
+	$.messager.confirm(msg.MSG0053, msg, function(r) {
 
 		if (!r)
 			return;
@@ -496,7 +496,7 @@ function readURL(input, fileId){
 
 function SystemToJobType(){
 	//var itemType = $("#s_SystemType").combobox('getValue');
-	var itemType = "IMMES";
+	var itemType = "LSBAS";
 	var itemName = "";
 
 	$("#sysId, #d_sysId").val(itemType);

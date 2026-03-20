@@ -6,355 +6,236 @@
 <mapper namespace="com.wsc.common.report.DataManagement">
 
     <!-- ========================================================== -->
-    <!--   Oracle Paging Clause                                     -->
+    <!--   1. DATA_OPER_MAST 조회 - 프로시저 호출                    -->
     <!-- ========================================================== -->
-    <sql id="pagingColumns">
-        <if test="start == null or end == null">
-            ,0 AS RNUM
-        </if>
-    </sql>
-    <sql id="pagingOpen">
-        <if test="start != null and end != null">
-            SELECT *
-              FROM (
-                    SELECT X.*
-                      FROM (
-                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
-                              FROM (
-        </if>
-    </sql>
-    <sql id="pagingClose">
-        <if test="start != null and end != null">
-                                   ) Z1, (SELECT @rownum:=0 ) Z2
-                           ) X
-                     WHERE RNUM <![CDATA[< ]]> #{end}
-                   ) X
-             WHERE RNUM <![CDATA[>= ]]> #{start}
-        </if>
-    </sql>
-    <sql id="sortClause">
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
-		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
-		        ${sort}
-		  	</foreach>
-	  	</if>
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
-         	   A.REGI_DATE DESC
-         	  ,A.CHNG_DATE DESC
-	  	</if>
-    </sql>
 
-    <sql id="selectColumns">
-        SYS_ID AS "sysId"
-       ,JOB_NO AS "jobNo"
-       ,JOB_DESC AS "jobDesc"
-       ,JOB_TYPE1 AS "jobType1"
-       ,JOB_TYPE2 AS "jobType2"
-       ,AUTH_TYPE AS "authType"
-       ,AUTH_GROUPS AS "authGroups"
-       ,AUTH_USERS AS "authUsers"
-       ,AUTH_FUNC AS "authFunc"
-       ,USE_YN AS "useYn"
-       ,JOB_SQL AS "jobSql"
-       ,REMK AS "remk"
-      </sql>
-
-
-	<sql id="selectDetlColumns">
-        SYS_ID AS "sysId"
-       ,JOB_NO AS "jobNo"
-       ,PARAMETER_CODE AS "parameterCode"
-       ,PARAMETER_NAME AS "parameterName"
-       ,PARAMETER_SEQ AS "parameterSeq"
-       ,PARAMETER_TYPE AS "parameterType"
-       ,PARAMETER_LENGTH AS "parameterLength"
-       ,PARAMETER_DESC AS "parameterDesc"
-       ,PARAMETER_INIT_VAL AS "parameterInitVal"
-       ,USE_YN AS "useYn"
-
-      </sql>
-
-    <sql id="whereClause">
-        SYS_ID = #{sysId}
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchJobNo)">AND JOB_NO like CONCAT('%',#{searchJobNo},'%')	</if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(searchDesc )">AND JOB_DESC like CONCAT('%',#{searchDesc},'%')	</if>
-    </sql>
-
-    <sql id="whereDetlClause">
-        SYS_ID = #{sysId}
-        AND JOB_NO = #{jobNo}
-    </sql>
-
-    <sql id="insertColumns-fields">
-		 SYS_ID
-		,JOB_NO
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobDesc        )">,JOB_DESC</if>
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobType1        )">,JOB_TYPE1</if>
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobType2        )">,JOB_TYPE2</if>
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(authType        )">,AUTH_TYPE</if>
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(authGroups        )">,AUTH_GROUPS</if>
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(authUsers        )">,AUTH_USERS</if>
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(authFunc        )">,AUTH_FUNC</if>
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useYn        )">,USE_YN</if>
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobSql        )">,JOB_SQL</if>
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(remk        )">,REMK</if>
-		,REGI_ID
-		,REGI_DATE
-    </sql>
-
-    <sql id="insertColumns-values">
-           #{sysId}
-         , #{jobNo}
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobDesc        )">, #{jobDesc}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobType1        )">, #{jobType1}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobType2        )">, #{jobType2}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(authType        )">, #{authType}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(authGroups        )">, #{authGroups}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(authUsers        )">, #{authUsers}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(authFunc        )">, #{authFunc}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useYn        )">, #{useYn}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobSql        )">, #{jobSql}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(remk        )">, #{remk}</if>
-         , #{gsUserId}
-         , NOW()
-    </sql>
-
-	<sql id="insertDetlColumns-fields">
-		 SYS_ID
-		,JOB_NO
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterCode        )">,PARAMETER_CODE</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterName        )">,PARAMETER_NAME</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterSeq        )">,PARAMETER_SEQ</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterType        )">,PARAMETER_TYPE</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterLength        )">,PARAMETER_LENGTH</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterDesc        )">,PARAMETER_DESC</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterInitVal        )">,PARAMETER_INIT_VAL</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useYn        )">,USE_YN</if>
-		,REGI_ID
-		,REGI_DATE
-    </sql>
-
-    <sql id="insertDetlColumns-values">
-           #{sysId}
-         , #{jobNo}
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterCode        )">,#{parameterCode}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterName        )">,#{parameterName}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterSeq        )">,#{parameterSeq}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterType        )">,#{parameterType}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterLength        )">,#{parameterLength}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterDesc        )">,#{parameterDesc}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(parameterInitVal        )">,#{parameterInitVal}</if>
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useYn        )">,#{useYn}</if>
-         , #{gsUserId}
-         , NOW()
-    </sql>
-
-    <sql id="updateColumns">
-          CHNG_ID   = #{gsUserId}
-         ,CHNG_DATE = NOW()
-        , JOB_DESC = #{jobDesc}
-        , JOB_TYPE1 = #{jobType1}
-        , JOB_TYPE2 = #{jobType2}
-        , AUTH_TYPE = #{authType}
-        , AUTH_GROUPS = #{authGroups}
-        , AUTH_USERS = #{authUsers}
-        , AUTH_FUNC = #{authFunc}
-        , USE_YN = #{useYn}
-        , REMK = #{remk}
-    </sql>
-
-	<sql id="updateDetlColumns">
-          CHNG_ID   = #{gsUserId}
-         ,CHNG_DATE = NOW()
-		,PARAMETER_NAME = #{parameterName}
-		,PARAMETER_SEQ = #{parameterSeq}
-		,PARAMETER_TYPE = #{parameterType}
-		,PARAMETER_LENGTH = #{parameterLength}
-		,PARAMETER_DESC = #{parameterDesc}
-		,PARAMETER_INIT_VAL = #{parameterInitVal}
-		,USE_YN = #{useYn}
-    </sql>
-
-    <select id="search" resultType="record" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectColumns" />
-               <include refid="pagingColumns" /><!-- PAGING -->
-          FROM DATA_OPER_MAST A
-         WHERE <include refid="whereClause" />
-         ORDER
-            BY A.JOB_NO ASC
-         	  ,A.REGI_DATE DESC
-         	  ,A.CHNG_DATE DESC
-        <include refid="pagingClose" /><!-- PAGING -->
+    <!-- [search] DATA_OPER_MAST 목록 조회 (페이징) -->
+    <!-- gsSorts: List<String>을 bind로 콤마 구분 문자열 생성 후 프로시저에 전달 -->
+    <select id="search" statementType="CALLABLE" resultType="record" parameterType="params">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_data_management_search(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{searchJobNo, mode=IN, jdbcType=VARCHAR},
+            #{searchDesc, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=INTEGER},
+            #{end, mode=IN, jdbcType=INTEGER},
+            #{sortStr, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-    <select id="searchDetl" resultType="record" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectDetlColumns" />
-               <include refid="pagingColumns" /><!-- PAGING -->
-          FROM DATA_OPER_DETL A
-         WHERE <include refid="whereDetlClause" />
-         ORDER
-         	BY A.JOB_NO
-              ,A.PARAMETER_SEQ
-        <include refid="pagingClose" /><!-- PAGING -->
+    <!-- [searchDetl] DATA_OPER_DETL 목록 조회 (페이징) -->
+    <!-- gsSorts: List<String>을 bind로 콤마 구분 문자열 생성 후 프로시저에 전달 -->
+    <select id="searchDetl" statementType="CALLABLE" resultType="record" parameterType="params">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_data_management_search_detl(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobNo, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=INTEGER},
+            #{end, mode=IN, jdbcType=INTEGER},
+            #{sortStr, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-    <select id="searchCount" resultType="int" parameterType="params">
-        SELECT COUNT(1)
-          FROM DATA_OPER_MAST A
-         WHERE <include refid="whereClause" />
+    <!-- [searchCount] DATA_OPER_MAST 카운트 -->
+    <select id="searchCount" statementType="CALLABLE" resultType="int" parameterType="params">
+        {CALL sp_data_management_search_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{searchJobNo, mode=IN, jdbcType=VARCHAR},
+            #{searchDesc, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-	<select id="searchDetlCount" resultType="int" parameterType="params">
-        SELECT COUNT(1)
-          FROM DATA_OPER_DETL A
-         WHERE <include refid="whereDetlClause" />
+    <!-- [searchDetlCount] DATA_OPER_DETL 카운트 -->
+    <select id="searchDetlCount" statementType="CALLABLE" resultType="int" parameterType="params">
+        {CALL sp_data_management_search_detl_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobNo, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-    <select id="select" resultType="record" parameterType="params">
-        SELECT <include refid="selectColumns" />
-          FROM DATA_OPER_MAST A
-         WHERE SYS_ID   = #{sysId}
-           AND JOB_NO  = #{jobNo}
+    <!-- [select] DATA_OPER_MAST 단건 조회 -->
+    <select id="select" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_data_management_select(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobNo, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-       <select id="searchAll" resultType="record" parameterType="params">
-        SELECT <include refid="selectColumns" />
-           FROM DATA_OPER_MAST A
-         WHERE SYS_ID = #{sysId}
-         AND JOB_NO  = #{jobNo}
+    <!-- [searchAll] DATA_OPER_MAST 전체 조회 -->
+    <select id="searchAll" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_data_management_select(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobNo, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-    <select id="getjobNo" resultType="record" parameterType="params">
-    	SELECT CONCAT('E', LPAD(CAST(ifnull(SUBSTR(MAX(JOB_NO),2,5),'0') AS UNSIGNED)+1, 5, '0') ) AS "jobNo"
-          FROM DATA_OPER_MAST
-         WHERE SYS_ID    = #{sysId}
+    <!-- [getjobNo] JOB 번호 생성 -->
+    <select id="getjobNo" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_data_management_get_job_no(
+            #{sysId, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
+    <!-- ========================================================== -->
+    <!--   2. DATA_OPER_MAST CRUD - 프로시저 호출                    -->
+    <!-- ========================================================== -->
 
-    <insert id="DataManagementinsert" parameterType="params">
-    <selectKey resultType="string" keyProperty="jobNo" order="BEFORE">
-            SELECT CONCAT('J', LPAD(CAST(ifnull(SUBSTR(MAX(JOB_NO),2,5),'0') AS UNSIGNED)+1, 5, '0') ) AS "jobNo"
-              FROM DATA_OPER_MAST
-             WHERE SYS_ID    = #{sysId}
-        </selectKey>
-        INSERT
-          INTO DATA_OPER_MAST
-             ( <include refid="insertColumns-fields" /> )
-        VALUES
-             ( <include refid="insertColumns-values" /> )
+    <!-- [DataManagementinsert] DATA_OPER_MAST 등록 -->
+    <insert id="DataManagementinsert" statementType="CALLABLE" parameterType="params">
+        {CALL sp_data_management_insert(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobDesc, mode=IN, jdbcType=VARCHAR},
+            #{jobType1, mode=IN, jdbcType=VARCHAR},
+            #{jobType2, mode=IN, jdbcType=VARCHAR},
+            #{authType, mode=IN, jdbcType=VARCHAR},
+            #{authGroups, mode=IN, jdbcType=VARCHAR},
+            #{authUsers, mode=IN, jdbcType=VARCHAR},
+            #{authFunc, mode=IN, jdbcType=VARCHAR},
+            #{useYn, mode=IN, jdbcType=VARCHAR},
+            #{jobSql, mode=IN, jdbcType=LONGVARCHAR},
+            #{remk, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </insert>
 
-    <insert id="DataManagementinsertDetl" parameterType="params">
-        INSERT
-          INTO DATA_OPER_DETL
-             ( <include refid="insertDetlColumns-fields" /> )
-        VALUES
-             ( <include refid="insertDetlColumns-values" /> )
+    <!-- [DataManagementinsertDetl] DATA_OPER_DETL 등록 -->
+    <insert id="DataManagementinsertDetl" statementType="CALLABLE" parameterType="params">
+        {CALL sp_data_management_insert_detl(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobNo, mode=IN, jdbcType=VARCHAR},
+            #{parameterCode, mode=IN, jdbcType=VARCHAR},
+            #{parameterName, mode=IN, jdbcType=VARCHAR},
+            #{parameterSeq, mode=IN, jdbcType=INTEGER},
+            #{parameterType, mode=IN, jdbcType=VARCHAR},
+            #{parameterLength, mode=IN, jdbcType=INTEGER},
+            #{parameterDesc, mode=IN, jdbcType=VARCHAR},
+            #{parameterInitVal, mode=IN, jdbcType=VARCHAR},
+            #{useYn, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </insert>
 
-    <update id="DataManagementupdate" parameterType="params">
-        UPDATE DATA_OPER_MAST
-           SET <include refid="updateColumns" />
-         WHERE SYS_ID   = #{sysId}
-           AND JOB_NO  = #{jobNo}
-
+    <!-- [DataManagementupdate] DATA_OPER_MAST 수정 -->
+    <update id="DataManagementupdate" statementType="CALLABLE" parameterType="params">
+        {CALL sp_data_management_update(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobNo, mode=IN, jdbcType=VARCHAR},
+            #{jobDesc, mode=IN, jdbcType=VARCHAR},
+            #{jobType1, mode=IN, jdbcType=VARCHAR},
+            #{jobType2, mode=IN, jdbcType=VARCHAR},
+            #{authType, mode=IN, jdbcType=VARCHAR},
+            #{authGroups, mode=IN, jdbcType=VARCHAR},
+            #{authUsers, mode=IN, jdbcType=VARCHAR},
+            #{authFunc, mode=IN, jdbcType=VARCHAR},
+            #{useYn, mode=IN, jdbcType=VARCHAR},
+            #{remk, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </update>
 
-    <update id="DataManagementupdateDetl" parameterType="params">
-        UPDATE DATA_OPER_DETL
-           SET <include refid="updateDetlColumns" />
-         WHERE SYS_ID   = #{sysId}
-           AND JOB_NO  = #{jobNo}
-           AND PARAMETER_CODE  = #{parameterCode}
+    <!-- [DataManagementupdateDetl] DATA_OPER_DETL 수정 -->
+    <update id="DataManagementupdateDetl" statementType="CALLABLE" parameterType="params">
+        {CALL sp_data_management_update_detl(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobNo, mode=IN, jdbcType=VARCHAR},
+            #{parameterCode, mode=IN, jdbcType=VARCHAR},
+            #{parameterName, mode=IN, jdbcType=VARCHAR},
+            #{parameterSeq, mode=IN, jdbcType=INTEGER},
+            #{parameterType, mode=IN, jdbcType=VARCHAR},
+            #{parameterLength, mode=IN, jdbcType=INTEGER},
+            #{parameterDesc, mode=IN, jdbcType=VARCHAR},
+            #{parameterInitVal, mode=IN, jdbcType=VARCHAR},
+            #{useYn, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </update>
 
-    <update id="updateSql" parameterType="params">
-        UPDATE DATA_OPER_MAST
-           SET JOB_SQL   = #{jobSql:BLOB}
-         WHERE SYS_ID   = #{sysId}
-           AND JOB_NO  = #{jobNo}
+    <!-- [updateSql] JOB_SQL 수정 -->
+    <update id="updateSql" statementType="CALLABLE" parameterType="params">
+        {CALL sp_data_management_update_sql(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobNo, mode=IN, jdbcType=VARCHAR},
+            #{jobSql, mode=IN, jdbcType=LONGVARCHAR}
+        )}
     </update>
 
-    <delete id="DataManagementdelete" parameterType="params">
-        DELETE
-          FROM DATA_OPER_MAST
-         WHERE SYS_ID   = #{sysId}
-           AND JOB_NO  = #{jobNo}
+    <!-- [DataManagementdelete] DATA_OPER_MAST 삭제 -->
+    <delete id="DataManagementdelete" statementType="CALLABLE" parameterType="params">
+        {CALL sp_data_management_delete(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobNo, mode=IN, jdbcType=VARCHAR}
+        )}
     </delete>
 
-    <delete id="DataManagementdeleteDetl" parameterType="params">
-        DELETE
-          FROM DATA_OPER_DETL
-         WHERE SYS_ID   = #{sysId}
-           AND JOB_NO  = #{jobNo}
-            AND PARAMETER_CODE  = #{parameterCode}
+    <!-- [DataManagementdeleteDetl] DATA_OPER_DETL 삭제 -->
+    <delete id="DataManagementdeleteDetl" statementType="CALLABLE" parameterType="params">
+        {CALL sp_data_management_delete_detl(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobNo, mode=IN, jdbcType=VARCHAR},
+            #{parameterCode, mode=IN, jdbcType=VARCHAR}
+        )}
     </delete>
 
-    <select id="DataManagementgetFieldTitle" resultType="record" parameterType="params">
-        SELECT <include refid="selectColumns" />
-          FROM DATA_OPER_MAST A
-         WHERE <include refid="whereClause" />
-         ORDER
-            BY <include refid="sortClause" />
+    <!-- [DataManagementgetFieldTitle] 필드 타이틀 조회 -->
+    <!-- gsSorts: List<String>을 bind로 콤마 구분 문자열 생성 후 프로시저에 전달 -->
+    <select id="DataManagementgetFieldTitle" statementType="CALLABLE" resultType="record" parameterType="params">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_data_management_get_field_title(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{sortStr, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-    <select id="userType" resultType="record" parameterType="params">
-        SELECT CODE_CD AS "codeCd"
-                 , CODE_NAME AS "codeName"
-		  FROM SYS_CODE
-		 WHERE SYS_ID = #{sysId}
-		 	AND  CODE_GRUP = 'USER_TYPE'
-		 	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userType)">AND  CODE_CD NOT IN (${userType})</if>
+    <!-- ========================================================== -->
+    <!--   3. 사용자/그룹 조회 - 프로시저 호출                       -->
+    <!-- ========================================================== -->
+
+    <!-- [userType] 사용자 타입 조회 (NOT IN) -->
+    <select id="userType" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_data_management_user_type(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{userType, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-	<select id="userTypeTarget" resultType="record" parameterType="params">
-        SELECT CODE_CD AS "codeCd"
-                 , CODE_NAME AS "codeName"
-		  FROM SYS_CODE
-		 WHERE SYS_ID = #{sysId}
-		 	AND  CODE_GRUP = 'USER_TYPE'
-		 	AND  CODE_CD IN (${userTypeTarget})
+    <!-- [userTypeTarget] 사용자 타입 타겟 조회 (IN) -->
+    <select id="userTypeTarget" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_data_management_user_type_target(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{userTypeTarget, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-    <select id="groupList" resultType="record" parameterType="params">
-        SELECT GROUP_ID AS "groupId"
-                 , GROUP_NAME AS "groupName"
-		  FROM SYS_GRUP
-		 WHERE SYS_ID = #{sysId}
-		     <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(group)">AND  GROUP_ID NOT IN (${group})</if>
+    <!-- [groupList] 그룹 목록 조회 (NOT IN) -->
+    <select id="groupList" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_data_management_group_list(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{group, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-    <select id="groupTarget" resultType="record" parameterType="params">
-        SELECT GROUP_ID AS "groupId"
-                 , GROUP_NAME AS "groupName"
-		  FROM SYS_GRUP
-		 WHERE SYS_ID = #{sysId}
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(groupTarget)">
-		     AND  GROUP_ID IN (${groupTarget})
-		 </if>
+    <!-- [groupTarget] 그룹 타겟 조회 (IN) -->
+    <select id="groupTarget" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_data_management_group_target(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{groupTarget, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-    <select id="userIdList" resultType="record" parameterType="params">
-        SELECT USER_ID AS "userId"
-                 , USER_NAME AS "userName"
-		  FROM SYS_USER
-		 WHERE SYS_ID = #{sysId}
-		     AND USE_FLAG = 'Y'
-		     <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userId)">AND  USER_ID NOT IN (${userId})</if>
+    <!-- [userIdList] 사용자 ID 목록 조회 (NOT IN) -->
+    <select id="userIdList" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_data_management_user_id_list(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-    <select id="userIdTarget" resultType="record" parameterType="params">
-        SELECT USER_ID AS "userId"
-                 , USER_NAME AS "userName"
-		  FROM SYS_USER
-		 WHERE SYS_ID = #{sysId}
-		     AND USE_FLAG = 'Y'
-		 <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userIdTarget)">
-		     AND  USER_ID IN (${userIdTarget})
-		 </if>
+    <!-- [userIdTarget] 사용자 ID 타겟 조회 (IN) -->
+    <select id="userIdTarget" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_data_management_user_id_target(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{userIdTarget, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-
 
 </mapper>

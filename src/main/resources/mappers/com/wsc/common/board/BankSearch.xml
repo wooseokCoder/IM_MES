@@ -4,88 +4,27 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.wsc.common.board.BankSearch">
-	<sql id="pagingColumns">
-        <if test="start == null or end == null">
-				<!-- ,0 AS "rnum" -->
-        </if>
-    </sql>
-    <sql id="pagingOpen">
-        <if test="start != null and end != null">
- 		 SELECT * 
-              FROM (
-                    SELECT X.*
-                      FROM (
-                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
-                              FROM ( 
-        </if>
-    </sql>
-    <sql id="pagingClose">
-        <if test="start != null and end != null">
-                  ) Z1, (SELECT @rownum:=0 ) Z2
-                           ) X
-                     WHERE RNUM <![CDATA[< ]]> #{end}
-                   ) X
-             WHERE RNUM <![CDATA[>= ]]> #{start} 
-         </if>  
-    </sql>
-     
-    <sql id="sortClause">    
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sortValue)">
-		        ${sortValue}
-	  	</if>
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(sortValue)">
-	  	     OM.ORDR_DATE DESC, OM.ORDR_NO DESC
-	  	</if>
-    </sql>
-    <sql id="selectColumns">
-	   A.DEAL_STAT
-      ,A.END_DATE
-      ,A.DEAL_CODE
-      ,A.SHIP_TO
-      ,A.DEAL_NAME
-      ,A.ADDR_STR
-      ,A.REPR_PERS
-      ,A.ADDR_CITY
-      ,A.ADDR_REGN
-      ,A.POST_CODE
-      ,A.TEL_NO
-      ,A.FAX_NO
-      ,A.E_MAIL
-      ,A.CHAR_BM
-      ,A.SERV_MGR
-      ,A.SALE_GRUP
-      ,A.LS_SIGN
-      ,A.LAB_RATE
-      ,A.SIGN_FORM
-      ,A.CONT_MAIL_DATE
-      ,A.COOP_AD_AGR
-      ,A.CRE_DATE
-      ,A.BRND_SOLD
-      ,A.CHNG_DATE
-      ,A.GE_CDF_NO
-      ,A.WGO_IDX
-      ,A.E_MAIL_RECV
-    </sql>
-    
-    <sql id="whereClause">
-        A.SYS_ID = #{sysId}
-    	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(DEAL_CODE  )">  AND (A.DEAL_CODE like CONCAT('%',#{DEAL_CODE},'%') OR A.DEAL_NAME like CONCAT('%',#{DEAL_CODE},'%')) </if>
-    </sql>
 
-    <select id="search" resultType="record" parameterType="params">
-   		<include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectColumns" />
-        <include refid="pagingColumns" /><!-- PAGING -->
-        FROM   DEAL_MAST A
-        WHERE  <include refid="whereClause" /> 
-        ORDER BY A.DEAL_CODE ASC
-        <include refid="pagingClose" /><!-- PAGING -->
+    <!-- ========================================================== -->
+    <!--   딜러 검색 (DEAL_MAST) - 프로시저 호출                      -->
+    <!-- ========================================================== -->
+
+    <!-- [search] 딜러 목록 조회 (페이징) -->
+    <select id="search" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_bank_search_search(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{DEAL_CODE, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=VARCHAR},
+            #{end, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    
-    <select id="searchCount" resultType="int" parameterType="params">
-        SELECT COUNT(1)
-        FROM   DEAL_MAST A
-        WHERE  <include refid="whereClause" /> 
+
+    <!-- [searchCount] 딜러 카운트 -->
+    <select id="searchCount" statementType="CALLABLE" parameterType="params" resultType="int">
+        {CALL sp_bank_search_search_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{DEAL_CODE, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
 </mapper>

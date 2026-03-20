@@ -27,12 +27,11 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/common/user/personalexcelinfo.js" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/user/personalexcelinfo.js?v=260227A" />"></script>
 <style>
 #report-button-pdf .l-btn-text{
 	width: 100px;
 }
-.search-label-h {width:10%;}
 </style>
 </head>
 
@@ -65,14 +64,14 @@
 	        </tr>
 	    </thead>
 	</table>
-	
+
 	<div id="search-toolbar" class="wui-toolbar">
     <form id="search-form">
         <fieldset class="Remake-div-line-new wd-100">
-            <table cellpadding="7" class="search-table tableSearch-c wd-100">
+            <table cellpadding="0" class="search-table tableSearch-c wd-100">
             	<colgroup>
-            		<col width="7%">
-            		<col width="13%">
+            		<col width="55px">
+            		<col width="150px">
             		<col width="*">
             	</colgroup>
             	<tr class="topnav_sty">
@@ -86,8 +85,8 @@
             		</td>
             	</tr>
 	                <tr>
-	                    <th class="h table-Search-h search-label-h2" style="min-width: 127px;" data-item="LAB_001"><span>FILE_NM </span></th>
-	                    <td class="d" style="min-width: 165px;">
+	                    <th class="h table-Search-h search-label-h" data-item="LAB_001"><span>FILE_NM </span></th>
+	                    <td class="d">
 	                        <select class="easyui-combobox" name="s_windId" ID="s_windId" data-options="width:180,height:30">
 	                            <option value="" selected>ALL</option>
 	                            <c:forEach var="selectCode" items="${selectCode}">

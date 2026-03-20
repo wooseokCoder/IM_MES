@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TORD_EMAIL_GROUP_EMP.xml
+설명: 이메일 수신자그룹 사원 CRUD 매퍼 (TORD_EMAIL_GROUP_EMP 테이블)
+작성자: 송우석
+작성일: 2026-02-10
+============================================================================
+PK: PLT_CODE + MCODE + EMP_CODE
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TORD_EMAIL_GROUP_EMP">
+
+    <!--
+    ============================================================
+    TORD_EMAIL_GROUP_EMP_SER: 단건 조회 (PLT_CODE + MCODE + EMP_CODE)
+    용도: 존재 여부 확인 (UPSERT 분기용)
+    ============================================================
+    -->
+    <select id="TORD_EMAIL_GROUP_EMP_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tord_email_group_emp_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TORD_EMAIL_GROUP_EMP_INS: 등록
+    용도: 그룹에 사원 추가
+    ============================================================
+    -->
+    <insert id="TORD_EMAIL_GROUP_EMP_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tord_email_group_emp_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{empName, mode=IN, jdbcType=VARCHAR},
+            #{email, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=TINYINT},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TORD_EMAIL_GROUP_EMP_UPD: 수정
+    용도: 사원 이메일 수정 (DATA_FLAG=0 복원)
+    ============================================================
+    -->
+    <update id="TORD_EMAIL_GROUP_EMP_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tord_email_group_emp_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{empName, mode=IN, jdbcType=VARCHAR},
+            #{email, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=TINYINT},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TORD_EMAIL_GROUP_EMP_UDE: 삭제 (논리삭제)
+    용도: DATA_FLAG = 2로 논리 삭제
+    ============================================================
+    -->
+    <update id="TORD_EMAIL_GROUP_EMP_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tord_email_group_emp_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

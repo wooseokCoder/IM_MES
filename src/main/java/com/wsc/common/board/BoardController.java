@@ -458,19 +458,45 @@ public class BoardController extends BaseController {
 	
 	@RequestMapping(value = "/searchbordagtc04.json")
 	public String searchBordAgTc04(HttpServletRequest request, Model model) {
-    	
+
         // 파라메터를 가져온다.
         ParamsMap params = getParams(request);
         Object result = service.search("searchBordAgTc04", params);
 
         // 모델에 객체를 추가한다.
         addObject(model, result);
-        
+
         // 뷰이름을 반환한다.
         return "jsonView";
 	}
-	
-	
+
+	// 조직 계층형 검색 (TreeGrid용)
+	@RequestMapping(value = "/orgSearch/treeSearch.json")
+	public String orgTreeSearch(HttpServletRequest request, Model model) {
+		ParamsMap params = getParams(request);
+		Object result = service.search("com.wsc.common.board.OrgSearch.treeSearch", params);
+		addObject(model, result);
+		return "jsonView";
+	}
+
+	// 사원 검색 (acEmpForm 팝업용)
+	@RequestMapping(value = "/empSearch/search.json")
+	public String empSearch(HttpServletRequest request, Model model) {
+		ParamsMap params = getParams(request);
+		Object result = service.search("com.wsc.common.board.EmpSearch.search", params);
+		addObject(model, result);
+		return "jsonView";
+	}
+
+	// 설비 검색 (acMachineForm 팝업용)
+	@RequestMapping(value = "/machineSearch/search.json")
+	public String machineSearch(HttpServletRequest request, Model model) {
+		ParamsMap params = getParams(request);
+		Object result = service.search("com.wsc.common.board.MachineSearch.search", params);
+		addObject(model, result);
+		return "jsonView";
+	}
+
 	//차트 데이터 조회
 	@RequestMapping(value = "/searchChartBizPlan.json")
 	public String searchChartBizPlan(HttpServletRequest request, Model model) {

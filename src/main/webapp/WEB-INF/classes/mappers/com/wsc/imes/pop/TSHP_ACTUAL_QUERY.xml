@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_ACTUAL_QUERY.xml
+설명: 실적 복합 조회 매퍼 (POP 모듈)
+원본: ProActive TSHP_ACTUAL_QUERY.cs
+화면: POP33A (공수오류현황)
+작성일: 2026-03-05
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_ACTUAL_QUERY">
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY22: 공수오류현황 메인 조회
+    원본: TSHP_ACTUAL_QUERY.TSHP_ACTUAL_QUERY22()
+    용도: 공수오류현황 메인 그리드 데이터 조회
+    검색조건: 작업일자 범위, 작업자명(LIKE), 근무구분
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY22" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_query22(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sWorkDate, mode=IN, jdbcType=VARCHAR},
+            #{eWorkDate, mode=IN, jdbcType=VARCHAR},
+            #{empLike, mode=IN, jdbcType=VARCHAR},
+            #{empGubun2, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY15_1: 작업자별 실적 조회 (1)
+    원본: TSHP_ACTUAL_QUERY.TSHP_ACTUAL_QUERY15_1()
+    용도: 공수오류현황 상세 조회 - 작업자의 해당 일자 실적 목록
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY15_1" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_query15_1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY15_2: 작업자별 실적 조회 (2)
+    원본: TSHP_ACTUAL_QUERY.TSHP_ACTUAL_QUERY15_2()
+    용도: 공수오류현황 상세 조회 - 작업자의 해당 일자 실적 상세
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY15_2" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_query15_2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY17: 작업자현황 메인 조회
+    용도: POP41A 메인 그리드 (검색조건 없음)
+    작성자: 송우석
+    작성일: 2026-03-16
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY17" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_query17(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orgCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY40: 진행 중 실적 조회
+    원본: TSHP_ACTUAL_QUERY.TSHP_ACTUAL_QUERY40()
+    용도: POP30B - 진행 중인 실적 조회 (ACT_END_TIME IS NULL)
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY40" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_query40(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{procStat, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY41_2: 실적+비가동 통합 조회
+    원본: TSHP_ACTUAL_QUERY.TSHP_ACTUAL_QUERY41_2()
+    용도: POP30B - 실적과 비가동을 UNION ALL로 통합 조회
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY41_2" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_query41_2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sWorkDate, mode=IN, jdbcType=VARCHAR},
+            #{eWorkDate, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY42_2: 최신 실적 상태 (WO별 RANK)
+    원본: TSHP_ACTUAL_QUERY.TSHP_ACTUAL_QUERY42_2()
+    용도: POP30B - WO별 최신 실적의 상태 조회 (ROW_NUMBER)
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY42_2" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_query42_2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

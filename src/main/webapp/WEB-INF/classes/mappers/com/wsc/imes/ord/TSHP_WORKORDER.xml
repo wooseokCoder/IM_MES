@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_WORKORDER.xml
+설명: 작업지시 CUD 매퍼 (TSHP_WORKORDER 테이블)
+원본: ProActive TSHP_WORKORDER.cs
+작성일: 2026-02-23
+수정일: 2026-02-24 (ORD06A용 SER, SER4, UPD4, UPD4_1, UPD28_1, UPD28_2 추가)
+수정일: 2026-03-04 (MAT05A용 UPD17 추가)
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TSHP_WORKORDER">
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD32: 비고(SCOMMENT) 저장
+    용도: ORD13A 비고 저장 (SAP_WO_NO 단위)
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD32" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd32(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD35: 공정명(PROC_CODE) 저장
+    용도: ORD13A 공정명 저장 (SAP_WO_NO + WO_SEQ 단위)
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD35" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd35(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR},
+            #{woSeq, mode=IN, jdbcType=VARCHAR},
+            #{procCode, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_SER: 작업지시 단건 조회 (상태 검증용)
+    용도: ORD06A 확정/계획저장 전 WO_FLAG 상태 확인
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_SER4: 동일 제품의 확정 WO 존재 여부 확인
+    용도: ORD06A 확정취소 시 다른 확정 WO 존재 확인
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_SER4" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_ser4(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{prodCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD4: WO_FLAG + CONFIRM_DATE 업데이트
+    용도: ORD06A 확정(WO_FLAG=1) / 확정취소(WO_FLAG=0)
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD4" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd4(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{woFlag, mode=IN, jdbcType=VARCHAR},
+            #{confirmDate, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD4_1: BF_PLN 시간 업데이트
+    용도: ORD06A 확정취소 시 BF_PLN 시간 초기화
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD4_1" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd4_1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{bfPlnStartTime, mode=IN, jdbcType=VARCHAR},
+            #{bfPlnEndTime, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD28_1: 계획시간 + 설비 업데이트
+    용도: ORD06A 계획 저장, 확정 시 PLN/BF_PLN/MC_CODE 수정
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD28_1" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd28_1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{plnStartTime, mode=IN, jdbcType=VARCHAR},
+            #{plnEndTime, mode=IN, jdbcType=VARCHAR},
+            #{bfPlnStartTime, mode=IN, jdbcType=VARCHAR},
+            #{bfPlnEndTime, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD28_2: 고객명(MCT_VEN_NAME) 업데이트
+    용도: ORD06A 계획 저장 시 SAP_WO_NO 단위 고객명 수정
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD28_2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd28_2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR},
+            #{mctVenName, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+    
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD31: 작업지시 완료 처리
+    용도: ORD16A 완료처리 - WO_FLAG=2, ACT_START/END_TIME 설정
+    비고: AS-IS에서 PRE_WORK는 UPD31에서 전달하지 않음 (파라미터 제외)
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD31" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd31(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{woFlag, mode=IN, jdbcType=VARCHAR},
+            #{actStartTime, mode=IN, jdbcType=VARCHAR},
+            #{actEndTime, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD17: 불출율 업데이트
+    용도: MAT05A_INS/DEL - 현장불출/불출취소 후 불출율 갱신
+    추가일: 2026-03-04
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD17" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd17(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{matOutRateMes, mode=IN, jdbcType=DECIMAL},
+            #{isOutMes, mode=IN, jdbcType=VARCHAR},
+            #{matOutStkRate, mode=IN, jdbcType=DECIMAL},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD36: 오더완료일 수정
+    용도: ORD18A D0A 팝업 - ACT_START_TIME, ACT_END_TIME 업데이트
+    추가일: 2026-03-06
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD36" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd36(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{actStartTime, mode=IN, jdbcType=VARCHAR},
+            #{actEndTime, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD5_5: WO_FLAG 업데이트 (비가동 시)
+    원본: TSHP_WORKORDER.TSHP_WORKORDER_UPD5_5
+    용도: POP30B 비가동 발생 시 WO_FLAG 상태 변경
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD5_5" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd5_5(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{woFlag, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD15: WO_FLAG 단순 업데이트
+    원본: TSHP_WORKORDER.TSHP_WORKORDER_UPD15
+    용도: POP30B WO_FLAG만 변경 (수정일시/수정자 없이)
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD15" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd15(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{woFlag, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD30: IS_INS_CHK 업데이트 (by WO_NO)
+    원본: TSHP_WORKORDER.TSHP_WORKORDER_UPD30
+    용도: POP30B WO_NO 기준 검사체크 업데이트
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD30" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd30(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{isInsChk, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD30_1: IS_INS_CHK 업데이트 (by SAP_WO_NO)
+    원본: TSHP_WORKORDER.TSHP_WORKORDER_UPD30_1
+    용도: POP30B SAP_WO_NO 기준 검사체크 업데이트
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD30_1" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd30_1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR},
+            #{isInsChk, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_UPD34: ACT_EMP_CODE, ACT_MC_CODE, PRE_WORK 업데이트
+    원본: TSHP_WORKORDER.TSHP_WORKORDER_UPD34
+    용도: POP30B 작업자, 실적설비, 전작업 정보 업데이트
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <update id="TSHP_WORKORDER_UPD34" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_upd34(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{actEmpCode, mode=IN, jdbcType=VARCHAR},
+            #{actMcCode, mode=IN, jdbcType=VARCHAR},
+            #{preWork, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

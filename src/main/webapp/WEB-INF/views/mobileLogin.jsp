@@ -211,7 +211,7 @@ function PopupCenter(url, title, w, h) {
 	color: #fff;
 	margin-top: 35px;
 	margin-bottom: 5px;
-} 
+}
 
 input[type=button]:hover, button:hover {
 	background-color: #e3e7ee !important;
@@ -267,7 +267,7 @@ input[type=button]:hover, button:hover {
   border-radius: 5px;
 }
 
-.login-box input, 
+.login-box input,
 .login-box button {
   display: block;
   /* width: 100%;
@@ -305,10 +305,10 @@ input[type=button]:hover, button:hover {
 
 .login-maing-text {
 	/* margin-top: 10rem;  */
-	margin-top: 5vh; 
-	text-align: center; 
-	color: #000; 
-	font-size: 12px; 
+	margin-top: 5vh;
+	text-align: center;
+	color: #000;
+	font-size: 12px;
 	font-weight: 500;
 	border-top: 1px solid #99a6bb;
 	padding-top: 10px;
@@ -316,10 +316,10 @@ input[type=button]:hover, button:hover {
 
 .login-maing-text11 {
 	/* margin-top: 10rem;  */
-	/* margin-top: 10vh; */ 
-	text-align: center; 
-	color: #fff; 
-	font-size: 45px; 
+	/* margin-top: 10vh; */
+	text-align: center;
+	color: #fff;
+	font-size: 45px;
 	font-weight: 700;
 }
 
@@ -358,7 +358,7 @@ input[type=button]:hover, button:hover {
 	.login-body .login-section{
 		padding: 0 !important;
 	}
-	
+
 	.login-box {
 		padding: 25px 20px !important;
 		border-radius: 10px !important;
@@ -379,7 +379,7 @@ input[type=button]:hover, button:hover {
 						<img src="<%=request.getContextPath()%>/resources/images/login_new/LSTA_Logos_Blue_White.png" style="height: 45px;">
 					</h1>
 					<p id="deal-title" class="login-maing-text11" style="margin-bottom: 100px;">Dealer Portal</p>
-	
+
 					<div class="login-box">
 						<div class="loginBox dis_flex">
 							<div class="tac login-icon">
@@ -390,7 +390,7 @@ input[type=button]:hover, button:hover {
 								<input type="text" id="username" class="loginInputSelect" name="j_userid" style="color: #333333;" placeholder="ID">
 							</div>
 						</div>
-							
+
 						<div class="loginBox dis_flex">
 							<div class="tac login-icon">
 								<!-- <i class="fa fa-lock fa-2x vati" aria-hidden="true"></i> -->
@@ -412,14 +412,14 @@ input[type=button]:hover, button:hover {
 								</select>
 							</div>
 						</div> --%>
-		
+
 						<input type="button" id="submit-button" value="Login" class="login_btn_new2" style="border-radius: 20px;">
-		
+
 						<div class="div-center">
 							<div class="div-right" style="text-align: right; margin-top: 18px">
 								<input id="language" name="j_language" type="hidden" value="en">
 							</div>
-		
+
 							<div class="div-left" style="text-align: left; margin-top: 10px; display: inline-block;">
 								<label class="dis_flex">
 									<input type="checkbox" id="remember" name="j_remember" style="margin: 0px 0px 0px 0px;">
@@ -427,17 +427,17 @@ input[type=button]:hover, button:hover {
 								</label>
 							</div>
 						</div>
-		
+
 						<div class="tac" style="margin-top: 5px;">
 							<a href="javascript:void(0)" id="changePassword-button" style="color: #000000; font-weight: 600; font-size: 16px;">Send mail for password reset</a>
 						</div>
-						
+
 						<%-- <div class="tac" style="margin-top: 5px; font-size: 14px; color: red">
 							This app is connected to the development server.<br>
 							Please download the latest version from the store to continue using the service.
 						</div> --%>
 					</div>
-	
+
 					<input id="system" name="j_system" type="hidden" value="<spring:eval expression="@app['default.system.id']" />" />
 					<input id="system" name="j_type"   type="hidden" value="M" />
               		<input id="system" name="j_returl" type="hidden" value="${retURL}" />
@@ -445,13 +445,13 @@ input[type=button]:hover, button:hover {
 			</form>
 			</div>
 		</div>
-	
+
 		<%-- -----------로그인 테이블 끝------------------------------------------------------------------ --%>
 		<div>
 			<!-- <p class="login-maing-text" style="margin-top: 45px; text-align: center; padding-top: 5px; border-top: 1px solid #99a6bb; color: #ffffff;">ⓒ 2019 LS Tractor USA</p> -->
-			<p class="login-maing-text" >ⓒ 2025 LS Tractor USA</p>
+			<!-- <p class="login-maing-text" >ⓒ 2025 LS Tractor USA</p> -->
 		</div>
-		
+
 
 		<!-- help -->
 		<div id="help-dialog" class="wui-dialog" style="border-top-width: 1px; display: none;">

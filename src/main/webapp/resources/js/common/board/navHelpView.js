@@ -139,7 +139,7 @@ consts = {
 	//저장,삭제 후 이동처리
 	doResult: function(res, callback) {
 		//jboard.doList();
-		$.messager.alert(msg.MSG0123, res.success, msg.MSG0123, function() {
+		$.messager.alert(msg.MSG0053, res.success, msg.MSG0053, function() {
 			doClose();
 		});
 	}

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_ACTUAL.xml
+설명: 실적 CRUD 매퍼 (POP 모듈)
+원본: ProActive TSHP_ACTUAL.cs
+화면: POP33A (공수오류현황)
+작성일: 2026-03-05
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_ACTUAL">
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_UPD11: 실적 IF_SEL_FLAG 업데이트
+    원본: TSHP_ACTUAL.TSHP_ACTUAL_UPD11()
+    용도: 공수오류현황에서 실적 전송 플래그 수정
+    ============================================================
+    -->
+    <update id="TSHP_ACTUAL_UPD11" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_upd11(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{actualId, mode=IN, jdbcType=VARCHAR},
+            #{ifSelFlag, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_SER2: 실적 단건 조회
+    원본: TSHP_ACTUAL.TSHP_ACTUAL_SER2()
+    용도: 공수오류현황에서 특정 실적 상세 조회
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_SER2" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_ser2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{actualId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_DEL: 실적 삭제
+    원본: TSHP_ACTUAL.TSHP_ACTUAL_DEL()
+    용도: 공수오류현황에서 실적 삭제 처리
+    ============================================================
+    -->
+    <delete id="TSHP_ACTUAL_DEL" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_del(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{actualId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_INS3: 실적 등록 (전체 컬럼)
+    원본: TSHP_ACTUAL.TSHP_ACTUAL_INS3()
+    용도: 공수오류현황에서 삭제된 실적 복원 등록
+    파라미터: 21개 (gsPltCode ~ ifFlag)
+    ============================================================
+    -->
+    <insert id="TSHP_ACTUAL_INS3" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_ins3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{actualId, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcNmCheck, mode=IN, jdbcType=VARCHAR},
+            #{procStat, mode=IN, jdbcType=VARCHAR},
+            #{panelStat, mode=IN, jdbcType=VARCHAR},
+            #{actStartTime, mode=IN, jdbcType=VARCHAR},
+            #{actEndTime, mode=IN, jdbcType=VARCHAR},
+            #{selfTime, mode=IN, jdbcType=INTEGER},
+            #{manTime, mode=IN, jdbcType=INTEGER},
+            #{otTime, mode=IN, jdbcType=INTEGER},
+            #{okQty, mode=IN, jdbcType=NUMERIC},
+            #{ngQty, mode=IN, jdbcType=NUMERIC},
+            #{multiStartCnt, mode=IN, jdbcType=INTEGER},
+            #{inputFlag, mode=IN, jdbcType=VARCHAR},
+            #{regDate, mode=IN, jdbcType=VARCHAR},
+            #{regEmp, mode=IN, jdbcType=VARCHAR},
+            #{ifFlag, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    POP33A_UPD_SEL_FLAG: IF_SEL_FLAG 업데이트 (ACT/IL 분기)
+    용도: KEY 접두어로 TSHP_ACTUAL/TSHP_IDLETIME 분기하여 업데이트
+    구현: SP 내에서 ACT%→upd11, IL%→upd8 호출
+    호출: pop33aIns(), pop33aIns2()
+    ============================================================
+    -->
+    <update id="POP33A_UPD_SEL_FLAG" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_idletime_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{key, mode=IN, jdbcType=VARCHAR},
+            #{ifSelFlag, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_IDLETIME_DEL: 실적삭제 래퍼 (ACT/IL 분기)
+    용도: ORD18A Tab1 삭제 (KEY 접두어로 ACTUAL/IDLETIME 분기)
+    구현: SP 내에서 ACT%→백업+삭제, IL%→논리삭제(DATA_FLAG=2)
+    호출: Ord18aService.ord18aDel()
+    ============================================================
+    -->
+    <update id="TSHP_ACTUAL_IDLETIME_DEL" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_idletime_del(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{key, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_IDLETIME_DEL_RESTORE: 삭제취소 래퍼 (ACT/IL 분기)
+    용도: ORD18A Tab2 삭제취소 (KEY 접두어로 ACTUAL/IDLETIME 분기)
+    구현: SP 내에서 ACT%→복원+백업삭제, IL%→복원(DATA_FLAG=0)
+    호출: Ord18aService.ord18aDelCancel()
+    ============================================================
+    -->
+    <update id="TSHP_ACTUAL_IDLETIME_DEL_RESTORE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_idletime_del_restore(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{key, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_INS_POP30B: 실적 등록 (작업 시작)
+    원본: TSHP_ACTUAL.TSHP_ACTUAL_INS() - POP30B용
+    용도: POP30B 작업 시작 시 실적 등록 (ACT_END_TIME 없음)
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <insert id="TSHP_ACTUAL_INS_POP30B" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_ins_pop30b(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{actualId, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcNmCheck, mode=IN, jdbcType=VARCHAR},
+            #{procStat, mode=IN, jdbcType=VARCHAR},
+            #{panelStat, mode=IN, jdbcType=VARCHAR},
+            #{actStartTime, mode=IN, jdbcType=VARCHAR},
+            #{selfTime, mode=IN, jdbcType=INTEGER},
+            #{manTime, mode=IN, jdbcType=INTEGER},
+            #{otTime, mode=IN, jdbcType=INTEGER},
+            #{okQty, mode=IN, jdbcType=NUMERIC},
+            #{ngQty, mode=IN, jdbcType=NUMERIC},
+            #{multiStartCnt, mode=IN, jdbcType=INTEGER},
+            #{inputFlag, mode=IN, jdbcType=VARCHAR},
+            #{isPreWork, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_INS2_POP30B: 실적 등록 (작업 완료)
+    원본: TSHP_ACTUAL.TSHP_ACTUAL_INS2() - POP30B용
+    용도: POP30B 작업 완료 시 실적 등록 (ACT_END_TIME 포함)
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <insert id="TSHP_ACTUAL_INS2_POP30B" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_ins2_pop30b(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{actualId, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcNmCheck, mode=IN, jdbcType=VARCHAR},
+            #{procStat, mode=IN, jdbcType=VARCHAR},
+            #{panelStat, mode=IN, jdbcType=VARCHAR},
+            #{actStartTime, mode=IN, jdbcType=VARCHAR},
+            #{actEndTime, mode=IN, jdbcType=VARCHAR},
+            #{selfTime, mode=IN, jdbcType=INTEGER},
+            #{manTime, mode=IN, jdbcType=INTEGER},
+            #{otTime, mode=IN, jdbcType=INTEGER},
+            #{okQty, mode=IN, jdbcType=NUMERIC},
+            #{ngQty, mode=IN, jdbcType=NUMERIC},
+            #{multiStartCnt, mode=IN, jdbcType=INTEGER},
+            #{inputFlag, mode=IN, jdbcType=VARCHAR},
+            #{isPreWork, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_UPD8: 종료시간+상태 업데이트
+    원본: TSHP_ACTUAL.TSHP_ACTUAL_UPD8()
+    용도: POP30B 작업 종료 시 종료시간 및 공정상태 업데이트
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <update id="TSHP_ACTUAL_UPD8" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_upd8(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{actualId, mode=IN, jdbcType=VARCHAR},
+            #{procStat, mode=IN, jdbcType=VARCHAR},
+            #{actEndTime, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_UPD9: 종료+IS_AUTO_IDLE_FLAG 리셋
+    원본: TSHP_ACTUAL.TSHP_ACTUAL_UPD9()
+    용도: POP30B 작업 종료 시 종료시간/상태 + IS_AUTO_IDLE_FLAG 리셋
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <update id="TSHP_ACTUAL_UPD9" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_upd9(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{actualId, mode=IN, jdbcType=VARCHAR},
+            #{procStat, mode=IN, jdbcType=VARCHAR},
+            #{actEndTime, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_UPD10: IS_AUTO_IDLE_FLAG 리셋 (작업자+날짜별)
+    원본: TSHP_ACTUAL.TSHP_ACTUAL_UPD10()
+    용도: POP30B 작업자의 해당 날짜 실적 IS_AUTO_IDLE_FLAG 일괄 리셋
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <update id="TSHP_ACTUAL_UPD10" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_upd10(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_SER4: 진행 중 실적 조회 (WO+EMP)
+    원본: TSHP_ACTUAL.TSHP_ACTUAL_SER4()
+    용도: POP30B 작업 시작 전 동일 WO/EMP의 진행 중 실적 확인
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_SER4" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_ser4(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_SER5: 실적 단건 조회 (WO+EMP, 최신)
+    원본: TSHP_ACTUAL.TSHP_ACTUAL_SER5()
+    용도: POP30B WO+EMP 기준 최신 실적 단건 조회
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_SER5" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_ser5(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

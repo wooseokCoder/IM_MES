@@ -65,15 +65,22 @@
 		<fieldset class="div-line-new" style="border-top:0px;">
 			<input type="hidden" name="sysId"    id="s_sysId"    value="${model.sysId}"   />
 			<input type="hidden" name="bordGrup" id="s_bordGrup" value="${model.bordGrup}"/>
-			<table cellpadding="5" class="search-table tableSearch-c" >
-				<td>
+			<table cellpadding="0" class="search-table tableSearch-c wd-100" >
+				<colgroup>
+					<col width="120px" />
+					<col width="120px" />
+					<col width="*" />
+				</colgroup>
+				<tr>
+				<td class="d">
 					<input class="easyui-combobox" name="searchKey"  id="s_searchKey"  value="${model.searchKey}"  codeGrup="BORD_STYPE" data-options="mode:'remote',width:100,editable:false,loader:jcombo.loader,panelHeight:'auto'"/>
 					<input class="easyui-textbox"  name="searchText" id="r_searchText" value="${model.searchText}" style="width:300px"/>
 				</td>
 				<td class="b">
 					<a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001">Select</a>
-
 				</td>
+				<td class="d"></td>
+				</tr>
 			</table>
 		</fieldset>
 	</form>

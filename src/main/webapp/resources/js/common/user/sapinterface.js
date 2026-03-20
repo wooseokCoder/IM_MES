@@ -419,12 +419,12 @@ function doSave() {
 	        type: 'post',
 	        data: saveParams,
 	        success: function(data){
-	        	$.messager.alert('Information',msg.MSG0117,'info');
+	        	$.messager.alert('Information',msg.MSG0035,'info');
 	        },
 	        error: function(){
 	        }
 	    });
 	}else{
-		$.messager.alert('Warning',msg.MSG0123,'warning');
+		$.messager.alert('Warning',msg.MSG0014,'warning');
 	}
 }

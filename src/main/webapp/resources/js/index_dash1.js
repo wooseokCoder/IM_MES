@@ -485,7 +485,7 @@ function doBord(){
     if(window.innerWidth<900){
 
     	$('#bord-popup-dialog').dialog({
-    	    title: tit.TITLE0036,
+    	    title: tit.TITLE0014,
     	    iconCls: 'icon-search',
     	    width: 355,
     	    height: 700,
@@ -500,7 +500,7 @@ function doBord(){
     	/* 팝업창 초기화 */
 
     	$('#bord-popup-dialog').dialog({
-    	    title: tit.TITLE0036,
+    	    title: tit.TITLE0014,
     	    iconCls: 'icon-search',
     	    width: 800,
     	    height: 700,
@@ -783,11 +783,11 @@ function doBordDetail(grup, no){
 
 	if($("#h_atchGrup").val() == 'B08'){
     	$('#bord-popup-dialog').dialog({
-    	    title: tit.TITLE0036
+    	    title: tit.TITLE0014
     	});
 	}else{
     	$('#bord-popup-dialog').dialog({
-    	    title: tit.TITLE0036
+    	    title: tit.TITLE0015
     	});
 	}
 
@@ -887,7 +887,7 @@ var fileuploadForm = {
 						var row  = rows[index];
 
 						if (row.exist != true) {
-							$.messager.alert("Error", msg.MSG0113, 'error');
+							$.messager.alert("Error", msg.MSG0083, 'error');
 							return;
 						}
 						//obj.download(row.index);   //파일 다운

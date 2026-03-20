@@ -33,12 +33,22 @@ public class User extends BaseModel {
 	private String pwdChngDate;   // 비밀번호변경일자
 	private String lastLoginDate; // 최종로그인일자
 	private String userTypeDesc;  // 사용자유형(내부/업체)
-	
+
 	private String idSfdc;        // Salesforce 계정
 	private String sfdcFlag;		//Salesforce 계정 여부
-	
+
 	private String notiAllreadYn; //알림 전체읽음처리 사용여부
-	
+
+	// MES 통합 필드 추가
+	private String pltCode;       // 플랜트코드
+	private String orgCode;       // 조직코드 (TSTD_ORG 참조)
+	private String position;      // 직위
+	private int isSystem;         // 시스템관리자 (0/1)
+	private String lockYn;        // 계정잠금여부
+	private String lang;          // 언어설정
+	private String grupId;        // 그룹 ID (sys_ugrp 조인)
+	private String grupNm;        // 그룹명 (sys_grup 조인)
+
 	private Group[] groups;
 
     public void setDefault(String sysId) {
@@ -239,7 +249,70 @@ public class User extends BaseModel {
 	public void setNotiAllreadYn(String notiAllreadYn) {
 		this.notiAllreadYn = notiAllreadYn;
 	}
-	
-	
+
+	// MES 통합 필드 getter/setter
+	public String getPltCode() {
+		return pltCode;
+	}
+
+	public void setPltCode(String pltCode) {
+		this.pltCode = pltCode;
+	}
+
+	public String getOrgCode() {
+		return orgCode;
+	}
+
+	public void setOrgCode(String orgCode) {
+		this.orgCode = orgCode;
+	}
+
+	public String getPosition() {
+		return position;
+	}
+
+	public void setPosition(String position) {
+		this.position = position;
+	}
+
+	public int getIsSystem() {
+		return isSystem;
+	}
+
+	public void setIsSystem(int isSystem) {
+		this.isSystem = isSystem;
+	}
+
+	public String getLockYn() {
+		return lockYn;
+	}
+
+	public void setLockYn(String lockYn) {
+		this.lockYn = lockYn;
+	}
+
+	public String getLang() {
+		return lang;
+	}
+
+	public void setLang(String lang) {
+		this.lang = lang;
+	}
+
+	public String getGrupId() {
+		return grupId;
+	}
+
+	public void setGrupId(String grupId) {
+		this.grupId = grupId;
+	}
+
+	public String getGrupNm() {
+		return grupNm;
+	}
+
+	public void setGrupNm(String grupNm) {
+		this.grupNm = grupNm;
+	}
 
 }

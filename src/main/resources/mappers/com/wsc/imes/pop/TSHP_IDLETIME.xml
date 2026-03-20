@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_IDLETIME.xml
+설명: 비가동 실적 CRUD 매퍼 (POP 모듈)
+원본: ProActive TSHP_IDLETIME.cs - UDE, UPD, UPD8, UPD9
+화면: POP32A (비가동 현황), POP33A (공수오류현황), ORD16A (공정현황)
+작성일: 2026-03-04
+============================================================================
+참고: D0A(등록)/D2A(수정) 팝업 관련 매퍼는 별도 개발자가 담당
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_IDLETIME">
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_UDE: 논리 삭제
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_UDE()
+    용도: 메인 그리드 삭제 버튼 (POP32A_DEL)
+    삭제 방식: DATA_FLAG = 2로 논리 삭제 (물리 삭제 아님)
+    ============================================================
+    -->
+    <update id="TSHP_IDLETIME_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_idletime_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleId, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_UPD: 비가동 종료 처리
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_UPD() (ORD16A 전용)
+    용도: ORD16A 완료처리 시 진행중인 비가동을 강제 종료
+          IDLE_TIME 계산, IDLE_STATE=2(종료), END_TIME 설정
+    파라미터: gsPltCode, idleId, idleState, endTime
+    ============================================================
+    -->
+    <update id="TSHP_IDLETIME_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_idletime_upd_ord16a(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleId, mode=IN, jdbcType=VARCHAR},
+            #{idleState, mode=IN, jdbcType=VARCHAR},
+            #{endTime, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+    
+    <!--
+    ============================================================
+    TSHP_IDLETIME_UDE: 논리 삭제
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_UDE()
+    용도: 메인 그리드 삭제 버튼 (POP32A_DEL)
+    삭제 방식: DATA_FLAG = 2로 논리 삭제 (물리 삭제 아님)
+    ============================================================
+    -->
+    <update id="TSHP_IDLETIME_UPD9" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_idletime_upd9(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleId, mode=IN, jdbcType=VARCHAR},
+            #{mctScomment, mode=IN, jdbcType=VARCHAR},
+            #{mctScommentResult, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_UPD8: 비가동 IF_SEL_FLAG 업데이트
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_UPD8()
+    용도: 공수오류현황에서 비가동 전송 플래그 수정 (POP33A)
+    ============================================================
+    -->
+    <update id="TSHP_IDLETIME_UPD8" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_idletime_upd8(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleId, mode=IN, jdbcType=VARCHAR},
+            #{ifSelFlag, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_UDE_RESTORE: 비가동 DATA_FLAG 복원 (삭제취소)
+    원본: 신규 (POP33A delCancel 기능)
+    용도: POP33A Grid3에서 삭제된 비가동 복원 시 DATA_FLAG='0'으로 변경
+    ============================================================
+    -->
+    <update id="TSHP_IDLETIME_UDE_RESTORE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_idletime_ude_restore(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleId, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_SER2: 비가동 단건 조회
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_SER2()
+    용도: POP32A_INS2 (D2A 수정) 시 IF_FLAG 확인
+    파라미터: gsPltCode, idleId
+    ============================================================
+    -->
+    <select id="TSHP_IDLETIME_SER2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_idletime_ser2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_UPD3: 비가동시간 수정
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_UPD3()
+    용도: POP32A_INS2 (D2A 수정 팝업 저장)
+    파라미터: gsPltCode, idleId, workDate, idleTime, startTime, endTime, idleState, gsUserId
+    ============================================================
+    -->
+    <update id="TSHP_IDLETIME_UPD3" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_idletime_upd3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleId, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{idleTime, mode=IN, jdbcType=INTEGER},
+            #{startTime, mode=IN, jdbcType=VARCHAR},
+            #{endTime, mode=IN, jdbcType=VARCHAR},
+            #{idleState, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_INS: 비가동시간 신규 등록
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_INS()
+    용도: POP32A_INS (D0A 등록 팝업 저장)
+    파라미터: gsPltCode, idleId, mcCode, empCode, idleCode, startTime, endTime, idleState, idleTime, workDate, gsUserId, scomment
+    ============================================================
+    -->
+    <insert id="TSHP_IDLETIME_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_idletime_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleId, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{idleCode, mode=IN, jdbcType=VARCHAR},
+            #{startTime, mode=IN, jdbcType=VARCHAR},
+            #{endTime, mode=IN, jdbcType=VARCHAR},
+            #{idleState, mode=IN, jdbcType=VARCHAR},
+            #{idleTime, mode=IN, jdbcType=INTEGER},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{actualId, mode=IN, jdbcType=VARCHAR},
+            #{ngId, mode=IN, jdbcType=VARCHAR},
+            #{mctScomment, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_UPD4: 비가동 종료 (IDLE_STATE/END_TIME)
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_UPD4()
+    용도: POP30B 비가동 종료 처리
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <update id="TSHP_IDLETIME_UPD4" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_idletime_upd4(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleId, mode=IN, jdbcType=VARCHAR},
+            #{idleState, mode=IN, jdbcType=VARCHAR},
+            #{endTime, mode=IN, jdbcType=VARCHAR},
+            #{idleTime, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_SER_POP30B: 비가동 단건 조회 (MC_CODE + IDLE_STATE)
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_SER() (POP30B용)
+    용도: POP30B 설비코드 + 비가동상태 기준 비가동 조회
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <select id="TSHP_IDLETIME_SER_POP30B" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_idletime_ser_pop30b(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{idleState, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_SER4: 비가동 조회 (WO_NO + IDLE_STATE)
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_SER4()
+    용도: POP30B 작업지시번호 + 비가동상태 기준 비가동 조회
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <select id="TSHP_IDLETIME_SER4" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_idletime_ser4(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{idleState, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_SER4_2: 비가동 조회 (MC_CODE + IDLE_STATE, START 용)
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_SER4_2()
+    용도: POP30B 설비코드 + 비가동상태 기준 비가동 시작 조회
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <select id="TSHP_IDLETIME_SER4_2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_idletime_ser4_2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{idleState, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_SER5: 비가동 조회 (EMP+WO+STATE)
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_SER5()
+    용도: POP30B 작업자 + 작업지시 + 비가동상태 기준 비가동 조회
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <select id="TSHP_IDLETIME_SER5" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_idletime_ser5(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{idleState, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_IDLETIME_UPD6: 자동비가동 플래그 해제
+    원본: TSHP_IDLETIME.TSHP_IDLETIME_UPD6()
+    용도: POP30A_INS2 비가동 시작/종료 시 IS_AUTO_IDLE_FLAG='0' 업데이트
+    추가일: 2026-03-19
+    ============================================================
+    -->
+    <update id="TSHP_IDLETIME_UPD6" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_idletime_upd6(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

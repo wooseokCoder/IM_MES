@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_INS_GRP.xml
+설명: 검사그룹 CRUD 매퍼 (TSTD_INS_GRP 테이블)
+작성자: 송우석
+작성일: 2026-03-04
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.qct.TSTD_INS_GRP">
+
+    <!--
+    ============================================================
+    TSTD_INS_GRP_SER2: 검사그룹 목록 조회 (PLANTS별)
+    ============================================================
+    -->
+    <select id="TSTD_INS_GRP_SER2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_ins_grp_ser2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_INS_GRP_INS: 검사그룹 신규 등록
+    ============================================================
+    -->
+    <insert id="TSTD_INS_GRP_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ins_grp_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR},
+            #{insGrpName, mode=IN, jdbcType=VARCHAR},
+            #{insGrpModel, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{grpSeq, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSTD_INS_GRP_UPD: 검사그룹 수정
+    ============================================================
+    -->
+    <update id="TSTD_INS_GRP_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ins_grp_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR},
+            #{insGrpName, mode=IN, jdbcType=VARCHAR},
+            #{insGrpModel, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{grpSeq, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSTD_INS_GRP_UPD2: 이미지 저장
+    ============================================================
+    -->
+    <update id="TSTD_INS_GRP_UPD2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ins_grp_upd2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR},
+            #{insImg, mode=IN, jdbcType=BLOB},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSTD_INS_GRP_IMG_SER: 검사그룹 이미지 단건 조회 (TO_BASE64 문자열 반환)
+    ============================================================
+    -->
+    <select id="TSTD_INS_GRP_IMG_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_ins_grp_img_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

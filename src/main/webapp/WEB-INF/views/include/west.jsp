@@ -45,7 +45,7 @@ div#left-region {
     padding: 8px 14px !important;
 	border-bottom: 0 !important;
 	position: relative;
-	
+
 	background-color: #0a1e5a;
 }
 
@@ -197,11 +197,11 @@ div#left-region {
 #menu-region.collapsed .menu-text, #menu-region.collapsed .logoImg, #menu-region.collapsed .menuBtLst {
   display: none;
 }
- 
+
 #hoverTextPopup {
   pointer-events: none;  /* 마우스 이벤트 무시 */
   position: fixed;
-  
+
 }
 
 @media (max-width: 768px) {
@@ -218,7 +218,7 @@ div#left-region {
 .noAuth {
 	pointer-events: none;
 }
-    
+
 </style>
 <!--  20160929 박소현  -->
 <div class="easyui-layout" fit="true">
@@ -230,7 +230,7 @@ div#left-region {
 			<span  data-item="LAB_012"  style="font-weight: bold; color:white; font-size: 12px; width: calc(100% - 48px);">
 				<%-- <a href="<c:url value="/index.do" />" style="display: flex; height: 100%;"> --%>
 				<a href="javascript:goHome();" style="display: flex; height: 100%;">
-				<img class="logoImg" src="<c:url value="/resources/images/lsta_logo.png" />" 
+				<img class="logoImg" src="<c:url value="/resources/images/mes_logo.png" />"
 					style="margin-left: 20px !important; margin: auto; height: 28px; width: 121.72px;">
 				</a>
 			</span>
@@ -238,13 +238,19 @@ div#left-region {
 		<div class="easyui-layout" fit="true" id="left-region" style="height: calc(100% - 158px) !important; ">
 		    <div data-options="region:'center',split:false,border:false,minHeight:180, maxHeight:775" id="west-menu-new" style="overflow: auto; background-color:#0a1e5a; height: 100%; ">
 				<div id="left-submenu" class="wui-menu" style="height: 100% important; scrollbar-width: none;">
-					<ul  id="left-menu">
+					<ul id="left-menu">
 					</ul>
+					<div id="left-context" class="easyui-menu" style="width:100px">
+						<div onclick="jwidget.hotmenu.addByMenu()" iconCls="icon-ok">즐겨찾기 추가</div>
+					</div>
+					<div id="hotmenu-context" class="easyui-menu" style="width:100px">
+						<div onclick="jwidget.hotmenu.delByContext()" iconCls="icon-cancel">즐겨찾기 삭제</div>
+					</div>
 				</div>
 		    </div>
 		</div>
-		
-		<div class="menuBtLst" style="background:rgb(10, 30, 90); height: 110px; padding-left: 16px; padding-top: 15px;">
+
+		<!-- <div class="menuBtLst" style="background:rgb(10, 30, 90); height: 110px; padding-left: 16px; padding-top: 15px;">
 			<div>
 				<span style="color: white; font-size: 15px; font-weight: 700;">Related Site</span>
 			</div>
@@ -253,7 +259,7 @@ div#left-region {
 				<span onclick="goToSite('https://scm.lstractorusa.com/lslogi')" style="cursor: pointer;">Gate Pass</span>
 				<span onclick="goToSite('https://lstractorusa.com/')" style="cursor: pointer;">LS Tractor</span>
 			</div>
-		</div>
+		</div> -->
     </div>
 </div>
 
@@ -267,47 +273,47 @@ let isCollapsed = false;
 
 window.onload = function(){
 	var windowWidth = $(window).width();
-	
+
 	//모바일일 떄 메뉴 축소
 	if (windowWidth <= 768 || isMobile) {
 		let layout = $('body');
         let westPanel = layout.layout('panel', 'west');
-        
+
 		$('#menu-region').addClass('collapsed');
         westPanel.panel('resize', { width: 1 });
         $(".top-buttons").removeClass("pdl-260");
         $(".top-buttons").addClass("pdl-60");
         layout.layout('resize');
-        
+
         windowSizeChk = true;
         isCollapsed = true;
-        
+
         $(".layout-expand-west").css("display","none");
         $("#menu-region").css("display","block");
         $("#menu-region").parent().css("display","block");
-        
+
 	}
 	else {
 		$(".top-buttons").addClass("pdl-260");
 	}
-	
+
 	//메뉴 권한 없을 경우 설정 tree create onLoadSuccess 함수로 로직 이동
 	//$(".fa-angle-right").parent().removeClass("noAuth");
 	//$("#left-menu > li > div:not(.tree-level3, .tree-level4)").removeClass("noAuth").addClass("tree-level2");
 };
 
 $(document).ready(function() {
-	
+
 	 $(window).resize(function(){
 	        var width = $(window).width();
 	        var height = $(window).height();
 	        $("#result").text("창의 너비: " + width + ", 높이: " + height);
-	        
+
 	        let layout = $('body');
 	        let westPanel = layout.layout('panel', 'west');
 
 	        var windowWidth = $(window).width(); // 현재 창의 가로 크기 가져오기
-	        
+
 	  	      if(isMobile) {
 			  	       // 메뉴 축소
 			  	  	$('#menu-region').addClass('collapsed');
@@ -342,11 +348,11 @@ $(document).ready(function() {
   	      	  $(".layout-expand-west").css("display","none");
 	  	      $("#menu-region").css("display","block");
 	  	      $("#menu-region").parent().css("display","block");
-		  	    
+
 	        layout.layout('resize'); // 레이아웃 전체 리사이즈
-	  	      
+
 		  });
-	
+
 });
 
 $(function() {
@@ -357,7 +363,7 @@ $(function() {
 });
 
 var hotMenuCnt = 0;
-function MenuMove(){            
+function MenuMove(){
 	//console.log(hotMenuCnt);
 	//70
 	var left_sub = $("#left-submenu").height();
@@ -370,7 +376,7 @@ function MenuMove(){
 		$("#left-submenu").css("height",($("#left-submenu").height())+"px");
 		//$("#left-region div.panel.layout-panel.layout-panel-center").animate({top:300},'fast');
 		hotMenuCnt = 0;
-	}else{		
+	}else{
 		//닫힘
 		$("#hot-menu > li").each(function(index){
 			hotMenuCnt += $(this).height();
@@ -380,22 +386,22 @@ function MenuMove(){
 		}
 		$("#west-menu-new").css("height","40px");
 		$("#left-hotmenu").css("height","0px");
-		
+
 		//$("#left-region div.panel.layout-panel.layout-panel-center").css("top","40px");
 		$("#left-region div.panel.layout-panel.layout-panel-center").animate({top:41});
 		$("#left-submenu").css("height",($("#left-submenu").height()+130)+"px");
 		$("#left-hotmenu").hide();
 	}
-	
+
 	$("body").click(function(event) {
 		 //console.log(event.target.nodeName);
-		});  
+		});
 }
 
 function hideShowMenu2() {
     var panelWidth = $('#main-layout').layout('panel', 'west').panel('options').width;
     var animationSpeed = 400;
-    
+
     if (sessionStorage.getItem('menuStat') === 'open') {
         // 메뉴 닫기
         $("#main-layout").layout('collapse', 'west');
@@ -457,15 +463,15 @@ function hideShowMenu () {
           $(".top-buttons").removeClass("pdl-60");
           $(".top-buttons").addClass("pdl-260");
         }
-      
+
       layout.layout('resize'); // 레이아웃 전체 리사이즈
       isCollapsed = !isCollapsed;
-      
+
       // content-wrapper margin 업데이트
       if (typeof window.updateContentMargin === 'function') {
           window.updateContentMargin();
       }
-      
+
       $(".layout-expand-west").css("display","none");
       $("#menu-region").css("display","block");
       $("#menu-region").parent().css("display","block");
@@ -475,4 +481,6 @@ function goToSite(url) {
 	if (!url) return;
 	window.open(url, "_blank"); // 새 탭에서 열기
 }
+
+
 </script>

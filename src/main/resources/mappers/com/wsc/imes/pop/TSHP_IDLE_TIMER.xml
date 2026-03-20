@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_IDLE_TIMER.xml
+설명: 비가동 타이머 CRUD 매퍼
+원본: ProActive TSHP_IDLE_TIMER.cs - INS
+용도: WorkIdle "분 후 시작" 선택 시 타이머 레코드 등록
+작성일: 2026-03-19
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_IDLE_TIMER">
+
+    <!--
+    ============================================================
+    TSHP_IDLE_TIMER_INS: 비가동 타이머 등록
+    원본: TSHP_IDLE_TIMER.TSHP_IDLE_TIMER_INS()
+    용도: POP30A_INS2 비가동 시작, IDLE_MINUTE 있을 때
+    ============================================================
+    -->
+    <insert id="TSHP_IDLE_TIMER_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_idle_timer_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idtId, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{idleCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{startTime, mode=IN, jdbcType=VARCHAR},
+            #{timerUpdateTime, mode=IN, jdbcType=VARCHAR},
+            #{idleMinute, mode=IN, jdbcType=INTEGER},
+            #{remainMinute, mode=IN, jdbcType=INTEGER},
+            #{ingMinute, mode=IN, jdbcType=INTEGER},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=TINYINT},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+</mapper>

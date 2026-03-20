@@ -186,7 +186,7 @@ $(function() {
 	consts.init();
 
 	$('#progress-popup').dialog({
-	       title: tit.TITLE0009,
+	       title: tit.TITLE0003,
 	       top:     100,
 	       width: 200,
 	       height: 200,
@@ -255,6 +255,8 @@ $(window).load(function() {
 				doGroupSearch();
 			}
 		});
+
+		doSearch();
 
 	}, 100);
 
@@ -351,7 +353,7 @@ function doAppend() {
 	      return false;
 	   }
 	if($("#userId").combobox('getValue') == ''){
-		$.messager.alert(msg.MSG0121,msg.MSG0123,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0015,msg.MSG0051);
 		return;
 	}
 

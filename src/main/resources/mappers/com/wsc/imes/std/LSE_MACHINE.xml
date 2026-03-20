@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    LSE_MACHINE CRUD 매퍼
+    설비 마스터: SER, INS, UPD, UDE
+    작성자: 송우석
+    작성일: 2026-02-11
+    수정일: 2026-02-23 (STD04A용 INS, UPD, UDE 추가)
+-->
+<mapper namespace="com.wsc.imes.std.LSE_MACHINE">
+
+    <!-- 단건 설비 조회 (MC_CODE + PLT_CODE) -->
+    <select id="LSE_MACHINE_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_machine_ser(
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- 설비 신규 등록 -->
+    <insert id="LSE_MACHINE_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_lse_machine_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcName, mode=IN, jdbcType=VARCHAR},
+            #{mcGroup, mode=IN, jdbcType=VARCHAR},
+            #{ctrlSys, mode=IN, jdbcType=VARCHAR},
+            #{specX, mode=IN, jdbcType=INTEGER},
+            #{specY, mode=IN, jdbcType=INTEGER},
+            #{specZ, mode=IN, jdbcType=INTEGER},
+            #{rpm, mode=IN, jdbcType=INTEGER},
+            #{buyDate, mode=IN, jdbcType=VARCHAR},
+            #{mcLocation, mode=IN, jdbcType=VARCHAR},
+            #{grade, mode=IN, jdbcType=VARCHAR},
+            #{mcAutomated, mode=IN, jdbcType=TINYINT},
+            #{mcOs, mode=IN, jdbcType=TINYINT},
+            #{mcShift, mode=IN, jdbcType=TINYINT},
+            #{mcMgtFlag, mode=IN, jdbcType=TINYINT},
+            #{mcOpenDate, mode=IN, jdbcType=VARCHAR},
+            #{mcCloseDate, mode=IN, jdbcType=VARCHAR},
+            #{mcModel, mode=IN, jdbcType=VARCHAR},
+            #{cprocCode, mode=IN, jdbcType=VARCHAR},
+            #{mcSeq, mode=IN, jdbcType=INTEGER},
+            #{mainEmp, mode=IN, jdbcType=VARCHAR},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{venCode, mode=IN, jdbcType=VARCHAR},
+            #{isOperateState, mode=IN, jdbcType=TINYINT},
+            #{isMultiStart, mode=IN, jdbcType=TINYINT},
+            #{multiStartDiv, mode=IN, jdbcType=TINYINT},
+            #{plcIp, mode=IN, jdbcType=VARCHAR},
+            #{mcMaker, mode=IN, jdbcType=VARCHAR},
+            #{assetNo, mode=IN, jdbcType=VARCHAR},
+            #{asTel, mode=IN, jdbcType=VARCHAR},
+            #{mcFlag, mode=IN, jdbcType=VARCHAR},
+            #{isSap, mode=IN, jdbcType=TINYINT},
+            #{isSimGantt, mode=IN, jdbcType=TINYINT},
+            #{procCode, mode=IN, jdbcType=VARCHAR},
+            #{isPop, mode=IN, jdbcType=TINYINT},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!-- 설비 수정 -->
+    <update id="LSE_MACHINE_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_lse_machine_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcName, mode=IN, jdbcType=VARCHAR},
+            #{mcGroup, mode=IN, jdbcType=VARCHAR},
+            #{ctrlSys, mode=IN, jdbcType=VARCHAR},
+            #{specX, mode=IN, jdbcType=INTEGER},
+            #{specY, mode=IN, jdbcType=INTEGER},
+            #{specZ, mode=IN, jdbcType=INTEGER},
+            #{rpm, mode=IN, jdbcType=INTEGER},
+            #{buyDate, mode=IN, jdbcType=VARCHAR},
+            #{mcLocation, mode=IN, jdbcType=VARCHAR},
+            #{grade, mode=IN, jdbcType=VARCHAR},
+            #{mcAutomated, mode=IN, jdbcType=TINYINT},
+            #{mcOs, mode=IN, jdbcType=TINYINT},
+            #{mcShift, mode=IN, jdbcType=TINYINT},
+            #{mcMgtFlag, mode=IN, jdbcType=TINYINT},
+            #{mcOpenDate, mode=IN, jdbcType=VARCHAR},
+            #{mcCloseDate, mode=IN, jdbcType=VARCHAR},
+            #{mcModel, mode=IN, jdbcType=VARCHAR},
+            #{cprocCode, mode=IN, jdbcType=VARCHAR},
+            #{mcSeq, mode=IN, jdbcType=INTEGER},
+            #{mainEmp, mode=IN, jdbcType=VARCHAR},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{venCode, mode=IN, jdbcType=VARCHAR},
+            #{plcIp, mode=IN, jdbcType=VARCHAR},
+            #{mcMaker, mode=IN, jdbcType=VARCHAR},
+            #{assetNo, mode=IN, jdbcType=VARCHAR},
+            #{asTel, mode=IN, jdbcType=VARCHAR},
+            #{isSignal, mode=IN, jdbcType=TINYINT},
+            #{isOperateState, mode=IN, jdbcType=TINYINT},
+            #{isMultiStart, mode=IN, jdbcType=TINYINT},
+            #{multiStartDiv, mode=IN, jdbcType=TINYINT},
+            #{mcFlag, mode=IN, jdbcType=VARCHAR},
+            #{isSap, mode=IN, jdbcType=TINYINT},
+            #{isSimGantt, mode=IN, jdbcType=TINYINT},
+            #{procCode, mode=IN, jdbcType=VARCHAR},
+            #{isPop, mode=IN, jdbcType=TINYINT},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- 설비 논리삭제 (DATA_FLAG=2) -->
+    <update id="LSE_MACHINE_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_lse_machine_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{delReason, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

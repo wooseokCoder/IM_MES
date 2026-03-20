@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_IDLECODE.xml
+설명: 비가동코드 CRUD 매퍼 (TSTD_IDLECODE 테이블)
+원본: ProActive TSTD_IDLECODE.cs
+작성일: 2026-02-05
+============================================================================
+주의: SCODE 채번은 공통 서비스 사용 (UtilityService.getSerialNo)
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_IDLECODE">
+
+    <!--
+    ============================================================
+    TSTD_IDLECODE_SER: 단건 조회 (SCODE로)
+    원본: TSTD_IDLECODE.TSTD_IDLECODE_SER()
+    용도: 존재 여부 확인, 상세 조회
+    ============================================================
+    -->
+    <select id="TSTD_IDLECODE_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_idlecode_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{scode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_IDLECODE_SER2: 사용중인 목록 조회
+    원본: TSTD_IDLECODE.TSTD_IDLECODE_SER2()
+    용도: 콤보박스용 (DATA_FLAG=0, USE_FLAG='1')
+    ============================================================
+    -->
+    <select id="TSTD_IDLECODE_SER2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_idlecode_ser2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_IDLECODE_SER3: 단건 조회 (IDLE_CODE로)
+    원본: TSTD_IDLECODE.TSTD_IDLECODE_SER3()
+    용도: MES코드로 존재 여부 확인
+    ============================================================
+    -->
+    <select id="TSTD_IDLECODE_SER3" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_idlecode_ser3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    [DEPRECATED] TSTD_IDLECODE_GET_SCODE
+    ============================================================
+    SCODE 채번은 공통 서비스를 사용합니다:
+
+    @Autowired
+    private UtilityService utilityService;
+
+    String scode = utilityService.getSerialNo(gsPltCode, "S");
+    // 결과: S260205-0001
+
+    참고: com.wsc.imes.common.UtilityService
+    ============================================================
+    -->
+
+    <!--
+    ============================================================
+    TSTD_IDLECODE_INS: 등록
+    원본: TSTD_IDLECODE.TSTD_IDLECODE_INS()
+    용도: 신규 비가동코드 등록
+    ============================================================
+    -->
+    <insert id="TSTD_IDLECODE_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_idlecode_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{scode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{idleCode, mode=IN, jdbcType=VARCHAR},
+            #{sapCode, mode=IN, jdbcType=VARCHAR},
+            #{idleName, mode=IN, jdbcType=VARCHAR},
+            #{mgType1, mode=IN, jdbcType=VARCHAR},
+            #{mgType2, mode=IN, jdbcType=VARCHAR},
+            #{mgOrg, mode=IN, jdbcType=VARCHAR},
+            #{idleSeq, mode=IN, jdbcType=INTEGER},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{isNg, mode=IN, jdbcType=VARCHAR},
+            #{alarmType, mode=IN, jdbcType=VARCHAR},
+            #{isSap, mode=IN, jdbcType=VARCHAR},
+            #{isRpt, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSTD_IDLECODE_UPD: 수정 (전체 필드)
+    원본: TSTD_IDLECODE.TSTD_IDLECODE_UPD()
+    용도: 상세 팝업에서 전체 필드 수정
+    ============================================================
+    -->
+    <update id="TSTD_IDLECODE_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_idlecode_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{scode, mode=IN, jdbcType=VARCHAR},
+            #{sapCode, mode=IN, jdbcType=VARCHAR},
+            #{idleName, mode=IN, jdbcType=VARCHAR},
+            #{mgType1, mode=IN, jdbcType=VARCHAR},
+            #{mgType2, mode=IN, jdbcType=VARCHAR},
+            #{mgOrg, mode=IN, jdbcType=VARCHAR},
+            #{idleSeq, mode=IN, jdbcType=INTEGER},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{isNg, mode=IN, jdbcType=VARCHAR},
+            #{alarmType, mode=IN, jdbcType=VARCHAR},
+            #{isSap, mode=IN, jdbcType=VARCHAR},
+            #{isRpt, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSTD_IDLECODE_UPD2: 일괄 수정 (일부 필드)
+    원본: TSTD_IDLECODE.TSTD_IDLECODE_UPD2()
+    용도: 그리드에서 일부 필드만 일괄 수정
+    ============================================================
+    -->
+    <update id="TSTD_IDLECODE_UPD2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_idlecode_upd2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{scode, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{idleSeq, mode=IN, jdbcType=INTEGER},
+            #{isNg, mode=IN, jdbcType=VARCHAR},
+            #{isSap, mode=IN, jdbcType=VARCHAR},
+            #{isRpt, mode=IN, jdbcType=VARCHAR},
+            #{isMctScomment, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSTD_IDLECODE_UDE: 삭제 (논리삭제)
+    원본: TSTD_IDLECODE.TSTD_IDLECODE_UDE()
+    용도: DATA_FLAG = 2로 논리 삭제
+    ============================================================
+    -->
+    <update id="TSTD_IDLECODE_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_idlecode_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{scode, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

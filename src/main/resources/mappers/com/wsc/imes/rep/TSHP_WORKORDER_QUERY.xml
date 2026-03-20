@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: REP09A_QUERY.xml
+설명: 가공 진행현황 조회 매퍼
+원본: ProActive REP09A (BREP)
+작성일: 2026-03-16
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.rep.TSHP_WORKORDER_QUERY">
+
+    <!--
+    ============================================================
+    REP09A_SER: 메인 그리드 조회 (WO 그룹 요약)
+    SP: sp_imes_rep09a_ser
+    ============================================================
+    -->
+    <select id="REP09A_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_rep09a_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{sPlanDate, mode=IN, jdbcType=VARCHAR},
+            #{ePlanDate, mode=IN, jdbcType=VARCHAR},
+            #{sapWoLike, mode=IN, jdbcType=VARCHAR},
+            #{modelLike, mode=IN, jdbcType=VARCHAR},
+            #{partLike, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    REP09A_SER_WO: WO 공정별 상태 목록 (동적 컬럼 데이터)
+    SP: sp_imes_rep09a_ser_wo
+    ============================================================
+    -->
+    <select id="REP09A_SER_WO" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_rep09a_ser_wo(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{sPlanDate, mode=IN, jdbcType=VARCHAR},
+            #{ePlanDate, mode=IN, jdbcType=VARCHAR},
+            #{sapWoLike, mode=IN, jdbcType=VARCHAR},
+            #{modelLike, mode=IN, jdbcType=VARCHAR},
+            #{partLike, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    REP09A_SER_EMP: WO별 작업자 목록
+    SP: sp_imes_rep09a_ser_emp
+    ============================================================
+    -->
+    <select id="REP09A_SER_EMP" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_rep09a_ser_emp(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{sPlanDate, mode=IN, jdbcType=VARCHAR},
+            #{ePlanDate, mode=IN, jdbcType=VARCHAR},
+            #{sapWoLike, mode=IN, jdbcType=VARCHAR},
+            #{modelLike, mode=IN, jdbcType=VARCHAR},
+            #{partLike, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    REP09A_SER2_PROC: D0A 공정별 상태
+    SP: sp_imes_rep09a_ser2_proc
+    ============================================================
+    -->
+    <select id="REP09A_SER2_PROC" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_rep09a_ser2_proc(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    REP09A_SER2_ACT: D0A 실적/비가동 내역
+    SP: sp_imes_rep09a_ser2_act
+    ============================================================
+    -->
+    <select id="REP09A_SER2_ACT" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_rep09a_ser2_act(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    REP09A_SER2_NG: D0A/D1A 부적합 내역
+    SP: sp_imes_rep09a_ser2_ng
+    ============================================================
+    -->
+    <select id="REP09A_SER2_NG" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_rep09a_ser2_ng(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR},
+            #{woSeq, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    REP09A_SER2_INS: D0A/D1A 자주검사 내역
+    SP: sp_imes_rep09a_ser2_ins
+    ============================================================
+    -->
+    <select id="REP09A_SER2_INS" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_rep09a_ser2_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR},
+            #{woSeq, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    REP09A_SER3: D1A 완료공정 목록
+    SP: sp_imes_rep09a_ser3
+    ============================================================
+    -->
+    <select id="REP09A_SER3" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_rep09a_ser3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{sPlanDate, mode=IN, jdbcType=VARCHAR},
+            #{ePlanDate, mode=IN, jdbcType=VARCHAR},
+            #{sapWoLike, mode=IN, jdbcType=VARCHAR},
+            #{modelLike, mode=IN, jdbcType=VARCHAR},
+            #{partLike, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    REP09A_SER4_ACT: D1A 실적/비가동 내역 (WO_SEQ 지정)
+    SP: sp_imes_rep09a_ser4_act
+    ============================================================
+    -->
+    <select id="REP09A_SER4_ACT" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_rep09a_ser4_act(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR},
+            #{woSeq, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

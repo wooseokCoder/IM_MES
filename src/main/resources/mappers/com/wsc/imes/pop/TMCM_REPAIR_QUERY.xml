@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TMCM_REPAIR_QUERY.xml
+설명: 수리수선 조회 매퍼 (TMCM_REPAIR 테이블)
+원본: ProActive TMCM_REPAIR_QUERY.cs
+작성일: 2026-03-11
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TMCM_REPAIR_QUERY">
+
+    <!--
+    ============================================================
+    TMCM_REPAIR_QUERY1: 수리수선 목록 조회
+    원본: TMCM_REPAIR_QUERY.TMCM_REPAIR_QUERY1()
+    용도: 메인 그리드 목록 조회
+    ============================================================
+    -->
+    <select id="TMCM_REPAIR_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tmcm_repair_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcrId, mode=IN, jdbcType=VARCHAR},
+            #{sRepairDate, mode=IN, jdbcType=VARCHAR},
+            #{eRepairDate, mode=IN, jdbcType=VARCHAR},
+            #{repairVendorLike, mode=IN, jdbcType=VARCHAR},
+            #{repairMcLike, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+</mapper>

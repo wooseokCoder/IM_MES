@@ -1,7 +1,9 @@
 package com.wsc.common.sample;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -10,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsbas.service.IF_SFDC_DEALER_LSTA_038;
 import com.lsbas.service.if_sfdc_dealer_lsta_038.request.IF_SFDC_DEALER_LSTA_038_data;
 import com.lsbas.service.if_sfdc_dealer_lsta_038.request.IF_SFDC_DEALER_LSTA_038_request;
@@ -338,6 +340,141 @@ public class WsdlTestController extends BaseController {
 		}
 		
 		return "jsonView";
+	}
+	@RequestMapping(value = "/restSample.json")
+	public String restSample(HttpServletRequest request, Model model) {
+		ParamsMap params = getParams(request);
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("success", "Y");
+		result.put("sysId", params.get("sysId"));
+		result.put("query", params.get("q"));
+		addObject(model, result);
+		return "jsonView";
+	}
+	
+	/**
+	 * OAuth2 토큰 발급 엔드포인트 (REST 배치 프로그램 테스트용)
+	 * POST /common/sample/token.json
+	 * Content-Type: application/x-www-form-urlencoded
+	 * Body: grant_type=client_credentials&client_id=xxx&client_secret=xxx
+	 */
+	@RequestMapping(value = "/token.json", method = org.springframework.web.bind.annotation.RequestMethod.POST, 
+	                consumes = "application/x-www-form-urlencoded", produces = "application/json")
+	public String token(HttpServletRequest request, Model model) {
+		try {
+			ParamsMap params = getParams(request);
+			String grantType = params.get("grant_type") != null ? params.get("grant_type").toString() : "";
+			String clientId = params.get("client_id") != null ? params.get("client_id").toString() : "";
+			String clientSecret = params.get("client_secret") != null ? params.get("client_secret").toString() : "";
+			
+			// 샘플용 토큰 응답 생성
+			Map<String, Object> result = new HashMap<String, Object>();
+			
+			// client_credentials 방식 확인
+			if ("client_credentials".equals(grantType)) {
+				// 샘플 액세스 토큰 생성 (실제로는 검증 후 발급)
+				String accessToken = "sample_access_token_" + System.currentTimeMillis();
+				
+				result.put("access_token", accessToken);
+				result.put("token_type", "Bearer");
+				result.put("expires_in", 3600);
+				
+				model.addAttribute("result", result);
+			} else {
+				Map<String, Object> error = new HashMap<String, Object>();
+				error.put("error", "unsupported_grant_type");
+				error.put("error_description", "Grant type must be 'client_credentials'");
+				model.addAttribute("result", error);
+			}
+			
+			return "jsonView";
+		} catch (Exception e) {
+			Map<String, Object> error = new HashMap<String, Object>();
+			error.put("error", "server_error");
+			error.put("error_description", e.getMessage());
+			model.addAttribute("result", error);
+			return "jsonView";
+		}
+	}
+	
+	/**
+	 * SOAP 배치 프로그램에서 테스트용으로 사용
+	 */
+	@RequestMapping(value = "/soapSample", consumes = "text/xml", produces = "text/xml")
+	public void soapSample(HttpServletRequest request, javax.servlet.http.HttpServletResponse response) {
+		try {
+			// SOAP 요청 읽기
+			java.io.BufferedReader reader = request.getReader();
+			StringBuilder soapRequest = new StringBuilder();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				soapRequest.append(line);
+			}
+			
+			// SOAP 요청 파싱 (간단한 샘플용)
+			String requestBody = soapRequest.toString();
+			
+			// 샘플 SOAP 응답 생성
+			StringBuilder soapResponse = new StringBuilder();
+			soapResponse.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			soapResponse.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:cxf=\"http://cxf.component.camel.apache.org/\">");
+			soapResponse.append("<soapenv:Header/>");
+			soapResponse.append("<soapenv:Body>");
+			soapResponse.append("<cxf:invokeResponse>");
+			soapResponse.append("<cxf:O_RESULT>S</cxf:O_RESULT>");
+			soapResponse.append("<cxf:O_MESSAGE>Sample SOAP response - Success</cxf:O_MESSAGE>");
+			
+			// 요청에서 받은 데이터 개수 확인 (ITAB 또는 TAB 요소 개수)
+			int dataCount = 0;
+			if (requestBody.contains("<ITAB>") || requestBody.contains("<TAB>")) {
+				java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("<(ITAB|TAB)>");
+				java.util.regex.Matcher matcher = pattern.matcher(requestBody);
+				while (matcher.find()) {
+					dataCount++;
+				}
+			}
+			
+			// 개별 결과 추가 (요청한 데이터 개수만큼)
+			for (int i = 1; i <= dataCount; i++) {
+				soapResponse.append("<cxf:RESULT_").append(String.format("%03d", i)).append(">S</cxf:RESULT_").append(String.format("%03d", i)).append(">");
+				soapResponse.append("<cxf:MESSAGE_").append(String.format("%03d", i)).append(">Sample data ").append(i).append(" processed successfully</cxf:MESSAGE_").append(String.format("%03d", i)).append(">");
+			}
+			
+			soapResponse.append("</cxf:invokeResponse>");
+			soapResponse.append("</soapenv:Body>");
+			soapResponse.append("</soapenv:Envelope>");
+			
+			// 응답 설정
+			response.setContentType("text/xml; charset=utf-8");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().write(soapResponse.toString());
+			response.getWriter().flush();
+			
+		} catch (Exception e) {
+			try {
+				e.printStackTrace();
+				// 에러 응답
+				StringBuilder errorResponse = new StringBuilder();
+				errorResponse.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+				errorResponse.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:cxf=\"http://cxf.component.camel.apache.org/\">");
+				errorResponse.append("<soapenv:Header/>");
+				errorResponse.append("<soapenv:Body>");
+				errorResponse.append("<soapenv:Fault>");
+				errorResponse.append("<faultcode>soapenv:Server</faultcode>");
+				errorResponse.append("<faultstring>").append(e.getMessage()).append("</faultstring>");
+				errorResponse.append("</soapenv:Fault>");
+				errorResponse.append("</soapenv:Body>");
+				errorResponse.append("</soapenv:Envelope>");
+				
+				response.setStatus(500);
+				response.setContentType("text/xml; charset=utf-8");
+				response.setCharacterEncoding("UTF-8");
+				response.getWriter().write(errorResponse.toString());
+				response.getWriter().flush();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 }
 

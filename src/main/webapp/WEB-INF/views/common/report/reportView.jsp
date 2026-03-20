@@ -75,9 +75,18 @@
 <div id="search-toolbar" class="wui-toolbar">
 	<form id="search-form">
 		<fieldset class="div-line-new" >
-	        <table cellpadding="5" class="search-table tableSearch-c" >
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+	        	<colgroup>
+	        		<col width="80px" />
+	        		<col width="150px" />
+	        		<col width="65px" />
+	        		<col width="120px" />
+	        		<col width="65px" />
+	        		<col width="120px" />
+	        		<col width="*" />
+	        	</colgroup>
 	            <tr>
-					<th class="h table-Search-h"><span data-item="LAB_001">코드그룹 </span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_001">코드그룹 </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="codeGrup" ID="s_codeGrup" data-options="mode:'remote',onChange:doGrupChange">
 							<option value="ALL">전체</option>
@@ -87,7 +96,7 @@
 							<option value="0" selected>코드그룹</option>
 						</select>
 					</td>
-					<th class="h"><span data-item="LAB_002">사용여부 </span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_002">사용여부 </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="useFlag" ID="s_useFlag" data-options="mode:'remote',onChange:doGrupChange">
 							<c:forEach var="item" items="${result}">
@@ -102,7 +111,7 @@
 							<input name="useFlag" type="radio" value="N" id="s_useFlag2"/><label for="s_useFlag2">중지</label>
 						</span> -->
 					</td>
-					<th class="h"><span data-item="LAB_003">정렬선택 </span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_003">정렬선택 </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="sort" ID="s_sort" data-options="mode:'remote',width:85,onChange:doGrupChange">
 							<c:forEach var="selectCodeSort" items="${selectCodeSort}">
@@ -111,9 +120,9 @@
 						</select>
 					<!-- <input class="easyui-combobox" name="sort" id="s_sort" codeGrup="CODE_SORT" data-options="mode:'remote',width:100,loader:jcombo.loader"/> -->
 					</td>
-					<td class="b">
-						<!-- <a href="javascript:void(0)" class="easyui-linkbutton cgray" iconCls="icon-search" id="search-button">검색</a> -->
-						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001">검색</a> 
+					<td class="d">
+						<!-- <a href="javascript:void(0)" class="easyui-linkbutton cgray" iconCls="icon-search" id="search-button">조회</a> -->
+						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001">조회</a> 
 					</td>
 	            </tr>
 	        </table>

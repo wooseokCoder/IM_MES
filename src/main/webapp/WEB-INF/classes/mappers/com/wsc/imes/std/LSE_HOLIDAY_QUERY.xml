@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    LSE_HOLIDAY QUERY 매퍼
+    휴일 마스터 조회: QUERY1
+    작성자: 송우석
+    작성일: 2026-02-11
+-->
+<mapper namespace="com.wsc.imes.std.LSE_HOLIDAY_QUERY">
+
+    <!-- 기간별 휴일 목록 조회 (달력 표시용) -->
+    <select id="LSE_HOLIDAY_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_holiday_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sHoliDate, mode=IN, jdbcType=VARCHAR},
+            #{eHoliDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

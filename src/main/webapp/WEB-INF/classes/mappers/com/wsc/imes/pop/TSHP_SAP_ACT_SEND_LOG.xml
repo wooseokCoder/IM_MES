@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_SAP_ACT_SEND_LOG.xml
+설명: SAP 실적 전송 로그 CRUD 매퍼 (POP 모듈)
+원본: ProActive TSHP_SAP_ACT_SEND_LOG.cs
+화면: POP33A (공수오류현황)
+작성일: 2026-03-05
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_SAP_ACT_SEND_LOG">
+
+    <!--
+    ============================================================
+    TSHP_SAP_ACT_SEND_LOG_SER: SAP 전송 로그 조회
+    원본: TSHP_SAP_ACT_SEND_LOG.TSHP_SAP_ACT_SEND_LOG_SER()
+    용도: 해당 작업자/작업일의 SAP 전송 이력 존재 여부 조회
+    ============================================================
+    -->
+    <select id="TSHP_SAP_ACT_SEND_LOG_SER" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_sap_act_send_log_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_SAP_ACT_SEND_LOG_INS: SAP 전송 로그 등록
+    원본: TSHP_SAP_ACT_SEND_LOG.TSHP_SAP_ACT_SEND_LOG_INS()
+    용도: SAP 전송 시 신규 로그 등록
+    ============================================================
+    -->
+    <insert id="TSHP_SAP_ACT_SEND_LOG_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_sap_act_send_log_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{sendFlag, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSHP_SAP_ACT_SEND_LOG_UPD: SAP 전송 로그 수정
+    원본: TSHP_SAP_ACT_SEND_LOG.TSHP_SAP_ACT_SEND_LOG_UPD()
+    용도: SAP 전송 상태 변경 시 기존 로그 업데이트
+    ============================================================
+    -->
+    <update id="TSHP_SAP_ACT_SEND_LOG_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_sap_act_send_log_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{sendFlag, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_SAP_ACT_SEND_LOG_SAVE: SAP 전송 로그 UPSERT (저장)
+    용도: 기존 SER→INS/UPD 3번 호출을 1번으로 통합
+    구현: INSERT ... ON DUPLICATE KEY UPDATE
+    호출: pop33aIns2()
+    ============================================================
+    -->
+    <insert id="TSHP_SAP_ACT_SEND_LOG_SAVE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_sap_act_send_log_save(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{sendFlag, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+</mapper>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_WORK_EXCEPT.xml
+설명: 작업 제외 처리 CRUD 매퍼 (POP 모듈)
+원본: ProActive TSHP_WORK_EXCEPT.cs
+화면: POP33A (공수오류현황)
+작성일: 2026-03-05
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_WORK_EXCEPT">
+
+    <!--
+    ============================================================
+    TSHP_WORK_EXCEPT_SER: 작업 제외 정보 조회
+    원본: TSHP_WORK_EXCEPT.TSHP_WORK_EXCEPT_SER()
+    용도: 해당 작업자/작업일의 작업 제외 여부 조회
+    ============================================================
+    -->
+    <select id="TSHP_WORK_EXCEPT_SER" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_work_except_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_WORK_EXCEPT_INS: 작업 제외 등록
+    원본: TSHP_WORK_EXCEPT.TSHP_WORK_EXCEPT_INS()
+    용도: 해당 작업자/작업일에 대한 작업 제외 신규 등록
+    ============================================================
+    -->
+    <insert id="TSHP_WORK_EXCEPT_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_work_except_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{isExcept, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSHP_WORK_EXCEPT_UPD: 작업 제외 수정
+    원본: TSHP_WORK_EXCEPT.TSHP_WORK_EXCEPT_UPD()
+    용도: 기존 작업 제외 정보의 제외 여부 변경
+    ============================================================
+    -->
+    <update id="TSHP_WORK_EXCEPT_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_work_except_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{isExcept, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_WORK_EXCEPT_SAVE: 작업 제외 UPSERT (저장)
+    용도: 기존 SER→INS/UPD 3번 호출을 1번으로 통합
+    구현: INSERT ... ON DUPLICATE KEY UPDATE
+    호출: pop33aIns3()
+    ============================================================
+    -->
+    <insert id="TSHP_WORK_EXCEPT_SAVE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_work_except_save(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{isExcept, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+</mapper>

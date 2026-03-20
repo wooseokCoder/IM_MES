@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_INS_RESULT.xml
+설명: 검사결과 상세 CRUD 매퍼 (POP 모듈)
+원본: ProActive TSHP_INS_RESULT.cs
+화면: POP30B (단말기 - 가공)
+작성일: 2026-03-18
+============================================================================
+포함 SQL (3개):
+  1. TSHP_INS_RESULT_INS  - 검사결과 등록
+  2. TSHP_INS_RESULT_UPD  - 검사결과 수정
+  3. TSHP_INS_RESULT_SER  - INSM_NO+INS_CODE 조회
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_INS_RESULT">
+
+    <!--
+    ============================================================
+    TSHP_INS_RESULT_INS: 검사결과 등록
+    원본: TSHP_INS_RESULT.TSHP_INS_RESULT_INS()
+    용도: POP30B 검사결과 상세 항목 등록
+    ============================================================
+    -->
+    <insert id="TSHP_INS_RESULT_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ins_result_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insmNo, mode=IN, jdbcType=VARCHAR},
+            #{insNo, mode=IN, jdbcType=VARCHAR},
+            #{procCode, mode=IN, jdbcType=VARCHAR},
+            #{prodType, mode=IN, jdbcType=VARCHAR},
+            #{insName, mode=IN, jdbcType=VARCHAR},
+            #{insDesc, mode=IN, jdbcType=VARCHAR},
+            #{insType, mode=IN, jdbcType=VARCHAR},
+            #{insUnit, mode=IN, jdbcType=VARCHAR},
+            #{avgVal, mode=IN, jdbcType=NUMERIC},
+            #{minVal, mode=IN, jdbcType=NUMERIC},
+            #{maxVal, mode=IN, jdbcType=NUMERIC},
+            #{insResult, mode=IN, jdbcType=VARCHAR},
+            #{insResultImg, mode=IN, jdbcType=VARCHAR},
+            #{insSeq, mode=IN, jdbcType=INTEGER},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR},
+            #{insCode, mode=IN, jdbcType=VARCHAR},
+            #{insNong, mode=IN, jdbcType=VARCHAR},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSHP_INS_RESULT_UPD: 검사결과 수정
+    원본: TSHP_INS_RESULT.TSHP_INS_RESULT_UPD()
+    용도: POP30B 검사결과 상세 항목 수정
+    ============================================================
+    -->
+    <update id="TSHP_INS_RESULT_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ins_result_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insNo, mode=IN, jdbcType=VARCHAR},
+            #{insResult, mode=IN, jdbcType=VARCHAR},
+            #{insResultImg, mode=IN, jdbcType=VARCHAR},
+            #{insNong, mode=IN, jdbcType=VARCHAR},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_INS_RESULT_SER: INSM_NO+INS_CODE 조회
+    원본: TSHP_INS_RESULT.TSHP_INS_RESULT_SER()
+    용도: POP30B 검사마스터번호+검사코드 기준 검사결과 조회
+    ============================================================
+    -->
+    <select id="TSHP_INS_RESULT_SER" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ins_result_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insmNo, mode=IN, jdbcType=VARCHAR},
+            #{insCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_INS_RESULT_MASTER.xml
+설명: 검사결과 마스터 CRUD 매퍼 (POP 모듈)
+원본: ProActive TSHP_INS_RESULT_MASTER.cs
+화면: POP30B (단말기 - 가공)
+작성일: 2026-03-18
+============================================================================
+포함 SQL (5개):
+  1. TSHP_INS_RESULT_MASTER_INS2  - 검사결과 마스터 등록
+  2. TSHP_INS_RESULT_MASTER_UPD   - 검사결과 마스터 수정
+  3. TSHP_INS_RESULT_MASTER_UPD2  - QMS 상태 수정
+  4. TSHP_INS_RESULT_MASTER_SER3  - WO_NO+INS_GRP_CODE 조회
+  5. TSHP_INS_RESULT_MASTER_SER4  - WO_NO 조회
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_INS_RESULT_MASTER">
+
+    <!--
+    ============================================================
+    TSHP_INS_RESULT_MASTER_INS2: 검사결과 마스터 등록
+    원본: TSHP_INS_RESULT_MASTER.TSHP_INS_RESULT_MASTER_INS2()
+    용도: POP30B 검사결과 마스터 신규 등록
+    ============================================================
+    -->
+    <insert id="TSHP_INS_RESULT_MASTER_INS2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ins_result_master_ins2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insmNo, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSHP_INS_RESULT_MASTER_UPD: 검사결과 마스터 수정
+    원본: TSHP_INS_RESULT_MASTER.TSHP_INS_RESULT_MASTER_UPD()
+    용도: POP30B 검사결과 마스터 수정 (작업자, DATA_FLAG)
+    ============================================================
+    -->
+    <update id="TSHP_INS_RESULT_MASTER_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ins_result_master_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insmNo, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_INS_RESULT_MASTER_UPD2: QMS 상태 수정
+    원본: TSHP_INS_RESULT_MASTER.TSHP_INS_RESULT_MASTER_UPD2()
+    용도: POP30B QMS 전송 상태 및 전송일시 업데이트
+    ============================================================
+    -->
+    <update id="TSHP_INS_RESULT_MASTER_UPD2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ins_result_master_upd2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insmNo, mode=IN, jdbcType=VARCHAR},
+            #{qmsState, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_INS_RESULT_MASTER_SER3: WO_NO+INS_GRP_CODE 조회
+    원본: TSHP_INS_RESULT_MASTER.TSHP_INS_RESULT_MASTER_SER3()
+    용도: POP30B 작업오더+검사그룹 기준 검사결과 마스터 조회
+    ============================================================
+    -->
+    <select id="TSHP_INS_RESULT_MASTER_SER3" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ins_result_master_ser3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_INS_RESULT_MASTER_SER4: WO_NO 조회
+    원본: TSHP_INS_RESULT_MASTER.TSHP_INS_RESULT_MASTER_SER4()
+    용도: POP30B 작업오더 기준 검사결과 마스터 전체 조회
+    ============================================================
+    -->
+    <select id="TSHP_INS_RESULT_MASTER_SER4" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ins_result_master_ser4(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+</mapper>

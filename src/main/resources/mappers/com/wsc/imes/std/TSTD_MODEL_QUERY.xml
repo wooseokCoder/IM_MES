@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_MODEL_QUERY.xml
+설명: 모델군 관리 조회 매퍼 (TSTD_MODEL 테이블)
+작성자: 송우석
+작성일: 2026-02-20
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_MODEL_QUERY">
+
+    <!--
+    ============================================================
+    TSTD_MODEL_QUERY1: 목록 조회
+    용도: DATA_TYPE, P_SCODE 조건으로 모델군 목록 조회
+    ============================================================
+    -->
+    <select id="TSTD_MODEL_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_model_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{dataType, mode=IN, jdbcType=VARCHAR},
+            #{pScode, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=TINYINT}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_MODEL_QUERY2: 모델 구분 조회 (Level 0)
+    용도: STD47A_SER 트리 데이터 (구분)
+    ============================================================
+    -->
+    <select id="TSTD_MODEL_QUERY2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_model_query2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{modelLike, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=TINYINT}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_MODEL_QUERY2_1: 모델 시리즈 조회 (Level 1)
+    용도: STD47A_SER 트리 데이터 (시리즈)
+    ============================================================
+    -->
+    <select id="TSTD_MODEL_QUERY2_1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_model_query2_1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{modelLike, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=TINYINT}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_MODEL_QUERY2_2: 모델 조회 (Level 2)
+    용도: STD47A_SER 트리 데이터 (모델)
+    ============================================================
+    -->
+    <select id="TSTD_MODEL_QUERY2_2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_model_query2_2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{modelLike, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=TINYINT}
+        )}
+    </select>
+
+
+    <!--
+    ============================================================
+    TSTD_MODEL_QUERY2_2_BY_MODEL: 특정 모델의 공정그룹 조회 (Level 2 Lazy Load)
+    용도: STD47A_SER_LEVEL3 - LEVEL2 노드 펼치기 시 해당 MODEL_NO 의 LEVEL3만 반환
+    ============================================================
+    -->
+    <select id="TSTD_MODEL_QUERY2_2_BY_MODEL" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_model_query2_2_by_model(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{modelNo, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=TINYINT}
+        )}
+    </select>
+
+</mapper>

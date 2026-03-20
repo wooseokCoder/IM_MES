@@ -81,12 +81,17 @@
 	<div id="search-toolbar" class="wui-toolbar">
 		<form id="search-form">
 			<fieldset class="div-line-new" >
-		        <table cellpadding="5" class="search-table tableSearch-c" >
+		        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+		            <colgroup>
+		                <col width="70px">
+		                <col width="150px">
+		                <col width="*">
+		            </colgroup>
 		            <tr>
-		            <th class="h table-Search-h" ><span data-item="LAB_001">마감년도 </span></th>
+		            <th class="h table-Search-h search-label-h" ><span data-item="LAB_001">마감년도 </span></th>
 								<td class="d">
 									<select class="easyui-combobox" name="closedYear" ID="closedYear" data-options="width:80">
- 									<option value=""><span data-item='LAB_002'>전체</span></option> 
+ 									<option value=""><span data-item='LAB_002'>전체</span></option>
 						            	<c:set var="today" value="<%=new java.util.Date()%>" />
 								        <fmt:formatDate value="${today}" pattern="yyyy" var="start"/>
 								        <option value="${start}">${start}</option>
@@ -96,7 +101,7 @@
 						            </select>
 								</td>
 						<td class="b">
-							<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001" data-options="disabled:${RET}" >검색</a>
+							<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001" data-options="disabled:${RET}" >조회</a>
 						</td>
 		            </tr>
 		        </table>

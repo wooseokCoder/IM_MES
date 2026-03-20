@@ -27,13 +27,12 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/common/user/jobhist.js" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/user/jobhist.js?v=260227A" />"></script>
 <style>
 #account-layout{min-width:1000px !important;}
 #report-button-pdf .l-btn-text{
 	width: 100px;
 }
-.search-label-h {width:10%;}
 
 /* EasyUI datebox 실제 input 요소 너비 조정 */
 #accTimeBgn + .datebox, #accTimeEnd + .datebox {
@@ -85,27 +84,27 @@
 
 	<form id="search-form">
 		<fieldset class="Remake-div-line-new wd-100">
-        <table cellpadding="7" class="search-table tableSearch-c wd-100">
+        <table cellpadding="0" class="search-table tableSearch-c wd-100">
         	<colgroup>
-        		<col width="7%">
-        		<col width="15%">
-        		<col width="7%">
-        		<col width="13%">
-        		<col width="7%">
-        		<col width="13%">
+        		<col width="80px">
+        		<col width="230px">
+        		<col width="70px">
+        		<col width="150px">
+        		<col width="50px">
+        		<col width="150px">
         		<col width="*">
         	</colgroup>
             <tr>
-            	<th class="h table-Search-h search-label-h2" style="min-width: 127px;" data-item="LAB_001"><span>Begin Date</span></th>
-            	<td class="d" style="min-width: 165px;">
+            	<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>Begin Date</span></th>
+            	<td class="d">
             		<div style="display: flex; align-items: center;">
             			<input class="easyui-datebox"  name="accTimeBgn" id="accTimeBgn" style="width:100px" value="${accTimeBgn}"/>
             			<span style="margin: 0 5px;"></span>
             			<input class="easyui-datebox"  name="accTimeEnd" id="accTimeEnd" style="width:100px" value="${accTimeEnd}"/>
             		</div>
             	</td>
-				<th class="h table-Search-h search-label-h2" style="min-width: 125px;" data-item="LAB_002"><span>Job Name </span></th>
-				<td class="d" style="min-width: 165px;">
+				<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>Job Name </span></th>
+				<td class="d">
 					<select class="easyui-combobox" name="jobId" ID="jobId" data-options="width:150">
 						<option value="">ALL</option>
 						<c:forEach var="selectJobIdList" items="${selectJobIdList}">
@@ -113,8 +112,8 @@
 						</c:forEach>
 					</select>
 				</td>
-				<th class="h table-Search-h search-label-h2" style="min-width: 100px;" data-item="LAB_003"><span>Result </span></th>
-				<td class="d" style="min-width: 165px;">
+				<th class="h table-Search-h search-label-h" data-item="LAB_003"><span>Result </span></th>
+				<td class="d">
 					<select class="easyui-combobox" name="jobRslt" ID="jobRslt" data-options="width:150">
 						<option value="">ALL</option>
 						<c:forEach var="selectJobRsltList" items="${selectJobRsltList}">
@@ -122,6 +121,7 @@
 						</c:forEach>
 					</select>
 				</td>
+				<td class="d"></td>
             </tr>
         </table>
    </fieldset>
@@ -148,7 +148,7 @@
 </div>
 
 <!-- 엑셀  진행상태 -->
-<div id="progress-popup" class="easyui-dialog" >
+<div id="progress-popup" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>

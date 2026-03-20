@@ -28,7 +28,7 @@
 
 <!-- BUSINESS JAVASCRIPT -->
 <script type="text/javascript" src="<c:url value="/resources/js/include/system.js" />"></script>
-<script type="text/javascript" src="<c:url value="/resources/js/common/user/programlistuser.js?v=0712A" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/user/programlistuser.js?v=260227A" />"></script>
 </head>
 
 <!-- BODY 상단 INCLUDE -->
@@ -48,20 +48,15 @@
 
 	<form id="search-form">
 		<fieldset class="Remake-div-line-new">
-            <table cellpadding="7" class="search-table tableSearch-c wd-100">
+            <table cellpadding="0" class="search-table tableSearch-c wd-100">
             	<colgroup>
-            		<col width="10%">
-	        		<col width="15%">
-	        		<col width="10%">
-	        		<col width="15%">
-	        		<col width="10%">
-	        		<col width="15%">
-	        		<col width="10%">
-	        		<col width="15%">
+            		<col width="80px">
+	        		<col width="150px">
+	        		<col width="*">
             	</colgroup>
             	<!-- topnav2 영역 -->
             	<tr class="topnav_sty">
-            		<td colspan="8">
+            		<td colspan="3">
             			<div>
             				<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
             				<div>
@@ -73,14 +68,15 @@
             	</tr>
             	
 	            <tr>
-					<th class="h table-Search-h" data-item="LAB_001"><span>Prog Name </span></th>
-					<td class="d" colspan="3">
+					<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>Prog Name </span></th>
+					<td class="d">
 						<select class="easyui-combobox" name="progId" ID="progId" data-options="width:400">
 							<c:forEach var="selectUserProgList" items="${selectUserProgList}">
 								<option value="${selectUserProgList.PROG_ID}">${selectUserProgList.PROG_NAME}</option>
 							</c:forEach>
 						</select>
 					</td>
+					<td class="d"></td>
 	            </tr>
 	        </table>
 	     </fieldset>
@@ -90,7 +86,7 @@
                     <td class="h">
                     	<div class="dis_flex_gap4">
 						    <!-- <a href="javascript:void(0)" class="easyui-linkbutton cgray" iconCls="icon-reload" id="reload-button">초기화</a> -->
-						    <!-- <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-search'" id="search-button">검색</a> -->
+						    <!-- <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-search'" id="search-button">조회</a> -->
 						    <a href="javascript:void(0)" class="easyui-linkbutton c4" id="excel-button" data-item="BTN_002">Excel Download <img src="<%=request.getContextPath() %>/resources/images/excel_download.png" style="width: 16px; height: 16px; margin-left: 5px;"></a>
 	
 							<!-- <input type="hidden" name="userId" id="s_userId"  />
@@ -127,7 +123,7 @@
 
 
 <!-- 엑셀  진행상태 -->
-<div id="progress-popup" class="easyui-dialog" >
+<div id="progress-popup" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>

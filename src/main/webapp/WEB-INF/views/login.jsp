@@ -22,12 +22,12 @@
 <%-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --%>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<%@ include file="/WEB-INF/views/include/common.jsp" %>
+<%@ include file="include/common.jsp" %>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 <script type="text/javascript">
 	 var context = "<c:out value="${pageContext.request.contextPath}" />";
 </script>
-<script type="text/javascript" src="<c:url value="/resources/js/login.js?v=251121A" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/login.js?v=260311A" />"></script>
 <link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/login.css?v=251110A" />" />
 <%-- <link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/login.css" />" /> --%>
 <%
@@ -79,7 +79,7 @@ $(function() {
 
 $(window).load(function() {
 	$(".wui-dialog").show();
-	
+
 
 
 	const video = document.getElementById("mainVideo");
@@ -89,7 +89,7 @@ $(window).load(function() {
 	  const t = video.currentTime;
 
 	  // 예: 5초~7초 구간에서 이미지 보이기
-	  if (t >= 25.5) { 
+	  if (t >= 25.5) {
 		  //console.log("시간 : " + t);
 		  //logoImg.style.display = "none";
 		  logoImg.style.opacity = "0";
@@ -202,7 +202,7 @@ function PopupCenter(url, title, w, h) {
 	min-height: 100vh;
 	display: flex;
 	align-items: center;
-} 
+}
 
 .login-logo {
 	display: flex;
@@ -220,7 +220,7 @@ function PopupCenter(url, title, w, h) {
 	color: #fff;
 	margin-top: 25px;
 	margin-bottom: 5px;
-} 
+}
 
 input[type=button]:hover, button:hover, button:focus, button:active {
 	background-color: #0057c9 !important;
@@ -245,7 +245,7 @@ input[type=button]:hover, button:hover, button:focus, button:active {
     height: 45px;
     margin-top: 10px;
 }
-/* 
+/*
 .loginBox .box_icon {
 	width: 40px;
 }
@@ -254,7 +254,7 @@ input[type=button]:hover, button:hover, button:focus, button:active {
 	width: calc(100% - 40px);
 }
  */
- 
+
 .loginInputSelect {
 	width: 100%;
 	height: 43px;
@@ -337,7 +337,7 @@ input[type=button]:hover, button:hover, button:focus, button:active {
 	width: 100%;
 	object-fit: cover;
 }
-/* 
+/*
 .login_icon {
 	height: 18px;
 }
@@ -374,9 +374,9 @@ input[type=button]:hover, button:hover, button:focus, button:active {
 
 .logo-white {
    	display: block;
-   	transition: opacity 3s ease; 
+   	transition: opacity 3s ease;
 }
-   
+
 .logo-org {
    	display: none;
 }
@@ -391,19 +391,19 @@ input[type=button]:hover, button:hover, button:focus, button:active {
 	.login-width {
 		width: 100%;
 	}
-	
+
 	.login-logo {
     	margin-bottom: 20px;
     }
-    
+
     .logo-white {
     	display: none;
     }
-    
+
     .logo-org {
     	display: block;
     }
-    
+
     .bg-video {
     	display: none;
     }
@@ -436,8 +436,8 @@ input[type=button]:hover, button:hover, button:focus, button:active {
 }
 
 .login-loading-spinner {
-	width: 48px;
-	height: 48px;
+	/* width: 48px;
+	height: 48px; */
 	margin-bottom: 15px;
 }
 
@@ -458,14 +458,16 @@ input[type=button]:hover, button:hover, button:focus, button:active {
 <body class="login-body">
 	<!-- 로그인 로딩 오버레이 -->
 	<div id="login-loading-overlay" class="login-loading-overlay">
-		<img class="login-loading-tractor" src="<%=request.getContextPath()%>/resources/images/tractor.png" alt="Loading...">
-		<img class="login-loading-spinner" src="<%=request.getContextPath()%>/resources/images/loading.gif" alt="Loading...">
+		<%-- <img class="login-loading-tractor" src="<%=request.getContextPath()%>/resources/images/tractor.png" alt="Loading...">
+		<img class="login-loading-spinner" src="<%=request.getContextPath()%>/resources/images/loading.gif" alt="Loading..."> --%>
+		<img class="login-loading-spinner" src="<%=request.getContextPath()%>/resources/images/Trail_loading_01.gif" alt="Loading...">
 		<span class="login-loading-text">Logging in...</span>
 	</div>
 	<div class="bg-video">
 		<video id="mainVideo" class="bg-video_content" autoplay muted loop>
 			<!-- <source src="https://monitoring.lstractor.co.kr/lsmd_data/upload/real/DASH/20250915_79057f20-023d-49e8-852f-34b587dad760.mp4" type="video/mp4" /> -->
-			<source src="https://dealerportaldev.lstractorusa.com/lsdp_data/upload/real/COMM/login.mp4" type="video/mp4" />
+<!-- 			<source src="https://dealerportaldev.lstractorusa.com/lsdp_data/upload/real/COMM/login.mp4" type="video/mp4" /> -->
+			<source src="<%=request.getContextPath()%>/resources/videos/main.mp4" type="video/mp4" />
 			Your browser is not supported!
 		</video>
 	</div>
@@ -498,15 +500,16 @@ input[type=button]:hover, button:hover, button:focus, button:active {
 								<div class="login-input">
 									<input type="password" id="password" name="j_password" class="loginInputSelect" style="color: #333333;" placeholder="PASSWORD">
 								</div>
-							</div> 
+							</div>
 							<div class="loginBox dis_flex">
 								<div class="tac login-icon">
 									<img class="" src="<%=request.getContextPath()%>/resources/images/login_new/global.png" >
 								</div>
 								<div class="login-input">
 									<select id="language" name="j_language" class="loginInputSelect sel-appr" onchange="doLanguage()">
+										<option value="ko">한국어</option>
 										<option value="en">English</option>
-										<option value="pt">Portuguese</option>
+										<option value="zh">中文</option>
 									</select>
 								</div>
 							</div>
@@ -515,7 +518,7 @@ input[type=button]:hover, button:hover, button:focus, button:active {
 
 							<div class="div-center">
 								<div class="div-right" style="text-align: right; margin-top: 18px">
-									<input id="language" name="j_language" type="hidden" value="en">
+									<input id="language" name="j_language" type="hidden" value="ko">
 								</div>
 
 								<div class="div-left" style="text-align: left; margin-top: 10px; display: inline-block;">
@@ -539,70 +542,70 @@ input[type=button]:hover, button:hover, button:focus, button:active {
 				<hr class="hrStyle" />
 				<div>
 					<!-- <p class="login-maing-text">ⓒ 2019 LS Tractor USA</p> -->
-					<p class="login-maing-text">ⓒ 2025 LS Tractor USA</p>
+					<!-- <p class="login-maing-text">ⓒ 2025 LS Tractor USA</p> -->
 				</div>
 			</div>
 		</div>
-	   
+
 		<!-- help -->
 		<div id="help-dialog" class="wui-dialog" style="border-top-width:1px;display:none;">
 			<div class="custom-popup">
-		
+
 				<div class="custom-id">user1</div>
 				<div class="custom-content">&emsp;- 사용자1 ( 생산 미포함 )</div>
-	
+
 				<div class="custom-id">usera</div>
 				<div class="custom-content">&emsp;- 사용자A ( 생산 기본형 )</div>
-	
+
 				<div class="custom-id">userb</div>
 				<div class="custom-content">&emsp;- 사용자B ( 생산 기본형+외주관리 )</div>
-	
+
 				<div class="custom-id">userc</div>
 				<div class="custom-content">&emsp;- 사용자C ( 생산 계획형 )</div>
-	
+
 				<div class="custom-id">userd</div>
 				<div class="custom-content">&emsp;- 사용자D ( 생산 계획형+외주관리 )</div>
-	
+
 				<div class="custom-id">userm</div>
 				<div class="custom-content">&emsp;- 사용자M ( 모바일 사용자 )</div>
 				<br>
-	
+
 				<div class="custom-content1">비밀번호는 모두<span style='color:red'> pwd123! </span>입니다.</div>
-	
+
 				<div class="custom-button">
 					<input class="custom-button1" type="button" onclick="doClosePopup()" value="닫기">
 				</div>
-		
+
 			</div>
 		</div>
-		
-		
+
+
 		<!-- help -->
 		<div id="help-prod-dialog" class="wui-dialog" style="border-top-width:1px;display:none;">
 			<div class="custom-popup">
-		
+
 				<div class="custom-id">userap </div>
 				<div class="custom-content">&emsp;- 사용자AP ( 생산 기본형 )  </div>
-	
+
 				<div class="custom-id">userbp </div>
 				<div class="custom-content">&emsp;- 사용자BP ( 생산 기본형+외주관리 )  </div>
-	
+
 				<div class="custom-id">usercp </div>
 				<div class="custom-content">&emsp;- 사용자CP ( 생산 계획형 )  </div>
-	
+
 				<div class="custom-id">userdp </div>
 				<div class="custom-content">&emsp;- 사용자DP ( 생산 계획형+외주관리 )  </div>
-	
+
 				<div class="custom-id">usermp </div>
 				<div class="custom-content">&emsp;- 사용자MP ( 모바일 사용자 )  </div>
 				<br>
-	
+
 				<div class="custom-content1">비밀번호는 모두<span style='color:red'> pwd123! </span>입니다.</div>
-	
+
 				<div class="custom-button">
 					<input class="custom-button1" type="button" onclick="doClosePopupProd()" value="닫기">
 				</div>
-		
+
 			</div>
 		</div>
 	</div>

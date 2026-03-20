@@ -82,7 +82,7 @@ function doChangePassword() {
         dataType: 'json',
         async: true,
         type: 'post',
-        data: {sysId:'IMMES'
+        data: {sysId:'LSBAS'
         	 , userId:$("#username").val()
         	 , email:$("#email").val()
         	 , mail_to:$("#email").val()

@@ -9,23 +9,18 @@ function doInit(args) {
 //2016/12/06 김영진 -- 쿠키로 한영전환
 function checkLanguage(){
 	var cName = getCookie('culture');
-	//console.log(cName);
-//    if (cName == 'ko') {
-//    	$('#language').val("ko");
-//        krClick();
-//    } else  if (cName == 'vi') {
-//    	$('#language').val("vi");
-//    	viClick();
-//    } else {
-//    	$('#language').val("en");
-//        enClick();
-//    }
-	if (cName == 'pt') {
-    	$('#language').val("pt");
-    	ptClick();
-    } else {
+	if (cName == 'ko') {
+    	$('#language').val("ko");
+        koClick();
+    } else if (cName == 'zh') {
+    	$('#language').val("zh");
+    	zhClick();
+    } else if (cName == 'en') {
     	$('#language').val("en");
         enClick();
+    } else {
+    	$('#language').val("ko");
+        koClick();
     }
 }
 //2016/12/06 김영진 -- 쿠키읽기
@@ -43,16 +38,20 @@ function getCookie(cName) {
     return unescape(cValue);
 }
 //2016/12/06 김영진 -- 한글화
-function krClick() {
+function koClick() {
 	devWidth = $("body").width();
 	if(devWidth > 460){
 		$('.lg-login-pg .login-pg-img').css("background", "url('"+context+"/resources/images/login/login_main.png') no-repeat");
 	}else{
 		//$('.login-form-table').css("background", "url('"+context+"/resources/images/login/login_main_bg_form.png') no-repeat");
 	}
+	$('input:text').attr('placeholder','아이디');
+	$('input:password').attr('placeholder','비밀번호');
+	$('#deal-title').html("사출 MES");
 	$('#submit-button').val("로그인");
-	$('#id_save').html("아이디저장");
-	setCookie("culture", "kr", 30);
+	$('#id_save').html("아이디 저장");
+	$('#changePassword-button').html("비밀번호 재설정 메일 발송");
+	setCookie("culture", "ko", 30);
 }
 //2016/12/06 김영진 -- 영문화
 //function enClick() {
@@ -89,28 +88,28 @@ function enClick() {
 	}
 	$('input:text').attr('placeholder','ID');
 	$('input:password').attr('placeholder','PASSWORD');
-	$('#deal-title').html("Dealer Portal");
+	$('#deal-title').html("Injection MES");
 	$('#submit-button').val("Login");
 	$('#id_save').html("ID Save");
 	$('#changePassword-button').html("Send mail for password reset");
 	setCookie("culture", "en", 30);
 }
 
-//2020/01/10 김경환 -- 포르투갈어
-function ptClick() {
+//2020/01/10 김경환 -- 중국어
+function zhClick() {
 	devWidth = $("body").width();
 	if(devWidth > 460){
 		$('.lg-login-pg .login-pg-img').css("background", "url('"+context+"/resources/images/login/login_main_en.png') no-repeat");
 	}else{
 		//$('.login-form-table').css("background", "url('"+context+"/resources/images/login/login_main_bg_form_en.png') no-repeat");
 	}
-	$('input:text').attr('placeholder','EU IA');
-	$('input:password').attr('placeholder','SENHA');
-	$('#deal-title').html("Portal do Revendedor");
-	$('#submit-button').val("Conecte-se");
-	$('#id_save').html("ID Salvar");
-	$('#changePassword-button').html("Mande e-mail para restaurar a senha.");
-	setCookie("culture", "pt", 30);
+	$('input:text').attr('placeholder','用户名');
+	$('input:password').attr('placeholder','密码');
+	$('#deal-title').html("注塑MES");
+	$('#submit-button').val("登录");
+	$('#id_save').html("保存ID");
+	$('#changePassword-button').html("发送邮件重置密码");
+	setCookie("culture", "zh", 30);
 }
 //2016/12/06 김영진 -- 언어변경
 //function doLanguage(){
@@ -125,10 +124,12 @@ function ptClick() {
 //}
 function doLanguage(){
 	var selected = $('#language').val();
-	if(selected == "en"){
-		enClick();
+	if(selected == "ko"){
+		koClick();
+	}else if(selected == "zh"){
+		zhClick();
 	}else{
-		ptClick();
+		enClick();
 	}
 }
 //2016/12/06 김영진 -- pc, mobile 화면전환
@@ -190,6 +191,8 @@ $(function() {
 
     //쿠키에 저장된 값 불러오기
     doIdLoad();
+
+    checkLanguage();
 });
 
 
@@ -282,7 +285,7 @@ function doLogin() {
 	showLoginLoading();
 
 	setCookie("reportLogin", "N", 30);
-	
+
 	var errMsg;
 	//아이디 대소문자 처리
 	$.ajax({
@@ -298,7 +301,7 @@ function doLogin() {
         	const inputUsername = $("#username").val();
         	const isOldUserIdEmpty = hasRows && rows.oldUserId === "";
         	const isMatchingUserId = hasRows && (rows.USER_ID).toLowerCase() === inputUsername.toLowerCase();
-        	
+
         	if (hasRows && (isOldUserIdEmpty || isMatchingUserId)) {
         	    $("#username").val(rows.USER_ID);
         	    errMsg = rows.LockYn;
@@ -312,45 +315,49 @@ function doLogin() {
         	hideLoginLoading();
         }
     });
-	
+
 	if(errMsg == 'NoID'){
 		hideLoginLoading();
 		if($('#language').val() == 'en'){
 			$.messager.alert('Warning',"This is an unregistered ID.",'Warning');
+		}else if($('#language').val() == 'ko'){
+			$.messager.alert('경고',"등록되지 않은 아이디입니다.",'경고');
     	}else{
-    		$.messager.alert('Aviso',"Este é um ID não registrado.",'Aviso');
+    		$.messager.alert('警告',"此ID未注册。",'警告');
     	}
 		return false;
 	}
-	
+
 	if(errMsg == 'OldID') {
 		location.href=getUrl("/changeoldid.do?lang="+$('#language').val()+"&userId=" + encodeURIComponent($("#username").val()));
 		return false;
 	}
-	
+
 	if(errMsg != 'Y' && errMsg != 'OldID'){
 		hideLoginLoading();
 		if($('#language').val() == 'en'){
 			$.messager.alert('Warning',"Please contact your System Manager.",'Warning');
+		}else if($('#language').val() == 'ko'){
+			$.messager.alert('경고',"시스템 관리자에게 문의하세요.",'경고');
     	}else{
-    		$.messager.alert('Aviso',"Por favor, pergunte ao gerente.",'Aviso');
+    		$.messager.alert('警告',"请联系系统管理员。",'警告');
     	}
 		return false;
 	}
-	
-	
 
-	
+
+
+
 	//아이디저장 처리
 	if ($("#remember").is(":checked")){
 		setCookie(COOKIE_NAME, $("#username").val(), 30);
 	}else{
 		deleteCookie(COOKIE_NAME);
 	}
-	
+
 	sessionStorage.setItem("currStat","Y");
 	sessionStorage.setItem("userId",$("#username").val());
-	
+
 	//sso 로그인 한 시간 초기화
 	sessionStorage.setItem('ssoTime', 0);
 
@@ -373,8 +380,10 @@ function doLogin() {
         		hideLoginLoading();
         		if($('#language').val() == 'en'){
         			$.messager.alert('Warning',"Password doesn't match.",'Warning');
+        		}else if($('#language').val() == 'ko'){
+        			$.messager.alert('경고',"비밀번호가 일치하지 않습니다.",'경고');
             	}else{
-            		$.messager.alert('Aviso',"A senha não corresponde.",'Aviso');
+            		$.messager.alert('警告',"密码不匹配。",'警告');
             	}
         	}
         },
@@ -394,8 +403,10 @@ function doValidation() {
     if ($("#username").val().isBlank()) {
     	if($('#language').val() == 'en'){
     		alert("Please enter your ID.");
+    	}else if($('#language').val() == 'ko'){
+    		alert("아이디를 입력하세요.");
     	}else{
-    		alert("Por favor, insira seu ID.");
+    		alert("请输入您的ID。");
     	}
 
         $("#username").focus();
@@ -406,10 +417,11 @@ function doValidation() {
     if ($("#password").val().isBlank()) {
     	if($('#language').val() == 'en'){
     		alert("Please enter your password.");
+    	}else if($('#language').val() == 'ko'){
+    		alert("비밀번호를 입력하세요.");
     	}else{
-    		alert("Por favor, insira sua senha.");
+    		alert("请输入您的密码。");
     	}
-        
 
         $("#password").focus();
 

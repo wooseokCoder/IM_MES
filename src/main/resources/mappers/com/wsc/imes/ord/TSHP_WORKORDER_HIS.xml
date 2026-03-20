@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_WORKORDER_HIS.xml
+설명: 작업지시 확정이력 매퍼 (TSHP_WORKORDER_HIS 테이블)
+원본: ProActive TSHP_WORKORDER_HIS.cs
+작성일: 2026-02-24
+사용화면: ORD06A
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TSHP_WORKORDER_HIS">
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_HIS_INS: 확정/취소 이력 등록
+    ============================================================
+    -->
+    <insert id="TSHP_WORKORDER_HIS_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_his_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{procCode, mode=IN, jdbcType=VARCHAR},
+            #{prodHogi, mode=IN, jdbcType=VARCHAR},
+            #{woFlag, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_HIS_SER: WO_NO별 확정이력 조회
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_HIS_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_his_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

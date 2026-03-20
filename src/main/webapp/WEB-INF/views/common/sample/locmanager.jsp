@@ -95,9 +95,14 @@ html, body {
 		<div id="search-toolbar" class="wui-toolbar">
 			<form id="search-form">
 			<fieldset class="div-line-new">
-				<table cellpadding="5" class="search-table tableSearch-c wd-100">
+				<table cellpadding="0" class="search-table tableSearch-c wd-100">
+					<colgroup>
+						<col width="95px" />
+						<col width="150px" />
+						<col width="*" />
+					</colgroup>
 					<tr class="topnav_sty">
-						<td colspan="10">
+						<td colspan="3">
 							<div style="display:flex; justify-content: space-between; align-items: center;">
 								<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
 								<div>
@@ -108,7 +113,7 @@ html, body {
 						</td>
 					</tr>
 					<tr>
-						<th class="h table-Search-h">
+						<th class="h table-Search-h search-label-h">
 							<span>Shipping W/H</span>
 						</th>
 						<td class="d">
@@ -120,7 +125,7 @@ html, body {
 								</c:forEach>
 							</select>
 						</td>
-						<td></td>
+						<td class="d"></td>
 					</tr>
 				</table>
 			</fieldset>

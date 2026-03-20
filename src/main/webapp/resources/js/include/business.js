@@ -22,7 +22,7 @@ var jlogic = {
 	//args.data
 	//args.oper
 	//args.message
-	save: function(args) {
+	save: function (args) {
 
 		var cfg = {
 			type: "post",
@@ -31,7 +31,7 @@ var jlogic = {
 
 		$.extend(cfg, args);
 
-		var fnSave = function() {
+		var fnSave = function () {
 			if (cfg.data &&
 				cfg.oper) {
 				jstatus.set(cfg.data, cfg.oper);
@@ -40,7 +40,7 @@ var jlogic = {
 		}
 
 		if (cfg.message) {
-			$.messager.confirm(msg.MSG0123, cfg.message, function(r) {
+			$.messager.confirm(msg.MSG0053, cfg.message, function (r) {
 				if (!r)
 					return;
 
@@ -51,11 +51,11 @@ var jlogic = {
 			fnSave();
 		}
 	},
-	remove: function(args) {
-		$.extend(args, {oper: jstatus.DELETE});
+	remove: function (args) {
+		$.extend(args, { oper: jstatus.DELETE });
 		this.save(args);
 	},
-	select: function(args) {
+	select: function (args) {
 
 		var cfg = {
 			type: "post",
@@ -66,95 +66,95 @@ var jlogic = {
 
 		$.ajax(cfg);
 	},
-	excel: function(args) {
+	excel: function (args) {
 		excel();
 		//엑셀 다운로드
-		function excel(){
-		    setCookie("fileDownload","false"); //호출
+		function excel() {
+			setCookie("fileDownload", "false"); //호출
 			checkDownloadCheck();
 			//  프로그래스바 ON 
-			args.form.attr({action:args.url}).submit();
-			}
-
-		function setCookie(c_name,value){
-		    var exdate=new Date();
-		    var c_value=escape(value);
-		    document.cookie=c_name + "=" + c_value + "; path=/";
-			}
-		function checkDownloadCheck(){
-			if (document.cookie.indexOf("fileDownload=true") != -1) {
-			    var date = new Date(1000);
-			    document.cookie = "fileDownload=; expires=" + date.toUTCString() + "; path=/";
-			    //프로그래스바 OFF 
-			    $('#progress-popup').dialog('close');
-			    return;
-			   }
-			   setTimeout(checkDownloadCheck , 100);
-			}
-		
-	},
-	excelPost : function(args){
-		excel();
-		//엑셀 다운로드
-		function excel(){
-		    setCookie("fileDownload","false"); //호출
-			checkDownloadCheck();
-
-		    var xhr = new XMLHttpRequest();
-		    xhr.onreadystatechange = function(){
-		        if (this.readyState == 4 && this.status == 200){
-		            var filename = "";
-		            var disposition = xhr.getResponseHeader('Content-Disposition');
-		            if (disposition && disposition.indexOf('attachment') !== -1) {
-		                var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-		                var matches = filenameRegex.exec(disposition);
-		                if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
-		            }
-		         
-		            //this.response is what you're looking for
-		            console.log(this.response, typeof this.response);
-		            var a = document.createElement("a");
-		            var url = URL.createObjectURL(this.response)
-		            a.href = url;
-		            a.download = filename;
-		            document.body.appendChild(a);
-		            a.click();
-		            window.URL.revokeObjectURL(url);
-		       }
-		   }
-		   //xhr.open('POST', consts.url.excel);
-		   console.log(args.url);
-		   xhr.open('POST', args.url);
-		   xhr.responseType = 'blob'; 
-		   xhr.send(JSON.stringify(args.data));
+			args.form.attr({ action: args.url }).submit();
 		}
 
-		function setCookie(c_name,value){
-		    var exdate=new Date();
-		    var c_value=escape(value);
-		    document.cookie=c_name + "=" + c_value + "; path=/";
-			}
-		function checkDownloadCheck(){
+		function setCookie(c_name, value) {
+			var exdate = new Date();
+			var c_value = escape(value);
+			document.cookie = c_name + "=" + c_value + "; path=/";
+		}
+		function checkDownloadCheck() {
 			if (document.cookie.indexOf("fileDownload=true") != -1) {
-			    var date = new Date(1000);
-			    document.cookie = "fileDownload=; expires=" + date.toUTCString() + "; path=/";
-			    //프로그래스바 OFF 
-			    $('#progress-popup').dialog('close');
-			    return;
-			   }
-			   setTimeout(checkDownloadCheck , 100);
+				var date = new Date(1000);
+				document.cookie = "fileDownload=; expires=" + date.toUTCString() + "; path=/";
+				//프로그래스바 OFF 
+				$('#progress-popup').dialog('close');
+				return;
 			}
-		
+			setTimeout(checkDownloadCheck, 100);
+		}
+
 	},
-	report: function(args) {
+	excelPost: function (args) {
+		excel();
+		//엑셀 다운로드
+		function excel() {
+			setCookie("fileDownload", "false"); //호출
+			checkDownloadCheck();
+
+			var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = function () {
+				if (this.readyState == 4 && this.status == 200) {
+					var filename = "";
+					var disposition = xhr.getResponseHeader('Content-Disposition');
+					if (disposition && disposition.indexOf('attachment') !== -1) {
+						var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+						var matches = filenameRegex.exec(disposition);
+						if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+					}
+
+					//this.response is what you're looking for
+					console.log(this.response, typeof this.response);
+					var a = document.createElement("a");
+					var url = URL.createObjectURL(this.response)
+					a.href = url;
+					a.download = filename;
+					document.body.appendChild(a);
+					a.click();
+					window.URL.revokeObjectURL(url);
+				}
+			}
+			//xhr.open('POST', consts.url.excel);
+			console.log(args.url);
+			xhr.open('POST', args.url);
+			xhr.responseType = 'blob';
+			xhr.send(JSON.stringify(args.data));
+		}
+
+		function setCookie(c_name, value) {
+			var exdate = new Date();
+			var c_value = escape(value);
+			document.cookie = c_name + "=" + c_value + "; path=/";
+		}
+		function checkDownloadCheck() {
+			if (document.cookie.indexOf("fileDownload=true") != -1) {
+				var date = new Date(1000);
+				document.cookie = "fileDownload=; expires=" + date.toUTCString() + "; path=/";
+				//프로그래스바 OFF 
+				$('#progress-popup').dialog('close');
+				return;
+			}
+			setTimeout(checkDownloadCheck, 100);
+		}
+
+	},
+	report: function (args) {
 
 		var params = jutils.toQueryString(args.params);
-		var url    = args.url+params;
+		var url = args.url + params;
 
 		window.open(url, "wscreportwin", "width=1024,height=768,scrollbars=yes,status=yes,menubar=yes,toolbar=yes");
 	},
 	//결과처리
-	result: function(response, callback) {
+	result: function (response, callback) {
 		var res = response;
 		if (typeof res == 'string') {
 			res = jutils.escapeJson(res);
@@ -164,8 +164,8 @@ var jlogic = {
 
 			// show message
 			$.messager.show({
-				title: msg.MSG0122,
-				msg: msg.MSG0122
+				title: msg.MSG0052,
+				msg: msg.MSG0057
 			});
 
 			if (callback && $.isFunction(callback)) {
@@ -193,58 +193,58 @@ var jlogic = {
 //포맷함수 모음
 var jformat = {
 	//권한여부 포맷처리
-	tran: function(val, row) {
-		if (val=='1')
+	tran: function (val, row) {
+		if (val == '1')
 			return '허용';
-		else if (val=='0')
+		else if (val == '0')
 			return '거부';
 
 		return val;
 	},
 	//YES,NO 포맷처리
-	yesno: function(val, row) {
-		if (val=='Y')
+	yesno: function (val, row) {
+		if (val == 'Y')
 			return '예';
 		return '아니오';
 	},
 	//활성여부 포맷처리
-	enable: function(val, row) {
-		if (val=='Y')
+	enable: function (val, row) {
+		if (val == 'Y')
 			return '활성';
 
 		return '비활성';
 	},
 	//숫자포맷처리
-	number: function(val, row) {
+	number: function (val, row) {
 		return jutils.formatMoney(val);
 	},
 	//2016/09/26 김영진 추가 사용유무 포맷처리
-	useflag: function(val, row){
-		if(val=='Y')
+	useflag: function (val, row) {
+		if (val == 'Y')
 			return '사용중';
 		return '중지';
 	},
-	act: function(val, row) {
-		if (val=='Y')
+	act: function (val, row) {
+		if (val == 'Y')
 			return 'O';
-		else if (val=='N')
+		else if (val == 'N')
 			return 'X';
 
 		return val;
 	},
 	//2016/12/22 김영진 -- 첨부파일 포맷처리
-	filecnt: function(val, row){
-		var cnt = val*1;
-		if(val > 0){
+	filecnt: function (val, row) {
+		var cnt = val * 1;
+		if (val > 0) {
 			var strCnt = "<i class='fa fa-file-o'></i>";
 			return strCnt;
 		}
 		return '';
 	},
-	
-	invprint: function(val, row){
-		var cnt = val*1;
-		if(val > 0){
+
+	invprint: function (val, row) {
+		var cnt = val * 1;
+		if (val > 0) {
 			var strCnt = "<i class='fa fa-print fa-2x'></i>";
 			return strCnt;
 		}
@@ -253,31 +253,32 @@ var jformat = {
 };
 
 //[WSC2.0] [2015.04.13 LSH] IE8에서 날짜선택오류 수정
-$.fn.datebox.defaults.formatter = function(date){
+//[MES] 한국식 날짜 포맷 YYYY-MM-DD 적용
+$.fn.datebox.defaults.formatter = function (date) {
 	var y = date.getFullYear();
-	var m = date.getMonth()+1;
+	var m = date.getMonth() + 1;
 	var d = date.getDate();
-	return (m<10?('0'+m):m)+'.'+(d<10?('0'+d):d)+'.'+y;
+	return y + '-' + (m < 10 ? ('0' + m) : m) + '-' + (d < 10 ? ('0' + d) : d);
 };
-$.fn.datebox.defaults.parser = function(s){
-   if (!s) return new Date();
-   var ss = s.split('.');
-   var m = parseInt(ss[0],10);
-   var d = parseInt(ss[1],10);
-   var y = parseInt(ss[2],10);
-   if (!isNaN(m) && !isNaN(d) && !isNaN(y)){
-      return new Date(y,m-1,d);
-   } else {
-      return new Date();
-   }
+$.fn.datebox.defaults.parser = function (s) {
+	if (!s) return new Date();
+	var ss = s.split('-');
+	var y = parseInt(ss[0], 10);
+	var m = parseInt(ss[1], 10);
+	var d = parseInt(ss[2], 10);
+	if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+		return new Date(y, m - 1, d);
+	} else {
+		return new Date();
+	}
 };
 //[WSC2.0] [2015.04.28 LSH] 날짜 Validation 추가
 $.extend($.fn.validatebox.defaults.rules, {
 	validDate: {
-		validator: function(value){
+		validator: function (value) {
 			var date = $.fn.datebox.defaults.parser(value);
 			var s = $.fn.datebox.defaults.formatter(date);
-			return s==value;
+			return s == value;
 		},
 		message: 'Please enter a valid date.'
 	}
@@ -286,10 +287,10 @@ $.extend($.fn.validatebox.defaults.rules, {
 //[WSC2.0] [2017.03.23 김연주] 날짜 Validation 추가
 $.extend($.fn.validatebox.defaults.rules, {
 	validDate: {
-		validator: function(value){
+		validator: function (value) {
 			var date = $.fn.datebox.defaults.parser(value);
 			var s = $.fn.datebox.defaults.formatter(date);
-			return s==value;
+			return s == value;
 		},
 		message: 'Please enter a valid date.'
 	}
@@ -302,15 +303,15 @@ var jstatus = {
 	INSERT: 'I',    //등록 상태값
 	UPDATE: 'U',    //수정 상태값
 	DELETE: 'D',    //삭제 상태값
-	READ:   'R',    //조회 상태값
-	REPLY:  'A',    //답변 상태값
-	DONE:   'X',    //비활성 상태값
+	READ: 'R',    //조회 상태값
+	REPLY: 'A',    //답변 상태값
+	DONE: 'X',    //비활성 상태값
 	STATUS: 'oper', //상태 필드명
 	//-----------------------------------------//
 	//폼객체에 상태값 바인딩
-	setForm: function(form, status) {
+	setForm: function (form, status) {
 
-		var oper = form.find('[name="'+this.STATUS+'"]');
+		var oper = form.find('[name="' + this.STATUS + '"]');
 
 		if (jutils.empty(oper))
 			return;
@@ -323,7 +324,7 @@ var jstatus = {
 	},
 	//-----------------------------------------//
 	//일반객체에 상태값 바인딩
-	setObject: function(data, status) {
+	setObject: function (data, status) {
 		if (jutils.empty(data))
 			return;
 
@@ -335,7 +336,7 @@ var jstatus = {
 	},
 	//-----------------------------------------//
 	//입력받은 상태값 바인딩
-	set: function(data, status) {
+	set: function (data, status) {
 		if (data instanceof jQuery)
 			this.setForm(data, status);
 		else
@@ -343,7 +344,7 @@ var jstatus = {
 	},
 	//-----------------------------------------//
 	//등록상태값 바인딩
-	insert: function(data) {
+	insert: function (data) {
 		if (data instanceof jQuery)
 			this.setForm(data);
 		else
@@ -351,7 +352,7 @@ var jstatus = {
 	},
 	//-----------------------------------------//
 	//수정상태값 바인딩
-	update: function(data) {
+	update: function (data) {
 		if (data instanceof jQuery)
 			this.setForm(data, this.UPDATE);
 		else
@@ -359,7 +360,7 @@ var jstatus = {
 	},
 	//-----------------------------------------//
 	//삭제상태값 바인딩
-	remove: function(data) {
+	remove: function (data) {
 		if (data instanceof jQuery)
 			this.setForm(data, this.DELETE);
 		else
@@ -367,7 +368,7 @@ var jstatus = {
 	},
 	//-----------------------------------------//
 	//조회상태값 바인딩
-	read: function(data) {
+	read: function (data) {
 		if (data instanceof jQuery)
 			this.setForm(data, this.READ);
 		else
@@ -375,7 +376,7 @@ var jstatus = {
 	},
 	//-----------------------------------------//
 	//비활성상태값 바인딩
-	done: function(data) {
+	done: function (data) {
 		if (data instanceof jQuery)
 			this.setForm(data, this.DONE);
 		else
@@ -383,11 +384,11 @@ var jstatus = {
 	},
 	//-----------------------------------------//
 	//상태 확인
-	equals: function(data, status) {
+	equals: function (data, status) {
 		var s = '';
 
 		if (data instanceof jQuery)
-			s = data.find('[name="'+this.STATUS+'"]').val();
+			s = data.find('[name="' + this.STATUS + '"]').val();
 		else
 			s = data[this.STATUS];
 
@@ -395,17 +396,17 @@ var jstatus = {
 	},
 	//-----------------------------------------//
 	//등록상태인지 확인
-	isInsert: function(data) {
+	isInsert: function (data) {
 		return this.equals(data, this.INSERT);
 	},
 	//-----------------------------------------//
 	//수정상태인지 확인
-	isUpdate: function(data) {
+	isUpdate: function (data) {
 		return this.equals(data, this.UPDATE);
 	},
 	//-----------------------------------------//
 	//삭제상태인지 확인
-	isRemove: function(data) {
+	isRemove: function (data) {
 		return this.equals(data, this.DELETE);
 	}
 };
@@ -419,14 +420,14 @@ jeasygrid = function (args) {
 
 	//컨트롤 사용항목
 	var options = {
-		title:    false, //화면제목
-		gridKey:  "#search-grid",
-		formKey:  "#regist-form",
+		title: false, //화면제목
+		gridKey: "#search-grid",
+		formKey: "#regist-form",
 		sformKey: "#search-form",
 		popupKey: "#regist-dialog",
 		spanPrefix: 'r_',
-		grid:  false, //그리드 객체
-		form:  false, //등록폼 객체
+		grid: false, //그리드 객체
+		form: false, //등록폼 객체
 		sform: false, //검색폼 객체
 		popup: false, //팝업패널 객체
 		index: undefined, //그리드 편집시 선택INDEX
@@ -441,17 +442,17 @@ jeasygrid = function (args) {
 			showFooter: true,
 			multiSort: true,
 			remoteSort: false,
-			onBeforeLoad: function(param) {
+			onBeforeLoad: function (param) {
 				//alert('before');
 				//jcommon.printobject(param);
 			}
 		},
 		url: {
 			search: false, //검색처리 URL
-			excel:  false, //엑셀다운 URL
+			excel: false, //엑셀다운 URL
 			select: false, //상세조회 URL
 			remove: false, //삭제처리 URL
-			save:   false  //저장처리 URL
+			save: false  //저장처리 URL
 		},
 		fn: {
 			//저장,삭제 후 결과처리 함수
@@ -462,19 +463,19 @@ jeasygrid = function (args) {
 	if (args)
 		$.extend(true, options, args);
 
-	options.grid  = $(options.gridKey);
-	options.form  = $(options.formKey);
+	options.grid = $(options.gridKey);
+	options.form = $(options.formKey);
 	options.sform = $(options.sformKey);
 	options.popup = $(options.popupKey);
 
-	this.grid  = options.grid;
-	this.form  = options.form;
+	this.grid = options.grid;
+	this.form = options.form;
 	this.sform = options.sform;
 	this.popup = options.popup;
 
 	//-----------------------------------------//
 	//그리드 생성
-	this.init = function(gridOptions) {
+	this.init = function (gridOptions) {
 
 		// BBUG.ADD : grid odd/even Color
 		/*
@@ -488,7 +489,7 @@ jeasygrid = function (args) {
 		});  */
 
 		// BBUG.ADD : striped: true  - for grid odd/even Color
-		var opts = {url: options.url.search, striped: true};
+		var opts = { url: options.url.search, striped: true };
 
 		if (options.noneTitle) {
 
@@ -497,7 +498,7 @@ jeasygrid = function (args) {
 			if (options.title) {
 				//opts.title   = options.title + ' 검색';
 				//opts.iconCls = 'icon-search';
-				opts.title   = options.title;
+				opts.title = options.title;
 			}
 		}
 		$.extend(options.gridOptions, opts);
@@ -507,22 +508,22 @@ jeasygrid = function (args) {
 
 		options.grid.datagrid(options.gridOptions);
 
-//		//chang
-//		options.grid.datagrid('getPanel').panel('panel').attr('tabindex',1).bind('keydown',function(e){
-//
-//		var selectedrow = options.grid.datagrid('getSelected');
-//		var rowIndex = options.grid.datagrid("getRowIndex", selectedrow);
-//		var rowMaxlength = options.grid.datagrid('getRows');
-//		if(event.keyCode == 38){
-//			if(!(rowIndex == 0)){
-//				options.grid.datagrid('selectRow',rowIndex - 1);
-//			}
-//		}else if(event.keyCode == 40){
-//			if(!(rowIndex == rowMaxlength.length - 1)){
-//				options.grid.datagrid('selectRow',rowIndex + 1);
-//			}
-//		}
-//		});	//end keydown
+		//		//chang
+		//		options.grid.datagrid('getPanel').panel('panel').attr('tabindex',1).bind('keydown',function(e){
+		//
+		//		var selectedrow = options.grid.datagrid('getSelected');
+		//		var rowIndex = options.grid.datagrid("getRowIndex", selectedrow);
+		//		var rowMaxlength = options.grid.datagrid('getRows');
+		//		if(event.keyCode == 38){
+		//			if(!(rowIndex == 0)){
+		//				options.grid.datagrid('selectRow',rowIndex - 1);
+		//			}
+		//		}else if(event.keyCode == 40){
+		//			if(!(rowIndex == rowMaxlength.length - 1)){
+		//				options.grid.datagrid('selectRow',rowIndex + 1);
+		//			}
+		//		}
+		//		});	//end keydown
 
 	};
 
@@ -532,13 +533,13 @@ jeasygrid = function (args) {
 	}
 
 	//그리드 검색폼 데이터 반환
-	this.getSearchData = function() {
+	this.getSearchData = function () {
 		var f = options.sform;
 		return f.serializeObject();
 	};
 
 	//그리드 등록폼 데이터 반환
-	this.getRegistData = function() {
+	this.getRegistData = function () {
 		var f = options.form;
 		return f.serializeObject();
 	};
@@ -549,11 +550,11 @@ jeasygrid = function (args) {
 		var data = this.getSearchData();
 		options.grid.datagrid('load',data);
 
-        //g.datagrid('reload');
+		//g.datagrid('reload');
 	};*/
 
 	//그리드 검색폼 검색
-	this.search = function(url, param) {
+	this.search = function (url, param) {
 		// 검색URL이 입력되었을경우 URL 맵핑
 		if (url) {
 			options.gridOptions.url = url;
@@ -566,42 +567,42 @@ jeasygrid = function (args) {
 		if (param)
 			$.extend(data, param);
 
-		options.grid.datagrid('load',data);
-		
+		options.grid.datagrid('load', data);
+
 		// 검색 후 행 선택 초기화 20191016 박민혁
 		options.index = undefined;
-        
+
 		//g.datagrid('reload');
 	};
 
 	//-----------------------------------------//
 	//그리드 엑셀다운로드
-	this.download = function() {
+	this.download = function () {
 		jlogic.excel({
 			url: options.url.excel,
 			form: options.sform
 		});
 	};
 	//그리드 엑셀다운로드2
-	this.download2 = function() {
+	this.download2 = function () {
 		jlogic.excel({
 			url: options.url.excel2,
 			form: options.sform
 		});
 	};
-	this.download3 = function() {
+	this.download3 = function () {
 		jlogic.excel({
 			url: options.url.excel3,
 			form: options.sform
 		});
 	};
-	this.download4 = function() {
+	this.download4 = function () {
 		jlogic.excel({
 			url: options.url.excel4,
 			form: options.sform
 		});
 	};
-	this.downloadPost = function() {
+	this.downloadPost = function () {
 		jlogic.excelPost({
 			url: options.url.excelPost,
 			form: options.sform,
@@ -610,111 +611,111 @@ jeasygrid = function (args) {
 	};
 	//-----------------------------------------//
 	//그리드 데이터 로드
-	this.loadData = function(rows) {
-		options.grid.datagrid('loadData',rows);
+	this.loadData = function (rows) {
+		options.grid.datagrid('loadData', rows);
 	};
 
 	//-----------------------------------------//
 	//그리드 데이터 초기화
-	this.resetData = function() {
-		options.grid.datagrid('loadData', {"total":0,"rows":[]});
+	this.resetData = function () {
+		options.grid.datagrid('loadData', { "total": 0, "rows": [] });
 	};
 
 	//-----------------------------------------//
 	//그리드 상세조회
-	this.select = function(index, row) {
+	this.select = function (index, row) {
 
 		control.clear();
 
-		var f   = options.form;
+		var f = options.form;
 		var url = options.url.select;
 		var pre = options.spanPrefix;
 
 		jlogic.select({
 			url: url,
 			data: row,
-			success: function(data) {
+			success: function (data) {
 
-	        	if (!data ||
-	        		!data.rows) {
-	        		$.messager.alert(msg.MSG0121,msg.MSG0031,msg.MSG0121);
-	        		return;
-	        	}
+				if (!data ||
+					!data.rows) {
+					$.messager.alert(msg.MSG0051, msg.MSG0027, msg.MSG0051);
+					return;
+				}
 
-	        	//폼데이터 로드
-	        	f.form('load', data.rows);
-	        	//레이어에 데이터 로드
-	        	jcommon.toHtml(data.rows, pre);
+				//폼데이터 로드
+				f.form('load', data.rows);
+				//레이어에 데이터 로드
+				jcommon.toHtml(data.rows, pre);
 
-	        	//수정상태 정의
-	        	jstatus.update(f);
+				//수정상태 정의
+				jstatus.update(f);
 			}
 		});
 	};
 
 	//-----------------------------------------//
 	//그리드 리로드
-	this.reload = function() {
+	this.reload = function () {
 		options.grid.datagrid('reload');
 		options.grid.datagrid('clearSelections');
 	};
 
 	//-----------------------------------------//
 	//그리드 검색폼 초기화
-	this.reset = function() {
+	this.reset = function () {
 		options.sform.form('clear');
 	};
 
 	//-----------------------------------------//
 	//그리드 행삭제
-	this.removeRow = function() {
+	this.removeRow = function () {
 
 		var data = control.getSearchData();
-		var row  = options.grid.datagrid('getSelected');
+		var row = options.grid.datagrid('getSelected');
 
 		if (!row) {
-			$.messager.alert(msg.MSG0121,msg.MSG0123,msg.MSG0121);
+			$.messager.alert(msg.MSG0051, msg.MSG0016, msg.MSG0051);
 			return;
 		}
 
-		$.messager.confirm(msg.MSG0123,msg.MSG0123, function(r) {
+		$.messager.confirm(msg.MSG0053, msg.MSG0094, function (r) {
 			if (!r)
 				return;
 
-	    	//삭제상태
+			//삭제상태
 			jstatus.remove(row);
 
-			$.extend(data,row);
+			$.extend(data, row);
 
-	        $.post(
-	        	options.url.remove,
-	        	data,
-	        	function(data) {
-	        		control.result(data);
-	        	},
-	        	'json'
-	        );
+			$.post(
+				options.url.remove,
+				data,
+				function (data) {
+					control.result(data);
+				},
+				'json'
+			);
 		});
 	};
 
 	//-----------------------------------------//
 	//그리드 다중행 삭제 처리
-	this.removeAll = function() {
+	this.removeAll = function () {
 
 		var data = control.getSearchData();
 		var rows = options.grid.datagrid('getSelections');
 
 		if (!rows || rows.length == 0) {
-			$.messager.alert(msg.MSG0121,msg.MSG0123,msg.MSG0121);
+			$.messager.alert(msg.MSG0051, msg.MSG0016, msg.MSG0051);
 			return;
 		}
 		//삭제처리
-		$.messager.confirm(msg.MSG0123,msg.MSG0123, function(r) {
+		$.messager.confirm(msg.MSG0053, msg.MSG0094, function (r) {
 			if (!r)
 				return;
 
-			$.each(rows, function(i,row) {
-		    	//삭제상태
+			$.each(rows, function (i, row) {
+				//삭제상태
 				jstatus.remove(row);
 			});
 
@@ -723,31 +724,31 @@ jeasygrid = function (args) {
 			data['models'] = $.toJSON(rows);
 			jstatus.remove(data);
 
-			var fn = function(data) {
+			var fn = function (data) {
 				control.result(data);
 			};
-	        $.post(url,data,fn,'json');
+			$.post(url, data, fn, 'json');
 		});
 	};
 
 	//-----------------------------------------//
 	//2016/10/07 김영진 --그리드 다중행 삭제 처리(체크된 행만)
-	this.removeCheckAll = function() {
+	this.removeCheckAll = function () {
 
 		var data = control.getSearchData();
 		var rows = options.grid.datagrid('getChecked');
 
 		if (!rows || rows.length == 0) {
-			$.messager.alert(msg.MSG0121,msg.MSG0123,msg.MSG0121);
+			$.messager.alert(msg.MSG0051, msg.MSG0016, msg.MSG0051);
 			return;
 		}
 		//삭제처리
-		$.messager.confirm(msg.MSG0123,msg.MSG0123, function(r) {
+		$.messager.confirm(msg.MSG0053, msg.MSG0094, function (r) {
 			if (!r)
 				return;
 
-			$.each(rows, function(i,row) {
-		    	//삭제상태
+			$.each(rows, function (i, row) {
+				//삭제상태
 				jstatus.remove(row);
 			});
 
@@ -756,33 +757,33 @@ jeasygrid = function (args) {
 			data['models'] = $.toJSON(rows);
 			jstatus.remove(data);
 
-			var fn = function(data) {
+			var fn = function (data) {
 				control.result(data);
 			};
-	        $.post(url,data,fn,'json');
+			$.post(url, data, fn, 'json');
 		});
 	};
 
 	// TODO
 	//-----------------------------------------//
 	//2018/06/21 송준기 --그리드 다중행 삭제 처리(체크된 행만)
-	this.removeCheckAllEdit = function() {
+	this.removeCheckAllEdit = function () {
 
 		var rows = options.grid.datagrid('getChecked');
 
 		if (!rows || rows.length == 0) {
-			$.messager.alert(msg.MSG0121,msg.MSG0123,msg.MSG0121);
+			$.messager.alert(msg.MSG0051, msg.MSG0016, msg.MSG0051);
 			return;
 		}
 
-		$.each(rows, function(i,row) {
-	    	//삭제상태
+		$.each(rows, function (i, row) {
+			//삭제상태
 			jstatus.remove(row);
 		});
 
-		for(var j=0;j<rows.length;j++){
-		   var index = options.grid.datagrid('getRowIndex', rows[j]);
-		   options.grid.datagrid('cancelEdit', index).datagrid('deleteRow' , index);
+		for (var j = 0; j < rows.length; j++) {
+			var index = options.grid.datagrid('getRowIndex', rows[j]);
+			options.grid.datagrid('cancelEdit', index).datagrid('deleteRow', index);
 		}
 
 		options.index = undefined;
@@ -793,20 +794,20 @@ jeasygrid = function (args) {
 
 	//-----------------------------------------//
 	//등록폼 초기화
-	this.clear = function() {
+	this.clear = function () {
 		//등록폼 클리어
 		options.form.form('clear');
 		//레이어 초기화
-    	jcommon.clear(options.spanPrefix);
+		jcommon.clear(options.spanPrefix);
 		//등록상태
 		jstatus.insert(options.form);
 	};
 
 	//-----------------------------------------//
 	//수정폼 데이터바인딩
-	this.update = function(data) {
-    	//폼데이터 로드
-		options.form.form('load',data);
+	this.update = function (data) {
+		//폼데이터 로드
+		options.form.form('load', data);
 		//레이어 데이터 로드
 		jcommon.toHtml(data, options.spanPrefix);
 		//수정상태
@@ -815,7 +816,7 @@ jeasygrid = function (args) {
 
 	//-----------------------------------------//
 	//등록폼 저장
-	this.save = function(callback) {
+	this.save = function (callback) {
 
 		var f = options.form;
 
@@ -832,25 +833,25 @@ jeasygrid = function (args) {
 		});
 		/*
 		options.form.form('submit',{
-	       url: options.url.save,
-	       onSubmit: function() {
-	    	   return $(this).form('validate');
-	       },
-	       success:(callback ? callback : control.result)
-	    });
-	    */
+		   url: options.url.save,
+		   onSubmit: function() {
+			   return $(this).form('validate');
+		   },
+		   success:(callback ? callback : control.result)
+		});
+		*/
 	};
 
 	//-----------------------------------------//
 	//등록폼 삭제
-	this.remove = function() {
+	this.remove = function () {
 
 		if (!jstatus.isUpdate(options.form)) {
-			$.messager.alert(msg.MSG0121,msg.MSG0123,msg.MSG0121);
+			$.messager.alert(msg.MSG0051, msg.MSG0016, msg.MSG0051);
 			return;
 		}
 
-		$.messager.confirm(msg.MSG0123,msg.MSG0123, function(r) {
+		$.messager.confirm(msg.MSG0053, msg.MSG0094, function (r) {
 			if (!r)
 				return;
 
@@ -868,18 +869,18 @@ jeasygrid = function (args) {
 
 			/*
 			options.form.form('submit',{
-		       url: options.url.remove,
-		       success: control.result
-		    });
-		    */
+			   url: options.url.remove,
+			   success: control.result
+			});
+			*/
 		});
 	};
 
 	//-----------------------------------------//
 	//저장처리 후 결과처리
-	this.result = function(response, callback) {
+	this.result = function (response, callback) {
 
-		jlogic.result(response, function(res) {
+		jlogic.result(response, function (res) {
 			if (callback && $.isFunction(callback)) {
 				callback(res);
 			}
@@ -897,7 +898,7 @@ jeasygrid = function (args) {
 
 	//-----------------------------------------//
 	//현재 그리드 데이터목록 반환
-	this.getRows = function() {
+	this.getRows = function () {
 		return options.grid.datagrid('getRows');
 	};
 
@@ -906,53 +907,53 @@ jeasygrid = function (args) {
 	 * KWK
 	 * 현재 선택된 데이터 그리드 INDEX 반환
 	 */
-	this.rowIndex = function() {
+	this.rowIndex = function () {
 
-//		//chang
-//		var datagrid_id = '#search-grid' ;
-//
-//		$(datagrid_id).datagrid('getPanel').panel('panel').attr('tabindex',1).bind('keydown',function(e){
-//
-//		var selectedrow = $(datagrid_id).datagrid('getSelected');
-//		var rowIndex = $(datagrid_id).datagrid("getRowIndex", selectedrow);
-//		var rowMaxlength = $(datagrid_id).datagrid('getRows');
-//		if(event.keyCode == 38){
-//			if(!(rowIndex == 0)){
-//				$(datagrid_id).datagrid('selectRow',rowIndex - 1);
-//			}
-//		}else if(event.keyCode == 40){
-//			if(!(rowIndex == rowMaxlength.length - 1)){
-//				$(datagrid_id).datagrid('selectRow',rowIndex + 1);
-//			}
-//		}
-//		});	//end keydown
+		//		//chang
+		//		var datagrid_id = '#search-grid' ;
+		//
+		//		$(datagrid_id).datagrid('getPanel').panel('panel').attr('tabindex',1).bind('keydown',function(e){
+		//
+		//		var selectedrow = $(datagrid_id).datagrid('getSelected');
+		//		var rowIndex = $(datagrid_id).datagrid("getRowIndex", selectedrow);
+		//		var rowMaxlength = $(datagrid_id).datagrid('getRows');
+		//		if(event.keyCode == 38){
+		//			if(!(rowIndex == 0)){
+		//				$(datagrid_id).datagrid('selectRow',rowIndex - 1);
+		//			}
+		//		}else if(event.keyCode == 40){
+		//			if(!(rowIndex == rowMaxlength.length - 1)){
+		//				$(datagrid_id).datagrid('selectRow',rowIndex + 1);
+		//			}
+		//		}
+		//		});	//end keydown
 	};
 
 	//-----------------------------------------//
 	//[편집형]그리드 변경된 ROW 배열 반환
-	this.getEditChanges = function() {
+	this.getEditChanges = function () {
 		return options.grid.datagrid('getChanges');
 	};
 
 	//-----------------------------------------//
 	//[편집형]그리드 현재 편집행 INDEX 반환
-	this.getEditIndex = function() {
+	this.getEditIndex = function () {
 		return options.index;
 	};
 
 	//-----------------------------------------//
 	//[편집형]그리드 편집 종료 처리
-	this.endEdit = function() {
-	    if (options.index == undefined)
-	    	return true;
+	this.endEdit = function () {
+		if (options.index == undefined)
+			return true;
 
-	    if (options.grid.datagrid('validateRow', options.index)) {
-	    	options.grid.datagrid('endEdit', options.index);
-	    	options.index = undefined;
-	        return true;
-	    }
-	    else
-	    	return false;
+		if (options.grid.datagrid('validateRow', options.index)) {
+			options.grid.datagrid('endEdit', options.index);
+			options.index = undefined;
+			return true;
+		}
+		else
+			return false;
 	};
 
 	//[편집형]그리드 편집 종료 처리
@@ -960,123 +961,123 @@ jeasygrid = function (args) {
 	 * 20160922 김원국
 	 * 값 입력 바인딩 처리 무조건 바인딩할수있도록 수정
 	 */
-	this.endEditCustom = function() {
-	    if (options.index == undefined)
-	    	return true;
-	    //강제적으로 변경
-	    for(var i=0; i<options.grid.datagrid('getRows').length; i++){
-	    	options.grid.datagrid('endEdit', i);
-	    }
+	this.endEditCustom = function () {
+		if (options.index == undefined)
+			return true;
+		//강제적으로 변경
+		for (var i = 0; i < options.grid.datagrid('getRows').length; i++) {
+			options.grid.datagrid('endEdit', i);
+		}
 
-	    if (options.grid.datagrid('validateRow', options.index)) {
-	    	options.grid.datagrid('endEdit', options.index);
-	    	options.index = undefined;
-	        return true;
-	    }
-	    else
-	    	return false;
+		if (options.grid.datagrid('validateRow', options.index)) {
+			options.grid.datagrid('endEdit', options.index);
+			options.index = undefined;
+			return true;
+		}
+		else
+			return false;
 	};
 
 	//-----------------------------------------//
 	//[편집형]그리드 행 변경시 상태값을 '수정'으로 바인딩
-	this.afterEdit = function(index, row, changes) {
+	this.afterEdit = function (index, row, changes) {
 		if ($.isEmptyObject(changes) == false &&
 			jutils.empty(row.oper))
 			jstatus.update(row);
 	};
-    
+
 	/**
-    * idField가 배열 또는 string으로 넘어올때 처리를 위한 beforeEditFields 적용
-    * 2019/11/15 c-node
-    */
-   //ID FIELD 에디터 배열 정의
-   options.originEditor = {};
+	* idField가 배열 또는 string으로 넘어올때 처리를 위한 beforeEditFields 적용
+	* 2019/11/15 c-node
+	*/
+	//ID FIELD 에디터 배열 정의
+	options.originEditor = {};
 
-   //[편집형]그리드 ID FIELD의 경우 등록시에만 입력되도록 처리
-   this.beforeEditFields = function(index, row) {
-      var idf = options.grid.datagrid('options')['idField'];
+	//[편집형]그리드 ID FIELD의 경우 등록시에만 입력되도록 처리
+	this.beforeEditFields = function (index, row) {
+		var idf = options.grid.datagrid('options')['idField'];
 
-      if(typeof idf == 'object'){
-         for(var i = 0; i < idf.length; i++){
+		if (typeof idf == 'object') {
+			for (var i = 0; i < idf.length; i++) {
 
-            if (idf[i] == null)
-               continue;
+				if (idf[i] == null)
+					continue;
 
-            var opt = options.grid.datagrid('getColumnOption', idf[i]);
+				var opt = options.grid.datagrid('getColumnOption', idf[i]);
 
-            if (opt && opt.editor && options.originEditor[idf[i]] == undefined) {
-               options.originEditor[idf[i]] = opt.editor;
-            }
+				if (opt && opt.editor && options.originEditor[idf[i]] == undefined) {
+					options.originEditor[idf[i]] = opt.editor;
+				}
 
-            //수정상태인 경우
-            if (!jstatus.isInsert(row)) {
-               opt.editor = false;
-               continue;
-            }
-            //ID FIELD 에디터가 없는경우 SKIP
-            if (options.originEditor[idf[i]] == undefined)
-               continue;
+				//수정상태인 경우
+				if (!jstatus.isInsert(row)) {
+					opt.editor = false;
+					continue;
+				}
+				//ID FIELD 에디터가 없는경우 SKIP
+				if (options.originEditor[idf[i]] == undefined)
+					continue;
 
-            var editor = options.originEditor[idf[i]];
+				var editor = options.originEditor[idf[i]];
 
-            //[2015.05.22 수정]
-            if (typeof editor == 'string') {
-               opt.editor = {type: editor};
-            }
-            else {
-               opt.editor = $.extend(true, {}, editor);
-            }
-            if (opt.editor.options == undefined || opt.editor.options == false)
-               opt.editor.options = {};
-            opt.editor.options.required = true;
-         }
-      }else{
+				//[2015.05.22 수정]
+				if (typeof editor == 'string') {
+					opt.editor = { type: editor };
+				}
+				else {
+					opt.editor = $.extend(true, {}, editor);
+				}
+				if (opt.editor.options == undefined || opt.editor.options == false)
+					opt.editor.options = {};
+				opt.editor.options.required = true;
+			}
+		} else {
 
-         if (idf == null)
-            return true;
+			if (idf == null)
+				return true;
 
-         var opt = options.grid.datagrid('getColumnOption', idf);
+			var opt = options.grid.datagrid('getColumnOption', idf);
 
-         if (opt && opt.editor && options.originEditor[idf] == undefined) {
-            options.originEditor[idf] = opt.editor;
-         }
+			if (opt && opt.editor && options.originEditor[idf] == undefined) {
+				options.originEditor[idf] = opt.editor;
+			}
 
-         //수정상태인 경우
-         if (!jstatus.isInsert(row)) {
-            opt.editor = false;
-            return true;
-         }
-         //ID FIELD 에디터가 없는경우 SKIP
-         if (options.originEditor[idf] == undefined)
-            return true;
+			//수정상태인 경우
+			if (!jstatus.isInsert(row)) {
+				opt.editor = false;
+				return true;
+			}
+			//ID FIELD 에디터가 없는경우 SKIP
+			if (options.originEditor[idf] == undefined)
+				return true;
 
-         var editor = options.idfEditor;
+			var editor = options.idfEditor;
 
-         //[2015.05.22 수정]
-         if (typeof editor == 'string') {
-            opt.editor = {type: editor};
-         }
-         else {
-            opt.editor = $.extend(true, {}, editor);
-         }
-         if (opt.editor.options == undefined || opt.editor.options == false)
-            opt.editor.options = {};
+			//[2015.05.22 수정]
+			if (typeof editor == 'string') {
+				opt.editor = { type: editor };
+			}
+			else {
+				opt.editor = $.extend(true, {}, editor);
+			}
+			if (opt.editor.options == undefined || opt.editor.options == false)
+				opt.editor.options = {};
 
-         opt.editor.options.required = true;
-      }
+			opt.editor.options.required = true;
+		}
 
-      return true;
-   };
-	
-	
-	
+		return true;
+	};
+
+
+
 	//-----------------------------------------//
 	//[2015.06.05 버그수정] 수정행 클릭후 추가할시에 에디터 오류 수정
 	//ID FIELD 에디터 정의
 	options.idfEditor = false;
 
 	//[편집형]그리드 ID FIELD의 경우 등록시에만 입력되도록 처리
-	this.beforeEdit = function(index, row) {
+	this.beforeEdit = function (index, row) {
 
 		var idf = options.grid.datagrid('options')['idField'];
 
@@ -1104,7 +1105,7 @@ jeasygrid = function (args) {
 
 		//[2015.05.22 수정]
 		if (typeof editor == 'string') {
-			opt.editor = {type: editor};
+			opt.editor = { type: editor };
 		}
 		else {
 			opt.editor = $.extend(true, {}, editor);
@@ -1127,7 +1128,7 @@ jeasygrid = function (args) {
 	options.idfEditor2 = false;
 
 	//[편집형]그리드 ID FIELD의 경우 등록시에만 입력되도록 처리
-	this.beforeEditTwofield = function(index, row) {
+	this.beforeEditTwofield = function (index, row) {
 
 		var idf = options.grid.datagrid('options')['idField'];
 		var idf2 = options.grid.datagrid('options')['idField2'];
@@ -1164,8 +1165,8 @@ jeasygrid = function (args) {
 
 		//[2015.05.22 수정]
 		if (typeof editor == 'string') {
-			opt.editor = {type: editor};
-			opt2.editor = {type: editor};
+			opt.editor = { type: editor };
+			opt2.editor = { type: editor };
 		}
 		else {
 			opt.editor = $.extend(true, {}, editor);
@@ -1192,7 +1193,7 @@ jeasygrid = function (args) {
 	options.idfEditor14 = false;	//날짜박스
 
 	//[편집형]그리드 ID FIELD의 경우 등록시에만 입력되도록 처리
-	this.beforeEditPlandayfield = function(index, row) {
+	this.beforeEditPlandayfield = function (index, row) {
 
 		var idf = options.grid.datagrid('options')['idField'];
 		var idf2 = options.grid.datagrid('options')['idField2'];
@@ -1254,11 +1255,11 @@ jeasygrid = function (args) {
 
 		//[2015.05.22 수정]
 		if (typeof editor == 'string') {
-			opt.editor = {type: editor};
-			opt2.editor = {type: editor2};
-			opt7.editor = {type: editor2};
-			opt11.editor = {type: editor2};
-			opt12.editor = {type: editor4};
+			opt.editor = { type: editor };
+			opt2.editor = { type: editor2 };
+			opt7.editor = { type: editor2 };
+			opt11.editor = { type: editor2 };
+			opt12.editor = { type: editor4 };
 		}
 		else {
 			opt.editor = $.extend(true, {}, editor);
@@ -1286,7 +1287,7 @@ jeasygrid = function (args) {
 
 		return true;
 	};
-	
+
 	//ID FIELD 에디터 정의
 	/**
 	 *  추가 idField11 생산실적/공정 20180625 박민혁
@@ -1297,7 +1298,7 @@ jeasygrid = function (args) {
 	options.idfEditor24 = false;	//콤보박스
 
 	//[편집형]그리드 ID FIELD의 경우 등록시에만 입력되도록 처리
-	this.beforeEditProdProcfield = function(index, row) {
+	this.beforeEditProdProcfield = function (index, row) {
 
 		var idf = options.grid.datagrid('options')['idField'];
 		var idf2 = options.grid.datagrid('options')['idField2'];
@@ -1352,10 +1353,10 @@ jeasygrid = function (args) {
 
 		//[2015.05.22 수정]
 		if (typeof editor == 'string') {
-			opt.editor = {type: editor};
-			opt2.editor = {type: editor2};
-			opt3.editor = {type: editor3};
-			opt4.editor = {type: editor4};
+			opt.editor = { type: editor };
+			opt2.editor = { type: editor2 };
+			opt3.editor = { type: editor3 };
+			opt4.editor = { type: editor4 };
 		}
 		else {
 			opt.editor = $.extend(true, {}, editor);
@@ -1381,33 +1382,33 @@ jeasygrid = function (args) {
 
 	//-----------------------------------------//
 	//[편집형]그리드 행클릭시 편집 활성 처리
-	this.clickRowEdit = function(idx) {
-	    if (options.index == idx)
-	    	return;
+	this.clickRowEdit = function (idx) {
+		if (options.index == idx)
+			return;
 
-	    if (control.endEdit()) {
-	    	options.grid.datagrid('selectRow', idx)
-		  	            .datagrid('beginEdit', idx);
-	    	options.index = idx;
-	    }
-	    else {
-	    	options.grid.datagrid('selectRow', options.index);
-	    }
+		if (control.endEdit()) {
+			options.grid.datagrid('selectRow', idx)
+				.datagrid('beginEdit', idx);
+			options.index = idx;
+		}
+		else {
+			options.grid.datagrid('selectRow', options.index);
+		}
 	};
-	this.clickcheckEdit = function(idx, row) {
+	this.clickcheckEdit = function (idx, row) {
 		var rows = $('#search-create-grid').datagrid('getRows');
-		for(i=0;i<rows.length;i++){
+		for (i = 0; i < rows.length; i++) {
 			options.grid.datagrid('endEdit', i);
 		}
-		
+
 		var checkOption = "OP";
 		var checkOption2 = "ADP";
-		if(options.grid.datagrid('getRows')[idx]["ITEM_TYPE"].indexOf(checkOption) != -1 || options.grid.datagrid('getRows')[idx]["ITEM_TYPE"].indexOf(checkOption2) != -1){
+		if (options.grid.datagrid('getRows')[idx]["ITEM_TYPE"].indexOf(checkOption) != -1 || options.grid.datagrid('getRows')[idx]["ITEM_TYPE"].indexOf(checkOption2) != -1) {
 			options.grid.datagrid('selectRow', idx).datagrid('endEdit', idx);
 		}
-		else{
+		else {
 			options.grid.datagrid('selectRow', idx)
-	            	    .datagrid('beginEdit', idx).focus();
+				.datagrid('beginEdit', idx).focus();
 		}
 	};
 
@@ -1417,28 +1418,28 @@ jeasygrid = function (args) {
 	 * 20160922 김원국
 	 * 수정시에도 다른 Row를 클릭하여도 변경할수 있도록 추가
 	 */
-	this.clickRowEditCustom = function(idx) {
+	this.clickRowEditCustom = function (idx) {
 
-	    if (control.endEdit()) {
-	    	options.grid.datagrid('selectRow', idx)
-		  	            .datagrid('beginEdit', idx);
-	    	options.index = idx;
-	    }
-	    else {
-	    	options.grid.datagrid('selectRow', options.index);
-	    }
+		if (control.endEdit()) {
+			options.grid.datagrid('selectRow', idx)
+				.datagrid('beginEdit', idx);
+			options.index = idx;
+		}
+		else {
+			options.grid.datagrid('selectRow', options.index);
+		}
 	};
 
-	this.clickRowEditCustom2 = function(idx) {
+	this.clickRowEditCustom2 = function (idx) {
 
-    	options.grid.datagrid('selectRow', idx)
-                    .datagrid('beginEdit', idx);
-        options.index = idx;
+		options.grid.datagrid('selectRow', idx)
+			.datagrid('beginEdit', idx);
+		options.index = idx;
 	};
-	
+
 	//-----------------------------------------//
 	//[편집형]그리드 변경된 행 적용완료 처리
-	this.acceptEdit = function() {
+	this.acceptEdit = function () {
 
 		if (control.endEdit() == false)
 			return;
@@ -1448,29 +1449,29 @@ jeasygrid = function (args) {
 
 	//-----------------------------------------//
 	//[편집형]그리드 행 변경 취소 처리
-	this.rejectEdit = function() {
+	this.rejectEdit = function () {
 		options.grid.datagrid('rejectChanges');
 		options.index = undefined;
 	};
 
 	//-----------------------------------------//
 	//[편집형]그리드 행 추가 처리
-	this.appendEdit = function(param) {
+	this.appendEdit = function (param) {
 
 		if (control.endEdit() == false)
 			return;
 
 		var row = {};
-		if(param != null){
-			$.extend(row,param);
+		if (param != null) {
+			$.extend(row, param);
 		}
 
 		jstatus.insert(row);
 
 		options.grid.datagrid('appendRow', row);
-		options.index = options.grid.datagrid('getRows').length-1;
+		options.index = options.grid.datagrid('getRows').length - 1;
 		options.grid.datagrid('selectRow', options.index)
-		            .datagrid('beginEdit', options.index);
+			.datagrid('beginEdit', options.index);
 	};
 
 	//-----------------------------------------//
@@ -1479,21 +1480,21 @@ jeasygrid = function (args) {
 	 * 20160922 김원국
 	 * 추가를 여러개 추가할수 있도록 추가
 	 */
-	this.appendEditCustom = function() {
+	this.appendEditCustom = function () {
 
 		var row = {};
 		jstatus.insert(row);
 
 		options.grid.datagrid('appendRow', row);
-		options.index = options.grid.datagrid('getRows').length-1;
+		options.index = options.grid.datagrid('getRows').length - 1;
 		options.grid.datagrid('selectRow', options.index)
-		            .datagrid('beginEdit', options.index);
+			.datagrid('beginEdit', options.index);
 	};
 
 	//-----------------------------------------//
 	//[편집형]그리드 행 추가 처리
 	//(ROW 파라메터를 받아서 처리한다.)
-	this.appendRow = function(row) {
+	this.appendRow = function (row) {
 
 		if (control.endEdit() == false)
 			return;
@@ -1501,32 +1502,32 @@ jeasygrid = function (args) {
 		jstatus.insert(row);
 
 		options.grid.datagrid('appendRow', row);
-		options.index = options.grid.datagrid('getRows').length-1;
+		options.index = options.grid.datagrid('getRows').length - 1;
 		options.grid.datagrid('selectRow', options.index)
-		            .datagrid('beginEdit', options.index);
+			.datagrid('beginEdit', options.index);
 	};
 
 
 	//-----------------------------------------//
 	//[편집형]그리드 행 삭제 처리
-	this.removeEdit = function() {
+	this.removeEdit = function () {
 
 		if (options.index == undefined) {
-			$.messager.alert(msg.MSG0121,msg.MSG0123,msg.MSG0121);
-	    	return;
+			$.messager.alert(msg.MSG0051, msg.MSG0016, msg.MSG0051);
+			return;
 		}
 
 		var row = options.grid.datagrid('getSelected');
 
 		if (!row) {
-			$.messager.alert(msg.MSG0121,msg.MSG0123,msg.MSG0121);
+			$.messager.alert(msg.MSG0051, msg.MSG0016, msg.MSG0051);
 			return;
 		}
 
 		jstatus.remove(row);
 
 		options.grid.datagrid('cancelEdit', options.index)
-	                .datagrid('deleteRow' , options.index);
+			.datagrid('deleteRow', options.index);
 		options.index = undefined;
 
 	};
@@ -1537,24 +1538,24 @@ jeasygrid = function (args) {
 	 * 20160922 김원국
 	 * 삭제시 바인딩으로 처리할수 잇도록 수정
 	 */
-	this.removeEditCustom = function() {
+	this.removeEditCustom = function () {
 
 		if (options.index == undefined) {
-			$.messager.alert(msg.MSG0121,msg.MSG0123,msg.MSG0121);
-	    	return;
+			$.messager.alert(msg.MSG0051, msg.MSG0016, msg.MSG0051);
+			return;
 		}
 
 		var row = options.grid.datagrid('getSelected');
 
 		if (!row) {
-			$.messager.alert(msg.MSG0121,msg.MSG0123,msg.MSG0121);
+			$.messager.alert(msg.MSG0051, msg.MSG0016, msg.MSG0051);
 			return;
 		}
 
 		jstatus.remove(row);
 
 		options.grid.datagrid('cancelEdit', options.index)
-	                .datagrid('deleteRow' , options.index);
+			.datagrid('deleteRow', options.index);
 		options.index = undefined;
 
 		control.endEditCustom();
@@ -1563,7 +1564,7 @@ jeasygrid = function (args) {
 
 	//-----------------------------------------//
 	//[편집형]그리드 다중 편집 행 저장 처리
-	this.saveEdit = function() {
+	this.saveEdit = function () {
 
 		control.endEdit();
 
@@ -1572,11 +1573,11 @@ jeasygrid = function (args) {
 
 		if (rows == null ||
 			rows.length == 0) {
-			$.messager.alert(msg.MSG0121,msg.MSG0023,msg.MSG0121);
+			$.messager.alert(msg.MSG0051, msg.MSG0022, msg.MSG0051);
 			return;
 		}
 
-		var data = {models: $.toJSON(rows)};
+		var data = { models: $.toJSON(rows) };
 
 		jlogic.save({
 			url: options.url.save,
@@ -1591,7 +1592,7 @@ jeasygrid = function (args) {
 	 * 20160922 김원국
 	 * 저장하기전 로직 추가
 	 */
-	this.saveEditCustom = function() {
+	this.saveEditCustom = function () {
 
 		control.endEditCustom();
 
@@ -1600,16 +1601,16 @@ jeasygrid = function (args) {
 
 		if (rows == null ||
 			rows.length == 0) {
-			$.messager.alert(msg.MSG0121,msg.MSG0023,msg.MSG0121);
+			$.messager.alert(msg.MSG0051, msg.MSG0022, msg.MSG0051);
 			return;
 		}
 
-		if(!control.endEdit()){
-			$.messager.alert(msg.MSG0121,msg.MSG0038,msg.MSG0121);
+		if (!control.endEdit()) {
+			$.messager.alert(msg.MSG0051, msg.MSG0033, msg.MSG0051);
 			return;
 		}
 
-		var data = {models: $.toJSON(rows)};
+		var data = { models: $.toJSON(rows) };
 
 		jlogic.save({
 			url: options.url.save,
@@ -1620,7 +1621,7 @@ jeasygrid = function (args) {
 
 	//-----------------------------------------//
 	//[편집형]그리드 에디터 변경
-	this.changeEditor = function(field, editor) {
+	this.changeEditor = function (field, editor) {
 
 		control.endEdit();
 
@@ -1631,7 +1632,7 @@ jeasygrid = function (args) {
 		opts.editor = editor;
 	};
 
-	this.changeTitle = function(title) {
+	this.changeTitle = function (title) {
 
 		var g = options.grid;
 		var p = g.datagrid('getPanel');    // get the panel
@@ -1640,12 +1641,12 @@ jeasygrid = function (args) {
 
 	//-----------------------------------------//
 	//검색값 오브젝트 반환
-	this.getSearchObject = function() {
+	this.getSearchObject = function () {
 
 		var o = control.getSearchData();
 		var g = options.grid;
 
-		o['rows'] = g.datagrid('options')['pageSize'  ];
+		o['rows'] = g.datagrid('options')['pageSize'];
 		o['page'] = g.datagrid('options')['pageNumber'];
 		return o;
 	};
@@ -1661,26 +1662,26 @@ jdialog = function (args) {
 	var object = this;
 
 	var options = {
-		title:  false,
+		title: false,
 		dialog: false, // 다이얼로그 객체
-		grid:   false, // 그리드 객체(jeasygrid)
-		key:    false  // "#regist-dialog"
+		grid: false, // 그리드 객체(jeasygrid)
+		key: false  // "#regist-dialog"
 	};
 
 	//옵션정보가 있는 경우에만 다이얼로그 생성
 	if (args.dialogOptions) {
 		options.dialogOptions = {
-			href:      false,
-			width:     800,
-			height:    600,
-		    modal:     true,
-			cache:     false,
-			closed:    true,
-		    closable:  true,
-		    resizable: true,
-		    //collapsible: true,
-		    //minimizable: true,
-		    //maximizable: true,
+			href: false,
+			width: 800,
+			height: 600,
+			modal: true,
+			cache: false,
+			closed: true,
+			closable: true,
+			resizable: true,
+			//collapsible: true,
+			//minimizable: true,
+			//maximizable: true,
 			iconCls: false,
 			buttons: []
 		};
@@ -1694,11 +1695,11 @@ jdialog = function (args) {
 	}
 
 	//다이얼로그 오픈
-	this.open = function(args) {
+	this.open = function (args) {
 
 		if (args) {
 			if (typeof args == 'string') {
-				var t = options.title + (args ? ' '+ args : '');
+				var t = options.title + (args ? ' ' + args : '');
 				options.dialog.dialog('setTitle', t);
 			}
 			else {
@@ -1716,29 +1717,29 @@ jdialog = function (args) {
 	};
 
 	//다이얼로그 닫기
-	this.close = function() {
+	this.close = function () {
 		options.dialog.dialog('close');
 	};
 
 	//버튼 제어
-	this.enable = function(prefix) {
-		$('a[id^="'+prefix+'"]').each(function() {
+	this.enable = function (prefix) {
+		$('a[id^="' + prefix + '"]').each(function () {
 			$(this).linkbutton('enable');
 		});
 	};
-	this.disable = function(prefix) {
-		$('a[id^="'+prefix+'"]').each(function() {
+	this.disable = function (prefix) {
+		$('a[id^="' + prefix + '"]').each(function () {
 			$(this).linkbutton('disable');
 		});
 		//답글 버튼 활성화 20170906 박민혁
-		$('a[id=dialog-button-viewReply]').each(function() {
+		$('a[id=dialog-button-viewReply]').each(function () {
 			$(this).linkbutton('enable');
 		});
 	};
 
 	//-----------------------------------------//
 	//수정폼 다이얼로그 오픈
-	this.update = function(row) {
+	this.update = function (row) {
 		if (options.grid) {
 			options.grid.clear();
 		}
@@ -1752,15 +1753,15 @@ jdialog = function (args) {
 
 	//-----------------------------------------//
 	//추가폼 다이얼로그 오픈
-	this.append = function() {
-		this.open(tit.TITLE0037);
+	this.append = function () {
+		this.open(tit.TITLE0022);
 		if (options.grid) {
 			options.grid.clear();
 		}
 	};
 	//-----------------------------------------//
 	//다이얼로그 저장처리
-	this.save = function(args) {
+	this.save = function (args) {
 
 
 
@@ -1770,7 +1771,7 @@ jdialog = function (args) {
 		if (!g)
 			return;
 
-		g.save(function(res) {
+		g.save(function (res) {
 			p.close();
 			g.result(res);
 			if (args &&
@@ -1794,17 +1795,17 @@ jeasytree = function (args) {
 
 	//컨트롤 사용항목
 	var options = {
-		title:    false, //화면제목
-		gridKey:  "#search-grid",
+		title: false, //화면제목
+		gridKey: "#search-grid",
 		sformKey: "#search-form",
 		spanPrefix: 'r_',
-		grid:  false, //그리드 객체
-		form:  false, //등록폼 객체
+		grid: false, //그리드 객체
+		form: false, //등록폼 객체
 		sform: false, //검색폼 객체
 		gridOptions: {
 			url: null,
 			title: null,
-			iconCls:'icon-search',
+			iconCls: 'icon-search',
 			rownumbers: true,
 			pagination: true,
 			fitColumn: true,
@@ -1812,15 +1813,15 @@ jeasytree = function (args) {
 			showFooter: true,
 			multiSort: true,
 			lines: true,
-			onBeforeLoad: function(param) {
+			onBeforeLoad: function (param) {
 			}
 		},
 		url: {
 			search: false, //검색처리 URL
-			excel:  false, //엑셀다운 URL
+			excel: false, //엑셀다운 URL
 			select: false, //상세조회 URL
 			remove: false, //삭제처리 URL
-			save:   false  //저장처리 URL
+			save: false  //저장처리 URL
 		},
 		fn: {
 			//저장,삭제 후 결과처리 함수
@@ -1831,17 +1832,17 @@ jeasytree = function (args) {
 	if (args)
 		$.extend(true, options, args);
 
-	options.grid  = $(options.gridKey);
-	options.form  = $(options.formKey);
+	options.grid = $(options.gridKey);
+	options.form = $(options.formKey);
 	options.sform = $(options.sformKey);
 
-	this.grid  = options.grid;
-	this.form  = options.form;
+	this.grid = options.grid;
+	this.form = options.form;
 	this.sform = options.sform;
 
 	//-----------------------------------------//
 	//그리드 생성
-	this.init = function(gridOptions) {
+	this.init = function (gridOptions) {
 
 		// BBUG.ADD : striped: true  - for grid odd/even Color
 		$.extend(options.gridOptions, {
@@ -1860,21 +1861,21 @@ jeasytree = function (args) {
 	}
 
 	//그리드 검색폼 데이터 반환
-	this.getSearchData = function() {
+	this.getSearchData = function () {
 		var f = options.sform;
 		return f.serializeObject();
 	};
 
 	//-----------------------------------------//
 	//그리드 검색폼 검색
-	this.search = function() {
+	this.search = function () {
 		var data = this.getSearchData();
-		options.grid.treegrid('load',data);
+		options.grid.treegrid('load', data);
 	};
 
 	//-----------------------------------------//
 	//그리드 엑셀다운로드
-	this.download = function() {
+	this.download = function () {
 		jlogic.excel({
 			url: options.url.excel,
 			form: options.sform
@@ -1883,112 +1884,112 @@ jeasytree = function (args) {
 
 	//-----------------------------------------//
 	//그리드 전체펼치기
-	this.expandAll = function() {
+	this.expandAll = function () {
 		options.grid.treegrid('expandAll');
 	};
 
 	//-----------------------------------------//
 	//그리드 전체접기
-	this.collapseAll = function() {
+	this.collapseAll = function () {
 		options.grid.treegrid('collapseAll');
 	};
 
 	//-----------------------------------------//
 	//그리드 상세조회
-	this.select = function(index, row) {
+	this.select = function (index, row) {
 		control.clear();
 
-		var f   = options.form;
+		var f = options.form;
 		var url = options.url.select;
 		var pre = options.spanPrefix;
 
 		jlogic.select({
 			url: url,
 			data: row,
-			success: function(data) {
+			success: function (data) {
 
-	        	if (!data ||
-	        		!data.rows) {
-	        		$.messager.alert(msg.MSG0121,msg.MSG0031,msg.MSG0121);
-	        		return;
-	        	}
+				if (!data ||
+					!data.rows) {
+					$.messager.alert(msg.MSG0051, msg.MSG0027, msg.MSG0051);
+					return;
+				}
 
-	        	//폼데이터 로드
-	        	f.form('load', data.rows);
-	        	//레이어에 데이터 로드
-	        	jcommon.toHtml(data.rows, pre);
+				//폼데이터 로드
+				f.form('load', data.rows);
+				//레이어에 데이터 로드
+				jcommon.toHtml(data.rows, pre);
 
-	        	//수정상태 정의
-	        	jstatus.update(f);
+				//수정상태 정의
+				jstatus.update(f);
 			}
 		});
 	};
 
 	//-----------------------------------------//
 	//그리드 리로드
-	this.reload = function() {
+	this.reload = function () {
 		options.grid.treegrid('reload');
 		options.grid.treegrid('clearSelections');
 	};
 
 	//-----------------------------------------//
 	//그리드 검색폼 초기화
-	this.reset = function() {
+	this.reset = function () {
 		options.sform.form('clear');
 	};
 
 	return control;
 };
 
-jcombobox = function(args) {
+jcombobox = function (args) {
 
-	var objects   = this;
+	var objects = this;
 
 	var config = {
-		combo:   'combobox',
-		type:     1,
-		params:   {},
-		data:     [],
+		combo: 'combobox',
+		type: 1,
+		params: {},
+		data: [],
 		autoload: false,
-		options:  {}
+		options: {}
 	};
 
 	if (args)
 		$.extend(true, config, args);
 
-	this.editor = function() {
+	this.editor = function () {
 		var ret = {
-			type:    config.combo,
+			type: config.combo,
 			options: config.options
 		};
 		ret.options['data'] = config.data;
 
 		return ret;
 	};
-	this.formatter = function() {
+	this.formatter = function () {
 		var p = this;
-		return function(value) {
+		return function (value) {
 			return p.getItem(value);
 		};
 	};
 
-	this.getData = function() {
+	this.getData = function () {
 		return config.data;
 	},
-	this.getItem = function(id) {
+		this.getItem = function (id) {
 
-		var d  = config.data;
-		var vf = config.options.valueField || 'value';
-		var tf = config.options.textField  || 'text';
+			var d = config.data;
+			var vf = config.options.valueField || 'value';
+			var tf = config.options.textField || 'text';
 
-		for (var i=0; i<d.length; i++) {
-			if (d[i][vf] == id) {
-				return d[i][tf];
+			for (var i = 0; i < d.length; i++) {
+				if (d[i][vf] == id) {
+					return d[i][tf];
+				}
 			}
-		}
-		return '';
-	};
-	this.load = function( params ) {
+			return '';
+		};
+	this.load = function (params) {
 
 		if (config == false)
 			return;
@@ -2001,7 +2002,7 @@ jcombobox = function(args) {
 			config.type
 		);
 	};
-	
+
 	if (config.autoload)
 		this.load();
 
@@ -2064,93 +2065,93 @@ $.extend($.fn.datagrid.defaults.editors, {
 	 *
 	 * -----------------------------------------------------------------------
 	 */
-    uxcombobox: {
-        init: function(container, options){
-        	// 콤보박스객체
-            var input = $('<input type="text"/>').appendTo(container);
-            // 그리드객체
-            var grid  = consts.easygrid.grid;
-            // 선택행 INDEX
-            var index = parseInt($(container).closest('tr.datagrid-row').attr('datagrid-row-index'));
-            // 콤보박스옵션
-            var opts = $.extend({
-            	// 데이터 로딩타입
-            	mode: 'remote',
-            	// 로딩 URL
-            	url: getUrl('/common/code/code.json'),
-            	// VALUE KEY
-            	valueField: 'codeCd',
-            	// TEXT KEY
-            	textField: 'codeName',
-            	// 로딩된 데이터의 필터
-            	loadFilter: function(data) {
-            		return data['rows'];
-            	},
-            	// 사용자 파라메터 정의
-           		onBeforeLoad: function(param){
+	uxcombobox: {
+		init: function (container, options) {
+			// 콤보박스객체
+			var input = $('<input type="text"/>').appendTo(container);
+			// 그리드객체
+			var grid = consts.easygrid.grid;
+			// 선택행 INDEX
+			var index = parseInt($(container).closest('tr.datagrid-row').attr('datagrid-row-index'));
+			// 콤보박스옵션
+			var opts = $.extend({
+				// 데이터 로딩타입
+				mode: 'remote',
+				// 로딩 URL
+				url: getUrl('/common/code/code.json'),
+				// VALUE KEY
+				valueField: 'codeCd',
+				// TEXT KEY
+				textField: 'codeName',
+				// 로딩된 데이터의 필터
+				loadFilter: function (data) {
+					return data['rows'];
+				},
+				// 사용자 파라메터 정의
+				onBeforeLoad: function (param) {
 
-		            // 콤보의 기본조건 정의
-           			if (options.baseParams)
-           				$.extend(param, options.baseParams);
+					// 콤보의 기본조건 정의
+					if (options.baseParams)
+						$.extend(param, options.baseParams);
 
-           			// 하위콤보인 경우 상위콤보값에 의한 조건정의
-           			if (options.parentField &&
-           				options.parentKey) {
-			        	// 상위콤보값의 조건 KEY
-			        	var pkey = options.parentKey;
-           				// 상위콤보 에디터
-		            	var pbox = grid.datagrid('getEditor', {index:index, field: options.parentField});
-		            	// 상위콤보의 선택값을 조건으로 정의
-           				param[pkey] = $(pbox.target).combobox('getValue');
-           			}
-           		},
-           		// 선택변경시 하위콤보값 데이터 리로드
-           		onChange: function(newValue,oldValue) {
-           			// 상위콤보인 경우 하위콤보의 데이터 리로드
+					// 하위콤보인 경우 상위콤보값에 의한 조건정의
+					if (options.parentField &&
+						options.parentKey) {
+						// 상위콤보값의 조건 KEY
+						var pkey = options.parentKey;
+						// 상위콤보 에디터
+						var pbox = grid.datagrid('getEditor', { index: index, field: options.parentField });
+						// 상위콤보의 선택값을 조건으로 정의
+						param[pkey] = $(pbox.target).combobox('getValue');
+					}
+				},
+				// 선택변경시 하위콤보값 데이터 리로드
+				onChange: function (newValue, oldValue) {
+					// 상위콤보인 경우 하위콤보의 데이터 리로드
 
-		            if (options.childField) {
-		            	// 하위콤보 에디터
-		            	var cbox = grid.datagrid('getEditor', {index:index, field: options.childField});
-		            	// 하위콤보의 선택값 초기화
-           				$(cbox.target).combobox('setValue','');
-           				// 하위콤보의 옵션데이터 리로드
-           				$(cbox.target).combobox('reload');
-		            }
+					if (options.childField) {
+						// 하위콤보 에디터
+						var cbox = grid.datagrid('getEditor', { index: index, field: options.childField });
+						// 하위콤보의 선택값 초기화
+						$(cbox.target).combobox('setValue', '');
+						// 하위콤보의 옵션데이터 리로드
+						$(cbox.target).combobox('reload');
+					}
 
-		            if(options.codeField){
-		            	var nbox = grid.datagrid('getEditor', {index:index, field: options.name});
-		            	var cbox = grid.datagrid('getEditor', {index:index, field: options.codeField});
-		            	var codeVal = $(nbox.target).combobox('getValue');
-		            	var codeVal2 = $(cbox.target).textbox('getValue');
+					if (options.codeField) {
+						var nbox = grid.datagrid('getEditor', { index: index, field: options.name });
+						var cbox = grid.datagrid('getEditor', { index: index, field: options.codeField });
+						var codeVal = $(nbox.target).combobox('getValue');
+						var codeVal2 = $(cbox.target).textbox('getValue');
 
-		            	if((codeVal != '' && oldValue != '') || codeVal2 == ''){
-		            		$(cbox.target).textbox('setValue',codeVal);
-		            	}
+						if ((codeVal != '' && oldValue != '') || codeVal2 == '') {
+							$(cbox.target).textbox('setValue', codeVal);
+						}
 
-		            	if(newValue == ''){
-		            		$(cbox.target).textbox('setValue', '');
-		            	}
+						if (newValue == '') {
+							$(cbox.target).textbox('setValue', '');
+						}
 
-		            }
+					}
 
-           		}
-           }, options);
+				}
+			}, options);
 
-           return input.combobox(opts);
-       },
-       destroy: function(target){
-           $(target).combobox('destroy');
-       },
-       getValue: function(target){
-           return $(target).combobox('getValue');
-       },
-       setValue: function(target, value){
-           $(target).combobox('setValue', value);
-       },
-       resize: function(target, width){
-            $(target).combobox('resize', width);
-       }
-    },
+			return input.combobox(opts);
+		},
+		destroy: function (target) {
+			$(target).combobox('destroy');
+		},
+		getValue: function (target) {
+			return $(target).combobox('getValue');
+		},
+		setValue: function (target, value) {
+			$(target).combobox('setValue', value);
+		},
+		resize: function (target, width) {
+			$(target).combobox('resize', width);
+		}
+	},
 
 	/**
 	 * -------------------------------------------------------------------
@@ -2171,24 +2172,24 @@ $.extend($.fn.datagrid.defaults.editors, {
 	 * -----------------------------------------------------------------------
 	 */
 	popupbox: {
-	    init: function(container, options){
-	        var input    = $('<input type="text"/>').appendTo(container);
-	        var tr       = $(container).closest('tr.datagrid-row');
-	        var rowIndex = parseInt(tr.attr('datagrid-row-index'));
-	        var valueBox = false;
-	        if (options.valueField) {
-	        	valueBox = consts.easygrid.grid.datagrid('getEditor', {index:rowIndex, field: options.valueField});
-	        }
-	        var opts = $.extend({
-	        	// 편집불가처리
-	        	editable: false,
-	        	// 팝업아이콘 정의
+		init: function (container, options) {
+			var input = $('<input type="text"/>').appendTo(container);
+			var tr = $(container).closest('tr.datagrid-row');
+			var rowIndex = parseInt(tr.attr('datagrid-row-index'));
+			var valueBox = false;
+			if (options.valueField) {
+				valueBox = consts.easygrid.grid.datagrid('getEditor', { index: rowIndex, field: options.valueField });
+			}
+			var opts = $.extend({
+				// 편집불가처리
+				editable: false,
+				// 팝업아이콘 정의
 				icons: [{
-					iconCls:'icon-search',
+					iconCls: 'icon-search',
 					// 아이콘 클릭시 핸들러 정의
-					handler: function(e) {
+					handler: function (e) {
 						// 팝업오픈
-						options.onOpen(function(data) {
+						options.onOpen(function (data) {
 							// 선택값 필드가 존재하는 경우
 							if (valueBox) {
 								// 선택값입력박스에 선택항목의 VALUE 셋팅
@@ -2203,21 +2204,21 @@ $.extend($.fn.datagrid.defaults.editors, {
 						});
 					}
 				}]
-	       }, options);
-	       return input.textbox(opts);
-	   },
-	   destroy: function(target){
-	       $(target).textbox('destroy');
-	   },
-	   getValue: function(target){
-	       return $(target).textbox('getValue');
-	   },
-	   setValue: function(target, value){
-	       $(target).textbox('setValue', value);
-	   },
-	   resize: function(target, width){
-	        $(target).textbox('resize', width);
-	   }
+			}, options);
+			return input.textbox(opts);
+		},
+		destroy: function (target) {
+			$(target).textbox('destroy');
+		},
+		getValue: function (target) {
+			return $(target).textbox('getValue');
+		},
+		setValue: function (target, value) {
+			$(target).textbox('setValue', value);
+		},
+		resize: function (target, width) {
+			$(target).textbox('resize', width);
+		}
 	}
 });
 

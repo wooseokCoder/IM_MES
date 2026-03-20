@@ -40,7 +40,7 @@ $(function() {
 	
 
 	$('#progress-popup').dialog({
-			       title: tit.TITLE0009,
+			       title: tit.TITLE0003,
 			       top:     100,
 			       width: 200,
 			       height: 200,

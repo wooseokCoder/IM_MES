@@ -42,9 +42,6 @@
 <style>
 #account-layout{min-width:1200px !important;}
 /* .datagrid-body {height:60px !important;} */
-.search-label-h2 {
-    width: 90px;
-}
 #Progress_Loading{
  position: absolute;
  left: 50%;
@@ -93,19 +90,16 @@
 				<input type="hidden" name="bordGrup" id="r_bordGrup" value="${model.bordGrup}"/>
 				<input type="hidden" name="hOrgAuthCode" id="hOrgAuthCode" value="${user.orgAuthCode}"/>
 				
-	            <table cellpadding="5" class="search-table tableSearch-c wd-100" >
+	            <table cellpadding="0" class="search-table tableSearch-c wd-100" >
 	            	<colgroup>
-	            		<col width="10%" style="min-width: 80px;" />
-	            		<col width="15%" style="min-width: 110px;" />
-	            		<col width="10%" style="min-width: 80px;" />
-	            		<col width="15%" style="min-width: 110px;" />
-	            		<col width="10%" style="min-width: 80px;" />
-	            		<col width="15%" style="min-width: 110px;" />
-	            		<col width="10%" style="min-width: 80px;" />
-	            		<col width="15%" style="min-width: 110px;" />
+	            		<col width="60px" />
+	            		<col width="120px" />
+	            		<col width="95px" />
+	            		<col width="290px" />
+	            		<col width="*" />
 	            	</colgroup>
 	            	<tr class="topnav_sty">
-	            		<td colspan="8" >
+	            		<td colspan="5" >
 	            			<div>
 		            			<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
 		            			<div>
@@ -127,7 +121,7 @@
 								</c:forEach>
 							</select>
 						</td> --%>
-						<th class="h table-Search-h-right" data-item="LAB_004"><span>User ID </span></th>
+						<th class="h table-Search-h search-label-h" data-item="LAB_004"><span>User ID </span></th>
 						<td class="d">
 							<c:choose>
 								<c:when test="${user.orgAuthCode ne 'ADMIN'}">
@@ -138,13 +132,14 @@
 								</c:otherwise>
 							</c:choose>
 						</td>
-	                    <th class="h table-Search-h search-label-h2"><span data-item="LAB_045">Request Date</span></th>
-	                    <td class="d" style="min-width: 290px;">
+	                    <th class="h table-Search-h search-label-h"><span data-item="LAB_045">Request Date</span></th>
+	                    <td class="d">
 	                    	<div style="display: flex; align-items: center;">
 		                        <input class="easyui-datebox date-L" value="" textboxname="rqstDateFr" comboname="rqstDateFr" id="rqstDateFr" name="rqstDateFr"/>
 		                        <input class="easyui-datebox date-R" value="" textboxname="rqstDateTo" comboname="rqstDateTo" id="rqstDateTo" name="rqstDateTo"/>
 	                    	</div>
 	                    </td>
+	                    <td class="d"></td>
 	                </tr>
 	            </table>
 	       </fieldset>

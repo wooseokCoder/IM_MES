@@ -64,7 +64,7 @@
 							</c:if>
 						</td>
 						<!-- <td class="b">
-							<a href="javascript:void(0)" class="easyui-linkbutton cgray" iconCls="icon-search" id="search-button">검색</a>
+							<a href="javascript:void(0)" class="easyui-linkbutton cgray" iconCls="icon-search" id="search-button">조회</a>
 							<a href="javascript:void(0)" id="ehelp-save-button" class="easyui-linkbutton cgray">저장</a> 
 						</td> -->
 		            </tr>

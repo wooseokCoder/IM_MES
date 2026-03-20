@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_STK_OUT_PART.xml
+설명: 불출자재 CRUD 매퍼 (TSHP_STK_OUT_PART 테이블)
+원본: ProActive TSHP_STK_OUT_PART.cs
+작성일: 2026-03-04
+사용화면: MAT05A
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.mat.TSHP_STK_OUT_PART">
+
+    <!--
+    ============================================================
+    TSHP_STK_OUT_PART_SER: 불출자재 단건 조회 (존재 확인용)
+    용도: MAT05A_INS/DEL - 기존 불출자재 존재 여부 확인
+    ============================================================
+    -->
+    <select id="TSHP_STK_OUT_PART_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_stk_out_part_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{stkOutNo, mode=IN, jdbcType=VARCHAR},
+            #{stkOutPartNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_STK_OUT_PART_INS: 불출자재 등록
+    용도: MAT05A_INS - 현장불출 시 자재 상세 생성
+    ============================================================
+    -->
+    <insert id="TSHP_STK_OUT_PART_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_stk_out_part_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{stkOutNo, mode=IN, jdbcType=VARCHAR},
+            #{stkOutPartNo, mode=IN, jdbcType=VARCHAR},
+            #{partCode, mode=IN, jdbcType=VARCHAR},
+            #{outFlag, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSHP_STK_OUT_PART_UPD: 불출자재 상태 업데이트
+    용도: MAT05A_INS/DEL - OUT_FLAG 변경
+    ============================================================
+    -->
+    <update id="TSHP_STK_OUT_PART_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_stk_out_part_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{stkOutNo, mode=IN, jdbcType=VARCHAR},
+            #{stkOutPartNo, mode=IN, jdbcType=VARCHAR},
+            #{partCode, mode=IN, jdbcType=VARCHAR},
+            #{outFlag, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSHP_STK_OUT_PART_SER2: 불출자재 목록 조회 (STK_OUT_NO 기준)
+    용도: MAT05A_INS/DEL - MAT_OUT_RATE_MES 분자 계산
+    추가일: 2026-03-05
+    ============================================================
+    -->
+    <select id="TSHP_STK_OUT_PART_SER2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_stk_out_part_ser2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{stkOutNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

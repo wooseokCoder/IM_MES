@@ -56,7 +56,7 @@ function doSave() {
 
 	//lstractorusa.com
 	if(newPw == '') {
-		$.messager.alert('Information',msg.MSG0123,'info');
+		$.messager.alert('Information',msg.MSG0014,'info');
 	}
 	else{
 		$.ajax({
@@ -66,10 +66,10 @@ function doSave() {
 	        type: 'post',
 	        data: {SMTP_MAIL:userId
 	        	 ,SMTP_PW:newPw
-			 ,sysId:'IMMES'
+	        	 ,sysId:'LSBAS'
 	        	 ,userId:$("#userId").val()},
 	        success: function(data){
-	        	$.messager.alert('Information',msg.MSG0103,'info');
+	        	$.messager.alert('Information',msg.MSG0020,'info');
 	        },
 	        error: function(){
 	        }

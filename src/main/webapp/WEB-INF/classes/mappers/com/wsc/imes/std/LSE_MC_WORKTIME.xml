@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    LSE_MC_WORKTIME CRUD 매퍼
+    설비 요일별 근무시간: SER, SER2, DEL2, INS
+    작성자: 송우석
+    작성일: 2026-02-11
+    수정일: 2026-02-23 (STD04A용 SER2, DEL2, INS 추가)
+-->
+<mapper namespace="com.wsc.imes.std.LSE_MC_WORKTIME">
+
+    <!-- 설비/교대별 요일 근무시간 조회 -->
+    <select id="LSE_MC_WORKTIME_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_mc_worktime_ser(
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcShift, mode=IN, jdbcType=INTEGER},
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- 설비별 전체 교대 근무시간 조회 (MC_SHIFT 필터 없음) -->
+    <select id="LSE_MC_WORKTIME_SER2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_mc_worktime_ser2(
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- 설비별 근무시간 전체 삭제 -->
+    <delete id="LSE_MC_WORKTIME_DEL2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_lse_mc_worktime_del2(
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+    <!-- 설비 교대별 근무시간 등록 -->
+    <insert id="LSE_MC_WORKTIME_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_lse_mc_worktime_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcShift, mode=IN, jdbcType=TINYINT},
+            #{monTime, mode=IN, jdbcType=FLOAT},
+            #{tueTime, mode=IN, jdbcType=FLOAT},
+            #{wedTime, mode=IN, jdbcType=FLOAT},
+            #{thrTime, mode=IN, jdbcType=FLOAT},
+            #{friTime, mode=IN, jdbcType=FLOAT},
+            #{satTime, mode=IN, jdbcType=FLOAT},
+            #{sunTime, mode=IN, jdbcType=FLOAT}
+        )}
+    </insert>
+
+</mapper>

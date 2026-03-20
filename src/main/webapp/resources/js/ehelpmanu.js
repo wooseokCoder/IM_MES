@@ -72,7 +72,7 @@ var fileuploadForm = {
 						var row  = rows[index];
 
 						if (row.exist != true) {
-							$.messager.alert("Error", msg.MSG0113, 'error');
+							$.messager.alert("Error", msg.MSG0083, 'error');
 							return;
 						}
 						//obj.download(row.index);   //파일 다운

@@ -55,7 +55,7 @@
 			<input type="hidden" name="pageType" id="s_pageType" value="${model.pageType}"/>
 			<input class="easyui-combobox" name="searchKey"  id="s_searchKey"  value="S01" codeGrup="BORD_STYPE" data-options="mode:'remote',width:100,editable:false,loader:jcombo.loader"/>
 			<input class="easyui-textbox"  name="searchText" id="r_searchText" style="width:300px"/>
-			<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" id="search-button">검색</a>
+			<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" id="search-button">조회</a>
 		</fieldset>
 	</form>
 	

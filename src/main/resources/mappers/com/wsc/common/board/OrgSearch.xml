@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wsc.common.board.OrgSearch">
+
+    <!-- ========================================================== -->
+    <!--   조직 검색 (TSTD_ORG) - TreeGrid용 계층형 조회              -->
+    <!-- ========================================================== -->
+
+    <!-- [treeSearch] 조직 계층형 조회 (TreeGrid용) -->
+    <select id="treeSearch" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_org_tree_search(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{pltCode, mode=IN, jdbcType=VARCHAR},
+            #{orgCode, mode=IN, jdbcType=VARCHAR},
+            #{orgName, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

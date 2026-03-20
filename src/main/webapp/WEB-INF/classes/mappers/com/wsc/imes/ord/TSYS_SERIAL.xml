@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSYS_SERIAL.xml
+설명: 일련번호 CRUD 매퍼 (TSYS_SERIAL 테이블)
+작성자: 송우석
+작성일: 2026-02-10
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TSYS_SERIAL">
+
+    <!--
+    ============================================================
+    TSYS_SERIAL_UPD: 순번 수정
+    용도: D0A 팝업에서 순번(SR_NO) 수정
+    ============================================================
+    -->
+    <update id="TSYS_SERIAL_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tsys_serial_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{srCode, mode=IN, jdbcType=VARCHAR},
+            #{srKey, mode=IN, jdbcType=VARCHAR},
+            #{srNo, mode=IN, jdbcType=INTEGER}
+        )}
+    </update>
+
+</mapper>

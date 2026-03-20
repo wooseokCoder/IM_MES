@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_WORKGROUP.xml
+설명: 작업자 그룹 CRUD 매퍼 (TSTD_WORKGROUP, TSTD_WORKGROUP_MC, TSTD_WORKGROUP_EMP)
+원본: ProActive TSTD_WORKGROUP.cs, TSTD_WORKGROUP_MC.cs, TSTD_WORKGROUP_EMP.cs
+작성일: 2026-02-10
+============================================================================
+주의: GROUP_NO 채번은 공통 서비스 사용 (UtilityService.getSerialNo)
+      sr_code="GRP", format=YYYYMMDD → GRP20260210-0001
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_WORKGROUP">
+
+    <!-- ============================================================ -->
+    <!-- TSTD_WORKGROUP (마스터) CRUD                                  -->
+    <!-- ============================================================ -->
+
+    <!-- TSTD_WORKGROUP_SER: 단건 조회 (PLT_CODE + GROUP_NO) -->
+    <select id="TSTD_WORKGROUP_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_workgroup_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- TSTD_WORKGROUP_INS: 등록 -->
+    <insert id="TSTD_WORKGROUP_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_workgroup_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{groupName, mode=IN, jdbcType=VARCHAR},
+            #{empCount, mode=IN, jdbcType=INTEGER},
+            #{mcCount, mode=IN, jdbcType=INTEGER},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!-- TSTD_WORKGROUP_UPD: 수정 -->
+    <update id="TSTD_WORKGROUP_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_workgroup_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{groupName, mode=IN, jdbcType=VARCHAR},
+            #{empCount, mode=IN, jdbcType=INTEGER},
+            #{mcCount, mode=IN, jdbcType=INTEGER},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- TSTD_WORKGROUP_UDE: 논리삭제 -->
+    <update id="TSTD_WORKGROUP_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_workgroup_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- ============================================================ -->
+    <!-- TSTD_WORKGROUP_MC (자식: 작업장 매핑) CRUD                    -->
+    <!-- ============================================================ -->
+
+    <!-- TSTD_WORKGROUP_MC_SER: 단건 조회 -->
+    <select id="TSTD_WORKGROUP_MC_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_workgroup_mc_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- TSTD_WORKGROUP_MC_INS: 등록 -->
+    <insert id="TSTD_WORKGROUP_MC_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_workgroup_mc_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcSeq, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!-- TSTD_WORKGROUP_MC_UPD: 수정 (DATA_FLAG=0 복원) -->
+    <update id="TSTD_WORKGROUP_MC_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_workgroup_mc_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcSeq, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- TSTD_WORKGROUP_MC_UDE: 개별 논리삭제 -->
+    <update id="TSTD_WORKGROUP_MC_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_workgroup_mc_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- TSTD_WORKGROUP_MC_UDE2: 그룹 전체 논리삭제 -->
+    <update id="TSTD_WORKGROUP_MC_UDE2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_workgroup_mc_ude2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- ============================================================ -->
+    <!-- TSTD_WORKGROUP_EMP (자식: 작업자 매핑) CRUD                   -->
+    <!-- ============================================================ -->
+
+    <!-- TSTD_WORKGROUP_EMP_SER: 단건 조회 -->
+    <select id="TSTD_WORKGROUP_EMP_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_workgroup_emp_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- TSTD_WORKGROUP_EMP_INS: 등록 -->
+    <insert id="TSTD_WORKGROUP_EMP_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_workgroup_emp_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{empSeq, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!-- TSTD_WORKGROUP_EMP_UPD: 수정 (DATA_FLAG=0 복원) -->
+    <update id="TSTD_WORKGROUP_EMP_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_workgroup_emp_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{empSeq, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- TSTD_WORKGROUP_EMP_UDE: 개별 논리삭제 -->
+    <update id="TSTD_WORKGROUP_EMP_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_workgroup_emp_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- TSTD_WORKGROUP_EMP_UDE2: 그룹 전체 논리삭제 -->
+    <update id="TSTD_WORKGROUP_EMP_UDE2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_workgroup_emp_ude2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

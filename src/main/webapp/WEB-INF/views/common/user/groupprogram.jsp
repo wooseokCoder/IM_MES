@@ -27,7 +27,7 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 <!-- BUSINESS JAVASCRIPT -->
 <script type="text/javascript" src="<c:url value="/resources/js/include/system.js" />"></script>
-<script type="text/javascript" src="<c:url value="/resources/js/common/user/groupprogram.js" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/user/groupprogram.js?v=260227A" />"></script>
 </head>
 
 <!-- BODY 상단 INCLUDE -->
@@ -46,10 +46,10 @@
 <div id="search-toolbar" class="wui-toolbar">
 	<form id="search-form">
         <fieldset class="Remake-div-line-new wd-100">
-            <table cellpadding="7" class="search-table tableSearch-c">
+            <table cellpadding="0" class="search-table tableSearch-c wd-100">
             	<colgroup>
-	           		<col width="7%" style="min-width: 127px;" />
-	           		<col width="13%" style="min-width: 165px;" />
+	           		<col width="55px" />
+	           		<col width="150px" />
 	           		<col width="*" />
             	</colgroup>
             	<tr class="topnav_sty">
@@ -65,7 +65,7 @@
             	</tr>
 
 	            <tr>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_001"><span>Group Name </span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>Group Name </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="groupId" ID="groupId" data-options="width:150">
 							<option value="">ALL</option>
@@ -84,8 +84,8 @@
                     <td class="h">
                     	<div class="dis_flex_gap4">
 						    <!-- <a href="javascript:void(0)" class="easyui-linkbutton cgray" iconCls="icon-reload" id="reload-button">초기화</a> -->
-						    <!-- <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-search'" id="search-button">검색</a> -->
-						    <a href="javascript:void(0)" class="easyui-linkbutton c6" id="append-button" data-item="BTN_002" data-options="disabled:${INS}" >Add</a>
+						    <!-- <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-search'" id="search-button">조회</a> -->
+						    <a href="javascript:void(0)" class="easyui-linkbutton c6" id="append-button" data-item="BTN_006" data-options="disabled:${INS}" >Add</a>
 						    <a href="javascript:void(0)" class="easyui-linkbutton c6" id="remove-button" data-item="BTN_003" data-options="disabled:${DEL}" >Del</a>
 						    <a href="javascript:void(0)" class="easyui-linkbutton c6" id="save-button"   data-item="BTN_004" data-options="disabled:${UPD}" >Save</a>
 						    <a href="javascript:void(0)" class="easyui-linkbutton c4" id="excel-button"  data-item="BTN_005">Excel Download <img src="<%=request.getContextPath() %>/resources/images/excel_download.png" style="width: 16px; height: 16px; margin-left: 5px;"></a>
@@ -130,7 +130,7 @@
 
 
 <!-- 엑셀  진행상태 -->
-<div id="progress-popup" class="easyui-dialog" >
+<div id="progress-popup" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>

@@ -69,13 +69,19 @@
 <table id="search-grid"></table>
 
 <div id="search-toolbar" class="wui-toolbar">
-
 	<form id="search-form" class="brd_srch_div">
-		<fieldset class="div-line-new">
-		<!-- <fieldset class="Remake-div-line-new" > -->
 			<input type="hidden" name="sysId"    id="s_sysId"    value="${model.sysId}"   />
 			<input type="hidden" name="bordGrup" id="s_bordGrup" value="${model.bordGrup}"/>
-            <table cellpadding="5" class="search-table wd-100" >
+            
+            <!-- 검색 영역 -->
+			<fieldset class="Remake-div-line-new" >
+             <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+				<colgroup>
+					<col width="120px" />
+					<col width="250px" />
+					<col width="120px" />
+					<col width="*">
+				</colgroup>
 				<tr class="topnav_sty">
             		<td colspan="4" >
             			<div>
@@ -88,17 +94,23 @@
             	</tr>
 
 				<tr>
-					<td style="padding-left: 10px;">
-						<div class="dis_flex_gap5">
-							<input class="easyui-combobox" name="searchKey"  id="s_searchKey"  value="${model.searchKey}"  codeGrup="BORD_STYPE" data-options="mode:'remote',width:100,editable:false,loader:jcombo.loader,panelHeight:'auto'"/>
-							<span id="searchExt" style="width:calc(100% - 100px);">
-								<input class="easyui-textbox"  name="searchText" id="r_searchText" value="${model.searchText}" />
-							</span>
-							<span id="writeDate" class="dis_flex" style="display:none; width:calc(100% - 100px);" >
-								<input class="easyui-datebox date-L" name="date1" id="date1" value="${date1}" />
-								<input class="easyui-datebox date-R" name="date2" id="date2" value="${date2}" />
-							</span>
-						</div>
+					<td class="h table-Search-h search-label-h">
+						<input class="easyui-combobox" name="searchKey"  id="s_searchKey"  value="${model.searchKey}"  codeGrup="BORD_STYPE" data-options="mode:'remote',width:100,editable:false,loader:jcombo.loader,panelHeight:'auto'"/>
+					</td>
+					<td class="d">
+						<span id="searchExt" style="width:calc(100% - 100px);">
+							<input class="easyui-textbox"  name="searchText" id="r_searchText" value="${model.searchText}" />
+						</span>
+						
+						<span id="writeDate" class="" style="display:none; width:calc(100% - 100px);" >
+							<input class="easyui-datebox date-L" name="date1" id="date1" value="${date1}" />
+							<input class="easyui-datebox date-R" name="date2" id="date2" value="${date2}" />
+						</span>
+					</td>
+					<td class="d">
+						
+					</td>
+					<td class="d">
 					</td>
 				</tr>
 			</table>

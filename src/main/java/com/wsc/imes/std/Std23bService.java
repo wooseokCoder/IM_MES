@@ -111,7 +111,7 @@ public class Std23bService extends BaseService {
                 updParams.put("mcCode", capa.get("mcCode"));
                 updParams.put("workDate", holiDate);
                 updParams.put("capa", 0);
-                updParams.put("scomment", "");
+                updParams.put("scomment", null);
                 updateByMapper(NS_TSTD_MC_DAILYCAPA, "TSTD_MC_DAILYCAPA_UPD", updParams);
             }
         }
@@ -140,10 +140,13 @@ public class Std23bService extends BaseService {
         List<RecordMap> capaList = (List<RecordMap>) searchByMapper(
             NS_TSTD_MC_DAILYCAPA_QUERY, "TSTD_MC_DAILYCAPA_QUERY1", queryParams);
 
-        if (capaList != null) {
+        // [2026-02-13 SWS] AS-IS 버그 확인: STD23B.cs UPD3 루프 내에서 항상 dataTable.Rows[0]의
+        // MC_CODE만 참조하여 첫 번째 설비만 반복 갱신됨. 나머지 설비 CAPA는 0 상태로 방치.
+        // 정상이라면 각 row의 MC_CODE를 사용해야 하나, AS-IS 동작 유지를 위해 그대로 둠.
+        if (capaList != null && !capaList.isEmpty()) {
             String weekName = getWeekName(holiDate);
+            String mcCode = (String) capaList.get(0).get("mcCode");
             for (RecordMap capa : capaList) {
-                String mcCode = (String) capa.get("mcCode");
                 int defaultCapa = getDefaultCapa(pltCode, mcCode, weekName);
 
                 ParamsMap updParams = new ParamsMap();
@@ -151,7 +154,7 @@ public class Std23bService extends BaseService {
                 updParams.put("mcCode", mcCode);
                 updParams.put("workDate", holiDate);
                 updParams.put("capa", defaultCapa);
-                updParams.put("scomment", "");
+                updParams.put("scomment", null);
                 updateByMapper(NS_TSTD_MC_DAILYCAPA, "TSTD_MC_DAILYCAPA_UPD", updParams);
             }
         }

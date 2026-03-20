@@ -231,7 +231,7 @@ function doSave() {
 	}else if(tableUpdate == "Y"){
 		consts.easygrid.save();
 	}else{
-		$.messager.alert(msg.MSG0121,msg.MSG0023,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0022,msg.MSG0051);
 	}
 }
 
@@ -298,7 +298,7 @@ function doClickRow(index, row){
 function doCopyItem(){
 	var row = $('#search-grid').datagrid('getSelected');
 	if(row == null || row == ""){
-		$.messager.alert(msg.MSG0121,msg.MSG0047,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0013,msg.MSG0051);
 		return;
 	}
 	//

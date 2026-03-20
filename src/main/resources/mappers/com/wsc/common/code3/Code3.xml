@@ -6,454 +6,357 @@
 <mapper namespace="com.wsc.common.code3.Code3">
 
     <!-- ========================================================== -->
-    <!--   Oracle Paging Clause                                     -->
+    <!--   코드 목록 조회 (페이징)                                    -->
     <!-- ========================================================== -->
-    <sql id="pagingColumns">
-        <if test="start == null or end == null">
-            ,0 AS "rnum"
-        </if>
-    </sql>
-    <sql id="pagingOpen">
-        <if test="start != null and end != null">
-            SELECT *
-              FROM (
-                    SELECT X.*
-                      FROM (
-                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
-                              FROM (
-        </if>
-    </sql>
-    <sql id="pagingClose">
-        <if test="start != null and end != null">
-                                   ) Z1, (SELECT @rownum:=0 ) Z2
-                           ) X
-                     WHERE RNUM <![CDATA[< ]]> #{end}
-                   ) X
-             WHERE RNUM <![CDATA[>= ]]> #{start}
-        </if>
-    </sql>
-<!--     <sql id="sortClause">
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
-		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
-		        ${sort}
-		  	</foreach>
-	  	</if>
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
-               CODE_NAME
-	  	</if>
-    </sql>
-     -->
-
-    <sql id="sortClause">
-	  	SORT_SEQ
-    </sql>
-    <sql id="selectColumns">
-         SYS_ID        AS "sysId"
-        ,CODE_GRUP     AS "codeGrup"
-        ,CASE WHEN CODE_GRUP = '0' THEN CODE_NAME  ELSE (SELECT DISTINCT B.CODE_NAME FROM SYS_CODE B WHERE B.SYS_ID = 'WSC' AND B.CODE_CD = CODE_GRUP GROUP BY B.CODE_CD) END AS "codeGrup2"
-        ,CODE_CD       AS "codeCd"
-        ,(CASE WHEN #{gsLang} = 'ko'  THEN  CODE_NAME
-               WHEN #{gsLang} = 'en'  THEN ifnull(CODE_NAME_EN,CODE_NAME)
-               WHEN #{gsLang} = 'vi'  THEN ifnull(CODE_NAME_VI,CODE_NAME)
-               WHEN #{gsLang} = 'etc'  THEN ifnull(CODE_NAME_ETC,CODE_NAME)
-               ELSE CODE_NAME END)     AS "codeName"
-        ,CODE_NAME     AS "codeNameKr"
-        ,CODE_NAME_EN  AS "codeNameEn"
-        ,CODE_DESC     AS "codeDesc"
-        ,SORT_SEQ      AS "sortSeq"
-        ,USE_FLAG      AS "useFlag"
-        ,EXT_CHR01     AS "extChr01"
-        ,EXT_CHR02     AS "extChr02"
-        ,EXT_CHR03     AS "extChr03"
-        ,EXT_CHR04     AS "extChr04"
-        ,EXT_CHR05     AS "extChr05"
-        ,EXT_CHR06     AS "extChr06"
-        ,EXT_CHR07     AS "extChr07"
-        ,EXT_CHR08     AS "extChr08"
-        ,EXT_CHR09     AS "extChr09"
-        ,EXT_CHR10     AS "extChr10"
-        ,EXT_NUM01     AS "extNum01"
-        ,EXT_NUM02     AS "extNum02"
-        ,EXT_NUM03     AS "extNum03"
-        ,EXT_NUM04     AS "extNum04"
-        ,EXT_NUM05     AS "extNum05"
-        ,EXT_TEXT      AS "extText"
-        ,REGI_ID       AS "regiId"
-        ,DATE_FORMAT(REGI_DATE,'%Y-%m-%d %H:%i:%s')
-                       AS "regiDate"
-        ,CHNG_ID       AS "chngId"
-        ,DATE_FORMAT(CHNG_DATE,'%Y-%m-%d %H:%i:%s')
-                       AS "chngDate"
-    </sql>
-
-    <sql id="insertColumns-fields">
-           SYS_ID
-         , CODE_CD
-         , CODE_GRUP
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeNameKr)">, CODE_NAME </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeNameEn)">, CODE_NAME_EN </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDesc)">, CODE_DESC </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr01)">, EXT_CHR01 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr02)">, EXT_CHR02 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr03)">, EXT_CHR03 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr04)">, EXT_CHR04 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr05)">, EXT_CHR05 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr06)">, EXT_CHR06 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr07)">, EXT_CHR07 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr08)">, EXT_CHR08 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr09)">, EXT_CHR09 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr10)">, EXT_CHR10 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum01)">, EXT_NUM01 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum02)">, EXT_NUM02 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum03)">, EXT_NUM03 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum04)">, EXT_NUM04 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum05)">, EXT_NUM05 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extText )">, EXT_TEXT  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sortSeq )">, SORT_SEQ  </if>
-         , USE_FLAG
-         , REGI_ID
-         , REGI_DATE
-         , CHNG_ID
-         , CHNG_DATE
-    </sql>
-
-    <sql id="insertColumns-values">
-           #{sysId}
-         , #{codeCd}
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeGrup)">, #{codeGrup}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@empty(codeGrup)">, '0'  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeNameKr)">, #{codeNameKr}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeNameEn)">, #{codeNameEn}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDesc)">, #{codeDesc}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr01)">, #{extChr01}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr02)">, #{extChr02}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr03)">, #{extChr03}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr04)">, #{extChr04}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr05)">, #{extChr05}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr06)">, #{extChr06}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr07)">, #{extChr07}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr08)">, #{extChr08}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr09)">, #{extChr09}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr10)">, #{extChr10}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum01)">, #{extNum01}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum02)">, #{extNum02}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum03)">, #{extNum03}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum04)">, #{extNum04}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum05)">, #{extNum05}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extText )">, #{extText}   </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sortSeq )">, #{sortSeq}   </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag )">, #{useFlag}   </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@empty(useFlag )">, 'Y'   </if>
-         , #{gsUserId}
-         , NOW()
-         , #{gsUserId}
-         , NOW()
-    </sql>
-
-    <sql id="updateColumns">
-          CHNG_ID   = #{gsUserId}
-        , CHNG_DATE = NOW()
-        , CODE_NAME = #{codeNameKr}
-        , CODE_NAME_EN = #{codeNameEn}
-        , CODE_DESC = #{codeDesc}
-        , SORT_SEQ  = #{sortSeq}
-        , USE_FLAG  = #{useFlag}
-        , EXT_CHR01 = #{extChr01}
-        , EXT_CHR02 = #{extChr02}
-        , EXT_CHR03 = #{extChr03}
-        , EXT_CHR04 = #{extChr04}
-        , EXT_CHR05 = #{extChr05}
-        , EXT_CHR06 = #{extChr06}
-        , EXT_CHR07 = #{extChr07}
-        , EXT_CHR08 = #{extChr08}
-        , EXT_CHR09 = #{extChr09}
-        , EXT_CHR10 = #{extChr10}
-        , EXT_TEXT  = 'Y'
-    </sql>
-
-    <sql id="whereClause">
-    	SYS_ID = #{sysId}
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeGrup)">AND CODE_GRUP = #{codeGrup}</if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@empty(codeGrup   )">AND CODE_GRUP IS NULL</if>
-        AND CODE_GRUP != '0'
-        AND USE_FLAG = 'Y'
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeCd  )">AND CODE_CD   = #{codeCd}    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDesc)">AND (CODE_NAME LIKE CONCAT('%',#{codeDesc},'%') </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDesc)">OR CODE_DESC LIKE CONCAT('%',#{codeDesc},'%')   </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDesc)">OR EXT_TEXT LIKE CONCAT('%', #{codeDesc},'%'))  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sortSeq )">AND SORT_SEQ  = #{sortSeq}   </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag )">AND USE_FLAG  = #{useFlag}   </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr01)">AND EXT_CHR01 = #{extChr01}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr02)">AND EXT_CHR02 = #{extChr02}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr03)">AND EXT_CHR03 = #{extChr03}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr04)">AND EXT_CHR04 = #{extChr04}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr05)">AND EXT_CHR05 = #{extChr05}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr06)">AND EXT_CHR06 = #{extChr06}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr07)">AND EXT_CHR07 = #{extChr07}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr08)">AND EXT_CHR08 = #{extChr08}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr09)">AND EXT_CHR09 = #{extChr09}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr10)">AND EXT_CHR10 = #{extChr10}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum01)">AND EXT_NUM01 = #{extNum01}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum02)">AND EXT_NUM02 = #{extNum02}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum03)">AND EXT_NUM03 = #{extNum03}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum04)">AND EXT_NUM04 = #{extNum04}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum05)">AND EXT_NUM05 = #{extNum05}  </if>
-    </sql>
-
-    <sql id="whereClause-search">
-    	SYS_ID = #{sysId}
-    	<choose>
-    		<when test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeGrup)">
-    			AND CODE_GRUP = CASE WHEN #{codeGrup} = 'ALL' THEN CODE_GRUP ELSE #{codeGrup} END
-    			AND CODE_CD != '0'
-    		</when>
-    		<otherwise>
-    			AND CODE_GRUP = '0'
-    			AND CODE_CD != '0'
-    		</otherwise>
-    	</choose>
-
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeCd  )">AND CODE_CD   LIKE CONCAT('%',#{codeCd},'%')    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDesc)">AND (CODE_NAME LIKE CONCAT('%',#{codeDesc},'%') </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDesc)">OR CODE_DESC LIKE CONCAT('%',#{codeDesc},'%')   </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDesc)">OR EXT_TEXT LIKE CONCAT('%', #{codeDesc},'%'))  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(sortSeq )">AND SORT_SEQ  = #{sortSeq}   </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(useFlag )">AND USE_FLAG  = CASE WHEN #{useFlag}= 'ALL' THEN USE_FLAG ELSE  #{useFlag} END  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr01)">AND EXT_CHR01 = #{extChr01}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr02)">AND EXT_CHR02 = #{extChr02}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr03)">AND EXT_CHR03 = #{extChr03}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr04)">AND EXT_CHR04 = #{extChr04}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr05)">AND EXT_CHR05 = #{extChr05}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr06)">AND EXT_CHR06 = #{extChr06}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr07)">AND EXT_CHR07 = #{extChr07}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr08)">AND EXT_CHR08 = #{extChr08}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr09)">AND EXT_CHR09 = #{extChr09}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extChr10)">AND EXT_CHR10 = #{extChr10}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum01)">AND EXT_NUM01 = #{extNum01}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum02)">AND EXT_NUM02 = #{extNum02}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum03)">AND EXT_NUM03 = #{extNum03}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum04)">AND EXT_NUM04 = #{extNum04}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(extNum05)">AND EXT_NUM05 = #{extNum05}  </if>
-    </sql>
-
-    <select id="search" resultType="code" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectColumns" />
-               <include refid="pagingColumns" /><!-- PAGING -->
-          FROM SYS_CODE A
-         WHERE <include refid="whereClause-search" />
-         ORDER
-            BY <include refid="sortClause" /><!-- SORT -->
-        <include refid="pagingClose" /><!-- PAGING -->
+    <select id="search" resultType="code" parameterType="params" statementType="CALLABLE">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_code3_search(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR},
+            #{codeCd, mode=IN, jdbcType=VARCHAR},
+            #{codeDesc, mode=IN, jdbcType=VARCHAR},
+            #{sortSeq, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{extChr01, mode=IN, jdbcType=VARCHAR},
+            #{extChr02, mode=IN, jdbcType=VARCHAR},
+            #{extChr03, mode=IN, jdbcType=VARCHAR},
+            #{extChr04, mode=IN, jdbcType=VARCHAR},
+            #{extChr05, mode=IN, jdbcType=VARCHAR},
+            #{extChr06, mode=IN, jdbcType=VARCHAR},
+            #{extChr07, mode=IN, jdbcType=VARCHAR},
+            #{extChr08, mode=IN, jdbcType=VARCHAR},
+            #{extChr09, mode=IN, jdbcType=VARCHAR},
+            #{extChr10, mode=IN, jdbcType=VARCHAR},
+            #{extNum01, mode=IN, jdbcType=VARCHAR},
+            #{extNum02, mode=IN, jdbcType=VARCHAR},
+            #{extNum03, mode=IN, jdbcType=VARCHAR},
+            #{extNum04, mode=IN, jdbcType=VARCHAR},
+            #{extNum05, mode=IN, jdbcType=VARCHAR},
+            #{gsLang, mode=IN, jdbcType=VARCHAR},
+            #{sortStr, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=VARCHAR},
+            #{end, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="searchCount" resultType="int" parameterType="params">
-        SELECT COUNT(1)
-          FROM SYS_CODE A
-         WHERE <include refid="whereClause-search" />
+
+    <!-- ========================================================== -->
+    <!--   코드 목록 카운트                                          -->
+    <!-- ========================================================== -->
+    <select id="searchCount" resultType="int" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_search_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR},
+            #{codeCd, mode=IN, jdbcType=VARCHAR},
+            #{codeDesc, mode=IN, jdbcType=VARCHAR},
+            #{sortSeq, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{extChr01, mode=IN, jdbcType=VARCHAR},
+            #{extChr02, mode=IN, jdbcType=VARCHAR},
+            #{extChr03, mode=IN, jdbcType=VARCHAR},
+            #{extChr04, mode=IN, jdbcType=VARCHAR},
+            #{extChr05, mode=IN, jdbcType=VARCHAR},
+            #{extChr06, mode=IN, jdbcType=VARCHAR},
+            #{extChr07, mode=IN, jdbcType=VARCHAR},
+            #{extChr08, mode=IN, jdbcType=VARCHAR},
+            #{extChr09, mode=IN, jdbcType=VARCHAR},
+            #{extChr10, mode=IN, jdbcType=VARCHAR},
+            #{extNum01, mode=IN, jdbcType=VARCHAR},
+            #{extNum02, mode=IN, jdbcType=VARCHAR},
+            #{extNum03, mode=IN, jdbcType=VARCHAR},
+            #{extNum04, mode=IN, jdbcType=VARCHAR},
+            #{extNum05, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="select" resultType="code" parameterType="params">
-        SELECT <include refid="selectColumns" />
-          FROM SYS_CODE A
-         WHERE SYS_ID    = #{sysId}
-           AND CODE_CD   = #{codeCd}
-           AND CODE_GRUP = #{codeGrup}
-           ORDER BY SORT_SEQ
+
+    <!-- ========================================================== -->
+    <!--   코드 단건 조회                                            -->
+    <!-- ========================================================== -->
+    <select id="select" resultType="code" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_select(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeCd, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR},
+            #{gsLang, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <insert id="insert" parameterType="params">
-        INSERT
-          INTO SYS_CODE
-             ( <include refid="insertColumns-fields" /> )
-        VALUES
-             ( <include refid="insertColumns-values" /> )
+
+    <!-- ========================================================== -->
+    <!--   코드 등록                                                 -->
+    <!-- ========================================================== -->
+    <insert id="insert" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_insert(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeCd, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR},
+            #{codeNameKr, mode=IN, jdbcType=VARCHAR},
+            #{codeNameEn, mode=IN, jdbcType=VARCHAR},
+            #{codeDesc, mode=IN, jdbcType=VARCHAR},
+            #{sortSeq, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{extChr01, mode=IN, jdbcType=VARCHAR},
+            #{extChr02, mode=IN, jdbcType=VARCHAR},
+            #{extChr03, mode=IN, jdbcType=VARCHAR},
+            #{extChr04, mode=IN, jdbcType=VARCHAR},
+            #{extChr05, mode=IN, jdbcType=VARCHAR},
+            #{extChr06, mode=IN, jdbcType=VARCHAR},
+            #{extChr07, mode=IN, jdbcType=VARCHAR},
+            #{extChr08, mode=IN, jdbcType=VARCHAR},
+            #{extChr09, mode=IN, jdbcType=VARCHAR},
+            #{extChr10, mode=IN, jdbcType=VARCHAR},
+            #{extNum01, mode=IN, jdbcType=VARCHAR},
+            #{extNum02, mode=IN, jdbcType=VARCHAR},
+            #{extNum03, mode=IN, jdbcType=VARCHAR},
+            #{extNum04, mode=IN, jdbcType=VARCHAR},
+            #{extNum05, mode=IN, jdbcType=VARCHAR},
+            #{extText, mode=IN, jdbcType=LONGVARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </insert>
-    <update id="update" parameterType="params">
-        UPDATE SYS_CODE
-           SET <include refid="updateColumns" />
-         WHERE SYS_ID    = #{sysId}
-           AND CODE_CD   = #{codeCd}
-           AND CODE_GRUP = #{codeGrup}
+
+    <!-- ========================================================== -->
+    <!--   코드 수정                                                 -->
+    <!-- ========================================================== -->
+    <update id="update" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_update(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeCd, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR},
+            #{codeNameKr, mode=IN, jdbcType=VARCHAR},
+            #{codeNameEn, mode=IN, jdbcType=VARCHAR},
+            #{codeDesc, mode=IN, jdbcType=VARCHAR},
+            #{sortSeq, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{extChr01, mode=IN, jdbcType=VARCHAR},
+            #{extChr02, mode=IN, jdbcType=VARCHAR},
+            #{extChr03, mode=IN, jdbcType=VARCHAR},
+            #{extChr04, mode=IN, jdbcType=VARCHAR},
+            #{extChr05, mode=IN, jdbcType=VARCHAR},
+            #{extChr06, mode=IN, jdbcType=VARCHAR},
+            #{extChr07, mode=IN, jdbcType=VARCHAR},
+            #{extChr08, mode=IN, jdbcType=VARCHAR},
+            #{extChr09, mode=IN, jdbcType=VARCHAR},
+            #{extChr10, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </update>
-    <delete id="delete" parameterType="params">
-        DELETE
-          FROM SYS_CODE
-         WHERE SYS_ID    = #{sysId}
-           AND CODE_CD   = #{codeCd}
-           AND CODE_GRUP = #{codeGrup}
-    </delete>
-    <select id="searchAll" resultType="code" parameterType="params">
-        SELECT <include refid="selectColumns" />
-          FROM SYS_CODE
-         WHERE SYS_ID   = #{sysId}
-           AND CODE_CD != '0'
-           AND USE_FLAG = 'Y'
-         ORDER BY
-                SYS_ID
-               ,CODE_GRUP
-               ,SORT_SEQ
-               ,CODE_CD
-               ,CODE_NAME
-    </select>
-    <delete id="deleteAll" parameterType="params">
-        DELETE
-          FROM SYS_CODE
-         WHERE SYS_ID    = #{sysId}
-           AND CODE_GRUP = #{codeGrup}
+
+    <!-- ========================================================== -->
+    <!--   코드 삭제                                                 -->
+    <!-- ========================================================== -->
+    <delete id="delete" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_delete(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeCd, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR}
+        )}
     </delete>
 
     <!-- ========================================================== -->
-    <!--   Code Change History                                      -->
+    <!--   전체 코드 조회                                            -->
     <!-- ========================================================== -->
-    <insert id="insertHist" parameterType="params">
-        INSERT
-          INTO SYS_CODE_HIST
-             ( <include refid="insertColumns-fields" />
-	         , HIST_TYPE
-	         , HIST_DATE
-             )
-        VALUES
-             ( <include refid="insertColumns-values" />
-	         , #{histType}
-	         , NOW()
-             )
+    <select id="searchAll" resultType="code" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_search_all(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{gsLang, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- ========================================================== -->
+    <!--   코드 그룹 전체 삭제                                       -->
+    <!-- ========================================================== -->
+    <delete id="deleteAll" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_delete_all(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+    <!-- ========================================================== -->
+    <!--   코드 변경 이력 등록                                       -->
+    <!-- ========================================================== -->
+    <insert id="insertHist" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_insert_hist(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeCd, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR},
+            #{codeNameKr, mode=IN, jdbcType=VARCHAR},
+            #{codeNameEn, mode=IN, jdbcType=VARCHAR},
+            #{codeDesc, mode=IN, jdbcType=VARCHAR},
+            #{sortSeq, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{extChr01, mode=IN, jdbcType=VARCHAR},
+            #{extChr02, mode=IN, jdbcType=VARCHAR},
+            #{extChr03, mode=IN, jdbcType=VARCHAR},
+            #{extChr04, mode=IN, jdbcType=VARCHAR},
+            #{extChr05, mode=IN, jdbcType=VARCHAR},
+            #{extChr06, mode=IN, jdbcType=VARCHAR},
+            #{extChr07, mode=IN, jdbcType=VARCHAR},
+            #{extChr08, mode=IN, jdbcType=VARCHAR},
+            #{extChr09, mode=IN, jdbcType=VARCHAR},
+            #{extChr10, mode=IN, jdbcType=VARCHAR},
+            #{extNum01, mode=IN, jdbcType=VARCHAR},
+            #{extNum02, mode=IN, jdbcType=VARCHAR},
+            #{extNum03, mode=IN, jdbcType=VARCHAR},
+            #{extNum04, mode=IN, jdbcType=VARCHAR},
+            #{extNum05, mode=IN, jdbcType=VARCHAR},
+            #{extText, mode=IN, jdbcType=LONGVARCHAR},
+            #{histType, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </insert>
 
     <!-- ========================================================== -->
-    <!--   Code Term Management                                     -->
+    <!--   코드 기간 목록 조회 (페이징)                               -->
     <!-- ========================================================== -->
-    <select id="searchTerm" resultType="code" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectColumns" />
-             , CODE_DATE     AS "codeDate"
-               <include refid="pagingColumns" /><!-- PAGING -->
-          FROM SYS_CODE_TERM A
-         WHERE <include refid="whereClause" />
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDate)">
-           AND CODE_DATE = #{codeDate}
-        </if>
-         ORDER
-            BY <include refid="sortClause" /><!-- SORT -->
-        <include refid="pagingClose" /><!-- PAGING -->
+    <select id="searchTerm" resultType="code" parameterType="params" statementType="CALLABLE">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_code3_search_term(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR},
+            #{codeCd, mode=IN, jdbcType=VARCHAR},
+            #{codeDesc, mode=IN, jdbcType=VARCHAR},
+            #{sortSeq, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{extChr01, mode=IN, jdbcType=VARCHAR},
+            #{extChr02, mode=IN, jdbcType=VARCHAR},
+            #{extChr03, mode=IN, jdbcType=VARCHAR},
+            #{extChr04, mode=IN, jdbcType=VARCHAR},
+            #{extChr05, mode=IN, jdbcType=VARCHAR},
+            #{extChr06, mode=IN, jdbcType=VARCHAR},
+            #{extChr07, mode=IN, jdbcType=VARCHAR},
+            #{extChr08, mode=IN, jdbcType=VARCHAR},
+            #{extChr09, mode=IN, jdbcType=VARCHAR},
+            #{extChr10, mode=IN, jdbcType=VARCHAR},
+            #{extNum01, mode=IN, jdbcType=VARCHAR},
+            #{extNum02, mode=IN, jdbcType=VARCHAR},
+            #{extNum03, mode=IN, jdbcType=VARCHAR},
+            #{extNum04, mode=IN, jdbcType=VARCHAR},
+            #{extNum05, mode=IN, jdbcType=VARCHAR},
+            #{codeDate, mode=IN, jdbcType=VARCHAR},
+            #{gsLang, mode=IN, jdbcType=VARCHAR},
+            #{sortStr, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=VARCHAR},
+            #{end, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="searchTermCount" resultType="int" parameterType="params">
-        SELECT COUNT(1)
-          FROM SYS_CODE_TERM A
-         WHERE <include refid="whereClause" />
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(codeDate)">
-           AND CODE_DATE = #{codeDate}
-        </if>
+
+    <!-- ========================================================== -->
+    <!--   코드 기간 목록 카운트                                      -->
+    <!-- ========================================================== -->
+    <select id="searchTermCount" resultType="int" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_search_term_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR},
+            #{codeCd, mode=IN, jdbcType=VARCHAR},
+            #{codeDesc, mode=IN, jdbcType=VARCHAR},
+            #{sortSeq, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{extChr01, mode=IN, jdbcType=VARCHAR},
+            #{extChr02, mode=IN, jdbcType=VARCHAR},
+            #{extChr03, mode=IN, jdbcType=VARCHAR},
+            #{extChr04, mode=IN, jdbcType=VARCHAR},
+            #{extChr05, mode=IN, jdbcType=VARCHAR},
+            #{extChr06, mode=IN, jdbcType=VARCHAR},
+            #{extChr07, mode=IN, jdbcType=VARCHAR},
+            #{extChr08, mode=IN, jdbcType=VARCHAR},
+            #{extChr09, mode=IN, jdbcType=VARCHAR},
+            #{extChr10, mode=IN, jdbcType=VARCHAR},
+            #{extNum01, mode=IN, jdbcType=VARCHAR},
+            #{extNum02, mode=IN, jdbcType=VARCHAR},
+            #{extNum03, mode=IN, jdbcType=VARCHAR},
+            #{extNum04, mode=IN, jdbcType=VARCHAR},
+            #{extNum05, mode=IN, jdbcType=VARCHAR},
+            #{codeDate, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="selectTerm" resultType="code" parameterType="params">
-        SELECT <include refid="selectColumns" />
-             , CODE_DATE     AS "codeDate"
-          FROM SYS_CODE_TERM A
-         WHERE SYS_ID    = #{sysId}
-           AND CODE_CD   = #{codeCd}
-           AND CODE_GRUP = #{codeGrup}
+
+    <!-- ========================================================== -->
+    <!--   코드 기간 단건 조회                                        -->
+    <!-- ========================================================== -->
+    <select id="selectTerm" resultType="code" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_select_term(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeCd, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR},
+            #{gsLang, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <insert id="insertTerm" parameterType="params">
-        INSERT
-          INTO SYS_CODE_TERM
-             ( <include refid="insertColumns-fields" />
-        	 , CODE_DATE
-             )
-        VALUES
-             ( <include refid="insertColumns-values" />
-        	 , #{codeDate}
-             )
+
+    <!-- ========================================================== -->
+    <!--   코드 기간 등록                                            -->
+    <!-- ========================================================== -->
+    <insert id="insertTerm" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_insert_term(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeCd, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR},
+            #{codeNameKr, mode=IN, jdbcType=VARCHAR},
+            #{codeNameEn, mode=IN, jdbcType=VARCHAR},
+            #{codeDesc, mode=IN, jdbcType=VARCHAR},
+            #{sortSeq, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{extChr01, mode=IN, jdbcType=VARCHAR},
+            #{extChr02, mode=IN, jdbcType=VARCHAR},
+            #{extChr03, mode=IN, jdbcType=VARCHAR},
+            #{extChr04, mode=IN, jdbcType=VARCHAR},
+            #{extChr05, mode=IN, jdbcType=VARCHAR},
+            #{extChr06, mode=IN, jdbcType=VARCHAR},
+            #{extChr07, mode=IN, jdbcType=VARCHAR},
+            #{extChr08, mode=IN, jdbcType=VARCHAR},
+            #{extChr09, mode=IN, jdbcType=VARCHAR},
+            #{extChr10, mode=IN, jdbcType=VARCHAR},
+            #{extNum01, mode=IN, jdbcType=VARCHAR},
+            #{extNum02, mode=IN, jdbcType=VARCHAR},
+            #{extNum03, mode=IN, jdbcType=VARCHAR},
+            #{extNum04, mode=IN, jdbcType=VARCHAR},
+            #{extNum05, mode=IN, jdbcType=VARCHAR},
+            #{extText, mode=IN, jdbcType=LONGVARCHAR},
+            #{codeDate, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </insert>
-    <delete id="deleteTerm" parameterType="params">
-        DELETE
-          FROM SYS_CODE_TERM
-         WHERE SYS_ID    = #{sysId}
-           AND CODE_CD   = #{codeCd}
-           AND CODE_GRUP = #{codeGrup}
-           AND CODE_DATE = #{codeDate}
+
+    <!-- ========================================================== -->
+    <!--   코드 기간 삭제                                            -->
+    <!-- ========================================================== -->
+    <delete id="deleteTerm" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_delete_term(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeCd, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup, mode=IN, jdbcType=VARCHAR},
+            #{codeDate, mode=IN, jdbcType=VARCHAR}
+        )}
     </delete>
-	<select id="searchCodeAs" resultType="record" parameterType="params">
-		SELECT CONCAT(CODE_GRUP,CODE_DESC) AS CODE_GRUP
-		     , CODE_CD
-		     , CODE_NAME
-		     , EXT_CHR01
-		     , SORT_SEQ
-		     , CODE_DESC
-		  FROM SYS_CODE
-		 WHERE SYS_ID = #{sysId}
-		   AND CODE_GRUP ="INCOME_TYPE"
-		   AND CODE_DESC IN(${codeGrup2})
-		   AND USE_FLAG = 'Y'
-		   ORDER BY SORT_SEQ
 
-	</select>
+    <!-- ========================================================== -->
+    <!--   AS 코드 조회                                              -->
+    <!-- ========================================================== -->
+    <select id="searchCodeAs" resultType="record" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_search_code_as(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{codeGrup2, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
 
-	<select id="searchCustProd" resultType="record" parameterType="params">
-		SELECT A.CUST_NAME, A.CUST_CODE ,2 as sortnum
-		FROM CUST_MAST A
-		WHERE A.SYS_ID = 'WSC' AND USE_IDX = 'Y' AND MAK_CUST = 'Y'
-		UNION ALL
-		SELECT '공장' AS CUST_NAME, '02' AS CUST_CODE, 1 as sortnum
-		ORDER BY sortnum, CUST_NAME
+    <!-- ========================================================== -->
+    <!--   고객 제품 조회                                            -->
+    <!-- ========================================================== -->
+    <select id="searchCustProd" resultType="record" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_search_cust_prod()}
+    </select>
 
-	</select>
+    <!-- ========================================================== -->
+    <!--   전체 제품 조회                                            -->
+    <!-- ========================================================== -->
+    <select id="searchAllProd" resultType="record" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_search_all_prod()}
+    </select>
 
-	<select id="searchAllProd" resultType="record" parameterType="params">
-		SELECT A.CUST_NAME, A.CUST_CODE, 20 AS SORT_SEQ
-		FROM CUST_MAST A
-		WHERE A.SYS_ID = 'WSC' AND USE_IDX = 'Y' AND MAK_CUST = 'Y'
-		UNION ALL
-		SELECT CODE_NAME AS CUST_NAME, CODE_CD AS CUST_CODE, SORT_SEQ
-		FROM SYS_CODE
-		WHERE CODE_GRUP = 'STRG_TYPE' AND USE_FLAG = 'Y'
-		ORDER BY SORT_SEQ
+    <!-- ========================================================== -->
+    <!--   외주 고객 창고 조회                                        -->
+    <!-- ========================================================== -->
+    <select id="searchOutsCustStrg" resultType="record" parameterType="params" statementType="CALLABLE">
+        {CALL sp_code3_search_outs_cust_strg()}
+    </select>
 
-	</select>
-
-	<select id="searchOutsCustStrg" resultType="record" parameterType="params">
-		SELECT CONCAT("[",A.CODE_NAME , "] - ", (SELECT CUST_NAME FROM CUST_MAST WHERE SYS_ID = 'WSC' AND CUST_CODE = B.CUST_CODE)) AS CUST_NAME
-				 , A.CODE_CD AS CUST_CODE
-				 , A.SORT_SEQ AS SORT_SEQ
-		  FROM (SELECT SYS_ID,
-		               CODE_NAME,
-		               CODE_CD,
-		               EXT_CHR02,
-		               SORT_SEQ
-		          FROM SYS_CODE
-		         WHERE CODE_GRUP = 'STRG_TYPE' AND USE_FLAG = 'Y') A,
-		       (SELECT SYS_ID, CUST_CODE
-		          FROM CUST_MAST A
-		         WHERE A.SYS_ID = 'WSC' AND A.CUST_TYPE = '09') B
-		 WHERE A.SYS_ID = B.SYS_ID AND A.EXT_CHR02 = B.CUST_CODE
-	</select>
-	
-	<!--  Dealer Update -->
-<!--     <update id="updateExtChr" parameterType="params"> -->
-<!--     	UPDATE SYS_CODE -->
-<!--     	   SET EXT_CHR01 = IFNULL(#{extChr01},'') -->
-<!--     	 	 , EXT_CHR02 = IFNULL(#{extChr02},'') -->
-<!--     	 	 , EXT_CHR03 = IFNULL(#{extChr03},'') -->
-<!--     	 	 , EXT_CHR04 = IFNULL(#{extChr04},'') -->
-<!--     	 	 , EXT_CHR05 = IFNULL(#{extChr05},'') -->
-<!--     	 	 , EXT_CHR06 = IFNULL(#{extChr06},'') -->
-<!--     	 	 , EXT_CHR07 = IFNULL(#{extChr07},'') -->
-<!--     	 	 , EXT_CHR08 = IFNULL(#{extChr08},'') -->
-<!--     	 	 , EXT_CHR09 = IFNULL(#{extChr09},'') -->
-<!-- 			 , EXT_CHR10 = IFNULL(#{extChr10},'') -->
-<!--     	     , CHNG_ID	 = #{gsUserId} -->
-<!--     	     , CHNG_DATE = NOW() -->
-<!--     	 WHERE SYS_ID    = #{sysId} -->
-<!--     	   AND CODE_GRUP = #{codeGrup} -->
-<!--     	   AND CODE_CD   = #{codeCd} -->
-<!--     </update> -->
-<!--     <update id="updateExtNum" parameterType="params"> -->
-<!--     	UPDATE SYS_CODE -->
-<!--     	   SET EXT_NUM01 = IF(#{extNum01}='',0,#{extNum01}) -->
-<!--     	 	 , EXT_NUM02 = IF(#{extNum02}='',0,#{extNum02}) -->
-<!--     	 	 , EXT_NUM03 = IF(#{extNum03}='',0,#{extNum03}) -->
-<!--     	 	 , EXT_NUM04 = IF(#{extNum04}='',0,#{extNum04}) -->
-<!--     	 	 , EXT_NUM05 = IF(#{extNum05}='',0,#{extNum05}) -->
-<!--     	     , CHNG_ID	 = #{gsUserId} -->
-<!--     	     , CHNG_DATE = NOW() -->
-<!--     	 WHERE SYS_ID    = #{sysId} -->
-<!--     	   AND CODE_GRUP = #{codeGrup} -->
-<!--     	   AND CODE_CD   = #{codeCd} -->
-<!--     </update> -->
 </mapper>

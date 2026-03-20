@@ -50,10 +50,11 @@ var consts = {
 		//그리드 생성
 		this.easygrid.init({
 			fit: true,
+			fitColumns: false,
 			pageSize: this.pageSize,
 			toolbar:  "#search-toolbar",
 			idField:  'progId',
-			onResize: doResize_Single, //2016/09/23 김영진 수정 --화면 사이즈 고정 이벤트
+			//onResize: doResize_Single, //2016/09/23 김영진 수정 --화면 사이즈 고정 이벤트
 			singleSelect: true,
 			//그리드 편집이벤트 바인딩
 			onClickRow:   this.easygrid.clickRowEdit,
@@ -74,7 +75,7 @@ $(function() {
 	consts.init();
 
 	$('#progress-popup').dialog({
-	       title: tit.TITLE0009,
+	       title: tit.TITLE0003,
 	       top:     100,
 	       width: 200,
 	       height: 200,
@@ -142,6 +143,8 @@ $(window).load(function() {
 				doSearch();
 			}
 		});
+
+		doSearch();
 
 	}, 100);
 

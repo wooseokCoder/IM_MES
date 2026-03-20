@@ -91,8 +91,8 @@ public class PasswordController extends BaseController {
 	//Log IN 화면에서 사용 (chkPw에서  마스터키기능 추가로 인해 추가시킴)
 	@RequestMapping(value = "/userPwChk2.json")
 	public String userPwChk2(HttpServletRequest request, Model model) {
-		// 파라메터를 가져온다.
-    	ParamsMap params = getParams(request, true);
+		// 파라메터를 가져온다. (로그인 전 API이므로 세션 정보 사용 안함)
+    	ParamsMap params = getParams(request, false);
     	
     	Object result = passwordService.select("chkUserPw2", params);
 	    
@@ -155,8 +155,8 @@ public class PasswordController extends BaseController {
 	
 	@RequestMapping(value = "/chkUserChar.json")
 	public String chkUserChar(HttpServletRequest request, Model model) {
-		// 파라메터를 가져온다.
-    	ParamsMap params = getParams(request, true);
+		// 파라메터를 가져온다. (로그인 전 API이므로 세션 정보 사용 안함)
+    	ParamsMap params = getParams(request, false);
     	
     	Object result = passwordService.select("chkUserChar", params);
 	    

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSYS_SERIAL_QUERY.xml
+설명: 일련번호 조회 매퍼 (TSYS_SERIAL 테이블)
+작성자: 송우석
+작성일: 2026-02-10
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TSYS_SERIAL_QUERY">
+
+    <!--
+    ============================================================
+    TSYS_SERIAL_QUERY1: 일련번호 목록 조회
+    용도: 메인 그리드 목록 조회 (모델 검색, IS_HOGI 필터)
+    ============================================================
+    -->
+    <select id="TSYS_SERIAL_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tsys_serial_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{modelLike, mode=IN, jdbcType=VARCHAR},
+            #{isHogi, mode=IN, jdbcType=VARCHAR},
+            #{srCode, mode=IN, jdbcType=VARCHAR},
+            #{srKey, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_WORKGROUP_QUERY.xml
+설명: 작업자 그룹 조회 매퍼 (TSTD_WORKGROUP + LSE_MACHINE + SYS_USER JOIN)
+원본: ProActive TSTD_WORKGROUP_QUERY.cs, TSTD_WORKGROUP_MC_QUERY.cs,
+      TSTD_WORKGROUP_EMP_QUERY.cs
+작성일: 2026-02-10
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_WORKGROUP_QUERY">
+
+    <!--
+    ============================================================
+    TSTD_WORKGROUP_QUERY1: 그룹 목록 조회 (메인 그리드)
+    원본: TSTD_WORKGROUP_QUERY.TSTD_WORKGROUP_QUERY1()
+    용도: 메인 화면 그리드 목록 조회 (LIKE 검색)
+    ============================================================
+    -->
+    <select id="TSTD_WORKGROUP_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_workgroup_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupLike, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_WORKGROUP_MC_QUERY1: 그룹 소속 작업장 조회 (JOIN LSE_MACHINE)
+    원본: TSTD_WORKGROUP_MC_QUERY.TSTD_WORKGROUP_MC_QUERY1()
+    용도: 그룹 상세 - 소속 작업장 목록
+    ============================================================
+    -->
+    <select id="TSTD_WORKGROUP_MC_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_workgroup_mc_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_WORKGROUP_EMP_QUERY1: 그룹 소속 작업자 조회 (JOIN SYS_USER)
+    원본: TSTD_WORKGROUP_EMP_QUERY.TSTD_WORKGROUP_EMP_QUERY1()
+    용도: 그룹 상세 - 소속 작업자 목록
+    ============================================================
+    -->
+    <select id="TSTD_WORKGROUP_EMP_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_workgroup_emp_query1(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{groupNo, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    LSE_MACHINE_QUERY8: 전체 작업장 목록 (다이얼로그용)
+    원본: STD50A.STD50A_SER3() → LSE_MACHINE 전체
+    용도: 다이얼로그에서 전체 작업장 목록 표시
+    ============================================================
+    -->
+    <select id="LSE_MACHINE_QUERY8" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_machine_query8(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcGroup, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_EMPLOYEE_QUERY9: 전체 작업자 목록 (다이얼로그용)
+    원본: STD50A.STD50A_SER3() → SYS_USER (TSTD_EMPLOYEE에서 전환)
+    용도: 다이얼로그에서 전체 작업자 목록 표시
+    ============================================================
+    -->
+    <select id="TSTD_EMPLOYEE_QUERY9" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_sys_user_query9(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{isAssy, mode=IN, jdbcType=INTEGER},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+</mapper>

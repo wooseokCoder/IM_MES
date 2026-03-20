@@ -173,7 +173,7 @@ function dateReSort2(date1, date2) {
 					</td>
 
 				<td class="b">
-					<a href="javascript:void(0)" id="search-cust_pop-button" class="easyui-linkbutton cgray">검색</a>
+					<a href="javascript:void(0)" id="search-cust_pop-button" class="easyui-linkbutton cgray">조회</a>
 				</td>
 	            </tr>
 	        </table>

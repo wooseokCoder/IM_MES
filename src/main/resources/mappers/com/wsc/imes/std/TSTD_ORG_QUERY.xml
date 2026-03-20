@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_ORG_QUERY.xml
+설명: 부서/사원 조회 매퍼
+원본: ProActive TSTD_ORG_QUERY.cs, TSTD_EMPLOYEE_QUERY.cs
+작성일: 2026-02-11
+============================================================================
+TSTD_EMPLOYEE → sys_user 전환 적용
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_ORG_QUERY">
+
+    <!--
+    ============================================================
+    TSTD_ORG_QUERY1: 부서 목록 조회 (단순)
+    원본: TSTD_ORG_QUERY.TSTD_ORG_QUERY1()
+    용도: 부서 선택 팝업/드롭다운 (acORG 컴포넌트 등)
+    ============================================================
+    -->
+    <select id="TSTD_ORG_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_org_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_ORG_QUERY2: 부서 트리 조회 (메인)
+    원본: TSTD_ORG_QUERY.TSTD_ORG_QUERY2()
+    용도: 부서 treegrid 데이터 (JOIN sys_user)
+    ============================================================
+    -->
+    <select id="TSTD_ORG_QUERY2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_org_query2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER},
+            #{empType, mode=IN, jdbcType=VARCHAR},
+            #{empLike, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    SYSUSER_QUERY1: 사원 목록 조회 (sys_user 기반)
+    원본: TSTD_EMPLOYEE_QUERY.TSTD_EMPLOYEE_QUERY1()
+    용도: 부서 선택 시 소속 사원 목록 (읽기전용)
+    ============================================================
+    -->
+    <select id="SYSUSER_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_sysuser_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orgCode, mode=IN, jdbcType=VARCHAR},
+            #{empLike, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    SYSUSER_EMP_COUNT: 부서별 사원 수 확인
+    용도: 부서 삭제 시 소속 사원 존재 여부 확인
+    ============================================================
+    -->
+    <select id="SYSUSER_EMP_COUNT" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_sysuser_emp_count(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orgCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

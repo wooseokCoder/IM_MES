@@ -74,10 +74,10 @@
 		<fieldset class="Remake-div-line-new">
 			<input type="hidden" name="sysId"    id="s_sysId"    value="${model.sysId}"   />
 			<input type="hidden" name="bordGrup" id="s_bordGrup" value="${model.bordGrup}"/>
-			<table cellpadding="5" class="search-table tableSearch-c wd-100" >
+			<table cellpadding="0" class="search-table tableSearch-c wd-100" >
 				<colgroup>
-					<col width="30%" style="min-width: 140px;" />
-					<col width="70%" style="min-width: 140px;" />
+					<col width="120px" />
+					<col width="*" />
 				</colgroup>
 				<tr class="topnav_sty">
 					<td colspan="2">
@@ -90,7 +90,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td style="padding-left: 10px;">
+					<td class="h table-Search-h search-label-h">
 						<div class="dis_flex_gap5">
 							<input class="easyui-combobox" name="searchKey"  id="s_searchKey"  value="${model.searchKey}"  codeGrup="BORD_STYPE" data-options="mode:'remote',width:100,editable:false,loader:jcombo.loader,panelHeight:'auto'"/>
 							<span id="searchExt" style="width:calc(100% - 100px);">
@@ -102,8 +102,7 @@
 							</span>
 						</div>
 					</td>
-					<td class="b">
-					</td>
+					<td class="d"></td>
 				</tr>
 			</table>
 		</fieldset>

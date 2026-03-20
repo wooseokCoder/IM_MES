@@ -6,162 +6,92 @@
 <mapper namespace="com.wsc.common.user.JobHist">
 
     <!-- ========================================================== -->
-    <!--   Oracle Paging Clause                                     -->
+    <!--   JobHist Management - Stored Procedure Calls              -->
     <!-- ========================================================== -->
-    <sql id="pagingColumns">
-        <if test="start == null or end == null">
-            ,0 AS RNUM
-        </if>
-    </sql>
-    <sql id="pagingOpen">
-        <if test="start != null and end != null">
-            SELECT * 
-              FROM (
-                    SELECT X.*
-                      FROM (
-                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
-                              FROM (
-        </if>
-    </sql>
-    <sql id="pagingClose">
-        <if test="start != null and end != null">
-                                   ) Z1, (SELECT @rownum:=0 ) Z2
-                           ) X
-                     WHERE RNUM <![CDATA[< ]]> #{end}
-                   ) X
-             WHERE RNUM <![CDATA[>= ]]> #{start}
-        </if>  
-    </sql>
-    <sql id="sortClause">
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
-		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
-		        ${sort}
-		  	</foreach>
-	  	</if>
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
-         	   A.BGN_DATE DESC
-	  	</if>
-    </sql>
 
-    <sql id="selectColumns">
-         A.SYS_ID         AS "sysId"
-        ,JOB_ID  		  AS "jobId"
-		,JOB_NO  		  AS "jobNo"
-		,JOB_DESC  		  AS "jobDesc"
-        ,A.REGI_ID        AS "regiId"
-        ,A.CHNG_ID        AS "chngId"
-        ,BGN_DATE         AS "bgnDate"
-        ,END_DATE         AS "endDate"
-        ,RSLT_DESC        AS "rsltDesc"
-        ,A.REGI_DATE      AS "regiDate"
-        ,A.CHNG_DATE      AS "chngDate"
-        ,JOB_FILE         AS "jobFile"
-        ,JOB_RSLT         AS "jobRslt"
-        ,FILE_SEQ         AS "fileSeq"
-    </sql>
-    
-    <sql id="whereClause">
-    	A.SYS_ID = #{sysId} 
-    	AND JOB_FILE NOT LIKE '%dummy%'
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobId   )">AND JOB_ID      = #{jobId}                 </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobDesc )">AND JOB_DESC    = #{regiId}                </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobRslt )">AND JOB_RSLT    = #{jobRslt}               </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(bgnDate )">AND BGN_DATE    = #{bgnDate}               </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(endDate )">AND END_DATE    = #{endDate}               </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(rsltDesc)">AND RSLT_DESC   = #{chngDate}              </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobFile )">AND JOB_FILE    = #{jobFile}               </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobRslt )">AND JOB_RSLT LIKE concat(#{jobRslt},'%')   </if>
-        <choose>
-        	<when test="@com.wsc.framework.utils.MybatisUtils@notEmpty(accTimeBgn) or @com.wsc.framework.utils.MybatisUtils@notEmpty(accTimeEnd)">
-        		AND DATE_FORMAT(BGN_DATE,'%Y-%m-%d') BETWEEN FN_CONV_DATE(#{accTimeBgn}) AND FN_CONV_DATE(#{accTimeEnd})
-        	</when>
-        	<otherwise>
-        		AND DATE_FORMAT(BGN_DATE,'%Y-%m-%d') BETWEEN DATE_FORMAT(NOW(),'%Y-%m-%d') AND DATE_FORMAT(NOW(),'%Y-%m-%d')
-        	</otherwise>
-        </choose>
-    </sql>
-    
-    <select id="search" resultType="record" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectColumns" />
-               <include refid="pagingColumns" /><!-- PAGING -->
-          FROM SYS_JOB_HIST A
-          JOIN DATA_OPER_MAST B
-            ON A.JOB_ID = B.JOB_NO
-         WHERE <include refid="whereClause" />
-         ORDER 
-            BY <include refid="sortClause" /><!-- SORT -->
-        <include refid="pagingClose" /><!-- PAGING -->
+    <!-- search: 작업 이력 목록 조회 (페이징) -->
+    <select id="search" statementType="CALLABLE" resultType="record" parameterType="params">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_jobhist_search(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobId, mode=IN, jdbcType=VARCHAR},
+            #{jobDesc, mode=IN, jdbcType=VARCHAR},
+            #{jobRslt, mode=IN, jdbcType=VARCHAR},
+            #{bgnDate, mode=IN, jdbcType=VARCHAR},
+            #{endDate, mode=IN, jdbcType=VARCHAR},
+            #{rsltDesc, mode=IN, jdbcType=VARCHAR},
+            #{jobFile, mode=IN, jdbcType=VARCHAR},
+            #{accTimeBgn, mode=IN, jdbcType=VARCHAR},
+            #{accTimeEnd, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=INTEGER},
+            #{end, mode=IN, jdbcType=INTEGER},
+            #{sortStr, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="searchCount" resultType="int" parameterType="params">
-        SELECT COUNT(1) 
-          FROM SYS_JOB_HIST A
-          JOIN DATA_OPER_MAST B
-            ON A.JOB_ID = B.JOB_NO
-         WHERE <include refid="whereClause" />
+
+    <!-- searchCount: 작업 이력 건수 조회 -->
+    <select id="searchCount" statementType="CALLABLE" resultType="int" parameterType="params">
+        {CALL sp_jobhist_search_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobId, mode=IN, jdbcType=VARCHAR},
+            #{jobDesc, mode=IN, jdbcType=VARCHAR},
+            #{jobRslt, mode=IN, jdbcType=VARCHAR},
+            #{bgnDate, mode=IN, jdbcType=VARCHAR},
+            #{endDate, mode=IN, jdbcType=VARCHAR},
+            #{rsltDesc, mode=IN, jdbcType=VARCHAR},
+            #{jobFile, mode=IN, jdbcType=VARCHAR},
+            #{accTimeBgn, mode=IN, jdbcType=VARCHAR},
+            #{accTimeEnd, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <insert id="insert" parameterType="params">
-        INSERT 
-          INTO SYS_JOB_HIST 
-             ( SYS_ID
-             , JOB_ID
-             , REGI_ID
-             , CHNG_ID
-             , BGN_DATE
-             , REGI_DATE
-             , CHNG_DATE
-           	 , JOB_FILE
-           	 , JOB_RSLT
-             )
-        VALUES
-             ( #{sysId}
-             , #{jobId} 
-             , #{regiId}
-             , #{chngId} 
-             , DATE_FORMAT(NOW(),'%Y-%m-%d %H:%i:%s')
-             , DATE_FORMAT(NOW(),'%Y-%m-%d %H:%i:%s')
-             , DATE_FORMAT(NOW(),'%Y-%m-%d %H:%i:%s')
-             , #{jobFile} 
-             , #{jobRslt} 
-             )
+
+    <!-- insert: 작업 이력 등록 -->
+    <insert id="insert" statementType="CALLABLE" parameterType="params">
+        {CALL sp_jobhist_insert(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobId, mode=IN, jdbcType=VARCHAR},
+            #{regiId, mode=IN, jdbcType=VARCHAR},
+            #{chngId, mode=IN, jdbcType=VARCHAR},
+            #{jobFile, mode=IN, jdbcType=VARCHAR},
+            #{jobRslt, mode=IN, jdbcType=VARCHAR}
+        )}
     </insert>
-    <delete id="delete" parameterType="params">
-        DELETE 
-          FROM SYS_JOB_HIST
-         WHERE SYS_ID    = #{sysId}
-           AND JOB_ID    = #{jobId}
-           AND REGI_ID   = #{regiId}
-           AND CHNG_ID   = #{chngId}
-           <!-- AND ACC_TIME  = #{accTime} -->
+
+    <!-- delete: 작업 이력 삭제 -->
+    <delete id="delete" statementType="CALLABLE" parameterType="params">
+        {CALL sp_jobhist_delete(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobId, mode=IN, jdbcType=VARCHAR},
+            #{regiId, mode=IN, jdbcType=VARCHAR},
+            #{chngId, mode=IN, jdbcType=VARCHAR}
+        )}
     </delete>
-    
-    <select id="selectJobIdList" resultType="record" parameterType="params">
-		SELECT DISTINCT JOB_ID,
-		       JOB_DESC
-		  FROM SYS_JOB_HIST A
-		  JOIN DATA_OPER_MAST B
-            ON A.JOB_ID = B.JOB_NO
-		 WHERE A.SYS_ID = #{sysId}
+
+    <!-- selectJobIdList: Job ID 목록 조회 -->
+    <select id="selectJobIdList" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_jobhist_select_job_id_list(
+            #{sysId, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="selectJobRsltList" resultType="record" parameterType="params">
-		SELECT DISTINCT JOB_RSLT
-		  FROM SYS_JOB_HIST
-		 WHERE SYS_ID = #{sysId}
-		   AND JOB_RSLT IS NOT NULL
+
+    <!-- selectJobRsltList: Job 결과 목록 조회 -->
+    <select id="selectJobRsltList" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_jobhist_select_job_rslt_list(
+            #{sysId, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
- 	<select id="searchJobHistGroup" resultType="record" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectColumns" />
-             , JOB_DESC AS "jobDesc" 
-               <include refid="pagingColumns" /><!-- PAGING -->
-		  FROM SYS_JOB_HIST A
-		  JOIN DATA_OPER_MAST B
-         WHERE A.SYS_ID   = #{sysId}
-           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userId )">AND USER_ID  = (CASE WHEN #{userId} = '' THEN USER_ID 
-           																						  ELSE #{userId} END)  </if>
-           <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(groupId)">AND GROUP_ID = #{groupId} </if>
-         ORDER 
-            BY <include refid="sortClause" /><!-- SORT -->
-        <include refid="pagingClose" /><!-- PAGING -->
+
+    <!-- searchJobHistGroup: 작업 이력 그룹 조회 (페이징) -->
+    <select id="searchJobHistGroup" statementType="CALLABLE" resultType="record" parameterType="params">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_jobhist_search_group(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{groupId, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=INTEGER},
+            #{end, mode=IN, jdbcType=INTEGER},
+            #{sortStr, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
+
 </mapper>

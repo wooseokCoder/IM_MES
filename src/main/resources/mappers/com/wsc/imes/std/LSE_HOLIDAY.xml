@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    LSE_HOLIDAY CRUD 매퍼
+    휴일 마스터: SER, INS, UPD, DEL3
+    작성자: 송우석
+    작성일: 2026-02-11
+-->
+<mapper namespace="com.wsc.imes.std.LSE_HOLIDAY">
+
+    <!-- 단건 조회 (PLT_CODE + HOLI_DATE) -->
+    <select id="LSE_HOLIDAY_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_holiday_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{holiDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- 휴일 등록 -->
+    <insert id="LSE_HOLIDAY_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_lse_holiday_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{holiDate, mode=IN, jdbcType=VARCHAR},
+            #{holiName, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!-- 휴일에 해당하는 모든 설비 CAPA를 0으로 갱신 -->
+    <update id="LSE_HOLIDAY_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_lse_holiday_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- 휴일 삭제 -->
+    <delete id="LSE_HOLIDAY_DEL3" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_lse_holiday_del3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{holiDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+</mapper>

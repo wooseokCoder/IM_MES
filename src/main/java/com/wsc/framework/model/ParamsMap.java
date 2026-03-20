@@ -156,7 +156,36 @@ public class ParamsMap extends BaseMap {
      * 인덱스 페이지 유저 타입
      * */
     public static final String GS_DASH_TYPE = "gsDashType";
-    
+
+    /**
+     * MES 플랜트코드
+     */
+    public static final String GS_PLT_CODE = "gsPltCode";
+
+    /**
+     * MES 조직코드
+     */
+    public static final String GS_ORG_CODE = "gsOrgCode";
+
+    /**
+     * MES 그룹 ID
+     */
+    public static final String GS_GRUP_ID = "gsGrupId";
+
+    /**
+     * MES 그룹명
+     */
+    public static final String GS_GRUP_NM = "gsGrupNm";
+
+    /**
+     * MES 시스템관리자 여부
+     */
+    public static final String GS_IS_SYSTEM = "gsIsSystem";
+
+    /**
+     * MES 직위
+     */
+    public static final String GS_POSITION = "gsPosition";
 
     /**
      * 값을 추가한다.

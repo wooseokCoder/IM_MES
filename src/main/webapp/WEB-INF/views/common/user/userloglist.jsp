@@ -27,14 +27,13 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/common/user/userloglist.js?v=1024c" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/user/userloglist.js?v=260227A" />"></script>
 
 <style>
 #account-layout{min-width:1000px !important;}
 #report-button-pdf .l-btn-text{
 	width: 100px;
 }
-.search-label-h {width:10%;}
 
 #accTimeBgn + .datebox, #accTimeEnd + .datebox {
 	width: 45% !important;
@@ -73,9 +72,22 @@
 	<form id="search-form">
 		<!-- <fieldset class="div-line-new" > -->
 		<fieldset class="Remake-div-line-new" >
-	        <table cellpadding="5" class="search-table tableSearch-c wd-100" style="table-layout: auto;">
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100">
+	        	<colgroup>
+	        		<col width="65px">
+	        		<col width="250px">
+	        		<col width="70px">
+	        		<col width="120px">
+	        		<col width="65px">
+	        		<col width="120px">
+	        		<col width="80px">
+	        		<col width="120px">
+	        		<col width="80px">
+	        		<col width="150px">
+	        		<col width="*">
+	        	</colgroup>
 	        	<tr class="topnav_sty">
-            		<td colspan="12" >
+            		<td colspan="11" >
             			<div>
 	            			<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
 	            			<div>
@@ -85,28 +97,28 @@
                         </div>
             		</td>
             	</tr>
-            	
+
 	            <tr>
-	            	<th class="h table-Search-h-right search-label-h" data-item="LAB_001" style="width:7% !important; min-width:0px;"><span>Access Time</span></th>
-	            	<td class="d" style="width:19% !important;">
+	            	<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>Access Time</span></th>
+	            	<td class="d">
 	            		<input class="easyui-datebox"  name="accTimeBgn" id="accTimeBgn" value="${accTimeBgn}"/>
 	            		<span style="margin: 0 5px;"></span>
 	            		<input class="easyui-datebox"  name="accTimeEnd" id="accTimeEnd" value="${accTimeEnd}"/>
 	            	</td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_002" style="width:7% !important; min-width:0px;"><span>User ID</span></th>
-					<td class="d" style="width:12% !important;">
+					<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>User ID</span></th>
+					<td class="d">
 						<input class="easyui-textbox"  name="userId" id="userId" style="width:100px"/>
 					</td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_003" style="width:7% !important; min-width:0px;"><span>User Name</span></th>
-					<td class="d" style="width:12% !important;">
+					<th class="h table-Search-h search-label-h" data-item="LAB_003"><span>User Name</span></th>
+					<td class="d">
 						<input class="easyui-textbox"  name="clientName" id="clientName" style="width:100px"/>
 					</td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_004" style="width:7% !important; min-width:0px;"><span>Prog ID</span></th>
-					<td class="d" style="width:12% !important;">
+					<th class="h table-Search-h search-label-h" data-item="LAB_004"><span>Prog ID</span></th>
+					<td class="d">
 						<input class="easyui-textbox"  name="progId" id="progId" style="width:100px"/>
 					</td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_005" style="width:7% !important; min-width:0px;"><span>User Type</span></th>
-                    <td class="d" style="width:12% !important;">
+					<th class="h table-Search-h search-label-h" data-item="LAB_005"><span>User Type</span></th>
+                    <td class="d">
                         <select class="easyui-combobox" name="userType" ID="userType" data-options="width:150, height: 26, panelHeight:'auto'">
                             <option value="">ALL</option>
                             <c:forEach var ="item" items="${getUserType1}">
@@ -114,10 +126,11 @@
                             </c:forEach>
                         </select>
                     </td>
+                    <td class="d"></td>
 	            </tr>
 	        </table>
 	   </fieldset>
-	   
+
 	   <fieldset class="div-line-new-sub grd-div-btn">
             <table cellpadding="5" class="search-table tableEtc-c wd-100" >
                 <tr>

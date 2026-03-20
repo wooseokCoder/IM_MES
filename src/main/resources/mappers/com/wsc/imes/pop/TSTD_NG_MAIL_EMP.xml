@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_NG_MAIL_EMP.xml
+설명: 불량메일 발신자 관리 매퍼 (POP 모듈)
+원본: ProActive TSTD_NG_MAIL_EMP.cs
+화면: POP56A (불량메일 발신자 관리)
+작성일: 2026-03-07
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSTD_NG_MAIL_EMP">
+
+    <!--
+    ============================================================
+    QUERY1: 수신자 목록 조회 (DATA_FLAG=0인 활성 사원만)
+    원본: TSTD_NG_MAIL_EMP_QUERY1
+    용도: POP56A 메인 화면 Grid1/Grid2 조회
+    파라미터: gsPltCode - 공장코드
+    ============================================================
+    -->
+    <select id="QUERY1" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ng_mail_emp_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    SER: 존재 확인 (단건 조회)
+    원본: TSTD_NG_MAIL_EMP_SER
+    용도: 등록 전 중복 체크
+    파라미터: gsPltCode, empCode, prodType
+    ============================================================
+    -->
+    <select id="SER" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ng_mail_emp_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{prodType, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    INS: 등록 (신규 사원 추가)
+    원본: TSTD_NG_MAIL_EMP_INS
+    용도: 불량메일 수신자 등록
+    파라미터: gsPltCode, empCode, prodType, gsUserId
+    ============================================================
+    -->
+    <insert id="INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ng_mail_emp_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{prodType, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    UPD: 수정 (재활성화: DATA_FLAG=0)
+    원본: TSTD_NG_MAIL_EMP_UPD
+    용도: 삭제된 수신자 재활성화
+    파라미터: gsPltCode, empCode, prodType, gsUserId
+    ============================================================
+    -->
+    <update id="UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ng_mail_emp_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{prodType, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    UDE: 삭제 (논리삭제: DATA_FLAG=2)
+    원본: TSTD_NG_MAIL_EMP_UDE
+    용도: 불량메일 수신자 삭제 (soft delete)
+    파라미터: gsPltCode, empCode, prodType, gsUserId
+    ============================================================
+    -->
+    <update id="UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ng_mail_emp_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{prodType, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    CONF_UPSERT: TSYS_CONF 설정값 UPSERT
+    용도: POP56A 발신자 설정 저장 (NG_MAIL_E, NG_MAIL_P)
+    AS-IS: acInfo.SysConfig.SetSysConfigByServer()
+    파라미터: gsPltCode, confSection, confName, confValue, gsUserId
+    ============================================================
+    -->
+    <insert id="CONF_UPSERT" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tsys_conf_upsert(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{confSection, mode=IN, jdbcType=VARCHAR},
+            #{confName, mode=IN, jdbcType=VARCHAR},
+            #{confValue, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    GET_EMP_NAME: 사원코드로 사원명 조회 (SYS_USER)
+    용도: 화면 오픈 시 발신자 코드 → 사원명 변환
+    파라미터: gsPltCode - 공장코드, empCode - 사원코드
+    ============================================================
+    -->
+    <select id="GET_EMP_NAME" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_sys_user_get_name(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

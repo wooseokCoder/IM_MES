@@ -1,0 +1,131 @@
+# ============================================================
+# .claudeignore - IM_MES 프로젝트
+# 작성자: 송우석
+# 목적: 컨텍스트 절약을 위한 불필요 파일 제외
+# 원칙: 필요시 명시적으로 읽기 가능 (CLAUDE.md 참조)
+# ============================================================
+
+# === 환경변수 및 비밀 정보 ===
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.jks
+**/*.keystore
+**/*.credential*
+**/certification/
+**/app.properties
+**/globals.properties
+**/context-datasource.xml
+
+# === 빌드 산출물 ===
+**/bin/
+**/target/
+**/build/
+**/out/
+**/*.class
+**/*.war
+**/*.ear
+
+# === WEB-INF/classes (리소스 복사본) ===
+src/main/webapp/WEB-INF/classes/
+
+# === JAR 라이브러리 ===
+src/main/webapp/WEB-INF/lib/
+
+# === 대용량 바이너리/아카이브 ===
+**/*.jar
+**/*.zip
+**/*.tar.gz
+**/*.rar
+**/*.7z
+**/*.gz
+
+# === JasperReports 컴파일 결과물 ===
+**/*.jasper
+
+# === Excel 템플릿 (300+ 파일) ===
+src/main/webapp/WEB-INF/templates/
+
+# === 락 파일 ===
+**/*.lock
+**/package-lock.json
+**/yarn.lock
+**/pnpm-lock.yaml
+**/composer.lock
+**/Gemfile.lock
+**/Pipfile.lock
+**/poetry.lock
+
+# === 로그 파일 ===
+**/*.log
+**/logs/
+
+# === 의존성 디렉토리 ===
+**/node_modules/
+**/venv/
+**/.venv/
+**/__pycache__/
+**/.gradle/
+**/.m2/
+**/bower_components/
+
+# === Eclipse/IDE 설정 ===
+**/.metadata/
+**/.settings/
+**/.project
+**/.classpath
+**/.vscode/
+**/.idea/
+**/.history/
+**/*.iml
+
+# === VCS ===
+**/.svn/
+**/.git/
+
+# === Claude Code ===
+**/.claude/
+**/tmpclaude*
+
+# === 임시 파일 ===
+**/nul
+**/*.tmp
+**/*.bak
+**/*.swp
+**/*~
+**/*.orig
+
+# === OS 관련 ===
+**/.DS_Store
+**/Thumbs.db
+**/desktop.ini
+**/ehthumbs.db
+
+# === 업로드 디렉토리 ===
+upload/
+
+# === 정적 리소스 (외부 라이브러리) ===
+src/main/webapp/resources/jquery/
+src/main/webapp/resources/js/chartjs/
+src/main/webapp/resources/js/echart/
+src/main/webapp/resources/js/include/Blob.js
+src/main/webapp/resources/js/include/FileSaver.js
+src/main/webapp/resources/js/include/jquery.min.js
+src/main/webapp/resources/js/include/jquery-ui.min.js
+src/main/webapp/resources/js/include/jquery.number.min.js
+src/main/webapp/resources/js/include/tableexport.js
+src/main/webapp/resources/js/include/xlsx.core.js
+src/main/webapp/resources/js/Chart.js
+
+# === CSS/이미지/미디어 ===
+src/main/webapp/resources/css/
+src/main/webapp/resources/images/
+src/main/webapp/resources/videos/
+
+# === SQL 덤프 ===
+sql/
+
+# === 문서 (필요시 명시적으로 읽기) ===
+doc/

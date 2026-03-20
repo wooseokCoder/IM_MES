@@ -197,7 +197,7 @@ function doSave() {
 	        type: 'post',
 	        data: saveParams,
 	        success: function(data){
-	        	$.messager.alert('Information',msg.MSG0106,'info');
+	        	$.messager.alert('Information',msg.MSG0021,'info');
 	        },
 	        error: function(){
 	        }
@@ -214,11 +214,11 @@ function doSave() {
 	        type: 'post',
 	        data: saveParams,
 	        success: function(data){
-/*	        	$.messager.alert('Information',msg.MSG0106,function(){
+/*	        	$.messager.alert('Information',msg.MSG0021,function(){
 	        		location.reload();
 	        	});*/
 	        	
-	        	$.messager.alert('Information',msg.MSG0106,function(event){
+	        	$.messager.alert('Information',msg.MSG0021,function(event){
 	        	    if (event){
 	        	    	location.reload();
 	        	    }

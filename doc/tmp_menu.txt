@@ -1,0 +1,1 @@
+('POP41A', '작업자 현황', '/imes/pop/pop41a.do', Decimal('2'), Decimal('6'))

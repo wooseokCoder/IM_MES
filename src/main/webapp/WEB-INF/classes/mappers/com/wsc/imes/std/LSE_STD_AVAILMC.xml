@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    LSE_STD_AVAILMC CRUD 매퍼
+    공정별 가용설비: DEL2
+    작성자: 송우석
+    작성일: 2026-02-23
+-->
+<mapper namespace="com.wsc.imes.std.LSE_STD_AVAILMC">
+
+    <!-- 설비별 가용설비 매핑 삭제 -->
+    <delete id="LSE_STD_AVAILMC_DEL2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_lse_std_availmc_del2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+</mapper>

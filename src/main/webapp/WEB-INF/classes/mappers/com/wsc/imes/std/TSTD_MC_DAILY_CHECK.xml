@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_MC_DAILY_CHECK.xml
+설명: 설비점검항목 CRUD 매퍼 (TSTD_MC_DAILY_CHECK 테이블)
+작성자: 송우석
+작성일: 2026-02-06
+============================================================================
+주의: SMDC_NO 채번은 공통 서비스 사용 (UtilityService.getSerialNo)
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_MC_DAILY_CHECK">
+
+    <!--
+    ============================================================
+    TSTD_MC_DAILY_CHECK_SER: 단건 조회 (PLT_CODE + SMDC_NO)
+    용도: 존재 여부 확인, 상세 조회
+    ============================================================
+    -->
+    <select id="TSTD_MC_DAILY_CHECK_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_mc_daily_check_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{smdcNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_MC_DAILY_CHECK_INS: 등록
+    용도: 신규 점검항목 등록
+    ============================================================
+    -->
+    <insert id="TSTD_MC_DAILY_CHECK_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_mc_daily_check_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{smdcNo, mode=IN, jdbcType=VARCHAR},
+            #{smdcType, mode=IN, jdbcType=VARCHAR},
+            #{smdcNum, mode=IN, jdbcType=VARCHAR},
+            #{smdcContents, mode=IN, jdbcType=VARCHAR},
+            #{smdcCheck, mode=IN, jdbcType=VARCHAR},
+            #{smdcMeans, mode=IN, jdbcType=VARCHAR},
+            #{smdcSeq, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSTD_MC_DAILY_CHECK_UPD: 수정 (전체 필드)
+    용도: 팝업에서 전체 필드 수정 (DATA_FLAG=0 복원)
+    ============================================================
+    -->
+    <update id="TSTD_MC_DAILY_CHECK_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_mc_daily_check_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{smdcNo, mode=IN, jdbcType=VARCHAR},
+            #{smdcType, mode=IN, jdbcType=VARCHAR},
+            #{smdcNum, mode=IN, jdbcType=VARCHAR},
+            #{smdcContents, mode=IN, jdbcType=VARCHAR},
+            #{smdcCheck, mode=IN, jdbcType=VARCHAR},
+            #{smdcMeans, mode=IN, jdbcType=VARCHAR},
+            #{smdcSeq, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSTD_MC_DAILY_CHECK_UDE: 삭제 (논리삭제)
+    용도: DATA_FLAG = 2로 논리 삭제
+    ============================================================
+    -->
+    <update id="TSTD_MC_DAILY_CHECK_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_mc_daily_check_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{smdcNo, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

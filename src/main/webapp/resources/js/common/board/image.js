@@ -22,7 +22,7 @@ $(function() {
 	});
 
 	$('#zoom-dialog').dialog({
-//	    title: tit.TITLE0029,
+//	    title: tit.TITLE0002,
 	    iconCls: 'icon-search',
 	    top:     10,
 	    bottom:  10,

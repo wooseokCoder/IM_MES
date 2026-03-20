@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_INS_RESULT_QUERY.xml
+설명: 검사결과 조회 매퍼 (POP 모듈)
+원본: ProActive TSHP_INS_RESULT_QUERY.cs
+화면: POP30B (단말기 - 가공)
+작성일: 2026-03-18
+============================================================================
+포함 SQL (3개):
+  1. QUERY1  - 검사결과 조회 (마스터+상세 JOIN)
+  2. QUERY2  - 예약 (stub)
+  3. QUERY3  - 예약 (stub)
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_INS_RESULT_QUERY">
+
+    <!--
+    ============================================================
+    QUERY1: 검사결과 조회 (마스터+상세 JOIN)
+    원본: TSHP_INS_RESULT_QUERY.QUERY1()
+    용도: POP30B 검사결과 마스터+상세 JOIN 조회
+    JOIN: TSHP_INS_RESULT_MASTER ↔ TSHP_INS_RESULT ↔ LSE_STD_PROC ↔ TSTD_PROC_INS
+    ============================================================
+    -->
+    <select id="TSHP_INS_RESULT_QUERY1" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ins_result_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insmNo, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    QUERY2: 예약 (stub)
+    용도: 향후 확장용
+    ============================================================
+    -->
+    <select id="TSHP_INS_RESULT_QUERY2" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ins_result_query2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    QUERY3: 예약 (stub)
+    용도: 향후 확장용
+    ============================================================
+    -->
+    <select id="TSHP_INS_RESULT_QUERY3" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ins_result_query3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

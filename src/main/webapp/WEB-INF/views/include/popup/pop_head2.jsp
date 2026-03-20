@@ -75,13 +75,13 @@
 		//언어 변환
 		if(locale == 'en') {
 			//영어
-			//$("#pop_top_logo").attr("src", contextPath + "/resources/images/lsta_logo.png");
+			//$("#pop_top_logo").attr("src", contextPath + "/resources/images/mes_logo.png");
 			
 			$("#btn_order_form").text("Order form");
 			$("#btn_main_page").text("Main Page");
 		}
 		else {
-			//$("#pop_top_logo").attr("src", contextPath + "/resources/images/lsta_logo.png");
+			//$("#pop_top_logo").attr("src", contextPath + "/resources/images/mes_logo.png");
 			
 			$("#btn_order_form").text("p_Order form");
 			$("#btn_main_page").text("p_Main Page");
@@ -119,7 +119,7 @@
 <div class="easyui-layout" data-options="fit:true">
 	<div id="topnavSubDiv" data-options="region:'north' ,border:false" class="pop_topnav" >
 		<div class="tal" style="width: 130px;">
-			<img id="pop_top_logo" src="${pageContext.request.contextPath}/resources/images/lsta_logo.png" style="margin-left: 10px;padding-top: 15px;height: 40px;">
+			<img id="pop_top_logo" src="${pageContext.request.contextPath}/resources/images/mes_logo.png" style="margin-left: 10px;padding-top: 15px;height: 40px;">
 		</div>
 		<div class="order_header_tit tac">${owpTitle.codeName}</div>
 		<div style="display: flex; align-items: center; padding-right: 20px; width: 130px; justify-content: end;">

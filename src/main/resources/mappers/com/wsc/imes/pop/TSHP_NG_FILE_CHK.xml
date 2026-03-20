@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_NG_FILE_CHK.xml
+설명: NG파일 체크 매퍼 (POP 모듈)
+원본: ProActive POP55A.cs (QUERY22, QUERY23, TSHP_NG_FILE_CHK DEL)
+화면: POP55A (NAM공정 NG파일배포 확인)
+작성일: 2026-03-07
+============================================================================
+포함 SQL (3개):
+  1. QUERY22  - 메인 조회 (NG파일배포 제품 목록 + 확인 상태)
+  2. QUERY23  - 상세 조회 (선택 제품의 파일 목록)
+  3. DEL      - 삭제 (PROD_CODE 기반 일괄)
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_NG_FILE_CHK">
+
+    <!--
+    ============================================================
+    QUERY22: 메인 조회 (NG파일배포 제품 목록)
+    원본: POP55A.POP55A_SER() → QUERY22
+    용도: POP55A Grid1 제품 목록 + 확인 상태 조회
+    동적 조건: 납기일, 호기, 오더, 고객, 제품코드, 제품유형, MC번호
+    ============================================================
+    -->
+    <select id="QUERY22" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ng_file_chk_query22(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sIndueDate, mode=IN, jdbcType=VARCHAR},
+            #{eIndueDate, mode=IN, jdbcType=VARCHAR},
+            #{hogiLike, mode=IN, jdbcType=VARCHAR},
+            #{orderLike, mode=IN, jdbcType=VARCHAR},
+            #{customerLike, mode=IN, jdbcType=VARCHAR},
+            #{prodCode, mode=IN, jdbcType=VARCHAR},
+            #{prodType, mode=IN, jdbcType=VARCHAR},
+            #{mcNoLike, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    QUERY23: 상세 조회 (파일 목록)
+    원본: POP55A.POP55A_SER2() → QUERY23
+    용도: POP55A Grid2 선택 제품의 NG 파일 목록
+    ============================================================
+    -->
+    <select id="QUERY23" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ng_file_chk_query23(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{prodCode, mode=IN, jdbcType=VARCHAR},
+            #{model, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    DEL: TSHP_NG_FILE_CHK 삭제 (PROD_CODE 기반 일괄)
+    원본: POP55A TSHP_NG_FILE_CHK DEL
+    용도: 제품코드 기반 NG파일 체크 데이터 일괄 삭제
+    호출: pop55aUde() — cascade 삭제 1단계
+    ============================================================
+    -->
+    <delete id="DEL" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ng_file_chk_del(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{prodCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+</mapper>

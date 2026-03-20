@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_NG_FILE_WORK_MASTER.xml
+설명: NG파일 작업 마스터 CRUD 매퍼 (POP 모듈)
+원본: ProActive POP55A.cs (TSHP_NG_FILE_WORK_MASTER CRUD)
+화면: POP55A (NAM공정 NG파일배포 확인)
+작성일: 2026-03-07
+============================================================================
+포함 SQL (4개):
+  1. SER  - 존재 여부 조회 (단건, UPSERT 분기용)
+  2. INS  - 신규 등록
+  3. UPD  - 수정 (플래그/코멘트/수정자)
+  4. DEL  - 삭제 (물리 삭제)
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_NG_FILE_WORK_MASTER">
+
+    <!--
+    ============================================================
+    SER: 존재 여부 조회 (단건)
+    원본: POP55A TSHP_NG_FILE_WORK_MASTER SER
+    용도: INS 전 기존 데이터 존재 여부 확인 (UPSERT 분기용)
+    호출: pop55aIns() — Step 1
+    ============================================================
+    -->
+    <select id="SER" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ng_file_work_master_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{prodCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    INS: 신규 등록
+    원본: POP55A TSHP_NG_FILE_WORK_MASTER INS
+    용도: NG파일 확인 마스터 신규 등록
+    호출: pop55aIns() — Step 2 (SER 결과 null 시)
+    ============================================================
+    -->
+    <insert id="INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ng_file_work_master_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{prodCode, mode=IN, jdbcType=VARCHAR},
+            #{workFlag, mode=IN, jdbcType=VARCHAR},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    UPD: 수정
+    원본: POP55A TSHP_NG_FILE_WORK_MASTER UPD
+    용도: NG파일 확인 마스터 수정 (플래그/코멘트/수정자)
+    호출: pop55aIns() — Step 2 (SER 결과 존재 시)
+    ============================================================
+    -->
+    <update id="UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ng_file_work_master_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{prodCode, mode=IN, jdbcType=VARCHAR},
+            #{workFlag, mode=IN, jdbcType=VARCHAR},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    DEL: 삭제 (물리 삭제)
+    원본: POP55A TSHP_NG_FILE_WORK_MASTER DEL
+    용도: NG파일 확인 마스터 삭제
+    호출: pop55aUde() — cascade 삭제 2단계
+    ============================================================
+    -->
+    <delete id="DEL" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ng_file_work_master_del(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{prodCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+</mapper>

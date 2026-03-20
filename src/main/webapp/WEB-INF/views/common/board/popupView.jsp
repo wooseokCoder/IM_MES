@@ -107,7 +107,7 @@
 							<td width="38%" class="nhstyle nstyle"><span id="v_chngDate"></span></td>
 						</tr>
 						<tr>
-							<th width="12%" data-item="POP_LAB_006"><span>Display to</span></th>
+							<th width="12%" data-item="POP_LAB_008"><span>Display to</span></th>
 							<td width="88%" class="nhstyle nstyle" colspan="3"><span id="v_target"></span></td>
 						</tr>
 					</table>

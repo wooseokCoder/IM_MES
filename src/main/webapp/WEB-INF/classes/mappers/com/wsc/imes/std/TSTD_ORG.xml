@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_ORG.xml
+설명: 부서 CRUD 매퍼 (TSTD_ORG 테이블)
+원본: ProActive TSTD_ORG.cs
+작성일: 2026-02-11
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_ORG">
+
+    <!--
+    ============================================================
+    TSTD_ORG_SER: 단건 조회 (PK: PLT_CODE + ORG_CODE)
+    원본: TSTD_ORG.TSTD_ORG_SER()
+    용도: 존재 여부 확인, 상세 조회
+    ============================================================
+    -->
+    <select id="TSTD_ORG_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_org_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orgCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_ORG_INS: 등록
+    원본: TSTD_ORG.TSTD_ORG_INS()
+    용도: 신규 부서 등록
+    ============================================================
+    -->
+    <insert id="TSTD_ORG_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_org_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orgCode, mode=IN, jdbcType=VARCHAR},
+            #{orgName, mode=IN, jdbcType=VARCHAR},
+            #{orgParent, mode=IN, jdbcType=VARCHAR},
+            #{orgLeader, mode=IN, jdbcType=VARCHAR},
+            #{orgSeq, mode=IN, jdbcType=INTEGER},
+            #{costCenter, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSTD_ORG_UPD: 수정 (+ DATA_FLAG=0 복원)
+    원본: TSTD_ORG.TSTD_ORG_UPD()
+    용도: 부서 정보 수정 및 삭제 복원
+    ============================================================
+    -->
+    <update id="TSTD_ORG_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_org_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orgCode, mode=IN, jdbcType=VARCHAR},
+            #{orgName, mode=IN, jdbcType=VARCHAR},
+            #{orgParent, mode=IN, jdbcType=VARCHAR},
+            #{orgLeader, mode=IN, jdbcType=VARCHAR},
+            #{orgSeq, mode=IN, jdbcType=INTEGER},
+            #{costCenter, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSTD_ORG_UDE: 삭제 (논리삭제)
+    원본: TSTD_ORG.TSTD_ORG_UDE()
+    용도: DATA_FLAG = 2로 논리 삭제
+    ============================================================
+    -->
+    <update id="TSTD_ORG_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_org_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orgCode, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

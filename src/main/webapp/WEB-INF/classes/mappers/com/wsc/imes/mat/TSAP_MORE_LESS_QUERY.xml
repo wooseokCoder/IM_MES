@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSAP_MORE_LESS_QUERY.xml
+설명: 과부족정보 조회 매퍼 (TSAP_MORE_LESS 테이블)
+원본: ProActive TSAP_MORE_LESS_QUERY.cs
+작성일: 2026-03-03
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.mat.TSAP_MORE_LESS_QUERY">
+
+    <!--
+    ============================================================
+    TSAP_MORE_LESS_QUERY2: 과부족정보 메인 조회
+    용도: MAT01A 리스트 탭 + 피벗 탭
+    원본: TSAP_MORE_LESS_QUERY.TSAP_MORE_LESS_QUERY2
+    ============================================================
+    -->
+    <select id="TSAP_MORE_LESS_QUERY2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tsap_more_less_query2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orderLike, mode=IN, jdbcType=VARCHAR},
+            #{partLike, mode=IN, jdbcType=VARCHAR},
+            #{sIndueDate, mode=IN, jdbcType=VARCHAR},
+            #{eIndueDate, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_WORKORDER_QUERY.xml
+설명: 작업지시 조회 매퍼 (TSHP_WORKORDER 테이블)
+원본: ProActive TSHP_WORKORDER_QUERY.cs
+작성일: 2026-02-23
+수정일: 2026-02-24 (ORD06A용 QUERY5 파라미터 확장 7→11개)
+수정일: 2026-03-04 (MAT05A용 QUERY1_2_1, QUERY1_3 추가)
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TSHP_WORKORDER_QUERY">
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_QUERY6: 생산오더 요약 조회
+    용도: ORD13A 메인 그리드 (SAP_WO_NO별 집계, PROC_CNT 포함)
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_QUERY6" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_query6(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{modelLike, mode=IN, jdbcType=VARCHAR},
+            #{procLike, mode=IN, jdbcType=VARCHAR},
+            #{partLike, mode=IN, jdbcType=VARCHAR},
+            #{sPlnDate, mode=IN, jdbcType=VARCHAR},
+            #{ePlnDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_QUERY5: 생산오더 상세 조회
+    용도: ORD13A 동적컬럼 매핑 + ORD06A 메인 그리드
+    파라미터 11개 (2026-02-24 확장)
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_QUERY5" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_query5(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{modelLike, mode=IN, jdbcType=VARCHAR},
+            #{procLike, mode=IN, jdbcType=VARCHAR},
+            #{partLike, mode=IN, jdbcType=VARCHAR},
+            #{sPlnDate, mode=IN, jdbcType=VARCHAR},
+            #{ePlnDate, mode=IN, jdbcType=VARCHAR},
+            #{sapWoLike, mode=IN, jdbcType=VARCHAR},
+            #{sRegDate, mode=IN, jdbcType=VARCHAR},
+            #{eRegDate, mode=IN, jdbcType=VARCHAR},
+            #{isZero, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+	
+	<!--
+    ============================================================
+    TSHP_WORKORDER_QUERY29: 생산오더 완료처리 메인 조회
+    용도: ORD16A 메인 그리드 (9개 테이블 JOIN, 4개 SQL 함수 호출)
+    파라미터: 15개 (gsPltCode, isSim, 검색조건 13개)
+    수정일: 2026-03-05 (AS-IS 동일화: 3→15개 파라미터 확장)
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_QUERY29" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_query29(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{isSim, mode=IN, jdbcType=VARCHAR},
+            #{orderLike, mode=IN, jdbcType=VARCHAR},
+            #{hogiLike, mode=IN, jdbcType=VARCHAR},
+            #{customerLike, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{sDueDate, mode=IN, jdbcType=VARCHAR},
+            #{eDueDate, mode=IN, jdbcType=VARCHAR},
+            #{sIndueDate, mode=IN, jdbcType=VARCHAR},
+            #{eIndueDate, mode=IN, jdbcType=VARCHAR},
+            #{sSapDueDate, mode=IN, jdbcType=VARCHAR},
+            #{eSapDueDate, mode=IN, jdbcType=VARCHAR},
+            #{sPlnDate, mode=IN, jdbcType=VARCHAR},
+            #{ePlnDate, mode=IN, jdbcType=VARCHAR},
+            #{prodType, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+    
+    <!--
+    ============================================================
+    TSHP_WORKORDER_QUERY1_2: 작업지시 목록 조회 (SER5용)
+    용도: MAT05A_SER5 - 불출/취소 후 부모그리드 갱신
+    추가일: 2026-03-06
+    QUERY1_2_1과 차이: PLANTS 등호(=), ORDER_NO/ORDER_LINE 등호(=), 날짜 없음
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_QUERY1_2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_query1_2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orderNo, mode=IN, jdbcType=VARCHAR},
+            #{orderLine, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{isSim, mode=IN, jdbcType=VARCHAR},
+            #{woFlagIn, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_QUERY1_2_1: 작업지시 목록 조회 (Tab1 메인)
+    용도: MAT05A Tab1 공정별 메인 그리드
+    추가일: 2026-03-04
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_QUERY1_2_1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_query1_2_1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orderLike, mode=IN, jdbcType=VARCHAR},
+            #{hogiLike, mode=IN, jdbcType=VARCHAR},
+            #{customerLike, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{sPlnStartDate, mode=IN, jdbcType=VARCHAR},
+            #{ePlnStartDate, mode=IN, jdbcType=VARCHAR},
+            #{sIndueDate, mode=IN, jdbcType=VARCHAR},
+            #{eIndueDate, mode=IN, jdbcType=VARCHAR},
+            #{sSapDueDate, mode=IN, jdbcType=VARCHAR},
+            #{eSapDueDate, mode=IN, jdbcType=VARCHAR},
+            #{sDueDate, mode=IN, jdbcType=VARCHAR},
+            #{eDueDate, mode=IN, jdbcType=VARCHAR},
+            #{woFlagIn, mode=IN, jdbcType=VARCHAR},
+            #{isSim, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_QUERY1_3: 작업지시+소요자재 결합 조회
+    용도: MAT05A Tab2(전체), Tab3(불출현황)
+    추가일: 2026-03-04
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_QUERY1_3" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_query1_3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orderLike, mode=IN, jdbcType=VARCHAR},
+            #{hogiLike, mode=IN, jdbcType=VARCHAR},
+            #{customerLike, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{sPlnStartDate, mode=IN, jdbcType=VARCHAR},
+            #{ePlnStartDate, mode=IN, jdbcType=VARCHAR},
+            #{sIndueDate, mode=IN, jdbcType=VARCHAR},
+            #{eIndueDate, mode=IN, jdbcType=VARCHAR},
+            #{sSapDueDate, mode=IN, jdbcType=VARCHAR},
+            #{eSapDueDate, mode=IN, jdbcType=VARCHAR},
+            #{sDueDate, mode=IN, jdbcType=VARCHAR},
+            #{eDueDate, mode=IN, jdbcType=VARCHAR},
+            #{woFlagIn, mode=IN, jdbcType=VARCHAR},
+            #{isSim, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_QUERY12: 작업지시 목록 조회 (가공 실적관리)
+    용도: ORD14A 상단 그리드
+    파라미터: gsPltCode, orderLike, procLike, sPlnDate, ePlnDate, plants, dataFlag
+    추가일: 2026-03-06
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_QUERY12" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_query12(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orderLike, mode=IN, jdbcType=VARCHAR},
+            #{procLike, mode=IN, jdbcType=VARCHAR},
+            #{sPlnDate, mode=IN, jdbcType=VARCHAR},
+            #{ePlnDate, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_QUERY32: 오더완료일 조회 (Tab3)
+    용도: ORD18A Tab3 - WO_FLAG=4 완료 작업지시 목록
+    추가일: 2026-03-06
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_QUERY32" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_query32(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{orderLike, mode=IN, jdbcType=VARCHAR},
+            #{sapWoLike, mode=IN, jdbcType=VARCHAR},
+            #{hogiLike, mode=IN, jdbcType=VARCHAR},
+            #{procLike, mode=IN, jdbcType=VARCHAR},
+            #{sWoDate, mode=IN, jdbcType=VARCHAR},
+            #{eWoDate, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_QUERY27: 생산오더 일정 조회 (기계별)
+    원본: TSHP_WORKORDER_QUERY.TSHP_WORKORDER_QUERY27
+    용도: POP30B 기계별 작업지시 일정 조회
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_QUERY27" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_query27(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{isAll, mode=IN, jdbcType=VARCHAR},
+            #{sPlanTime, mode=IN, jdbcType=VARCHAR},
+            #{ePlanTime, mode=IN, jdbcType=VARCHAR},
+            #{includeDone, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_QUERY28: 생산오더 상태별 조회
+    원본: TSHP_WORKORDER_QUERY.TSHP_WORKORDER_QUERY28
+    용도: POP30B 상태/작업자 기준 작업지시 목록
+    추가일: 2026-03-18
+    ============================================================
+    -->
+    <select id="TSHP_WORKORDER_QUERY28" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_workorder_query28(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{woFlag, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

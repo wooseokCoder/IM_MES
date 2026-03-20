@@ -59,7 +59,7 @@ function doLink(url) {
 	});
     
     if(userId == "") {
-    	$.messager.alert('Warning',"No WGBC Id.",'warning');	//$.messager.alert('Warning',msg.MSG0086,'warning');
+    	$.messager.alert('Warning',"No WGBC Id.",'warning');	//$.messager.alert('Warning',msg.MSG0088,'warning');
     	return false;
     }
     

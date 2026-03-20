@@ -72,30 +72,20 @@
 		<div id="search-toolbar" class="wui-toolbar">
 			<form id="search-form">
 				<fieldset class="div-line-new" >
-			        <table cellpadding="5" class="search-table tableSearch-c" >
+			        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+			            <colgroup>
+			                <col width="70px">
+			                <col width="150px">
+			                <col width="80px">
+			                <col width="120px">
+			                <col width="*">
+			            </colgroup>
 			            <tr>
-			            	<th class="h table-Search-h"><span data-item="LAB_001">동호회명</span></td>
+			            	<th class="h table-Search-h search-label-h"><span data-item="LAB_001">동호회명</span></th>
 							<td class="d"><input class="easyui-textbox"  name="searchComuName" id="searchComuName" style="width:150px"/></td>
-			            	<th class="h table-Search-h"><span data-item="LAB_002">동호회 ID</span></td>
+			            	<th class="h table-Search-h search-label-h"><span data-item="LAB_002">동호회 ID</span></th>
 							<td class="d"><input class="easyui-textbox"  name="searchComuId" id="searchComuId" style="width:100px"/></td>
-			            	<!-- <th class="h table-Search-h"><span data-item="LAB_003">거래처구분</span></td>
-			            	<td class="d">
-			            	<select class="easyui-combobox" name="searchCustType" id="s_searchCustType" data-options="width:100">
-								<option value="" data-item = 'LAB_004'>전체</option>
-								<c:forEach var="item" items="${result}">
-									<c:if test="${item.CODE_GRUP eq 'CUST_TYPE' }">
-										<option value="${item.CODE_CD}">${item.CODE_NAME}</option>
-									</c:if>
-								</c:forEach>
-							</select>
-			            	</td>
-			            	<th class="h table-Search-h"><span data-item="LAB_005">대표자</span></td>
-							<td class="d"><input class="easyui-textbox"  name="searchOwnName" id="searchOwnName" style="width:100px"/></td>
-							<th class="h table-Search-h"><span data-item="LAB_006">입금자</span></td>
-							<td class="d"><input class="easyui-textbox"  name="searchDepositor1" id="searchDepositor1" style="width:100px"/></td>
-							<th class="h table-Search-h"><span data-item="LAB_007">사업자번호</span></td>
-							<td class="d"><input class="easyui-textbox"  name="searchBizNo" id="searchBizNo" style="width:100px"/></td> -->
-							<td class="b"><a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001" data-options="disabled:${RET}" >검색</a></td>
+							<td class="b"><a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001" data-options="disabled:${RET}" >조회</a></td>
 			            </tr>
 			        </table>
 			   </fieldset>

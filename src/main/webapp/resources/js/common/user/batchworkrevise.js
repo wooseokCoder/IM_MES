@@ -51,7 +51,7 @@ $(function() { //함수
 	consts.init(); //초기화
 	
 	$('#progress-popup').dialog({ //액셀 팝업창
-	       title: tit.TITLE0009,
+	       title: tit.TITLE0003,
 	       top:     100,
 	       width: 200,
 	       height: 200,
@@ -106,6 +106,8 @@ $(window).load(function() {
 				doSearch();
 			}
 		});
+
+		doSearch();
 
 	}, 100);
 
@@ -192,7 +194,7 @@ function doReviseJob() {
 	
 	var row  = $('#search-grid').datagrid('getSelected'); //행을 선택
 	if(!row){
-		$.messager.alert('Warning',msg.MSG0114,'warning');
+		$.messager.alert('Warning',msg.MSG0028,'warning');
 		return; //행을 선택하지 않으면 경고창 뜸
 	}
 	
@@ -319,7 +321,7 @@ function doSave() {
         		isSave = true;
         		$.messager.show({
         			title: 'Information',
-        			msg: msg.MSG0103
+        			msg: msg.MSG0020
         		});
         	}
 

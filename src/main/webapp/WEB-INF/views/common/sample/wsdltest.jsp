@@ -90,9 +90,12 @@
 <div id="search-toolbar" class="wui-toolbar">
 	<form id="search-form">
 	<fieldset class="div-line-new">
-		<table cellpadding="5" class="search-table tableSearch-c wd-100">
+		<table cellpadding="0" class="search-table tableSearch-c wd-100">
+			<colgroup>
+				<col width="*" />
+			</colgroup>
 			<tr class="topnav_sty">
-				<td colspan="10">
+				<td colspan="1">
 					<div style="display:flex; justify-content: space-between; align-items: center;">
 						<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
 					</div>

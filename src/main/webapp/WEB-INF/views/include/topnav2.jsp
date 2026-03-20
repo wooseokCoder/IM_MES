@@ -18,7 +18,7 @@
 <%-- @author C-NODE                                                         --%>
 <%-- @version 1.0 2016/09/20                                                --%>
 <%-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --%>
-<%-- 
+<%--
 <input type="hidden" name="text_menuKey" id="text_menuKey" value="${menuKey}"/>
 
 <input type="hidden" name="BAS" id="BAS" value="${BAS}" /> <!--기본  -->
@@ -110,26 +110,28 @@
 	    // 팝업을 가운데 위치시키기 위해 아래와 같이 값 구하기
 	    var _left = Math.ceil(( window.screen.width - _width )/2);
 	    var _top = Math.ceil(( window.screen.height - _height )/2); 
-		
+
 		let menualPop;
 		let menualUrl = "";
 		if( gconsts.ADMIN == 'Y' ) {
 			//1. 관리자일 경우 매뉴얼 등록 및 수정화면
-			menualUrl = "/common/board/navHelp/form.do";
+			// 260116 sws 관리자일 경우도 view.do 로 변경
+			// menualUrl = "/common/board/navHelp/form.do";
+			menualUrl = "/common/board/navHelp/view.do";
 		}
 		else {
 			//2. 그 외에는 상세화면
 			menualUrl = "/common/board/navHelp/view.do";
-		}	
-		
+		}
+
 		//menualPop = window.open(context + menualUrl + '?menuKey='+menuKey, 'menual_'+menuKey,'width='+ _width +',height='+ _height +',left=' + _left + ',top='+ _top);
 		menualPop = window.open(context + menualUrl + '?bordNo='+menuUrl, 'menual_'+menuKey,'width='+ _width +',height='+ _height +',left=' + _left + ',top='+ _top);
-	
-		/* 
+
+		/*
 		let params = {
 			"menuKey": menuKey
 		};
-		
+
 		$.ajax({
 			url: getUrl("/common/board/help"),
 	        dataType: 'json',
@@ -146,10 +148,10 @@
 					//2. 그 외에는 상세화면
 					menualPop = window.open("");
 				}
-				
+
 			}
 		});
 		 */
-		
+
 	}
 </script>

@@ -4,27 +4,39 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.wsc.framework.Base">
- 
-    <sql id="selectColumns">
-	   COL_LVL
-     , COL_VAL
-     , STYLE 
-    </sql>
-    
-    <sql id="whereClause-search">    
-	        SYS_ID = 'IMMES'
-	    AND FILE_NM = #{fileNM}
-    </sql>
 
-    <select id="searchHd" resultType="record" parameterType="params">
-    CALL sp_get_excelInfo(#{sysId},#{gsUserId},#{windId},#{myViewId},#{fileNM},#{excelSelect})
-<!-- 		SELECT <include refid="selectColumns" /> -->
-<!-- 		  FROM SYS_EXCEL_INFO -->
-<!-- 		 WHERE <include refid="whereClause-search" /> -->
-<!-- 		 ORDER BY cast(VIEW_NO as unsigned) -->
+    <!-- ========================================================== -->
+    <!--   Base 프레임워크 - 프로시저 호출                           -->
+    <!-- ========================================================== -->
+
+    <!-- [searchHd] 엑셀 헤더 정보 조회 -->
+    <!-- AS-IS 원본 쿼리:
+        SELECT COL_LVL, COL_VAL, STYLE
+        FROM SYS_EXCEL_INFO
+        WHERE SYS_ID = 'IMMES'
+          AND FILE_NM = #{fileNM}
+        ORDER BY cast(VIEW_NO as unsigned)
+    -->
+    <select id="searchHd" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_get_excelInfo(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR},
+            #{windId, mode=IN, jdbcType=VARCHAR},
+            #{myViewId, mode=IN, jdbcType=VARCHAR},
+            #{fileNM, mode=IN, jdbcType=VARCHAR},
+            #{excelSelect, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <!-- 개인화에서 엑셀 저장시 개인화명 가져오는 프로시져 -->
-    <select id="getMyViewName" resultType="record" parameterType="params">
-    		CALL sp_get_view_name(#{sysId},#{gsUserId},#{windId},#{myViewId})
+
+    <!-- [getMyViewName] 개인화 뷰 이름 조회 -->
+    <!-- 개인화에서 엑셀 저장시 개인화명 가져오는 프로시저 -->
+    <select id="getMyViewName" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_get_view_name(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR},
+            #{windId, mode=IN, jdbcType=VARCHAR},
+            #{myViewId, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
+
 </mapper>

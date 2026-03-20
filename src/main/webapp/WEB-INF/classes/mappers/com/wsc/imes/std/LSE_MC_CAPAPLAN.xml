@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    LSE_MC_CAPAPLAN CRUD 매퍼
+    설비 CAPA 계획: SER, INS, UPD, DEL3
+    작성자: 송우석
+    작성일: 2026-02-11
+-->
+<mapper namespace="com.wsc.imes.std.LSE_MC_CAPAPLAN">
+
+    <!-- 단건 조회 (PLT_CODE + MC_CODE + MC_DATE) -->
+    <select id="LSE_MC_CAPAPLAN_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_mc_capaplan_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- CAPA 계획 등록 -->
+    <insert id="LSE_MC_CAPAPLAN_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_lse_mc_capaplan_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcDate, mode=IN, jdbcType=VARCHAR},
+            #{ft1, mode=IN, jdbcType=FLOAT},
+            #{ft2, mode=IN, jdbcType=FLOAT},
+            #{fot, mode=IN, jdbcType=FLOAT},
+            #{sd1, mode=IN, jdbcType=FLOAT},
+            #{sd2, mode=IN, jdbcType=FLOAT},
+            #{sot, mode=IN, jdbcType=FLOAT},
+            #{td1, mode=IN, jdbcType=FLOAT},
+            #{td2, mode=IN, jdbcType=FLOAT},
+            #{tot, mode=IN, jdbcType=FLOAT},
+            #{scomment, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!-- CAPA 계획 수정 -->
+    <update id="LSE_MC_CAPAPLAN_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_lse_mc_capaplan_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcDate, mode=IN, jdbcType=VARCHAR},
+            #{ft1, mode=IN, jdbcType=FLOAT},
+            #{ft2, mode=IN, jdbcType=FLOAT},
+            #{fot, mode=IN, jdbcType=FLOAT},
+            #{sd1, mode=IN, jdbcType=FLOAT},
+            #{sd2, mode=IN, jdbcType=FLOAT},
+            #{sot, mode=IN, jdbcType=FLOAT},
+            #{td1, mode=IN, jdbcType=FLOAT},
+            #{td2, mode=IN, jdbcType=FLOAT},
+            #{tot, mode=IN, jdbcType=FLOAT},
+            #{scomment, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- CAPA 계획 삭제 -->
+    <delete id="LSE_MC_CAPAPLAN_DEL3" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_lse_mc_capaplan_del3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{mcDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+</mapper>

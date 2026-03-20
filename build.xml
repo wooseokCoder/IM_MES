@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="IM_MES" default="all" basedir=".">
+
+    <!-- ============================================================ -->
+    <!--  Properties                                                   -->
+    <!-- ============================================================ -->
+    <property file="build.properties"/>
+
+    <property name="src.dir"       value="src/main/java"/>
+    <property name="resources.dir" value="src/main/resources"/>
+    <property name="webapp.dir"    value="src/main/webapp"/>
+    <property name="classes.dir"   value="${webapp.dir}/WEB-INF/classes"/>
+    <property name="lib.dir"       value="${webapp.dir}/WEB-INF/lib"/>
+    <property name="deploy.dir"    value="${tomcat.home}/webapps/${deploy.context}"/>
+
+    <!-- ============================================================ -->
+    <!--  clean : WEB-INF/classes 정리                                 -->
+    <!-- ============================================================ -->
+    <target name="clean" description="Clean compiled classes">
+        <delete includeemptydirs="true" failonerror="false">
+            <fileset dir="${classes.dir}" includes="**/*.class"/>
+        </delete>
+    </target>
+
+    <!-- ============================================================ -->
+    <!--  strip-bom : Java 소스 UTF-8 BOM 제거                        -->
+    <!-- ============================================================ -->
+    <target name="strip-bom" description="Remove UTF-8 BOM from Java sources">
+        <exec executable="bash" failonerror="true">
+            <arg value="-c"/>
+            <arg value="find ${src.dir} -name '*.java' -exec sed -i 's/^\xEF\xBB\xBF//' {} +"/>
+        </exec>
+    </target>
+
+    <!-- ============================================================ -->
+    <!--  compile : Java 소스 컴파일                                   -->
+    <!-- ============================================================ -->
+    <target name="compile" depends="clean, strip-bom" description="Compile Java sources">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}"
+               destdir="${classes.dir}"
+               encoding="UTF-8"
+               source="1.6"
+               target="1.6"
+               includeantruntime="false"
+               debug="true"
+               fork="true"
+               executable="${java8.home}/bin/javac"
+               memorymaximumsize="512m">
+            <classpath>
+                <fileset dir="${lib.dir}" includes="*.jar"/>
+                <fileset dir="${tomcat.home}/lib" includes="*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- ============================================================ -->
+    <!--  resources : 리소스 파일을 WEB-INF/classes 로 복사             -->
+    <!-- ============================================================ -->
+    <target name="resources" description="Copy resources to WEB-INF/classes">
+        <mkdir dir="${classes.dir}"/>
+        <copy todir="${classes.dir}" overwrite="true">
+            <fileset dir="${resources.dir}">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ============================================================ -->
+    <!--  build : 컴파일 + 리소스 복사                                  -->
+    <!-- ============================================================ -->
+    <target name="build" depends="compile, resources" description="Full build (compile + resources)"/>
+
+    <!-- ============================================================ -->
+    <!--  deploy : rsync 로 Tomcat 배포 디렉토리에 동기화               -->
+    <!-- ============================================================ -->
+    <target name="deploy" depends="build" description="Deploy to Tomcat webapps">
+        <exec executable="rsync" failonerror="true">
+            <arg line="-rlv --delete --exclude='logs/' --exclude='upload/' --exclude='.svn/' ${webapp.dir}/ ${deploy.dir}/"/>
+        </exec>
+    </target>
+
+    <!-- ============================================================ -->
+    <!--  reload : web.xml touch + JSP touch 로 Tomcat 리로드          -->
+    <!-- ============================================================ -->
+    <target name="reload" description="Touch web.xml and JSPs to trigger Tomcat reload">
+        <touch file="${deploy.dir}/WEB-INF/web.xml"/>
+        <exec executable="bash">
+            <arg value="-c"/>
+            <arg value="find ${deploy.dir}/WEB-INF/views -name '*.jsp' -exec touch {} +"/>
+        </exec>
+    </target>
+
+    <!-- ============================================================ -->
+    <!--  all : 전체 빌드 + 배포 + 리로드 (기본 타겟)                   -->
+    <!-- ============================================================ -->
+    <target name="all" depends="deploy, reload" description="Full build, deploy, and reload"/>
+
+</project>

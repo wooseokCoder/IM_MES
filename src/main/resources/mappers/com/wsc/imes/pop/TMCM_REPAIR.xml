@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TMCM_REPAIR.xml
+설명: 수리수선 CRUD 매퍼 (TMCM_REPAIR 테이블)
+원본: ProActive TMCM_REPAIR.cs
+작성일: 2026-03-11
+============================================================================
+주의: MCR_ID 채번은 공통 서비스 사용 (UtilityService.getSerialNo)
+      sr_code="", format=YYYYMMDD → 20260311-0001
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TMCM_REPAIR">
+
+    <!--
+    ============================================================
+    TMCM_REPAIR_SER: 단건 조회 (PLT_CODE + MCR_ID)
+    원본: TMCM_REPAIR.TMCM_REPAIR_SER()
+    용도: 존재 여부 확인, 상세 조회
+    ============================================================
+    -->
+    <select id="TMCM_REPAIR_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tmcm_repair_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcrId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TMCM_REPAIR_INS: 등록
+    원본: TMCM_REPAIR.TMCM_REPAIR_INS()
+    용도: 신규 수리수선 등록
+    ============================================================
+    -->
+    <insert id="TMCM_REPAIR_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tmcm_repair_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcrId, mode=IN, jdbcType=VARCHAR},
+            #{repairDate, mode=IN, jdbcType=VARCHAR},
+            #{repairVendor, mode=IN, jdbcType=VARCHAR},
+            #{repairMc, mode=IN, jdbcType=VARCHAR},
+            #{repairMcType, mode=IN, jdbcType=VARCHAR},
+            #{repairName, mode=IN, jdbcType=VARCHAR},
+            #{repairContents, mode=IN, jdbcType=VARCHAR},
+            #{repairAmount, mode=IN, jdbcType=DECIMAL},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TMCM_REPAIR_UPD: 수정
+    원본: TMCM_REPAIR.TMCM_REPAIR_UPD()
+    용도: 다이얼로그에서 수정 (저장&닫기)
+    ============================================================
+    -->
+    <update id="TMCM_REPAIR_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tmcm_repair_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcrId, mode=IN, jdbcType=VARCHAR},
+            #{repairDate, mode=IN, jdbcType=VARCHAR},
+            #{repairVendor, mode=IN, jdbcType=VARCHAR},
+            #{repairMc, mode=IN, jdbcType=VARCHAR},
+            #{repairMcType, mode=IN, jdbcType=VARCHAR},
+            #{repairName, mode=IN, jdbcType=VARCHAR},
+            #{repairContents, mode=IN, jdbcType=VARCHAR},
+            #{repairAmount, mode=IN, jdbcType=DECIMAL},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TMCM_REPAIR_UDE: 삭제 (논리삭제)
+    원본: TMCM_REPAIR.TMCM_REPAIR_UDE()
+    용도: DATA_FLAG = 2로 논리 삭제
+    ============================================================
+    -->
+    <update id="TMCM_REPAIR_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tmcm_repair_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcrId, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

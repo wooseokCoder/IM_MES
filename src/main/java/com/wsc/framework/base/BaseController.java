@@ -38,10 +38,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -70,7 +70,7 @@ import com.wsc.framework.model.ParamsMap;
 import com.wsc.framework.model.RecordMap;
 import com.wsc.framework.model.ResultMap;
 import com.wsc.framework.utils.BaseUtils;
-import com.wsc.framework.view.JxlsView;	
+import com.wsc.framework.view.JxlsView;
 /**
  * 기본 컨트롤러 클래스이다.
  *
@@ -100,6 +100,7 @@ public abstract class BaseController {
 	protected String getViewName(String name) {
 		String cname = getClass().getPackage().getName();
 		String prefix = "com.wsc.";
+
 
 		if (cname.startsWith(prefix))
 			cname = cname.substring(prefix.length());
@@ -257,7 +258,7 @@ public abstract class BaseController {
 		}
 
     }
-    
+
     protected void logSaveSF(HttpServletRequest request, Model model) {
 
     	// 파라메터를 가져온다.
@@ -273,7 +274,7 @@ public abstract class BaseController {
     	if(params.get("progId") == null || params.getString("progId").isEmpty()) {
     		params.put("progId", 		request.getRequestURI().substring(sysId.length()));
     	}
-        
+
     	params.put("clientIp",  	request.getRemoteAddr());
     	params.put("clientName",	request.getRemoteUser());
     	params.put("clientAgent",  	request.getHeader("User-Agent"));
@@ -367,28 +368,28 @@ public abstract class BaseController {
         model.addAttribute(JxlsView.TEMPLATE_NAME, templateName);
         model.addAttribute(JxlsView.DOWNLOAD_NAME, downloadName);
         model.addAttribute(BaseConstants.DATA, result);
-        
+
     }
     protected void setExcelParams(Model model, Object result, String fileName) {
     	Date d = new Date();
-        
+
         String s = d.toString();
-        
+
         SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyy");
-        
+
         String nowDate = sdf.format(d);
-        
+
     	setExcelParams(model, result, fileName+"_Template.xlsx", fileName+"_"+nowDate+".xlsx");
     }
     protected void setExcelParams(Model model, Object result) {
     	Date d = new Date();
-        
+
         String s = d.toString();
-        
+
         SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyy");
-        
+
         String nowDate = sdf.format(d);
-        
+
     	setExcelParams(model, result, getName()+"_Template.xlsx", getName()+"_"+nowDate+".xlsx");
     }
 
@@ -430,7 +431,7 @@ public abstract class BaseController {
         ParamsMap params = getParams(request);
 
         Object result = getService().search2(params, sqlId);
-        
+
         setExcelParams(model, result, fileName);
 
         // 뷰이름을 반환한다.
@@ -739,8 +740,23 @@ public abstract class BaseController {
         params.put(ParamsMap.GS_ORG_AUTH_CODE,     user.getOrgAuthCode());
         params.put(ParamsMap.GS_SPC_AUTH_CODE,     user.getSpcAuthCode());
         params.put(ParamsMap.GS_DASH_TYPE,     user.getDashType());
+
+        // MES 통합 파라미터 추가
+        params.put(ParamsMap.GS_PLT_CODE,  user.getPltCode() != null ? user.getPltCode() : "100");
+        params.put(ParamsMap.GS_ORG_CODE,  user.getOrgCode());
+        params.put(ParamsMap.GS_GRUP_ID,   user.getGrupId());
+        params.put(ParamsMap.GS_GRUP_NM,   user.getGrupNm());
+        params.put(ParamsMap.GS_IS_SYSTEM, user.getIsSystem());
+        params.put(ParamsMap.GS_POSITION,  user.getPosition());
+
         try {
-        	params.put(ParamsMap.GS_LANG,      getSessionComponent().getLocale().toString());
+            // 사용자 언어 설정 우선, 없으면 세션 로케일 사용
+            String userLang = user.getLang();
+            if (userLang != null && !userLang.isEmpty()) {
+                params.put(ParamsMap.GS_LANG, userLang);
+            } else {
+                params.put(ParamsMap.GS_LANG, getSessionComponent().getLocale().toString());
+            }
 		} catch (NullPointerException e) {
 			params.put(ParamsMap.GS_LANG,      "ko");
 		}
@@ -1047,13 +1063,13 @@ public abstract class BaseController {
 
 		}
 		model.addAttribute("user", getSessionComponent().getUser());
-		
+
 		//BLOCK USER 메세지표시
 		params.put("eventId", "OPEN");
 		params.put("initMsg", "");
 		params.put("targetUserId", params.get("gsUserId"));
-		
-		
+
+
     	RecordMap result = (RecordMap)programService.select("getWindowMsg", params);
     	if("Y".equals((String)result.get("Dsp_Yn"))) {
     		model.addAttribute(BaseConstants.MENU_MSG, (String)result.get("Dsp_Msg"));
@@ -1062,19 +1078,19 @@ public abstract class BaseController {
     	} else {
     		model.addAttribute(BaseConstants.MENU_MSG, "");
     	}
-    	
+
     	RecordMap paypalResult = (RecordMap)programService.select("getPaypalYn", params);
     	model.addAttribute("paypalYn",   (String)paypalResult.get("paypalYn"));
     	model.addAttribute("paypalMeYn", (String)paypalResult.get("paypalMeYn"));
-    	
+
     	model.addAttribute("iconCls" , getSessionComponent().getMenu().getIconCls()); //메뉴 아이콘
-    	
+
     	RecordMap promoNameResult = (RecordMap)programService.select("getPromoName", params);
     	model.addAttribute("exhbnName",   (String)promoNameResult.get("exhbnName"));
     	model.addAttribute("exhbnBgnDate", (String) promoNameResult.get("exhbnBgnDate"));
     	model.addAttribute("exhbnEndDate", (String) promoNameResult.get("exhbnEndDate"));
     	model.addAttribute("todayDate",    (String) promoNameResult.get("todayDate"));
-		
+
 		return params;
     }
 
@@ -1141,23 +1157,23 @@ public abstract class BaseController {
 
     	return "jsonView";
     }
-    
+
     // 엑셀 다운로드
     protected String excelDownloadPost(String data, HttpServletResponse response, Model model) throws IOException, SQLException {
-    	
+
         ParamsMap params = new ParamsMap();
         JSONParser jsonParser = new JSONParser();
 
 		try {
 			JSONObject jsonObject = (JSONObject) jsonParser.parse(data);
 			Map<String, Object> paramList = new ObjectMapper().readValue(jsonObject.toJSONString(), Map.class);
-			
+
 			params.put("sysId", "IMMES");
 			for(String MapKey : paramList.keySet() ) {
 				params.put(MapKey, paramList.get(MapKey));
 				System.out.println("★★★★★★★"+MapKey+"★★★★★★"+paramList.get(MapKey));
 			}
-			
+
 		} catch (ParseException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -1174,36 +1190,36 @@ public abstract class BaseController {
 			e.printStackTrace();
 			/*result = "error";*/
 		}
-	
+
 		if(params.containsKey("h_poList") && !"".equals(params.get("h_poList").toString())){
 			String[] poList = params.get("h_poList").toString().split(",");
 			params.put("poList", poList);
 		}
-		
+
 		if(params.containsKey("h_sapList") && !"".equals(params.get("h_sapList").toString())){
 			String[] sapList = params.get("h_sapList").toString().split(",");
 			params.put("sapList", sapList);
 		}
-		
+
 		if(params.containsKey("h_seriList") && !"".equals(params.get("h_seriList").toString())){
 			String[] seriList = params.get("h_seriList").toString().split(",");
 			params.put("seriList", seriList);
 		}
-		
+
         // 뷰이름을 반환한다.
         return excelDownload2(params, response, model);
-    	
+
     }
-    
+
     // 엑셀 다운로드
     protected String excelDownload2(ParamsMap params, HttpServletResponse response, Model model) throws IOException, SQLException {
-        
+
         Date d = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyy");
         String nowDate = sdf.format(d);
-        
+
         String fileNM = getName();
-        
+
         // myViewId가 ORG가 아닌 경우, 앞에 추가
         if(params.containsKey("myViewId") && !"ORG".equals(params.get("myViewId").toString())) {
             List<HashMap<String, String>> myViewName = getService().getMyViewName(params);
@@ -1234,17 +1250,17 @@ public abstract class BaseController {
 
         return "jsonView";
     }
-    
+
 	@SuppressWarnings("deprecation")
 	private int setRecordSetXLSX(HttpServletResponse response, ParamsMap params, String fileName) throws IOException, SQLException {
-	    
+
 		//header정보
 		List<HashMap<String, String>> header = getService().searchHd(params);
-		
+
 		if(header.size() == 0){
 			throw new SystemException("no download column information !");
 		}
-		
+
 		//lavel, value정보
 		ArrayList<String> label = new ArrayList<String>();
 		ArrayList<String> key = new ArrayList<String>();
@@ -1254,27 +1270,27 @@ public abstract class BaseController {
 			key.add(target.get("COL_VAL"));
 			colStyle.add(target.get("STYLE"));
 		}
-		
+
 		//date정보
 		List<HashMap<String, String>> result = getService().search(params);
-		
+
 	    int rowCount = 0;
-	    
+
 		Cookie setCookie = new Cookie("fileDownload", "true");
 		setCookie.setPath("/");
         setCookie.setMaxAge(60*60*24); // 기간을 하루로 지정
         response.addCookie(setCookie);
-        
+
     	response.setContentType("application/octet-stream;");
 	    response.setHeader("Content-Disposition", "attachment; filename=\"" + new String(fileName.getBytes(), "ISO-8859-1") + "\"");
 	    response.setHeader("Pragma", "no-cache;");
 	    response.setHeader("Expires", "-1;");
-	    
+
 	    SXSSFWorkbook workbook = new SXSSFWorkbook();
-	    SXSSFSheet sheet = workbook.createSheet();		
+	    SXSSFSheet sheet = workbook.createSheet();
 	    OutputStream os = response.getOutputStream();
 	    int c = 0;
-	    
+
 	    //제일위에 헤더
 	    Row row = sheet.createRow(rowCount);
 	    Cell headerCell = row.createCell(c);
@@ -1287,7 +1303,7 @@ public abstract class BaseController {
 //	    style_header.setBorderLeft(BorderStyle.THIN);
 //	    style_header.setFillForegroundColor(IndexedColors.DARK_TEAL.getIndex());  // 배경색
 //	    style_header.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-	    
+
 	    //폰트 설정
 //	    Font hdF = workbook.createFont();
 //	    hdF.setFontName("맑은 고딕"); //글씨체
@@ -1313,14 +1329,14 @@ public abstract class BaseController {
 		style_title.setBorderLeft(BorderStyle.THIN);
 		style_title.setFillForegroundColor(IndexedColors.PALE_BLUE.getIndex());  // 배경색
 		style_title.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-	    
+
 	    //폰트 설정
 	    Font labF = workbook.createFont();
 	    labF.setFontName("맑은 고딕"); //글씨체
 	    labF.setFontHeight((short)(10*20)); //사이즈
 	    labF.setBold(true); //볼드 (굵게)
 	    style_title.setFont(labF);
-	    
+
 		row = sheet.createRow(rowCount);
 		row.setHeight((short) 600);
 		for(String t : label){
@@ -1331,21 +1347,21 @@ public abstract class BaseController {
 			c++;
 		}
 		rowCount++;
-		
+
 		CellStyle style = workbook.createCellStyle();
 		style.setBorderBottom(BorderStyle.THIN);
 		style.setBorderTop(BorderStyle.THIN);
 		style.setBorderRight(BorderStyle.THIN);
 		style.setBorderLeft(BorderStyle.THIN);
 		style.setAlignment(HorizontalAlignment.CENTER);
-		
+
 		CellStyle styleL = workbook.createCellStyle();
 		styleL.setBorderBottom(BorderStyle.THIN);
 		styleL.setBorderTop(BorderStyle.THIN);
 		styleL.setBorderRight(BorderStyle.THIN);
 		styleL.setBorderLeft(BorderStyle.THIN);
 		styleL.setAlignment(HorizontalAlignment.LEFT);
-		
+
 		// 숫자에 사용 xxxx,xx0
 		CellStyle styleR = workbook.createCellStyle();
 		styleR.setBorderBottom(BorderStyle.THIN);
@@ -1354,8 +1370,8 @@ public abstract class BaseController {
 		styleR.setBorderLeft(BorderStyle.THIN);
 		styleR.setAlignment(HorizontalAlignment.RIGHT);
 		styleR.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00"));
-		
-		
+
+
 		sheet.trackAllColumnsForAutoSizing();
 		for (int idx = 0; idx < result.size(); idx++) {
 	        row = sheet.createRow(rowCount);
@@ -1385,16 +1401,16 @@ public abstract class BaseController {
 			}
 	        rowCount++;
 	    }
-		
-		
+
+
 	    for (int i=0;i < label.size();i++)
-		{ 
+		{
 	    	sheet.autoSizeColumn(i);
 		}
 	    workbook.write(os);
 	    return rowCount;
 	}
-	
+
 	private static String getHtmlStrCnvr(String srcString) {
 
 		String tmpString = srcString;
@@ -1414,5 +1430,5 @@ public abstract class BaseController {
 		return tmpString;
 
 	}
-	
+
 }

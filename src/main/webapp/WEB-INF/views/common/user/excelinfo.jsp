@@ -27,7 +27,7 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/common/user/excelinfo.js" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/user/excelinfo.js?v=260227A" />"></script>
 </head>
 
 <!-- BODY 상단 INCLUDE -->
@@ -50,18 +50,18 @@
 	            <th data-options="field:'colVal', halign:'center', align:'left', width:200, editor:{type:'textbox'}, sortable:true,data_item:'GRD_003'">COL Value</th>
                 <th data-options="field:'align',  halign:'center', align:'center', width:200, editor:consts.combo.Align.editor(), sortable:true,data_item:'GRD_003'">STYLE</th>
                 <th data-options="field:'SEQ',    halign:'center', width:120, align:'center', data_item:'GRD_113', hidden:true"></th>
-                <hidden 
+                <hidden
 	        </tr>
 	    </thead>
 	</table>
-	
+
 	<div id="search-toolbar" class="wui-toolbar">
 	    <form id="search-form">
 	        <fieldset class="Remake-div-line-new wd-100">
-	            <table cellpadding="7" class="search-table tableSearch-c">
+	            <table cellpadding="0" class="search-table tableSearch-c wd-100">
 	            	<colgroup>
-	            		<col width="7%">
-	            		<col width="13%">
+	            		<col width="55px">
+	            		<col width="150px">
 	            		<col width="*">
 	            	</colgroup>
 	            	<tr class="topnav_sty">
@@ -75,8 +75,8 @@
 	            		</td>
 	            	</tr>
 	                <tr>
-	                    <th class="h table-Search-h search-label-h2" style="min-width: 127px;" data-item="LAB_001"><span>FILE_NM </span></th>
-	                    <td class="d" style="min-width: 165px;">
+	                    <th class="h table-Search-h search-label-h" data-item="LAB_001"><span>FILE_NM </span></th>
+	                    <td class="d">
 	                        <select class="easyui-combobox" name="s_fileNm" ID="s_fileNm" data-options="width:180,height:30">
 	                            <option value="" selected>ALL</option>
 	                            <c:forEach var="selectCode" items="${selectCode}">

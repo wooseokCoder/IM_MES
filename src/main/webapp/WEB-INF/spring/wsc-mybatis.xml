@@ -15,27 +15,74 @@
         ">
 
 	<!-- org.springframework.jdbc.datasource.DriverManagerDataSource -->
-    <bean id="dataSourceSpied" class="org.apache.commons.dbcp.BasicDataSource">
+	<!-- log4jdbc 사용하지 않으므로 dataSourceSpied 빈 제거 (사용 안 함) -->
+    <!-- <bean id="dataSourceSpied" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName"        value="#{app['jdbc.driver']}"/>
         <property name="url"                    value="#{app['jdbc.url']}"/>
         <property name="username"               value="#{app['jdbc.user']}"/>
         <property name="password"               value="#{app['jdbc.pwd']}"/>
-		<property name="maxActive"              value="100"/>
-		<property name="maxWait"                value="1000"/>
-		<property name="poolPreparedStatements" value="true"/>
-		<property name="defaultAutoCommit"      value="true"/>
-		<property name="validationQuery"        value=" SELECT 1 FROM DUAL" />
-    </bean>
+        <property name="maxActive"              value="100"/>
+        <property name="maxWait"                value="1000"/>
+        <property name="poolPreparedStatements" value="true"/>
+        <property name="defaultAutoCommit"      value="true"/>
+        <property name="validationQuery"        value="SELECT 1"/>
 
-	<bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
-	 <constructor-arg ref="dataSourceSpied" />
-	 <property name="logFormatter">
-	  <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
-	   <property name="loggingType" value="MULTI_LINE" />
-	   <property name="sqlPrefix" value="SQL=>	" />
-	  </bean>
-	 </property>
-	</bean>
+        <property name="testOnBorrow"           value="true"/>
+        <property name="testWhileIdle"          value="true"/>
+
+        <property name="timeBetweenEvictionRunsMillis" value="30000"/>
+        <property name="minEvictableIdleTimeMillis"    value="60000"/>
+        <property name="numTestsPerEvictionRun"        value="10"/>
+
+        <property name="removeAbandoned"        value="true"/>
+        <property name="removeAbandonedTimeout" value="300"/>
+        <property name="logAbandoned"           value="true"/>
+    </bean> -->
+
+    <!-- <bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+     <constructor-arg ref="dataSourceSpied" />
+     <property name="logFormatter">
+      <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+       <property name="loggingType" value="MULTI_LINE" />
+       <property name="sqlPrefix" value="SQL=>  " />
+      </bean>
+     </property>
+    </bean> -->
+
+	<!-- log4jdbc-log4j2는 DriverSpy만 사용하므로 ProxyDataSource 빈 제거 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName"        value="#{app['jdbc.driver']}"/>
+        <property name="url"                    value="#{app['jdbc.url']}"/>
+        <property name="username"               value="#{app['jdbc.user']}"/>
+        <property name="password"               value="#{app['jdbc.pwd']}"/>
+        <property name="maxActive"              value="100"/>
+        <property name="minIdle"                value="5"/>
+        <property name="maxWait"                value="1000"/>
+        <property name="poolPreparedStatements" value="false"/>
+        <property name="defaultAutoCommit"      value="true"/>
+        <property name="validationQuery"        value="SELECT 1"/>
+
+        <!-- InnoDB gap lock 방지: 모든 커넥션 READ_COMMITTED로 초기화 -->
+        <property name="connectionInitSqls">
+            <list>
+                <value>SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED</value>
+            </list>
+        </property>
+
+        <!-- 커넥션 유효성 검사 -->
+        <property name="testOnBorrow"           value="true"/>
+        <property name="testWhileIdle"          value="true"/>
+
+        <!-- 유휴 커넥션 정리 (Evictor 스레드) -->
+        <property name="timeBetweenEvictionRunsMillis" value="30000"/>
+        <property name="minEvictableIdleTimeMillis"    value="1800000"/>
+        <property name="numTestsPerEvictionRun"        value="10"/>
+
+        <!-- 좀비 커넥션 강제 제거 -->
+        <property name="removeAbandoned"        value="true"/>
+        <property name="removeAbandonedTimeout" value="300"/>
+        <property name="logAbandoned"           value="true"/>
+    </bean>
 
     <!-- SqlSessionFactory설정 -->
     <bean id="sqlSessionFactory" class="com.wsc.framework.utils.RefreshableSqlSessionFactoryBean">

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_IDLETIME_QUERY.xml
+설명: 비가동시간 조회 매퍼 (TSTD_IDLETIME + TSTD_IDLECODE JOIN)
+원본: ProActive TSTD_IDLETIME_QUERY.cs
+작성일: 2026-02-10
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_IDLETIME_QUERY">
+
+    <!--
+    ============================================================
+    TSTD_IDLETIME_QUERY1: 비가동시간 목록 조회 (JOIN TSTD_IDLECODE)
+    원본: TSTD_IDLETIME_QUERY.TSTD_IDLETIME_QUERY1()
+    용도: 메인 그리드 목록 조회
+    ============================================================
+    -->
+    <select id="TSTD_IDLETIME_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_idletime_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{idleLike, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_IDLETIME_QUERY2: 시간 중복 체크
+    원본: TSTD_IDLETIME_QUERY.TSTD_IDLETIME_QUERY2()
+    용도: STD49A_INS에서 시간 겹침 검증
+    참고: notIdleNo로 자기 자신(수정 대상) 제외
+    ============================================================
+    -->
+    <select id="TSTD_IDLETIME_QUERY2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_idletime_query2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{notIdleNo, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+</mapper>

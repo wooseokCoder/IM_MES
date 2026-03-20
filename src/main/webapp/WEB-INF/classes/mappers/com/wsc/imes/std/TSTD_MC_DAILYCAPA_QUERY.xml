@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    TSTD_MC_DAILYCAPA QUERY 매퍼
+    설비 일일 CAPA 조회: SER(=QUERY5), QUERY1, QUERY5
+    작성자: 송우석
+    작성일: 2026-02-11
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_MC_DAILYCAPA_QUERY">
+
+    <!-- 메인 그리드 조회 (STD23A_SER → QUERY5) -->
+    <select id="TSTD_MC_DAILYCAPA_QUERY5" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_mc_dailycapa_query5(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{date1, mode=IN, jdbcType=VARCHAR},
+            #{date2, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- 동적 WHERE 조건 조회 -->
+    <select id="TSTD_MC_DAILYCAPA_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_mc_dailycapa_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{afterWorkDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

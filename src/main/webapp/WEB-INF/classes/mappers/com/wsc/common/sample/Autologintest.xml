@@ -5,18 +5,14 @@
 
 <mapper namespace="com.wsc.common.sample.Autologintest">
 
-    <!-- 토큰 생성 -->
-    <select id="createTokenForTest" resultType="record" parameterType="params">
-        CALL SP_CREATE_TOKEN(#{sysId}, #{userId}, #{issuUrl}, #{rqstUrl})
+    <!-- 토큰 생성 (기존 SP_CREATE_TOKEN 프로시저 사용) -->
+    <select id="createTokenForTest" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL SP_CREATE_TOKEN(#{sysId}, #{userId}, #{issuUrl}, #{rqstUrl})}
     </select>
 
     <!-- URL 경로로 메뉴 키 조회 -->
-    <select id="getMenuKeyByUrl" resultType="string" parameterType="params">
-        SELECT MENU_KEY
-          FROM SYS_MENU
-         WHERE SYS_ID   = #{sysId}
-           AND MENU_URL = #{menuUrl}
-         LIMIT 0, 1
+    <select id="getMenuKeyByUrl" statementType="CALLABLE" resultType="string" parameterType="params">
+        {CALL sp_autologintest_get_menu_key_by_url(#{sysId}, #{menuUrl})}
     </select>
 
 </mapper>

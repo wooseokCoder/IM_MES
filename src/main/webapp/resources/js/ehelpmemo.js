@@ -84,7 +84,7 @@ function doEHelpSave(){
     var validator = new Trex.Validator();
     var content = Editor.getContent();
     if (!validator.exists(content)) {
-    	$.messager.alert('Warning',msg.MSG0038,'warning');
+    	$.messager.alert('Warning',msg.MSG0010,'warning');
         return false;
     }
 
@@ -353,7 +353,7 @@ var juploadMemo = {
 					var row  = rows[index];
 
 					if (row.exist != true) {
-						$.messager.alert("Error", msg.MSG0113, 'error');
+						$.messager.alert("Error", msg.MSG0083, 'error');
 						return;
 					}
 					obj.download(row.index);   //파일 다운

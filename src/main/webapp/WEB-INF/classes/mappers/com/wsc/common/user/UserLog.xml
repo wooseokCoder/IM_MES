@@ -6,8 +6,24 @@
 <mapper namespace="com.wsc.common.user.UserLog">
 
     <!-- ========================================================== -->
-    <!--   Oracle Paging Clause                                     -->
+    <!--   사용자 로그 목록 조회 (페이징)                              -->
     <!-- ========================================================== -->
+    <select id="search" statementType="CALLABLE" resultType="record" parameterType="params">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_userlog_search(
+            #{sysId,       mode=IN, jdbcType=VARCHAR},
+            #{userId,      mode=IN, jdbcType=VARCHAR},
+            #{progId,      mode=IN, jdbcType=VARCHAR},
+            #{loginDate,   mode=IN, jdbcType=VARCHAR},
+            #{clientIp,    mode=IN, jdbcType=VARCHAR},
+            #{clientName,  mode=IN, jdbcType=VARCHAR},
+            #{clientAgent, mode=IN, jdbcType=VARCHAR},
+            #{sortStr,     mode=IN, jdbcType=VARCHAR},
+            #{start,       mode=IN, jdbcType=INTEGER},
+            #{end,         mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+    <!-- AS-IS:
     <sql id="pagingColumns">
         <if test="start == null or end == null">
             ,0 AS RNUM
@@ -15,7 +31,7 @@
     </sql>
     <sql id="pagingOpen">
         <if test="start != null and end != null">
-            SELECT * 
+            SELECT *
               FROM (
                     SELECT X.*
                       FROM (
@@ -27,25 +43,24 @@
         <if test="start != null and end != null">
                                    ) Z1, (SELECT @rownum:=0 ) Z2
                            ) X
-                     WHERE RNUM <![CDATA[< ]]> #{end}
+                     WHERE RNUM < #{end}
                    ) X
-             WHERE RNUM <![CDATA[>= ]]> #{start}
-        </if>  
+             WHERE RNUM >= #{start}
+        </if>
     </sql>
     <sql id="sortClause">
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
-		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
-		        ${sort}
-		  	</foreach>
-	  	</if>
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
-         	   A.ACC_TIME DESC
-	  	</if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
+            <foreach item="sort" collection="gsSorts" open="" separator="," close="">
+                ${sort}
+            </foreach>
+        </if>
+        <if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
+               A.ACC_TIME DESC
+        </if>
     </sql>
-
     <sql id="selectColumns">
          SYS_ID           AS "sysId"
-        ,DATE_FORMAT(ACC_TIME,'%Y-%m-%d %H:%i:%s')     
+        ,DATE_FORMAT(ACC_TIME,'%Y-%m-%d %H:%i:%s')
                           AS "accTime"
         ,USER_ID          AS "userId"
         ,PROG_ID          AS "progId"
@@ -55,9 +70,8 @@
         ,CLIENT_AGENT     AS "clientAgent"
         ,LOG_REMK         AS "logRemk"
     </sql>
-    
     <sql id="whereClause">
-    	SYS_ID = #{sysId}
+        SYS_ID = #{sysId}
         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(userId     )">AND USER_ID      = #{userId}       </if>
         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(progId     )">AND PROG_ID      = #{progId}       </if>
         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(loginDate  )">AND LOGIN_DATE   = #{loginDate}    </if>
@@ -65,27 +79,59 @@
         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientName )">AND CLIENT_NAME  = #{clientName}   </if>
         <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientAgent)">AND CLIENT_AGENT = #{clientAgent}  </if>
     </sql>
-    
     <select id="search" resultType="record" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
+        <include refid="pagingOpen"  />
         SELECT <include refid="selectColumns" />
-               <include refid="pagingColumns" /><!-- PAGING -->
+               <include refid="pagingColumns" />
           FROM SYS_ULOG A
          WHERE <include refid="whereClause" />
-         ORDER 
-            BY <include refid="sortClause" /><!-- SORT -->
-        <include refid="pagingClose" /><!-- PAGING -->
+         ORDER
+            BY <include refid="sortClause" />
+        <include refid="pagingClose" />
     </select>
+    -->
+
+    <!-- ========================================================== -->
+    <!--   사용자 로그 건수 조회                                      -->
+    <!-- ========================================================== -->
+    <select id="searchCount" statementType="CALLABLE" resultType="int" parameterType="params">
+        {CALL sp_userlog_search_count(
+            #{sysId,       mode=IN, jdbcType=VARCHAR},
+            #{userId,      mode=IN, jdbcType=VARCHAR},
+            #{progId,      mode=IN, jdbcType=VARCHAR},
+            #{loginDate,   mode=IN, jdbcType=VARCHAR},
+            #{clientIp,    mode=IN, jdbcType=VARCHAR},
+            #{clientName,  mode=IN, jdbcType=VARCHAR},
+            #{clientAgent, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+    <!-- AS-IS:
     <select id="searchCount" resultType="int" parameterType="params">
-        SELECT COUNT(1) 
+        SELECT COUNT(1)
           FROM SYS_ULOG A
          WHERE <include refid="whereClause" />
     </select>
+    -->
+
+    <!-- ========================================================== -->
+    <!--   사용자 로그 등록 (기존 프로시저 유지)                        -->
+    <!-- ========================================================== -->
+    <insert id="insert" statementType="CALLABLE" parameterType="params">
+        {CALL sp_insert_sys_ulog(
+            #{sysId,       mode=IN, jdbcType=VARCHAR},
+            #{userId,      mode=IN, jdbcType=VARCHAR},
+            #{progId,      mode=IN, jdbcType=VARCHAR},
+            #{loginDate,   mode=IN, jdbcType=VARCHAR},
+            #{clientIp,    mode=IN, jdbcType=VARCHAR},
+            #{clientName,  mode=IN, jdbcType=VARCHAR},
+            #{clientAgent, mode=IN, jdbcType=VARCHAR},
+            #{logRemk,     mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+    <!-- AS-IS:
     <insert id="insert" parameterType="params">
-        CALL sp_insert_sys_ulog(#{sysId}, #{userId}, #{progId}, #{loginDate}, #{clientIp}, #{clientName}, #{clientAgent}, #{logRemk})
-        <!-- 
-        INSERT 
-          INTO SYS_ULOG 
+        INSERT
+          INTO SYS_ULOG
              ( SYS_ID
              , PROG_ID
              , USER_ID
@@ -105,15 +151,27 @@
             <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientName )">, #{clientName}   </if>
             <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(clientAgent)">, #{clientAgent}  </if>
              )
-        -->
     </insert>
+    -->
+
+    <!-- ========================================================== -->
+    <!--   사용자 로그 삭제                                           -->
+    <!-- ========================================================== -->
+    <delete id="delete" statementType="CALLABLE" parameterType="params">
+        {CALL sp_userlog_delete(
+            #{sysId,  mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{progId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+    <!-- AS-IS:
     <delete id="delete" parameterType="params">
-        DELETE 
+        DELETE
           FROM SYS_ULOG
          WHERE SYS_ID    = #{sysId}
            AND USER_ID   = #{userId}
            AND PROG_ID   = #{progId}
-           <!-- AND ACC_TIME  = #{accTime} -->
     </delete>
+    -->
 
 </mapper>

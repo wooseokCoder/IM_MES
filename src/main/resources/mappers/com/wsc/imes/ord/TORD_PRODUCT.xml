@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TORD_PRODUCT.xml
+설명: 생산오더 제품 매퍼 (TORD_PRODUCT 테이블)
+원본: ProActive TORD_PRODUCT.cs
+작성일: 2026-02-24
+사용화면: ORD06A
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TORD_PRODUCT">
+
+    <!--
+    ============================================================
+    TORD_PRODUCT_UPD3: 제품 상태(PROD_STATE) 업데이트
+    ============================================================
+    -->
+    <update id="TORD_PRODUCT_UPD3" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tord_product_upd3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{prodCode, mode=IN, jdbcType=VARCHAR},
+            #{prodState, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

@@ -26,14 +26,14 @@ function doSendEmail() {
     };
     
     if (!params.userId || !params.emailAddress || !params.targetUrl) {
-        $.messager.alert("Alert", "Please enter User ID, Email Address, and Target Page URL.", "info");
+        $.messager.alert(msg.MSG0051, msg.MSG0111, "Warning");
         return;
     }
     
     // Email validation
     var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(params.emailAddress)) {
-        $.messager.alert("Alert", "Please enter a valid email address.", "info");
+        $.messager.alert(msg.MSG0051, "Please enter a valid email address.", "Warning");
         return;
     }
     

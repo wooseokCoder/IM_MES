@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    LSE_STD_PARTINS 조회 매퍼
+    부품-검사그룹 연계 관리 (QCT06A)
+    작성자: 송우석
+-->
+<mapper namespace="com.wsc.imes.qct.LSE_STD_PARTINS_QUERY">
+
+    <!-- 부품 목록 조회 (ASSY/MACH 탭) -->
+    <select id="LSE_STD_PARTINS_QUERY1" parameterType="map" resultType="map"
+            statementType="CALLABLE">
+        {CALL sp_imes_lse_std_partins_query1(
+            #{gsPltCode}, #{partCode}, #{searchLike}
+        )}
+    </select>
+
+    <!-- 부품의 연계 검사그룹 조회 -->
+    <select id="LSE_STD_PARTINS_QUERY2" parameterType="map" resultType="map"
+            statementType="CALLABLE">
+        {CALL sp_imes_lse_std_partins_query2(
+            #{gsPltCode}, #{partCode}, #{plants}
+        )}
+    </select>
+
+    <!-- LIST 탭 전체 연계 현황 -->
+    <select id="LSE_STD_PARTINS_QUERY3" parameterType="map" resultType="map"
+            statementType="CALLABLE">
+        {CALL sp_imes_lse_std_partins_query3(
+            #{gsPltCode}, #{partLike}, #{groupLike}
+        )}
+    </select>
+
+    <!-- D0A 검사그룹 목록 -->
+    <select id="LSE_STD_PARTINS_QUERY4" parameterType="map" resultType="map"
+            statementType="CALLABLE">
+        {CALL sp_imes_lse_std_partins_query4(
+            #{gsPltCode}, #{plants}, #{searchLike}
+        )}
+    </select>
+
+    <!-- 검사그룹의 검사항목 조회 -->
+    <select id="LSE_STD_PARTINS_QUERY5" parameterType="map" resultType="map"
+            statementType="CALLABLE">
+        {CALL sp_imes_lse_std_partins_query5(
+            #{gsPltCode}, #{insGrpCode}
+        )}
+    </select>
+
+</mapper>

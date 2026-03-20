@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_INS_GRP_QUERY.xml
+설명: 검사그룹 조회 매퍼 (TSTD_INS_GRP 테이블)
+원본: ProActive TSTD_INS_GRP_QUERY.cs
+작성일: 2026-03-11
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_INS_GRP_QUERY">
+
+    <!--
+    ============================================================
+    TSTD_INS_GRP_QUERY1: 검사그룹 목록 조회
+    용도: STD51A_SER 그리드 데이터
+    ============================================================
+    -->
+    <select id="TSTD_INS_GRP_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_ins_grp_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{searchLike, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=TINYINT}
+        )}
+    </select>
+
+</mapper>

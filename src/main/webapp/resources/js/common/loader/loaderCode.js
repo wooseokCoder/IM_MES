@@ -12,10 +12,6 @@ var consts = {
 		if (id.indexOf("cform-") >= 0)
 			return true;
 		return false;
-		
-		
-		
-		
 	},
 	isitemgrid: function(id) {
 		if (id.indexOf("citem-") >= 0)
@@ -149,7 +145,7 @@ function doAppend() {
 	if ( consts.isitemgrid(id) ) {
 		var v = g.sform.getFormValue("codeGrup");
 		if ( jutils.empty(v) ) {
-			$.messager.alert('Warning',msg.MSG0088,'warning');
+			$.messager.alert('Warning',msg.MSG0019,'warning');
 			return;
 		}
 	}
@@ -173,7 +169,7 @@ function doValidate(id) {
 
 	if (rows == null ||
 		rows.length == 0) {
-		$.messager.alert('Warning',msg.MSG0121,'warning');
+		$.messager.alert('Warning',msg.MSG0022,'warning');
 		return false;
 	}
 	

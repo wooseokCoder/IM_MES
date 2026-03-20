@@ -41,7 +41,7 @@
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:600,700"rel="stylesheet">
 		
 <link rel="stylesheet" type="text/css" href="<c:url value="/resources/jquery/easyui-1.4/themes/ui-pepper-grinder/easyui.css" />" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/common.css?v=251107A" />" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/common.css?v=260306A" />" />
 
 <style>
 #logout-button .l-btn-left .l-btn-text {
@@ -415,15 +415,14 @@ input.textbox-text.validatebox-text{
 						      <a href="#;" onclick="fnDashboardLoad('B');" id="" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">Dashboard-B</a>
 						      <a href="#;" onclick="fnDashboardLoad('B_1');" id="" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">Dashboard-B-1</a>
 						      <a href="#;" onclick="fnDashboardLoad('Iframe');" id="" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">Dashboard-iframe</a> -->
-						      <a href="javascript:jmenus.go('LS601');" id="" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">Change Password</a>
-						      <a href="javascript:jmenus.go('LS602');" id="" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">Q&A</a>
-						      <!-- <a href="javascript:jmenus.go('LS605');" id="" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">My Account</a> -->
+						      <div class="accountMenuItems"></div>
+						      <div style="border-top: 1px solid #ddd; margin: 0px 0;"></div>
 						      <a href="#" id="logout-button" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">
-								<% if((LocaleUtil.getLocale(request)).toString().equals("ko")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;">Logout</span><%} %>
-								<% if((LocaleUtil.getLocale(request)).toString().equals("en")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;"">Logout</span><%} %>
-								<% if((LocaleUtil.getLocale(request)).toString().equals("vi")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;"">Đăng xuất</span><%} %>
-								<% if((LocaleUtil.getLocale(request)).toString().equals("pt")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;"">Sair</span><%} %>
-								</a> 
+								<% if((LocaleUtil.getLocale(request)).toString().equals("ko")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;">로그아웃</span><%} %>
+								<% if((LocaleUtil.getLocale(request)).toString().equals("en")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;">Logout</span><%} %>
+								<% if((LocaleUtil.getLocale(request)).toString().equals("zh")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;">登出</span><%} %>
+								<% if((LocaleUtil.getLocale(request)).toString().equals("vi")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;">Đăng xuất</span><%} %>
+								</a>
 						    </div>
 						</c:if>
 						<c:if test="${user.orgAuthCode ne 'DEAL'}">
@@ -439,15 +438,14 @@ input.textbox-text.validatebox-text{
 						      <a href="#;" onclick="fnDashboardLoad('B');" id="" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">Dashboard-B</a>
 						      <a href="#;" onclick="fnDashboardLoad('B_1');" id="" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">Dashboard-B-1</a>
 						      <a href="#;" onclick="fnDashboardLoad('Iframe');" id="" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">Dashboard-iframe</a> -->
-						      <a href="javascript:jmenus.go('LS601');" id="" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">Change Password</a>
-						      <a href="javascript:jmenus.go('LS602');" id="" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">Q&A</a>
-						      <!-- <a href="javascript:jmenus.go('LS605');" id="" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">My Account</a> -->
+						      <div class="accountMenuItems"></div>
+						      <div style="border-top: 1px solid #ddd; margin: 0px 0;"></div>
 						      <a href="#" id="logout-button" data-options="plain:true" style="font-family: 'Amazon Ember',Arial,sans-serif!important;">
-								<% if((LocaleUtil.getLocale(request)).toString().equals("ko")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;">Logout</span><%} %>
-								<% if((LocaleUtil.getLocale(request)).toString().equals("en")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;"">Logout</span><%} %>
-								<% if((LocaleUtil.getLocale(request)).toString().equals("vi")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;"">Đăng xuất</span><%} %>
-								<% if((LocaleUtil.getLocale(request)).toString().equals("pt")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;"">Sair</span><%} %>
-								</a> 
+								<% if((LocaleUtil.getLocale(request)).toString().equals("ko")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;">로그아웃</span><%} %>
+								<% if((LocaleUtil.getLocale(request)).toString().equals("en")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;">Logout</span><%} %>
+								<% if((LocaleUtil.getLocale(request)).toString().equals("zh")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;">登出</span><%} %>
+								<% if((LocaleUtil.getLocale(request)).toString().equals("vi")){ %><span style="line-height: 29px; font-family: 'Amazon Ember',Arial,sans-serif!important;font-size: 14px;">Đăng xuất</span><%} %>
+								</a>
 						    </div>
 						</c:if>
 						<%-- <c:out value="${user.userName}" /> --%>
@@ -620,6 +618,7 @@ $(function() {
 var reportWin = "";
 /*20160929 박소현*/
 $(function() {
+	/*사용 x
 	if(getCookie("reportLogin") == 'N') {
 		//var reportWin = window.open($("#reportUrl").val()+'/jasperserver/flow.html?_flowId=viewReportFlow&standAlone=true&_flowId=viewReportFlow&ParentFolderUri=/reports/lsvs&reportUnit=/reports/lsvs/dummy_login&decorate=no&output=pdf&j_username=lspdiuser&j_password=lspdi1@3$','pdfReport', 'toolbar=no, width=1, height=1, top=5000, left=5000, directories=no, status=no, scrollorbars=yes, resizable=no');
 		if(reportWin == "") {
@@ -632,7 +631,7 @@ $(function() {
 			reportWin.close();
 			setCookie("reportLogin", "Y", 30);
 		},10000);		
-	}
+	} */
 	
 	$("#menu-folding-left").bind("click", function() {
 		//메뉴접기
@@ -1079,19 +1078,14 @@ $(window).load(function() {
 	}
 	
 	
+	// 사용자 아이콘 클릭 시 계정 메뉴 열기
+	// 메뉴 KEY 설정: widget.js > jwidget.menu.consts.myAccountMenuKey
 	function myAccountMenu(auth) {
-		//관리자일 경우 MyAccount
-		/* if(auth == 'ADMIN') {
-			jmenus.go('LS605');
-		} */
 		if(auth == 'DEAL') {
-			//dealer인 경우 My info
-			jmenus.go('LS603');
+			jmenus.go(jwidget.menu.consts.myAccountMenuKey["DEAL"]);
 		}
 		else {
-			//dealer가 아닌 경우 My Account
-			//jmenus.go('LS601');
-			jmenus.go('LS605');
+			jmenus.go(jwidget.menu.consts.myAccountMenuKey["NODEAL"]);
 		}
 	}
 	
@@ -1099,7 +1093,42 @@ $(window).load(function() {
 	function goHome() {
 		document.location.href = context + "/index.do";
 	}
+	
+	// 헤더 드롭다운에 계정 서브메뉴를 동적 생성
+	// 소스 메뉴 KEY 설정: widget.js > jwidget.menu.consts.submenuKey
+	// 숨김 메뉴 KEY 설정: widget.js > jwidget.menu.consts.myAccountMenuKey
+	function buildAccountDropdown() {
+		var dropDownMenu = jmenus.getMenu(jwidget.menu.consts.submenuKey);
+		if (!dropDownMenu || !dropDownMenu.subs) return;
 
+		var html = '';
+		var lang = (typeof locale !== 'undefined') ? locale : 'ko';
+
+		// myAccountMenuKey에 포함된 메뉴는 드롭다운에서 숨김
+		var myAccKeys = jwidget.menu.consts.myAccountMenuKey;
+		var hideKeys = [];
+		for (var k in myAccKeys) { hideKeys.push(myAccKeys[k]); }
+
+		for (var i = 0; i < dropDownMenu.subs.length; i++) {
+			var menu = dropDownMenu.subs[i];
+			if (hideKeys.indexOf(menu.menuKey) > -1) continue;
+			var desc;
+			if (lang === 'en') {
+				desc = menu.menuDescEn || menu.menuDesc;
+			} else if (lang === 'ko') {
+				desc = menu.menuDescKr || menu.menuDesc;
+			} else {
+				desc = menu.menuDesc;
+			}
+
+			html += '<a href="javascript:jmenus.go(\'' + menu.menuKey + '\');" '
+				+ 'data-options="plain:true" '
+				+ 'style="font-family: \'Amazon Ember\',Arial,sans-serif!important;">'
+				+ desc + '</a>';
+		}
+
+		$('.accountMenuItems').html(html);
+	}
 
 
 </script>

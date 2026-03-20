@@ -5,122 +5,204 @@
 
 <mapper namespace="com.wsc.common.ftk.Token">
 
-	<select id="createToken" parameterType="params" resultType="record">
-		CALL SP_CREATE_TOKEN(#{sysId},#{userId},#{issuUrl},#{rqstUrl})
-	</select>
-	
-	<select id="selectToken" resultType="string" parameterType="params">
-		SELECT FN_MAKE_TOKEN()
-	</select>
-	
-	<select id="validateToken" resultType="string" parameterType="params">
-		CALL SP_VALIDATE_TOKEN(#{userId},#{ftokenNo})
+    <!-- ========================================================== -->
+    <!--   1. 토큰 관리 - 프로시저 호출                              -->
+    <!-- ========================================================== -->
+
+    <!-- [createToken] 토큰 생성 -->
+    <select id="createToken" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL SP_CREATE_TOKEN(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{issuUrl, mode=IN, jdbcType=VARCHAR},
+            #{rqstUrl, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-	<select id="validateToken2" resultType="string" parameterType="params">
-		CALL SP_VALIDATE_TOKEN2(#{userId},#{ftokenNo})
-    </select>
-    
-	<select id="seriNoUpdate" resultType="record" parameterType="params">
-		CALL SP_IF_PDI('SERI_NO',#{ordrNo},#{itemCode},#{userId},#{seriNo},'','','','')
-    </select>
-    
-    <select id="outBoundUpdate" resultType="record" parameterType="params">
-		CALL SP_IF_PDI('OUTBOUND','','',#{userId},#{bolNo},#{actShipDate},'','','')
+    <!-- [selectToken] 토큰 번호 조회 (함수 호출) -->
+    <select id="selectToken" resultType="string" parameterType="params">
+        SELECT FN_MAKE_TOKEN()
     </select>
 
-	<select id="outBoundCancelUpdate" resultType="record" parameterType="params">
-		CALL SP_IF_PDI('OUTBOUND_CNSL','','',#{userId},#{poNo},'','','','')
+    <!-- [validateToken] 토큰 검증 -->
+    <select id="validateToken" statementType="CALLABLE" resultType="string" parameterType="params">
+        {CALL SP_VALIDATE_TOKEN(
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{ftokenNo, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
 
-	<select id="assyNoUpdate" resultType="record" parameterType="params">
-		CALL SP_IF_PDI('ASSY_NO',#{ordrNo},'',#{userId},#{assyNo},#{assyDate},'','','')
+    <!-- [validateToken2] 토큰 검증 2 -->
+    <select id="validateToken2" statementType="CALLABLE" resultType="string" parameterType="params">
+        {CALL SP_VALIDATE_TOKEN2(
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{ftokenNo, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="ifOrdrUpdate" resultType="record" parameterType="params">
-		CALL SP_IF_PDI(#{type},#{ordrNo},#{itemCode},#{userId},#{var1},#{var2},#{var3},#{var4},#{var5},#{var6},#{var7},#{var8},#{var9},#{var10},#{var11})
+
+    <!-- ========================================================== -->
+    <!--   2. PDI 인터페이스 - 프로시저 호출                         -->
+    <!-- ========================================================== -->
+
+    <!-- [seriNoUpdate] 시리얼 번호 업데이트 -->
+    <select id="seriNoUpdate" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL SP_IF_PDI(
+            'SERI_NO',
+            #{ordrNo, mode=IN, jdbcType=VARCHAR},
+            #{itemCode, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{seriNo, mode=IN, jdbcType=VARCHAR},
+            '', '', '', ''
+        )}
     </select>
-    
-    <select id="outboundBolImgUpdate" resultType="record" parameterType="params">
-		CALL SP_IF_PDI(#{type},#{ordrNo},#{itemCode},#{userId},#{var1},#{var2},#{var3},#{var4},#{var5},#{var6},#{var7},#{var8},#{var9},#{var10},#{var11})
+
+    <!-- [outBoundUpdate] 출고 업데이트 -->
+    <select id="outBoundUpdate" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL SP_IF_PDI(
+            'OUTBOUND',
+            '', '',
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{bolNo, mode=IN, jdbcType=VARCHAR},
+            #{actShipDate, mode=IN, jdbcType=VARCHAR},
+            '', '', ''
+        )}
     </select>
-    
-    <select id="ifLsas" resultType="record" parameterType="params">
-		CALL SP_IF_LSAS(#{var1},#{var2},#{var3},#{var4},#{var5},#{var6},#{var7},#{var8},#{var9},#{var10},#{var11},#{var12},#{var13},#{var14},#{var15})
+
+    <!-- [outBoundCancelUpdate] 출고 취소 업데이트 -->
+    <select id="outBoundCancelUpdate" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL SP_IF_PDI(
+            'OUTBOUND_CNSL',
+            '', '',
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{poNo, mode=IN, jdbcType=VARCHAR},
+            '', '', '', ''
+        )}
     </select>
-    
-    <sql id="insertLog-fields">
-           SYS_ID
-        , SEQ
-        , USER_ID
-        , TOKEN_NO
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ordr_no)">, LOG_1     </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(assy_no)">, LOG_2     </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(type )">  , LOG_3     </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val )">   , LOG_4     </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val2 )">  , LOG_5     </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val3 )">  , LOG_6     </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val4 )">  , LOG_7     </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val5 )">  , LOG_8     </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val6 )">  , LOG_9     </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val7 )">  , LOG_10    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val8 )">  , LOG_11    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val9 )">  , LOG_12    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val10 )"> , LOG_13    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val11 )"> , LOG_14    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val12 )"> , LOG_15    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val13 )"> , LOG_16    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val14 )"> , LOG_17    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val15 )"> , LOG_18    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val16 )"> , LOG_19    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val17 )"> , LOG_20    </if>
-        , RET
-        , CON_DATE
-    </sql>
-    <sql id="insertLog-values">
-           'IMMES'
-         , fn_get_next_seq_d('TL','10')
-         , #{userId}
-         , #{token}
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(ordr_no)">, #{ordr_no} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(assy_no)">, #{assy_no} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(type )">  , #{type}    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val  )">,  #{val}   </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val2 )">,  #{val2}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val3 )">,  #{val3}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val4 )">,  #{val4}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val5 )">,  #{val5}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val6 )">,  #{val6}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val7 )">,  #{val7}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val8 )">,  #{val8}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val9 )">,  #{val9}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val10 )">, #{val10} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val11 )">, #{val11} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val12 )">, #{val12} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val13 )">, #{val13} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val14 )">, #{val14} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val15 )">, #{val15} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val16 )">, #{val16} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(val17 )">, #{val17} </if>
-         , NULL
-         , NOW()
-    </sql>
-    <insert id="TmpLogInsert" parameterType="params">
-        INSERT 
-          INTO SYS_API_TEMP_LOG 
-             ( <include refid="insertLog-fields" /> )
-        VALUES
-             ( <include refid="insertLog-values" /> )
+
+    <!-- [assyNoUpdate] 조립 번호 업데이트 -->
+    <select id="assyNoUpdate" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL SP_IF_PDI(
+            'ASSY_NO',
+            #{ordrNo, mode=IN, jdbcType=VARCHAR},
+            '',
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{assyNo, mode=IN, jdbcType=VARCHAR},
+            #{assyDate, mode=IN, jdbcType=VARCHAR},
+            '', '', ''
+        )}
+    </select>
+
+    <!-- [ifOrdrUpdate] 주문 인터페이스 업데이트 -->
+    <select id="ifOrdrUpdate" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL SP_IF_PDI(
+            #{type, mode=IN, jdbcType=VARCHAR},
+            #{ordrNo, mode=IN, jdbcType=VARCHAR},
+            #{itemCode, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{var1, mode=IN, jdbcType=VARCHAR},
+            #{var2, mode=IN, jdbcType=VARCHAR},
+            #{var3, mode=IN, jdbcType=VARCHAR},
+            #{var4, mode=IN, jdbcType=VARCHAR},
+            #{var5, mode=IN, jdbcType=VARCHAR},
+            #{var6, mode=IN, jdbcType=VARCHAR},
+            #{var7, mode=IN, jdbcType=VARCHAR},
+            #{var8, mode=IN, jdbcType=VARCHAR},
+            #{var9, mode=IN, jdbcType=VARCHAR},
+            #{var10, mode=IN, jdbcType=VARCHAR},
+            #{var11, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- [outboundBolImgUpdate] 출고 BOL 이미지 업데이트 -->
+    <select id="outboundBolImgUpdate" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL SP_IF_PDI(
+            #{type, mode=IN, jdbcType=VARCHAR},
+            #{ordrNo, mode=IN, jdbcType=VARCHAR},
+            #{itemCode, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{var1, mode=IN, jdbcType=VARCHAR},
+            #{var2, mode=IN, jdbcType=VARCHAR},
+            #{var3, mode=IN, jdbcType=VARCHAR},
+            #{var4, mode=IN, jdbcType=VARCHAR},
+            #{var5, mode=IN, jdbcType=VARCHAR},
+            #{var6, mode=IN, jdbcType=VARCHAR},
+            #{var7, mode=IN, jdbcType=VARCHAR},
+            #{var8, mode=IN, jdbcType=VARCHAR},
+            #{var9, mode=IN, jdbcType=VARCHAR},
+            #{var10, mode=IN, jdbcType=VARCHAR},
+            #{var11, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- [ifLsas] LSAS 인터페이스 -->
+    <select id="ifLsas" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL SP_IF_LSAS(
+            #{var1, mode=IN, jdbcType=VARCHAR},
+            #{var2, mode=IN, jdbcType=VARCHAR},
+            #{var3, mode=IN, jdbcType=VARCHAR},
+            #{var4, mode=IN, jdbcType=VARCHAR},
+            #{var5, mode=IN, jdbcType=VARCHAR},
+            #{var6, mode=IN, jdbcType=VARCHAR},
+            #{var7, mode=IN, jdbcType=VARCHAR},
+            #{var8, mode=IN, jdbcType=VARCHAR},
+            #{var9, mode=IN, jdbcType=VARCHAR},
+            #{var10, mode=IN, jdbcType=VARCHAR},
+            #{var11, mode=IN, jdbcType=VARCHAR},
+            #{var12, mode=IN, jdbcType=VARCHAR},
+            #{var13, mode=IN, jdbcType=VARCHAR},
+            #{var14, mode=IN, jdbcType=VARCHAR},
+            #{var15, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- ========================================================== -->
+    <!--   3. API 임시 로그 관리 (SYS_API_TEMP_LOG) - 프로시저 호출  -->
+    <!-- ========================================================== -->
+
+    <!-- [TmpLogInsert] API 임시 로그 등록 -->
+    <insert id="TmpLogInsert" statementType="CALLABLE" parameterType="params">
+        {CALL sp_token_tmp_log_insert(
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{token, mode=IN, jdbcType=VARCHAR},
+            #{ordr_no, mode=IN, jdbcType=VARCHAR},
+            #{assy_no, mode=IN, jdbcType=VARCHAR},
+            #{type, mode=IN, jdbcType=VARCHAR},
+            #{val, mode=IN, jdbcType=VARCHAR},
+            #{val2, mode=IN, jdbcType=VARCHAR},
+            #{val3, mode=IN, jdbcType=VARCHAR},
+            #{val4, mode=IN, jdbcType=VARCHAR},
+            #{val5, mode=IN, jdbcType=VARCHAR},
+            #{val6, mode=IN, jdbcType=VARCHAR},
+            #{val7, mode=IN, jdbcType=VARCHAR},
+            #{val8, mode=IN, jdbcType=VARCHAR},
+            #{val9, mode=IN, jdbcType=VARCHAR},
+            #{val10, mode=IN, jdbcType=VARCHAR},
+            #{val11, mode=IN, jdbcType=VARCHAR},
+            #{val12, mode=IN, jdbcType=VARCHAR},
+            #{val13, mode=IN, jdbcType=VARCHAR},
+            #{val14, mode=IN, jdbcType=VARCHAR},
+            #{val15, mode=IN, jdbcType=VARCHAR},
+            #{val16, mode=IN, jdbcType=VARCHAR},
+            #{val17, mode=IN, jdbcType=VARCHAR}
+        )}
     </insert>
-    <update id="TmpLogUpdate" parameterType="params">
-        UPDATE SYS_API_TEMP_LOG
-           SET RET      = #{ret}
-             , CON_DATE = NOW()
-         WHERE SYS_ID   = 'IMMES'
-           AND USER_ID  = #{userId}
-           AND TOKEN_NO = #{token}
+
+    <!-- [TmpLogUpdate] API 임시 로그 결과 업데이트 -->
+    <update id="TmpLogUpdate" statementType="CALLABLE" parameterType="params">
+        {CALL sp_token_tmp_log_update(
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{token, mode=IN, jdbcType=VARCHAR},
+            #{ret, mode=IN, jdbcType=VARCHAR}
+        )}
     </update>
-    
+
+    <!-- ========================================================== -->
+    <!--   4. API 키 조회 (함수 호출)                                -->
+    <!-- ========================================================== -->
+
+    <!-- [getApiKey] API 키 조회 -->
     <select id="getApiKey" parameterType="params" resultType="record">
-		SELECT FN_API_KEY_GET(#{sysId}) AS API_KEY
-	</select>
+        SELECT FN_API_KEY_GET(#{sysId}) AS API_KEY
+    </select>
+
 </mapper>

@@ -7,6 +7,7 @@
 var calYear;
 var calMonth;  /* 0-based (0=1월, 11=12월) */
 var holidayMap = {};
+var selectedCalDate = null;
 var contextMenuDate = null;
 
 /* D1B guard flag */
@@ -35,28 +36,42 @@ var consts = {
 /* ========== 초기화 ========== */
 
 $(function() {
+    // 500 에러 시 raw 메시지 대신 일반 메시지 표시
+    $.ajaxSetup({ statusCode: { 500: function() {
+        $.messager.alert('Error', '오류가 발생했습니다.', 'error');
+    }}});
     consts.init();
 });
 
 $(window).load(function() {
     hideLoadingBar();
+    GridHeaderMenu('#search-grid', { exportFileName: '휴일관리' });
+    enableGridSortReset('#search-grid');
     doSearch();
 });
 
-/* ========== 메인 그리드 (3컬럼: dispHoliDate, holiDate hidden, holiName) ========== */
+/* ========== 메인 그리드 ========== */
 
 function initMainGrid() {
     $('#search-grid').datagrid({
-        toolbar: '#search-toolbar',
         fit: true,
         fitColumns: true,
         singleSelect: true,
         striped: true,
-        rownumbers: true,
+        rownumbers: false,
         columns: [[
-            {field:'dispHoliDate', title:'일자', width:120, halign:'center', align:'center'},
+            {field:'dispHoliDate', title:'일자', width:100, halign:'center', align:'center',
+                formatter: function(value) {
+                    if (!value) return '';
+                    var s = String(value).replace(/[^0-9]/g, '');
+                    if (s.length === 8) {
+                        return s.substring(0, 4) + '-' + s.substring(4, 6) + '-' + s.substring(6, 8);
+                    }
+                    return value;
+                }
+            },
             {field:'holiDate', hidden:true},
-            {field:'holiName', title:'휴일명', width:200, halign:'center', align:'left'}
+            {field:'holiName', title:'휴일명', width:100, halign:'center', align:'center'}
         ]]
     });
 }
@@ -65,6 +80,14 @@ function initMainGrid() {
 
 function bindButtonEvents() {
     $('#search-button').bind('click', function() {
+        doSearch();
+    });
+
+    $('#cal-today').bind('click', function() {
+        var now = new Date();
+        calYear = now.getFullYear();
+        calMonth = now.getMonth();
+        selectedCalDate = calYear + padZero(calMonth + 1) + padZero(now.getDate());
         doSearch();
     });
 
@@ -84,14 +107,68 @@ function bindButtonEvents() {
 /* ========== 달력 ========== */
 
 function bindCalendarEvents() {
-    $('#cal-prev-year').bind('click', function() {
-        calYear--;
-        doSearch();
+    $(document).delegate('#cal-prev-year', 'click', function() {
+        moveSelectedDate(0, -1);
     });
-    $('#cal-next-year').bind('click', function() {
-        calYear++;
-        doSearch();
+    $(document).delegate('#cal-next-year', 'click', function() {
+        moveSelectedDate(0, 1);
     });
+    $(document).delegate('#cal-prev-month', 'click', function() {
+        moveSelectedDate(-1, 0);
+    });
+    $(document).delegate('#cal-next-month', 'click', function() {
+        moveSelectedDate(1, 0);
+    });
+}
+
+/**
+ * 선택 날짜 기준으로 월/연 이동
+ * - 이동 후 날짜가 현재 12개월 범위 안이면 선택만 이동 (달력 재렌더링 없음)
+ * - 범위 밖이면 달력을 다시 그림
+ */
+function moveSelectedDate(monthDelta, yearDelta) {
+    var base;
+    if (selectedCalDate && selectedCalDate.length === 8) {
+        var y = parseInt(selectedCalDate.substring(0, 4));
+        var m = parseInt(selectedCalDate.substring(4, 6)) - 1;
+        var d = parseInt(selectedCalDate.substring(6, 8));
+        base = new Date(y, m, d);
+    } else {
+        base = new Date();
+    }
+
+    var newY = base.getFullYear() + yearDelta;
+    var newM = base.getMonth() + monthDelta;
+    var newD = base.getDate();
+
+    // 월 오버플로우 처리
+    var temp = new Date(newY, newM, 1);
+    newY = temp.getFullYear();
+    newM = temp.getMonth();
+
+    // 일자 보정 (예: 3/31 → 2월이동 시 2/28)
+    var lastDay = new Date(newY, newM + 1, 0).getDate();
+    if (newD > lastDay) newD = lastDay;
+
+    var newDateStr = newY + padZero(newM + 1) + padZero(newD);
+
+    // 현재 달력 표시 범위: calYear/calMonth ~ +11개월
+    var rangeStart = new Date(calYear, calMonth, 1);
+    var rangeEnd = new Date(calYear, calMonth + 12, 0);  // 12번째 월 마지막날
+    var newDate = new Date(newY, newM, newD);
+
+    if (newDate >= rangeStart && newDate <= rangeEnd) {
+        // 범위 안 → 선택만 이동 (달력/AJAX 재호출 없음)
+        selectedCalDate = newDateStr;
+        $('#calendar-body td').removeClass('selected');
+        $('#calendar-body td[data-date="' + newDateStr + '"]').addClass('selected');
+    } else {
+        // 범위 밖 → 달력 시작월 조정 후 재조회
+        selectedCalDate = newDateStr;
+        calYear = newY;
+        calMonth = newM;
+        doSearch();
+    }
 }
 
 /* ========== 조회 (달력+그리드 동시) ========== */
@@ -148,10 +225,21 @@ function renderYearCalendar() {
     html += '</div>';
     $('#calendar-body').html(html);
 
-    // 달력 우클릭 이벤트
+    // 달력 좌클릭: 선택 표시
+    $('#calendar-body td[data-date]').bind('click', function() {
+        $('#calendar-body td').removeClass('selected');
+        $(this).addClass('selected');
+        selectedCalDate = $(this).attr('data-date');
+    });
+
+    // 달력 우클릭: 컨텍스트 메뉴
     $('#calendar-body td[data-date]').bind('contextmenu', function(e) {
         e.preventDefault();
         contextMenuDate = $(this).attr('data-date');
+        selectedCalDate = contextMenuDate;
+
+        $('#calendar-body td').removeClass('selected');
+        $(this).addClass('selected');
 
         var isHoliday = !!holidayMap[contextMenuDate];
         if (isHoliday) {
@@ -192,6 +280,7 @@ function renderMiniMonth(year, month, todayStr, dayHeaders) {
                 var classes = [];
 
                 if (dateStr === todayStr) classes.push('today');
+                if (dateStr === selectedCalDate) classes.push('selected');
                 if (holidayMap[dateStr]) classes.push('holiday');
                 if (col === 0) classes.push('sunday');
                 if (col === 6) classes.push('saturday');
@@ -210,6 +299,8 @@ function renderMiniMonth(year, month, todayStr, dayHeaders) {
 /* ========== D1B: 휴일설정 팝업 ========== */
 
 function doOpenD1b(dateStr) {
+	$("#d1b-buttons").css('visibility', '');
+	$('#d1b-popup').css('visibility', '');
     $('#d1b-popup').dialog('open').dialog('center');
     if (d1bInited) {
         loadD1bFields(dateStr);
@@ -260,7 +351,6 @@ function doSaveD1b() {
             }
         },
         error: function() {
-            $.messager.alert(getTitle('ERROR'), '저장 중 오류가 발생했습니다.', 'error');
         }
     });
 }
@@ -290,7 +380,6 @@ function doClearHoliday(dateStr) {
                 }
             },
             error: function() {
-                $.messager.alert(getTitle('ERROR'), '처리 중 오류가 발생했습니다.', 'error');
             }
         });
     });

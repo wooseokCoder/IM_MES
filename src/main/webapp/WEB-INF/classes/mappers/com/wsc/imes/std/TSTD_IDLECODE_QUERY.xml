@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_IDLECODE_QUERY.xml
+설명: 비가동코드 조회 매퍼 (TSTD_IDLECODE 테이블)
+원본: ProActive TSTD_IDLECODE_QUERY.cs
+작성일: 2026-02-05
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_IDLECODE_QUERY">
+
+    <!--
+    ============================================================
+    TSTD_IDLECODE_QUERY1: 비가동코드 목록 조회 (JOIN)
+    원본: TSTD_IDLECODE_QUERY.TSTD_IDLECODE_QUERY1()
+    용도: 메인 그리드 목록 조회
+    ============================================================
+    -->
+    <select id="TSTD_IDLECODE_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_idlecode_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{idleLike, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+</mapper>

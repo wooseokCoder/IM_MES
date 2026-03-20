@@ -47,6 +47,7 @@ var consts = {
 		//그리드 생성
 		this.easygrid.init({
 			fit: true,
+			fitColumns: false,
 			singleSelect: true,
 			pageSize: this.pageSize,
 			toolbar:  "#search-toolbar",
@@ -108,7 +109,7 @@ $(function() {
 	consts.init();
 
 	$('#progress-popup').dialog({
-       title: tit.TITLE0009,
+       title: tit.TITLE0003,
        top:     100,
        width: 200,
        height: 200,
@@ -118,7 +119,7 @@ $(function() {
 	});
 	
 	$('#regist-dialog').dialog({
-	    //title: tit.TITLE0029,//샘플게시판 등록
+	    //title: tit.TITLE0006,//샘플게시판 등록
 		title: 'Ext. Text',
 	    iconCls: 'icon-search',
 	    top:    10,
@@ -130,7 +131,7 @@ $(function() {
 	});	
 	
 	$('#regist-dialog2').dialog({
-	    //title: tit.TITLE0029,//샘플게시판 등록
+	    //title: tit.TITLE0006,//샘플게시판 등록
 		title: 'Ext. Number',
 	    iconCls: 'icon-search',
 	    top:    10,
@@ -229,10 +230,7 @@ $(window).load(function() {
 		  ,{"sortText":"Code Desc","sortValue":"CODE_DESC"}
 		  ,{"sortText":"Ext Text","sortValue":"EXT_TEXT"}];
 		jSortInit(sortContentParame);
-		//console.log($("#sortValue").val());
-		if($("#sortValue").val() != ""){
-			doSearch();
-		}
+		doSearch();
 
 	}, 100);
 
@@ -306,7 +304,7 @@ function doAppend() {
 	      return false;
 	   }
 	if($('input[name=codeGrup]').val() == "" || $('input[name=codeGrup]').val() == null){
-		$.messager.alert('Warning',msg.MSG0112,'warning');
+		$.messager.alert('Warning',msg.MSG0025,'warning');
 		return;
 	}
 	consts.easygrid.appendEdit();
@@ -341,7 +339,7 @@ function docheck() {
 			success: function(data){
 				$.messager.show({
 					title: 'Information',
-					msg: msg.MSG0103
+					msg: msg.MSG0020
 				});
 			},
 			error: function(){
@@ -400,7 +398,7 @@ function doExtChr() {
 	doCloseCreat();
 	var row = $('#search-grid').datagrid('getSelected');
 	if(row == null || row == ""){
-		$.messager.alert('Warning',msg.MSG0114,'warning');
+		$.messager.alert('Warning',msg.MSG0028,'warning');
 		return;
 	}
 	$("#r_codeCd").val(row.codeCd);
@@ -425,7 +423,7 @@ function doExtNum(){
 	doCloseCreat2();
 	var row = $('#search-grid').datagrid('getSelected');
 	if(row == null || row == ""){
-		$.messager.alert('Warning',msg.MSG0114,'warning');
+		$.messager.alert('Warning',msg.MSG0028,'warning');
 		return;
 	}
 	$("#r_codeCd2").val(row.codeCd);
@@ -473,7 +471,7 @@ function doSaveCreate() {
 		success: function(data){
 			$.messager.show({
 				title: 'Information',
-				msg: msg.MSG0103
+				msg: msg.MSG0020
 			});
 		},
 		error: function(){
@@ -497,7 +495,7 @@ function doSaveCreate2() {
 		success: function(data){
 			$.messager.show({
 				title: 'Information',
-				msg: msg.MSG0103
+				msg: msg.MSG0020
 			});
 		},
 		error: function(){

@@ -94,7 +94,7 @@ $(function() {
 	consts.init();	
 
 	$('#progress-popup').dialog({
-	       title: tit.TITLE0009,
+	       title: tit.TITLE0003,
 	       top:     100,
 	       width: 200,
 	       height: 200,
@@ -350,7 +350,7 @@ function doSave() {
 	}
 	
 	if($("#r_comuName").val() == ""){
-		$.messager.alert('Warning',msg.MSG0109,'warning');
+		$.messager.alert('Warning',msg.MSG0023,'warning');
 		return;
 	}
 

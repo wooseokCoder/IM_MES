@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_NG_FILE_MODEL.xml
+설명: NG파일 모델 매핑 매퍼 (TSTD_NG_FILE_MODEL 테이블)
+     + ORD32A 파일목록 조회 (TSYS_FILELIST_MASTER)
+     + 전체 모델 마스터 조회 (TSTD_MODEL)
+원본: ProActive TSTD_NG_FILE_MODEL.cs, TSTD_NG_FILE_MODEL_QUERY.cs
+작성일: 2026-03-10
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TSTD_NG_FILE_MODEL">
+
+    <!--
+    ============================================================
+    SER: 파일목록 조회 (ORD32A Grid1)
+    용도: TSYS_FILELIST_MASTER에서 NG_ASSY_FILE 파일 목록
+    조건: LINK_KEY='NG_ASSY_FILE', IS_UPLOAD=1, DATA_FLAG=0
+    JOIN: SYS_USER (등록자명)
+    ============================================================
+    -->
+    <select id="SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tsys_filelist_master_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    SER2_MODEL: 선택 파일의 적용 모델 조회 (ORD32A Grid2 / D0A Grid1)
+    용도: FILE_ID에 매핑된 모델 목록
+    JOIN: TSTD_MODEL (모델군/시리즈, DATA_TYPE='S', DATA_FLAG=0)
+    ============================================================
+    -->
+    <select id="SER2_MODEL" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_ng_file_model_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{fileId,    mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    SER3_MODEL: 전체 모델 마스터 조회 (D0A Grid2 - 전체 모델)
+    용도: TSTD_MODEL에서 DATA_TYPE='S', DATA_FLAG=0 모델 목록
+    ============================================================
+    -->
+    <select id="SER3_MODEL" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_model_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    DEL: 모델 매핑 전체 삭제 (FILE_ID 단위)
+    용도: ORD32A_INS 저장 시 기존 매핑 삭제
+    ============================================================
+    -->
+    <delete id="DEL" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ng_file_model_del(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{fileId,    mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+    <!--
+    ============================================================
+    INS: 모델 매핑 개별 등록
+    용도: ORD32A_INS 저장 시 선택된 모델 행별 INSERT
+    ============================================================
+    -->
+    <insert id="INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ng_file_model_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{fileId,    mode=IN, jdbcType=VARCHAR},
+            #{model,     mode=IN, jdbcType=VARCHAR},
+            #{gsUserId,  mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+</mapper>

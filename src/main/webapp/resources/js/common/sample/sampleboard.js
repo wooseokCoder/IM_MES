@@ -204,7 +204,7 @@ $(function() {
 		}
 	});
 	$('#regist-dialog').dialog({
-	    title: jprops.sampleboard.sampleboardwrite,//샘플게시판 등록
+	    title: msg.MSG0105,//샘플게시판 등록
 	    iconCls: 'icon-search',
 	    top:     10,
 	    //2016/12/21 김영진 -- 게시판 팝업 사이즈 조절
@@ -218,7 +218,7 @@ $(function() {
 	});
 	
 	$('#select-dialog').dialog({
-	    title: jprops.sampleboard.sampleboarddetail,//샘플게시판 상세
+	    title: msg.MSG0106,//샘플게시판 상세
 	    iconCls: 'icon-search',
 	    top:     10,
 	    //2016/12/21 김영진 -- 게시판 팝업 사이즈 조절
@@ -237,7 +237,7 @@ $(function() {
 	consts2.init();
 	
 	$('#regist-upload-dialog').dialog({
-		title: tit.TITLE0042,
+		title: tit.TITLE0025,
 	    top:     0,
 	    width: 800,
 	    height: 520,
@@ -269,7 +269,7 @@ $(function() {
 	
 	$('#search-upload-grid').datagrid({
 		rowStyler:function(index,row){
-			if(row.result != msg.MSG0119){
+			if(row.result != msg.MSG0099){
 				return 'background-color:#EB4747; color:#ffffff';
 			}
 		}
@@ -321,7 +321,7 @@ var fileuploadForm = {
 						var row  = rows[index];
 						
 						if (row.exist != true) {
-							$.messager.alert("Error", jprops.sampleboard.fileexist, 'error');//해당 파일이 존재하지 않습니다.
+							$.messager.alert("Error", msg.MSG0107, 'error');//해당 파일이 존재하지 않습니다.
 							return;
 						}
 						//obj.download(row.index);   //파일 다운
@@ -509,21 +509,21 @@ var consts2= {
 		var rows = this.easygrid.getRows();
 
 		if (rows == null || rows.length == 0) {
-			$.messager.alert(msg.MSG0121,msg.MSG0023,msg.MSG0121);
+			$.messager.alert(msg.MSG0051,msg.MSG0023,msg.MSG0051);
 			return;
 		}
 		
 		var data = {models: $.toJSON(rows)};
 		
 		for(var i=0; i<rows.length; i++){
-			if(rows[i].result != msg.MSG0119){
-				$.messager.alert(msg.MSG0121,msg.MSG0064);
+			if(rows[i].result != msg.MSG0099){
+				$.messager.alert(msg.MSG0051,msg.MSG0100);
 				$('.messager-window .messager-body').css('text-align', 'center');
 				return 0;
 			}
 		}
 
-		$.messager.confirm(msg.MSG0123, msg.MSG0118, function(r) {
+		$.messager.confirm(msg.MSG0053, msg.MSG0036, function(r) {
 			if (!r) return;
 			$('#progress-popup2').dialog('open');
 			jlogic.save({
@@ -550,7 +550,7 @@ var consts2= {
 			url: this.url.upload,
 			beforeSubmit: function () {
 				if ($("#s_excelFile").val() == '') {
-					$.messager.alert(msg.MSG0121,msg.MSG0019,msg.MSG0121);
+					$.messager.alert(msg.MSG0051,msg.MSG0018,msg.MSG0051);
 					$('#progress-popup2').dialog('close');
 					return false;
 				}
@@ -569,11 +569,11 @@ var consts2= {
 							data.rows[i].CHECK_MSG = CHECK_MSG[i];
 							totalCnt++;
 							
-							if (data.rows[i].bordNo == null || data.rows[i].CHECK_MSG != msg.MSG0119) {
-								data.rows[i]["result"] = "BORD_NO: " + msg.MSG0119;
+							if (data.rows[i].bordNo == null || data.rows[i].CHECK_MSG != msg.MSG0099) {
+								data.rows[i]["result"] = "BORD_NO: " + msg.MSG0099;
 								errorCnt++;
 							} else {
-								data.rows[i]["result"] = msg.MSG0119;
+								data.rows[i]["result"] = msg.MSG0099;
 							}
 						}
 						
@@ -581,7 +581,7 @@ var consts2= {
 						$("#errorCnt").html(errorCnt);
 						
 						if (data.rows == 'error') {
-							$.messager.alert(msg.MSG0121, msg.MSG0039, msg.MSG0121);
+							$.messager.alert(msg.MSG0051, msg.MSG0098, msg.MSG0051);
 						} else {
 							consts2.easygrid.loadData(data);
 						}
@@ -618,7 +618,7 @@ var consts2= {
 			error: function(jqXHR, textStatus, errorThrown) {
 				$('#progress-popup2').dialog('close');
 				if (jqXHR.readyState === 0) {
-					$.messager.alert(msg.MSG0121,msg.MSG0065);
+					$.messager.alert(msg.MSG0051,msg.MSG0101);
 					$('.messager-window .messager-body').css('text-align', 'center');
 				} 
 				else {
@@ -786,7 +786,7 @@ function doOpenMyView(type){
 					doOpenMyViewWin();
 				} else {
 					if (type == "U") {
-						$.messager.alert(msg.MSG0121,msg.MSG0098,msg.MSG0121);
+						$.messager.alert(msg.MSG0051,msg.MSG0102,msg.MSG0051);
 						return;
 					}
 				}
@@ -830,7 +830,7 @@ function reorderColumns(VIEW_ID){
 	$("#myViewId").val(VIEW_ID);
 	
 	if(VIEW_ID == ''){
-		$.messager.alert(msg.MSG0121,msg.MSG0098,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0102,msg.MSG0051);
 		return;
 	}else{
 		$.ajax({

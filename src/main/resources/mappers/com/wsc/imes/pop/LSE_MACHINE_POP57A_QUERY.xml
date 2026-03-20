@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: LSE_MACHINE_POP57A_QUERY.xml
+설명: 설비별 표준문서(검사) 조회 매퍼 (LSE_MACHINE 테이블)
+원본: ProActive POP57A.cs → LSE_MACHINE_QUERY1
+작성일: 2026-03-12
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.LSE_MACHINE_POP57A_QUERY">
+
+    <!--
+    ============================================================
+    LSE_MACHINE_QUERY_POP57A: 설비 목록 조회 (MC_GROUP='3605')
+    용도: POP57A_SER 그리드 데이터
+    ============================================================
+    -->
+    <select id="LSE_MACHINE_QUERY_POP57A" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_machine_query_pop57a(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

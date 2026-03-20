@@ -322,7 +322,7 @@ $(function() {
 	   });
 
 	$('#progress-popup').dialog({
-	       title: tit.TITLE0009,
+	       title: tit.TITLE0003,
 	       top:     100,
 	       width: 200,
 	       height: 200,
@@ -475,7 +475,7 @@ function doSave() {
 	
 		var cgridRow = $('#search-grid').datagrid('getRows');
 		if(cgridRow.length  <= 0){
-			$.messager.alert('Warning',msg.MSG0121,'warning');
+			$.messager.alert('Warning',msg.MSG0026,'warning');
 			return;
 		}
 	
@@ -493,8 +493,8 @@ function doSave() {
 	        data: {rows:JSON.stringify(row)},
 	        success: function(data){
 	        	$.messager.show({
-					title: msg.MSG0122,
-					msg: msg.MSG0120
+					title: msg.MSG0052,
+					msg: msg.MSG0050
 				});
 	
 				doSearch();
@@ -530,7 +530,7 @@ function doSaveDetl() {
 	
 		var cgridRow = $('#search-sub-grid').datagrid('getRows');
 		if(cgridRow.length  <= 0){
-			$.messager.alert('Warning',msg.MSG0121,'warning');
+			$.messager.alert('Warning',msg.MSG0026,'warning');
 			return;
 		}
 	
@@ -548,8 +548,8 @@ function doSaveDetl() {
 	        data: {rows:JSON.stringify(row)},
 	        success: function(data){
 	        	$.messager.show({
-					title: msg.MSG0122,
-					msg: msg.MSG0120
+					title: msg.MSG0052,
+					msg: msg.MSG0050
 				});
 	
 				doSearch();
@@ -634,8 +634,8 @@ function doSaveSql() {
 		      success: function(data){
 	
 					$.messager.show({
-						title: msg.MSG0122,
-						msg: msg.MSG0120
+						title: msg.MSG0052,
+						msg: msg.MSG0050
 					});
 	
 					doSearch();
@@ -797,7 +797,7 @@ function doOpenPopupGroup(callback) {
 
 	// HTML 상에 해당 DOM 객체가 없을경우 경고메세지 처리
 	if (elm.length == 0) {
-       $.messager.alert('Warning',msg.MSG0116,'warning');
+       $.messager.alert('Warning',msg.MSG0034,'warning');
        return false;
 	}
 
@@ -864,7 +864,7 @@ function doOpenPopupUserId(callback) {
 
 	// HTML 상에 해당 DOM 객체가 없을경우 경고메세지 처리
 	if (elm.length == 0) {
-       $.messager.alert('Warning',msg.MSG0116,'warning');
+       $.messager.alert('Warning',msg.MSG0034,'warning');
        return false;
 	}
 

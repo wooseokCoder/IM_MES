@@ -47,7 +47,7 @@ jcommon.init = function() {
 	});
 
 	$('#ehelp').dialog({
-	    title: tit.TITLE0031,
+	    title: tit.TITLE0008,
 	    iconCls: 'icon-search',
 	    width: 800,
 	    height: 768,
@@ -57,7 +57,7 @@ jcommon.init = function() {
 	});
 
 	$('#ehelpUpdate').dialog({
-	    title: tit.TITLE0031,
+	    title: tit.TITLE0008,
 	    iconCls: 'icon-search',
 	    width: 800,
 	    height: 768,
@@ -514,6 +514,74 @@ $.fn.getFormValue = function(name) {
     return null;
 };
 
+// datagrid/treegrid 전역 기본값 설정 (개별 datagrid/treegrid에서 옵션 명시 시 우선 적용)
+$.fn.datagrid.defaults.fitColumns = true;
+$.fn.treegrid.defaults.fitColumns = true;
+$.fn.datagrid.defaults.scrollbarSize = 0;
+
+// 세로 스크롤바 여백 자동 조정 (스크롤바 없을 때 우측 여백 제거)
+// 플러그인 래핑 방식 - 개별 onLoadSuccess 정의 여부와 무관하게 모든 그리드에 적용
+(function() {
+	var _scrollbarWidth = 18;
+
+	// document.ready 시점에 실제 스크롤바 너비 감지 및 treegrid 기본값 적용
+	$(function() {
+		var el = document.createElement('div');
+		el.className = 'datagrid-body';
+		el.style.cssText = 'width:100px;height:100px;overflow:scroll;position:absolute;top:-9999px;';
+		document.body.appendChild(el);
+		_scrollbarWidth = el.offsetWidth - el.clientWidth;
+		document.body.removeChild(el);
+		if (!_scrollbarWidth) _scrollbarWidth = 18;
+		$.fn.treegrid.defaults.scrollbarSize = _scrollbarWidth;
+	});
+
+	function adjustScrollbarGap(grid, type) {
+		if (grid.data('_sbAdjusting')) return;
+		setTimeout(function() {
+			try {
+				grid.data('_sbAdjusting', true);
+				var state = grid.data(type);
+				if (!state || !state.dc) return;
+				var opts = grid[type]('options');
+				if (!opts.fitColumns) return;
+				var body = state.dc.body2[0];
+				if (!body) return;
+				var hasVScroll = body.scrollHeight > body.clientHeight;
+				var newSize = hasVScroll ? _scrollbarWidth : 0;
+				if (opts.scrollbarSize !== newSize) {
+					opts.scrollbarSize = newSize;
+					grid[type]('resize');
+				}
+			} catch(e) {
+			} finally {
+				grid.data('_sbAdjusting', false);
+			}
+		}, 0);
+	}
+
+	// datagrid/treegrid 플러그인 래핑 - 초기화 시 onLoadSuccess에 스크롤바 조정 자동 주입
+	function wrapPlugin(name) {
+		var _orig = $.fn[name];
+		$.fn[name] = function(options, param) {
+			if (options && typeof options === 'object') {
+				var userFn = options.onLoadSuccess;
+				options.onLoadSuccess = function(data) {
+					if (userFn) userFn.call(this, data);
+					adjustScrollbarGap($(this), name);
+				};
+			}
+			return _orig.apply(this, arguments);
+		};
+		for (var key in _orig) {
+			$.fn[name][key] = _orig[key];
+		}
+	}
+
+	wrapPlugin('datagrid');
+	wrapPlugin('treegrid');
+})();
+
 //그리드 에디터에 콤보그리드 사용설정
 $.extend($.fn.datagrid.defaults.editors, {
 	combogrid: {
@@ -914,3 +982,58 @@ function chkAuthBtn(id) {
 		return true;
 	}
 }
+
+/**
+ * 글로벌 AJAX 에러 핸들러
+ * HTTP 500 에러 발생 시 사용자에게 알림
+ * @since 2026/01/23
+ */
+$(document).ready(function() {
+	$.ajaxSetup({
+		statusCode: {
+			500: function(xhr, status, error) {
+				var errorMsg = 'Server Error';
+				try {
+					var response = JSON.parse(xhr.responseText);
+					if (response && response.error) {
+						errorMsg = response.error;
+					} else if (response && response.result && response.result.message) {
+						errorMsg = response.result.message;
+					}
+				} catch (e) {
+					errorMsg = xhr.responseText || 'An unexpected server error occurred';
+				}
+				console.error('Server Error (500):', errorMsg);
+				// EasyUI 메시지 박스 사용 (있는 경우)
+				if ($.messager && $.messager.alert) {
+					$.messager.alert('Error', errorMsg, 'error');
+				} else {
+					alert('Error: ' + errorMsg);
+				}
+			},
+			401: function() {
+				// 인증 오류 - 로그인 페이지로 리다이렉트 (다국어 지원, 기본: 한국어)
+				var sessionExpiredMsg = (typeof tit !== 'undefined' && tit.SESSION_EXPIRED)
+					? tit.SESSION_EXPIRED
+					: '세션이 만료되었습니다. 다시 로그인하시겠습니까?';
+				if (confirm(sessionExpiredMsg)) {
+					window.location = (typeof context !== 'undefined' ? context : '') + '/login.do';
+				}
+			},
+			403: function() {
+				// 권한 오류 (다국어 지원, 기본: 한국어)
+				var accessDeniedTitle = (typeof tit !== 'undefined' && tit.ACCESS_DENIED)
+					? tit.ACCESS_DENIED
+					: '접근 거부';
+				var accessDeniedMsg = (typeof tit !== 'undefined' && tit.ACCESS_DENIED_MSG)
+					? tit.ACCESS_DENIED_MSG
+					: '이 작업을 수행할 권한이 없습니다.';
+				if ($.messager && $.messager.alert) {
+					$.messager.alert(accessDeniedTitle, accessDeniedMsg, 'warning');
+				} else {
+					alert(accessDeniedTitle + ': ' + accessDeniedMsg);
+				}
+			}
+		}
+	});
+});

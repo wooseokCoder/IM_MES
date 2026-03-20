@@ -47,9 +47,12 @@
 <input type="hidden" name="gsUserId" id="gsUserId" value="${gsUserId}"/>
 <!-- [LAYOUT] start -->
 <div class="easyui-layout" data-options="fit:true" id="account-layout" style="display:none">
-	<table cellpadding="5" class="search-table tableSearch-c wd-100" >
+	<table cellpadding="0" class="search-table tableSearch-c wd-100" >
+		<colgroup>
+			<col width="*">
+		</colgroup>
 		<tr class="topnav_sty">
-       		<td colspan="" >
+       		<td colspan="1" >
        			<div>
         			<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
             	</div>

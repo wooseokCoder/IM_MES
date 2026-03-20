@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: LSE_HOLIDAY_POP.xml
+설명: 휴일 조회 매퍼 (LSE_HOLIDAY 테이블)
+원본: ProActive LSE_HOLIDAY.cs
+화면: POP30B (단말기 - 가공)
+작성일: 2026-03-18
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.LSE_HOLIDAY">
+
+    <!--
+    ============================================================
+    LSE_HOLIDAY_SER: 휴일 목록 조회
+    원본: LSE_HOLIDAY.LSE_HOLIDAY_SER()
+    용도: POP30B 휴일 목록 조회 (기간 필터)
+    ============================================================
+    -->
+    <select id="LSE_HOLIDAY_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_holiday_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sDate,     mode=IN, jdbcType=VARCHAR},
+            #{eDate,     mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

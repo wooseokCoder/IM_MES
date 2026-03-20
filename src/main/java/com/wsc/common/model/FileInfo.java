@@ -2,7 +2,7 @@ package com.wsc.common.model;
 
 import java.util.UUID;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import com.wsc.common.file.FileDirectory;
 import com.wsc.framework.base.BaseModel;

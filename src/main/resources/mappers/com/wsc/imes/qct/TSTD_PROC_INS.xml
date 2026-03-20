@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_PROC_INS.xml
+설명: 자주검사 항목 CRUD 매퍼 (TSTD_PROC_INS 테이블)
+작성자: 송우석
+작성일: 2026-02-27
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.qct.TSTD_PROC_INS">
+
+    <!--
+    ============================================================
+    TSTD_PROC_INS_INS: 검사항목 등록
+    ============================================================
+    -->
+    <insert id="TSTD_PROC_INS_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_proc_ins_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{procCode, mode=IN, jdbcType=VARCHAR},
+            #{procName, mode=IN, jdbcType=VARCHAR},
+            #{insName, mode=IN, jdbcType=VARCHAR},
+            #{insDesc, mode=IN, jdbcType=VARCHAR},
+            #{insType, mode=IN, jdbcType=VARCHAR},
+            #{insUnit, mode=IN, jdbcType=VARCHAR},
+            #{avgVal, mode=IN, jdbcType=VARCHAR},
+            #{minVal, mode=IN, jdbcType=VARCHAR},
+            #{maxVal, mode=IN, jdbcType=VARCHAR},
+            #{insSeq, mode=IN, jdbcType=VARCHAR},
+            #{insImg, mode=IN, jdbcType=LONGVARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSTD_PROC_INS_UPD: 검사항목 수정
+    ============================================================
+    -->
+    <update id="TSTD_PROC_INS_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_proc_ins_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insCode, mode=IN, jdbcType=VARCHAR},
+            #{procCode, mode=IN, jdbcType=VARCHAR},
+            #{procName, mode=IN, jdbcType=VARCHAR},
+            #{insName, mode=IN, jdbcType=VARCHAR},
+            #{insDesc, mode=IN, jdbcType=VARCHAR},
+            #{insType, mode=IN, jdbcType=VARCHAR},
+            #{insUnit, mode=IN, jdbcType=VARCHAR},
+            #{avgVal, mode=IN, jdbcType=VARCHAR},
+            #{minVal, mode=IN, jdbcType=VARCHAR},
+            #{maxVal, mode=IN, jdbcType=VARCHAR},
+            #{insSeq, mode=IN, jdbcType=VARCHAR},
+            #{insImg, mode=IN, jdbcType=LONGVARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSTD_PROC_INS_UDE: 검사항목 논리삭제
+    ============================================================
+    -->
+    <update id="TSTD_PROC_INS_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_proc_ins_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insCode, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

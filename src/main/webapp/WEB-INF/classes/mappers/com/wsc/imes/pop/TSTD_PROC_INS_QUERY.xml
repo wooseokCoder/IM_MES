@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_PROC_INS_QUERY.xml
+설명: 검사항목 템플릿 조회 매퍼 (TSTD_PROC_INS 테이블)
+원본: ProActive TSTD_PROC_INS.cs
+화면: POP30B (단말기 - 가공)
+작성일: 2026-03-18
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSTD_PROC_INS_QUERY">
+
+    <!--
+    ============================================================
+    TSTD_PROC_INS_QUERY3: 검사그룹 기준 검사항목 조회
+    원본: TSTD_PROC_INS.TSTD_PROC_INS_QUERY3()
+    용도: POP30B 검사그룹 선택 시 검사항목 템플릿 조회
+    ============================================================
+    -->
+    <select id="TSTD_PROC_INS_QUERY3" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_proc_ins_query3(
+            #{gsPltCode,    mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode,   mode=IN, jdbcType=VARCHAR},
+            #{plants,       mode=IN, jdbcType=VARCHAR},
+            #{procCode,     mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

@@ -209,25 +209,34 @@ input[type="text"]:read-only {
 	<div id="search-toolbar" class="wui-toolbar">
 		<form id="search-form">
 			<fieldset class="div-line4-new Remake-div-line-new" >
-		        <table cellpadding="5" class="search-table tableSearch-c" >
+		        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+		        	<colgroup>
+		        		<col width="75px" />
+		        		<col width="120px" />
+		        		<col width="80px" />
+		        		<col width="120px" />
+		        		<col width="75px" />
+		        		<col width="150px" />
+		        		<col width="*" />
+		        	</colgroup>
 		            <tr>
-			            <th class="h table-Search-h search-label-h2"><span data-item="LAB_013">Item Code</span></th>
-						<td class="d" style="min-width: 260px;">
+			            <th class="h table-Search-h search-label-h"><span data-item="LAB_013">Item Code</span></th>
+						<td class="d">
 							<input class="easyui-textbox" name="listCode" id="listCode" data-options="width:180, height: 30" />
 						</td>
-						<th class="h table-Search-h search-label-h2"><span data-item="LAB_006">Item Name</span></th>
+						<th class="h table-Search-h search-label-h"><span data-item="LAB_006">Item Name</span></th>
 						<td class="d">
 		                    <input class="easyui-textbox" name="listName" id="listName" data-options="width:180, height: 30" />
 						</td>
-						<th class="h table-Search-h search-label-h2"><span data-item="LAB_003">Item Type</span></th>
-						<td class="d w-200">
+						<th class="h table-Search-h search-label-h"><span data-item="LAB_003">Item Type</span></th>
+						<td class="d">
 							<select class="easyui-combobox" name="listType" id="listType" data-options="height: 30, panelHeight: 'auto'">
 			    				<option value="ALL"> ALL </option>
 								<option value="Product">Product</option>
 								<option value="Assembly">Assembly</option>
 							</select>
 						</td>
-						<td class="b w-a" colspan="2" style="text-align: right;">
+						<td class="d" style="text-align: right;">
 							<a href="javascript:void(0)" style="width: 80px;" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001" data-options="">Search</a>
 							<a href="javascript:void(0)" style="width: 80px;" id="clear3-button" class="easyui-linkbutton c12" data-item="BTN_002" data-options="">Clear</a>
 						</td>

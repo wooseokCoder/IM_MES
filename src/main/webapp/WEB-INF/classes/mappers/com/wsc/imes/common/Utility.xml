@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: Utility.xml
+설명: IMES 공통 유틸리티 매퍼 (시리얼 채번 등)
+원본: ProActive UTIL.cs
+작성일: 2026-02-05
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.common.Utility">
+
+    <!--
+    ============================================================
+    UTILITY_GET_SERIALNO: 시리얼 번호 채번
+    원본: UTIL.UTILITY_GET_SERIALNO(plt_code, sr_code, bizExecute)
+    용도: 공통 시리얼 번호 생성 (예: S260205-0001)
+
+    파라미터:
+      - gsPltCode: 공장코드
+      - srCode: 시리얼 타입 (S, O, M 등)
+      - srKey: 시리얼 키 (NULL이면 현재 날짜 YYMMDD)
+      - sep: 순번 자릿수 (기본 4)
+    ============================================================
+    -->
+    <select id="UTILITY_GET_SERIALNO" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_utility_get_serialno(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{srCode, mode=IN, jdbcType=VARCHAR},
+            #{srKey, mode=IN, jdbcType=VARCHAR},
+            #{sep, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    UTILITY_GET_SERIALNO_YYMMDD: 날짜 기반 시리얼 채번
+    원본: UTIL.UTILITY_GET_SERIALNO(plt_code, sr_code, bizExecute)
+    용도: 현재 날짜(YYMMDD) 기준 시리얼 생성
+
+    파라미터:
+      - gsPltCode: 공장코드
+      - srCode: 시리얼 타입 (S, O, M 등)
+
+    반환: S260205-0001 형식
+    ============================================================
+    -->
+    <select id="UTILITY_GET_SERIALNO_YYMMDD" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_utility_get_serialno_yymmdd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{srCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

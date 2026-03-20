@@ -11,7 +11,7 @@ import java.util.List;
 import javax.inject.Provider;
 import javax.sql.DataSource;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

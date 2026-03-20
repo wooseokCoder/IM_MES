@@ -166,22 +166,31 @@
 		<div id="search-toolbar" class="wui-toolbar">
 			<form id="search-form">
 				<fieldset class="div-line3-new Remake-div-line-new" >
-			        <table cellpadding="4" class="search-table tableSearch-c wd-100" style="margin-top: 0;"  >
+			        <table cellpadding="0" class="search-table tableSearch-c wd-100" style="margin-top: 0;"  >
+			        	<colgroup>
+			        		<col width="80px" />
+			        		<col width="150px" />
+			        		<col width="65px" />
+			        		<col width="120px" />
+			        		<col width="65px" />
+			        		<col width="120px" />
+			        		<col width="*" />
+			        	</colgroup>
 			        	<tr class="topnav_sty">
-		            		<td colspan="8" >
+		            		<td colspan="7" >
 		            			<div>
 			            			<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
 			            			<div>
-										<a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001">검색</a>
+										<a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001">조회</a>
 			                        </div>
 		                        </div>
 		            		</td>
 		            	</tr>
 		            	
 			            <tr>
-							<th class="h table-Search-h"><span data-item="LAB_027">코드그룹 </span></th>
+							<th class="h table-Search-h search-label-h"><span data-item="LAB_027">코드그룹 </span></th>
 							<td class="d"><input class="easyui-combobox" name="codeGrup" id="s_codeGrup" codeGrup="0" data-options="mode:'remote',width:150,loader:jcombo.loader"/></td>
-							<th class="h"><span data-item="LAB_028">사용여부 </span></th>
+							<th class="h table-Search-h search-label-h"><span data-item="LAB_028">사용여부 </span></th>
 							<td class="d">
 								<select class="easyui-combobox" name="useFlag" ID="s_useFlag" data-option="width:90">
 									<c:forEach var="item" items="${result}">
@@ -195,11 +204,9 @@
 									<input name="useFlag" type="radio" value="N" id="s_useFlag2"/><label for="s_useFlag2">중지</label>
 								</span> -->
 							</td>
-							<th class="h"><span data-item="LAB_029">정렬선택 </span></th>
+							<th class="h table-Search-h search-label-h"><span data-item="LAB_029">정렬선택 </span></th>
 							<td class="d"><input class="easyui-combobox" name="sort" id="s_sort" codeGrup="CODE_SORT" data-options="mode:'remote',width:100,loader:jcombo.loader"/></td>
-							<td class="b">
-								<!-- <a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001">검색</a> -->
-							</td>
+							<td class="d"></td>
 			            </tr>
 			        </table>
 			   </fieldset>

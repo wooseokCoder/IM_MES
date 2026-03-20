@@ -27,9 +27,6 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/include/xlsx.core.js" />"></script>
-<script type="text/javascript" src="<c:url value="/resources/js/include/Blob.js" />"></script>
-<script type="text/javascript" src="<c:url value="/resources/js/include/FileSaver.js" />"></script>
 <script type="text/javascript" src="<c:url value="/resources/js/include/tableexport.js" />"></script>
 <script type="text/javascript" src="<c:url value="/resources/js/common/report/datasearch.js" />"></script>
 <script type="text/javascript">
@@ -201,7 +198,7 @@ $(function(){
 <!-- fieldset 변경 20190628 박소현 -->
 	<form id="search-form">
 		<fieldset class="Remake-div-line-new wd-100">
-            <table cellpadding="7" class="search-table tableSearch-c">
+            <table cellpadding="0" class="search-table tableSearch-c wd-100">
             	<!-- topnav2 영역 -->
             	<tr class="topnav_sty">
             		<td colspan="5">
@@ -215,16 +212,16 @@ $(function(){
             	</tr>
             	
 	            <tr>
-	            	<th class="h table-Search-h" style="text-align:left;width:0%;"><span></span></th>
+	            	<th class="h table-Search-h search-label-h" style="text-align:left;"><span></span></th>
 					<!-- <th class="h table-Search-h" style="text-align:  left;"><span data-item="LAB_004">- System</span></th> -->
-					<th class="h table-Search-h" style="text-align:left;width:23%;height:35px;"><span data-item="LAB_004">- Group</span></th>
-					<th class="h table-Search-h" style="text-align:left;width:66%;">
+					<th class="h table-Search-h search-label-h" style="text-align:left;height:35px;"><span data-item="LAB_004">- Group</span></th>
+					<th class="h table-Search-h search-label-h" style="text-align:left;">
 						<span data-item="LAB_005">- Parameter(Binding)</span>
 					</th>
-					<th class="h table-Search-h" style="width:10%;">
+					<th class="h table-Search-h search-label-h">
 						<span></span>
 					</th>
-					<th class="h table-Search-h" style="text-align:left;width:20px;"><span></span></th>
+					<th class="h table-Search-h search-label-h" style="text-align:left;"><span></span></th>
 	            </tr>
 	            <!-- <tr>
 	            	<td class="d" style="width:10%">
@@ -282,7 +279,7 @@ $(function(){
 				            </tr>
 				            <tr>
 								<td class="d" style="text-align:  right;">
-									<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001" data-options="disabled:${RET}" >검색</a>
+									<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001" data-options="disabled:${RET}" >조회</a>
 								</td>
 				            </tr>
 				        </table>

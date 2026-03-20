@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_STK_OUT_PART_QUERY.xml
+설명: 불출자재 조회 매퍼 (TSHP_STK_OUT + TSHP_STK_OUT_PART + TSHP_PART_USE)
+원본: ProActive TSHP_STK_OUT_PART_QUERY.cs
+작성일: 2026-03-04
+사용화면: MAT05A
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.mat.TSHP_STK_OUT_PART_QUERY">
+
+    <!--
+    ============================================================
+    TSHP_STK_OUT_PART_QUERY1: 불출율 계산용 불출건 조회
+    용도: 불출율 분자 (제외 코드 필터 적용, OUT_FLAG='1' 카운트)
+    ============================================================
+    -->
+    <select id="TSHP_STK_OUT_PART_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_stk_out_part_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{stkOutNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

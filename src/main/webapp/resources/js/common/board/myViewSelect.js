@@ -277,7 +277,7 @@ function doSave() {
 	    success: function(res) {
 	    	$.messager.show({
 				title: 'Information',
-				msg: msg.MSG0106
+				msg: msg.MSG0021
 			});
 	    	
 	    	//setMyViewList(viewId);
@@ -296,10 +296,10 @@ function doDelete() {
 	}
 	
 	if ($("#myViewId").val() == "") {
-		$.messager.alert(msg.MSG0121,msg.MSG0090,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0077,msg.MSG0051);
 		return;
 	} else {
-		$.messager.confirm(msg.MSG0123, msg.MSG0074, function(r) {
+		$.messager.confirm(msg.MSG0053, msg.MSG0063, function(r) {
 			if (!r) return;
 			$.ajax({
 				url: getUrl("/common/board/myViewSearch/deleteMyView.json"),
@@ -314,7 +314,7 @@ function doDelete() {
 				success: function(data){
 					$.messager.show({
 						title: 'Information',
-						msg: msg.MSG0124
+						msg: msg.MSG0096
 					});
 					
 					doClear();
@@ -325,7 +325,7 @@ function doDelete() {
 					doMyViewClose();
 				},
 				error: function(){
-					$.messager.alert(msg.MSG0121,msg.MSG0055,msg.MSG0121);
+					$.messager.alert(msg.MSG0051,msg.MSG0051,msg.MSG0051);
 					return;
 				}
 			});
@@ -355,7 +355,7 @@ function doSubmit() {
 	var viewName = $("#rViewName").textbox("getValue");
 	
 	if (viewName == "") {
-		$.messager.alert(msg.MSG0121,msg.MSG0091,msg.MSG0121);
+		$.messager.alert(msg.MSG0076,msg.MSG0051,msg.MSG0051);
 		return;
 	} else {
 		// columns seq. 정리 
@@ -390,7 +390,7 @@ function doSubmit() {
 					
 					doSave();
 				} else {
-					$.messager.alert(msg.MSG0121,resultMsg,msg.MSG0121);
+					$.messager.alert(msg.MSG0051,resultMsg,msg.MSG0051);
 					return;
 				}
 				
@@ -504,7 +504,7 @@ function doToLeft(){
     
     for (var i=0; i < selected.length; i++) {
 		if(selected[i].VIEW_TYPE == 'S') {
-			$.messager.alert(msg.MSG0121,msg.MSG0093,msg.MSG0121);
+			$.messager.alert(msg.MSG0078,msg.MSG0051,msg.MSG0090);
 			return;
 		}
 	}

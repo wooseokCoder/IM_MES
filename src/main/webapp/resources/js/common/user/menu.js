@@ -41,6 +41,7 @@ var consts = {
 		//그리드 생성
 		this.easygrid.init({
 			fit: true,
+			fitColumns: false,
 			pageSize: this.pageSize,
 			toolbar:  "#search-toolbar",
 			idField:  'menuKey',
@@ -113,7 +114,7 @@ $(function() {
 	consts.init();
 
 	$('#progress-popup').dialog({
-	       title: tit.TITLE0009,
+	       title: tit.TITLE0003,
 	       top:     100,
 	       width: 200,
 	       height: 200,
@@ -202,6 +203,8 @@ $(window).load(function() {
 				doSearch();
 			}
 		});
+
+		doSearch();
 
 	}, 100);
 
@@ -306,13 +309,13 @@ function doOpenPopup( callback ) {
 
 	// HTML 상에 해당 DOM 객체가 없을경우 경고메세지 처리
 	if (elm.length == 0) {
-       $.messager.alert('Warning',msg.MSG0116,'warning');
+       $.messager.alert('Warning',msg.MSG0034,'warning');
        return false;
 	}
 
 	// 팝업을 오픈한다.
 	elm.dialog({
-	    title: tit.TITLE0030,
+	    title: tit.TITLE0007,
 	    width:  300,
 	    height: 400,
 	    closed: false,

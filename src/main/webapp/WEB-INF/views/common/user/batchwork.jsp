@@ -27,7 +27,7 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/common/user/batchwork.js" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/user/batchwork.js?v=260227A" />"></script>
 <style>
 #account-layout{min-width:1000px !important;}
 </style>
@@ -70,10 +70,17 @@
 <div id="search-toolbar" class="wui-toolbar">
 	<form id="search-form">
 		<fieldset class="div-line-new" >
-	        <table cellpadding="5" class="search-table tableSearch-c" >
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+	        	<colgroup>
+	        		<col width="65px">
+	        		<col width="150px">
+	        		<col width="65px">
+	        		<col width="150px">
+	        		<col width="*">
+	        	</colgroup>
 	            <tr>
-	            	
-					<th class="h"  data-item="LAB_002"><span>작업구분</span></th>
+
+					<th class="h table-Search-h search-label-h"  data-item="LAB_002"><span>작업구분</span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="jobGrup" ID="jobGrup" data-options="mode:'remote'">
 							<option value="" selected>전체</option>
@@ -84,7 +91,7 @@
 							</c:forEach>
 						</select>
 					</td>
-					<th class="h" data-item="LAB_003"><span>작업주기</span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_003"><span>작업주기</span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="jobTerm" ID="jobTerm" data-options="mode:'remote'">
 							<option value="" selected>전체</option>
@@ -95,10 +102,10 @@
 							</c:forEach>
 						</select>
 					</td>
-	
+
 					<td class="b">
-						<!-- <a href="javascript:void(0)" class="easyui-linkbutton cgray" iconCls="icon-search" id="search-button">검색</a> -->
-						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001" data-options="disabled:${RET}" >검색</a>
+						<!-- <a href="javascript:void(0)" class="easyui-linkbutton cgray" iconCls="icon-search" id="search-button">조회</a> -->
+						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001" data-options="disabled:${RET}" >조회</a>
 					<!-- 	<a href="javascript:void(0)" class="easyui-linkbutton c8" id="dreload-button" data-item="BTN_002">초기화</a>  -->
 					</td>
 	            </tr>
@@ -120,7 +127,7 @@
 </div>
 
 <!-- 엑셀  진행상태 -->
-<div id="progress-popup" class="easyui-dialog" >
+<div id="progress-popup" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>

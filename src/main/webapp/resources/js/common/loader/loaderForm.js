@@ -251,7 +251,7 @@ function isEditableItem() {
 
 	var v = consts.itemgrid.sform.getFormValue("formCode");
 	if ( jutils.empty(v) ) {
-		$.messager.alert('Warning',msg.MSG0088,'warning');
+		$.messager.alert('Warning',msg.MSG0019,'warning');
 		return false;
 	}
 	return true;
@@ -287,7 +287,7 @@ function doValidateItem() {
 
 	if (rows == null ||
 		rows.length == 0) {
-		$.messager.alert('Warning',msg.MSG0121,'warning');
+		$.messager.alert('Warning',msg.MSG0022,'warning');
 		return false;
 	}
 	
@@ -337,7 +337,7 @@ function doUploadItem() {
 	//2016/12/29 김영진 -- 파일박스 변경
 	//if ($('#u_excelFile').filebox('getValue') == "") {
 	if ($('#u_excelFile').val() == "") {
-		$.messager.alert('Warning',msg.MSG0121,'warning');
+		$.messager.alert('Warning',msg.MSG0018,'warning');
 		return;
 	}
 	
@@ -348,7 +348,7 @@ function doUploadItem() {
 	form.toForm(data);
 	
 	if (form.getFormValue("formCode") == "") {
-		$.messager.alert('Warning',msg.MSG0088,'warning');
+		$.messager.alert('Warning',msg.MSG0019,'warning');
 		return;
 	}
 	
@@ -369,7 +369,7 @@ function doUploadItem() {
 	    }).submit();
 	};
 
-	$.messager.confirm(msg.MSG0123,message, function(r) {
+	$.messager.confirm(msg.MSG0053,message, function(r) {
 		if (r) {
 			uploadFn();
 		}

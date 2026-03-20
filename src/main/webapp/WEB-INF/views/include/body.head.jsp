@@ -53,8 +53,8 @@ $(function() {
 		menuDesc : '<c:out value="${menuDesc}" />'
 		
 	});
-	//핫메뉴 로딩
-	jwidget.hotmenu.load();
+	//핫메뉴 로딩 — 메뉴 트리 onLoadSuccess에서 자동 호출 (LS099 노드 필요)
+	//jwidget.hotmenu.load();
 });
 
 </script>

@@ -98,7 +98,7 @@ $(function() {
 	consts.init();
 
 	$('#progress-popup').dialog({
-	       title: tit.TITLE0009,
+	       title: tit.TITLE0003,
 	       top:     100,
 	       width: 200,
 	       height: 200,
@@ -382,7 +382,7 @@ function doAppend() {
 function doSave() {
 	
 	if($("#r_custName").val() == ""){
-		$.messager.alert(msg.MSG0121,msg.MSG0109,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0023,msg.MSG0051);
 		return;
 	}
 

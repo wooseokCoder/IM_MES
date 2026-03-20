@@ -1,0 +1,23 @@
+No	SQL 프로시저 파일명	대상 XML 파일	XML 경로	비고
+1	sp_user_procedures.sql	User.xml	mappers/com/wsc/common/system/User.xml	사용자 관리
+2	sp_program_procedures.sql	Program.xml	mappers/com/wsc/common/system/Program.xml	프로그램 관리
+3	sp_code_procedures.sql	Code.xml	mappers/com/wsc/common/system/Code.xml	코드 관리
+4	sp_password_procedures.sql	Password.xml	mappers/com/wsc/common/system/Password.xml	비밀번호 관리
+5	sp_group_procedures.sql	Group.xml	mappers/com/wsc/common/system/Group.xml	그룹 관리
+6	sp_svccode_procedures.sql	SvcCode.xml	mappers/com/wsc/common/system/SvcCode.xml	서비스코드 관리
+7	sp_screenterm_procedures.sql	ScreenTerm.xml	mappers/com/wsc/common/system/ScreenTerm.xml	화면용어 관리
+8	sp_batch_procedures.sql	Batch.xml	mappers/com/wsc/common/system/Batch.xml	배치 관리
+9	sp_userlog_procedures.sql	UserLog.xml	mappers/com/wsc/common/system/UserLog.xml	사용자 로그
+10	sp_usersecure_procedures.sql	UserSecure.xml	mappers/com/wsc/common/system/UserSecure.xml	사용자 보안
+11	sp_jobhist_procedures.sql	JobHist.xml	mappers/com/wsc/common/system/JobHist.xml	작업 이력
+12	sp_file_procedures.sql	File.xml	mappers/com/wsc/common/system/File.xml	파일 관리
+13	sp_loader_procedures.sql	Loader.xml	mappers/com/wsc/common/system/Loader.xml	로더 관리
+14	sp_mail_procedures.sql	Mail.xml	mappers/com/wsc/common/system/Mail.xml	메일 관리
+15	sp_board_address_procedures.sql	Address.xml	mappers/com/wsc/common/board/Address.xml	주소록 관리
+16	sp_board_help_procedures.sql	Help.xml	mappers/com/wsc/common/board/Help.xml	도움말 관리
+17	sp_board_notification_procedures.sql	Notification.xml	mappers/com/wsc/common/board/Notification.xml	알림 관리
+18	sp_board_common_procedures.sql	Qna.xml	mappers/com/wsc/common/board/Qna.xml	게시판 공통 (QnA)
+19	sp_board_common_procedures.sql	bulletin.xml	mappers/com/wsc/common/board/bulletin.xml	게시판 공통 (공지)
+20	sp_board_common_procedures.sql	reference.xml	mappers/com/wsc/common/board/reference.xml	게시판 공통 (자료실)
+21	sp_board_common_procedures.sql	Image.xml	mappers/com/wsc/common/board/Image.xml	게시판 공통 (이미지)
+22	sp_board_common_procedures.sql	Video.xml	mappers/com/wsc/common/board/Video.xml	게시판 공통 (동영상)

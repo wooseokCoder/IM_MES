@@ -27,13 +27,12 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/common/user/menu.js?v=0210" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/user/menu.js?v=260310B" />"></script>
 
 <style>
 #report-button-pdf .l-btn-text{
 	width: 100px;
 }
-.search-label-h {width:10%;}
 </style>
 </head>
 
@@ -83,9 +82,20 @@
 	<form id="search-form">
 		<!-- <fieldset class="div-line-new" > -->
 		<fieldset class="Remake-div-line-new" >
-	        <table cellpadding="5" class="search-table tableSearch-c wd-100" >
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+	        	<colgroup>
+	        		<col width="70px">
+	        		<col width="120px">
+	        		<col width="70px">
+	        		<col width="120px">
+	        		<col width="70px">
+	        		<col width="120px">
+	        		<col width="83px">
+	        		<col width="120px">
+	        		<col width="*">
+	        	</colgroup>
 	        	<tr class="topnav_sty">
-            		<td colspan="10" >
+            		<td colspan="9" >
             			<div>
 	            			<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
 	            			<div>
@@ -95,24 +105,25 @@
                         </div>
             		</td>
             	</tr>
-            	
+
 	            <tr>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_004"><span>Root Menu</span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_004"><span>Root Menu</span></th>
 					<td class="d">
 						<input class="easyui-textbox" name="parentType" id="parentType" data-options="width:100" />
 					</td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_001"><span>Menu Desc</span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>Menu Desc</span></th>
 					<td class="d">
 						<input class="easyui-textbox" name="menuDesc" id="menuDesc" data-options="width:100" />
 					</td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_002"><span>Menu URL</span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>Menu URL</span></th>
 					<td class="d">
 						<input class="easyui-textbox" name="menuUrl" id="menuUrl" data-options="width:150" />
 					</td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_003"><span>Uppr Menu ID</span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_003"><span>Uppr Menu ID</span></th>
 					<td class="d">
 						<input class="easyui-textbox" name="parentKey" id="parentKey" data-options="width:150" />
 					</td>
+					<td class="d"></td>
 	            </tr>
 	        </table>
 	   </fieldset>
@@ -164,7 +175,7 @@
 
 
 <!-- 엑셀  진행상태 -->
-<div id="progress-popup" class="easyui-dialog" >
+<div id="progress-popup" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>

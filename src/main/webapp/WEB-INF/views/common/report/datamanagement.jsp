@@ -152,7 +152,6 @@ $(function(){
 #report-button-pdf .l-btn-text{
 	width: 100px;
 }
-.search-label-h {width:10%;}
 </style>
 <!-- BODY 상단 INCLUDE -->
 <%@ include file="/WEB-INF/views/include/body.head.jsp" %>
@@ -169,15 +168,22 @@ $(function(){
 
 	<!-- 북쪽 영역: 툴바 + 그리드 + SQL -->
 	<div data-options="region:'north',border:false" style="height:60%;">
-		
+
 		<!-- 툴바 -->
 		<div id="search-toolbar" class="wui-toolbar">
 			<form id="search-form">
 				<!-- <fieldset class="div-line-new" style="padding-left:20px;"> -->
 				<fieldset class="Remake-div-line-new" >
-			        <table cellpadding="5" class="search-table tableSearch-c wd-100" >
+			        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+			        	<colgroup>
+			        		<col width="55px" />
+			        		<col width="150px" />
+			        		<col width="85px" />
+			        		<col width="150px" />
+			        		<col width="*" />
+			        	</colgroup>
 			        	<tr class="topnav_sty">
-		            		<td colspan="10" >
+		            		<td colspan="5" >
 		            			<div>
 			            			<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
 			            			<div>
@@ -189,12 +195,13 @@ $(function(){
 	                        </div>
 		            		</td>
 		            	</tr>
-		            	
+
 			            <tr>
-							<th class="h table-Search-h-right search-label-h" data-item="LAB_001"><span>Job No</span></th>
+							<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>Job No</span></th>
 							<td class="d"><input class="easyui-textbox" name="searchJobNo" id="searchJobNo" style="width:150px;height:30px;" /></td>
-							<th class="h table-Search-h-right search-label-h" data-item="LAB_002"><span>Description</span></th>
+							<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>Description</span></th>
 							<td class="d"><input class="easyui-textbox" name="searchDesc" id="searchDesc" style="width:150px;height:30px;" /></td>
+							<td class="d"></td>
 			            </tr>
 			        </table>
 		   </fieldset>
@@ -206,14 +213,14 @@ $(function(){
 							<td class="h">
 								<div class="dis_flex_gap4" >
 									<a href="javascript:void(0)" class="easyui-linkbutton c6" id="append-button" data-item="BTN_002" data-options="disabled:false">Add</a>
-									<a href="javascript:void(0)" class="easyui-linkbutton c6" id="save-button" data-item="BTN_002" data-options="disabled:false">Save</a>
+									<a href="javascript:void(0)" class="easyui-linkbutton c6" id="save-button" data-item="BTN_006" data-options="disabled:false">Save</a>
 									<a href="javascript:void(0)" class="easyui-linkbutton c6" id="remove-button" data-item="BTN_003" data-options="disabled:${DEL}">Del</a>
 								    <a href="javascript:void(0)" class="easyui-linkbutton c4" id="excel-button" data-item="BTN_004">
 								    	Excel Download&nbsp;
 								    	<img style="width:16px; height:16px;" src="<%=request.getContextPath() %>/resources/images/excel_download.png" />
 								    </a>
 									<a href="javascript:void(0)" class="easyui-linkbutton c8" id="dreload-button" data-item="BTN_005">Clear</a>
-									<a href="javascript:void(0)" class="easyui-linkbutton c6" id="save-sql-button" data-item="BTN_002" data-options="disabled:false">Save</a>
+									<a href="javascript:void(0)" class="easyui-linkbutton c6" id="save-sql-button" data-item="BTN_006" data-options="disabled:false">Save</a>
 								</div>
 							</td>
 			            </tr>
@@ -257,12 +264,12 @@ $(function(){
 						</tr>
 					</table>
 				</div>
-		
+
 <!-- 				SQL Save 버튼 영역
 				<fieldset class="div-line-new-sub" style="margin-top: 5px;">
 					<a href="javascript:void(0)" class="easyui-linkbutton c6" id="save-sql-button" data-item="BTN_002" data-options="disabled:false">Save</a>
 				</fieldset> -->
-		
+
 			</div>
 		</div>
 	</div>
@@ -273,7 +280,7 @@ $(function(){
 			<form id="search-sub-form" method="post">
 				<fieldset class="div-line-new-sub">
 					<a href="javascript:void(0)" class="easyui-linkbutton c6" id="append-detl-button" data-item="BTN_002" data-options="disabled:false">Add</a>
-					<a href="javascript:void(0)" class="easyui-linkbutton c6" id="save-detl-button" data-item="BTN_002" data-options="disabled:false">Save</a>
+					<a href="javascript:void(0)" class="easyui-linkbutton c6" id="save-detl-button" data-item="BTN_006" data-options="disabled:false">Save</a>
 					<a href="javascript:void(0)" class="easyui-linkbutton c6" id="remove-detl-button" data-item="BTN_003" data-options="disabled:${DEL}">Del</a>
 				</fieldset>
 				<input type="hidden" name="jobNo" id="jobNo" value="" />
@@ -283,14 +290,14 @@ $(function(){
 		<table id="search-sub-grid">
 			<thead>
 				<tr>
-					<th data-options="field:'jobNo', halign:'center', align:'center', width:120">Job No</th>
-					<th data-options="field:'parameterCode', halign:'center', editor:{type:'textbox'}, align:'center', width:150">Parameter Code</th>
-					<th data-options="field:'parameterName', halign:'center', editor:{type:'textbox'}, align:'center', width:150">Parameter Name</th>
-					<th data-options="field:'parameterSeq', halign:'center', editor:{type:'textbox'}, align:'center', width:80">Seq</th>
-					<th data-options="field:'parameterType', halign:'center', editor:{type:'textbox'}, align:'center', width:120">Type</th>
-					<th data-options="field:'parameterLength', halign:'center', editor:{type:'textbox'}, align:'center', width:100">Length</th>
-					<th data-options="field:'parameterDesc', halign:'center', editor:{type:'textbox'}, align:'center', width:300">Description</th>
-					<th data-options="field:'parameterInitVal', halign:'center', editor:{type:'textbox'}, align:'center', width:250">Initial value</th>
+					<th data-options="field:'jobNo', halign:'center', align:'center', width:120, data_item:'GRD_025'">Job No</th>
+					<th data-options="field:'parameterCode', halign:'center', editor:{type:'textbox'}, align:'center', width:150, data_item:'GRD_026'">Parameter Code</th>
+					<th data-options="field:'parameterName', halign:'center', editor:{type:'textbox'}, align:'center', width:150, data_item:'GRD_027'">Parameter Name</th>
+					<th data-options="field:'parameterSeq', halign:'center', editor:{type:'textbox'}, align:'center', width:80, data_item:'GRD_028'">Seq</th>
+					<th data-options="field:'parameterType', halign:'center', editor:{type:'textbox'}, align:'center', width:120, data_item:'GRD_029'">Type</th>
+					<th data-options="field:'parameterLength', halign:'center', editor:{type:'textbox'}, align:'center', width:100, data_item:'GRD_030'">Length</th>
+					<th data-options="field:'parameterDesc', halign:'center', editor:{type:'textbox'}, align:'center', width:300, data_item:'GRD_031'">Description</th>
+					<th data-options="field:'parameterInitVal', halign:'center', editor:{type:'textbox'}, align:'center', width:250, data_item:'GRD_032'">Initial value</th>
 				</tr>
 			</thead>
 		</table>

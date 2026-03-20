@@ -270,7 +270,7 @@ $(function() {
 	$("#remove-create-button").bind("click",doRemoveCreate);
 
 	$('#regist-dialog').dialog({
-	    title: tit.TITLE0010,//샘플게시판 등록
+	    title: tit.TITLE0004,//샘플게시판 등록
 	    iconCls: 'icon-search',
 	    top:     10,
 	    width: 1024,
@@ -281,7 +281,7 @@ $(function() {
 	});
 
 	$('#pdf-dialog').dialog({
-	    title: tit.TITLE0029,
+	    title: tit.TITLE0002,
 	    iconCls: 'icon-search',
 	    top:     10,
 	    bottom:  10,
@@ -294,7 +294,7 @@ $(function() {
 	});
 
 	$('#progress-popup').dialog({
-	       title: tit.TITLE0009,
+	       title: tit.TITLE0003,
 	       top:     100,
 	       width: 200,
 	       height: 200,

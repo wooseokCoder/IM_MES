@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,6 +30,8 @@ public class SessionComponent implements Serializable {
 	private List<Menu> mhotList; //핫메뉴목록
 	private Locale  locale;
 	
+	private Map<String, String> sysConfig;  // 시스템 설정 (AS-IS: acSysConfig)
+
 	private int     loginCount = -1;
 	private Date    loginTime;
 	private String  loginReturn;
@@ -106,6 +109,7 @@ public class SessionComponent implements Serializable {
 		this.menuInfo  = null;
 		this.menuList  = null;
 		this.mhotList  = null;
+		this.sysConfig = null;
 
 		this.loginCount   = -1;
 		this.loginTime    = null;
@@ -147,6 +151,18 @@ public class SessionComponent implements Serializable {
 	}
 	public void removeHotMenus() {
 		this.mhotList = null;
+	}
+
+	// 시스템 설정 (AS-IS: acInfo.SysConfig)
+	public void saveSysConfig(Map<String, String> sysConfig) {
+		this.sysConfig = sysConfig;
+	}
+	public String getSysConfig(String confName) {
+		if (this.sysConfig == null) return null;
+		return this.sysConfig.get(confName);
+	}
+	public Map<String, String> getSysConfigMap() {
+		return this.sysConfig;
 	}
 	
 	//전체 URL 가져오기

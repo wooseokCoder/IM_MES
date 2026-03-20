@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_NG_FILE_PROC.xml
+설명: NG파일 공정 매핑 매퍼 (TSTD_NG_FILE_PROC 테이블)
+     + 전체 공정 마스터 조회 (LSE_STD_PROC)
+원본: ProActive TSTD_NG_FILE_PROC.cs, TSTD_NG_FILE_PROC_QUERY.cs
+작성일: 2026-03-10
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TSTD_NG_FILE_PROC">
+
+    <!--
+    ============================================================
+    SER2_PROC: 선택 파일의 적용 공정 조회 (ORD32A Grid3 / D0A Grid3)
+    용도: FILE_ID에 매핑된 공정 목록
+    JOIN: LSE_STD_PROC (공정명, DATA_FLAG=0)
+    ============================================================
+    -->
+    <select id="SER2_PROC" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_ng_file_proc_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{fileId,    mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    SER3_PROC: 전체 공정 마스터 조회 (D0A Grid4 - 전체 공정)
+    용도: LSE_STD_PROC에서 DATA_FLAG=0 공정 목록
+    ============================================================
+    -->
+    <select id="SER3_PROC" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_std_proc_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    DEL: 공정 매핑 전체 삭제 (FILE_ID 단위)
+    용도: ORD32A_INS 저장 시 기존 매핑 삭제
+    ============================================================
+    -->
+    <delete id="DEL" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ng_file_proc_del(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{fileId,    mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+    <!--
+    ============================================================
+    INS: 공정 매핑 개별 등록
+    용도: ORD32A_INS 저장 시 선택된 공정 행별 INSERT
+    ============================================================
+    -->
+    <insert id="INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ng_file_proc_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{fileId,    mode=IN, jdbcType=VARCHAR},
+            #{procCode,  mode=IN, jdbcType=VARCHAR},
+            #{gsUserId,  mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+</mapper>

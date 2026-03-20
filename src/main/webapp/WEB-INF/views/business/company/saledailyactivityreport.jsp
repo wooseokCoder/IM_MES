@@ -63,14 +63,23 @@
 	<div id="search-toolbar2" class="wui-toolbar">
 		<form id="search-form">
 			<fieldset class="div-line-new" >
-		        <table cellpadding="5" class="search-table tableSearch-c" >
+		        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+		            <colgroup>
+		                <col width="70px">
+		                <col width="250px">
+		                <col width="55px">
+		                <col width="150px">
+		                <col width="65px">
+		                <col width="150px">
+		                <col width="*">
+		            </colgroup>
 		            <tr>
-						<th class="h table-Search-h" data-item="LAB_001"><span>검색기간 </span></th>
+						<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>검색기간 </span></th>
 						<td class="d">
 							<input class="easyui-datebox" name="date1" id="date1" value="${date2}"/>~
 							<input class="easyui-datebox" name="date2" id="date2" value="${date2}"/>
 						</td>
-						<th class="h" data-item="LAB_002"><span>사원명</span></th>
+						<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>사원명</span></th>
 						<td class="d">
 							<select class="easyui-combobox" name="salEply" ID="salEply" data-options="width:130">
 								<option value="">전체</option>
@@ -82,7 +91,7 @@
 							</select>
 						</td>
 
-						<th class="h" data-item="LAB_003"><span>담당부서</span></th>
+						<th class="h table-Search-h search-label-h" data-item="LAB_003"><span>담당부서</span></th>
 						<td class="d">
 							<select class="easyui-combobox" name="searchStafDept" ID="searchStafDept" data-options="width:100">
 								<option value="">전체</option>
@@ -95,7 +104,7 @@
 						</td>
 
 						<td class="b">
-							<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001">검색</a>
+							<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001">조회</a>
 						</td>
 		            </tr>
 		        </table>

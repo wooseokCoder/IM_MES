@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TPOP_MC_DAILY_CHECK_RESULT_QUERY.xml
+설명: 일일점검 이력 조회 매퍼 (POP 모듈)
+     TPOP_MC_DAILY_CHECK_RESULT + LSE_MACHINE JOIN
+화면: POP42A (일일점검 이력 조회)
+작성자: 송우석
+작성일: 2026-03-10
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TPOP_MC_DAILY_CHECK_RESULT_QUERY">
+
+    <!--
+    ============================================================
+    TPOP_MC_DAILY_CHECK_RESULT_QUERY2: 마스터 조회 (설비별 점검일 목록)
+    용도: POP42A 상단 마스터 그리드 조회 (POP42A_SER 서비스)
+    JOIN: LSE_MACHINE (설비명)
+    파라미터:
+      gsPltCode   - 공장코드
+      mdcrMcLike  - 설비명 LIKE 검색
+      sMdcrDate   - 점검일 시작 (yyyyMMdd)
+      eMdcrDate   - 점검일 종료 (yyyyMMdd)
+      dataFlag    - 데이터 상태 (0=활성)
+    정렬: 점검일 역순, 설비명 순
+    ============================================================
+    -->
+    <select id="TPOP_MC_DAILY_CHECK_RESULT_QUERY2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tpop_mc_daily_check_result_query2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mdcrMcLike, mode=IN, jdbcType=VARCHAR},
+            #{sMdcrDate, mode=IN, jdbcType=VARCHAR},
+            #{eMdcrDate, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TPOP_MC_DAILY_CHECK_RESULT_QUERY1: 디테일 조회 (점검항목 상세)
+    용도: POP42A 하단 디테일 그리드 조회 (POP42A_SER2 서비스)
+    파라미터:
+      gsPltCode   - 공장코드
+      mdcrMcCode  - 설비코드 (마스터에서 선택)
+      mdcrDate    - 점검일 (마스터에서 선택)
+      dataFlag    - 데이터 상태
+    정렬: 순번 순, 유형 순, 점검번호 순
+    ============================================================
+    -->
+    <select id="TPOP_MC_DAILY_CHECK_RESULT_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tpop_mc_daily_check_result_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mdcrMcCode, mode=IN, jdbcType=VARCHAR},
+            #{mdcrDate, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+</mapper>

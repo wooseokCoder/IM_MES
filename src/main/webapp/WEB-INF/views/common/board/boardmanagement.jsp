@@ -27,7 +27,7 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/common/board/boardmanagement.js?v=0626A" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/board/boardmanagement.js?v=260227A" />"></script>
 <script type="text/javascript">
 	 doInit({
 		sysId:    '${model.sysId}',
@@ -39,19 +39,13 @@
 </script>
 <style>
 #account-layout{min-width:1200px !important;}
-.search-label-h2 {
-    width: 128px;
-}
-table.search-table td.d {
-    padding-right: 20px;
-}
 #menu-button, #menu-button .l-btn-text { width: 100px; height: 32px;}
 #excel-button3, #excel-button3 .l-btn-text { width: 218px; text-align: left; border-radius:0px;}
-#excel-button3 .l-btn-text, #excel-button4 .l-btn-text { padding-left: 25px;} 
+#excel-button3 .l-btn-text, #excel-button4 .l-btn-text { padding-left: 25px;}
 .menu{border-style:none;}
 .menu-line {
-   border-left: none; 
-   border-right: none; 
+   border-left: none;
+   border-right: none;
 }
 </style>
 </head>
@@ -90,13 +84,13 @@ table.search-table td.d {
 	<form id="search-form">
 		<fieldset class="Remake-div-line-new">
 		<input type="hidden" name="sysId"    id="s_sysId"    value="${model.sysId}"   />
-			<table cellpadding="5" class="search-table tableSearch-c wd-100">
+			<table cellpadding="0" class="search-table tableSearch-c wd-100">
 				<colgroup>
-					<col width="7%" style="min-width: 120px;" />
-					<col width="18%" style="min-width: 150px;" />
-					<col width="7%" style="min-width: 120px;" />
-					<col width="25%" style="min-width: 150px;" />
-					<col width="*%" style="min-width: 200px;" />
+					<col width="80px" />
+					<col width="150px" />
+					<col width="70px" />
+					<col width="120px" />
+					<col width="*" />
 				</colgroup>
 				<tr class="topnav_sty">
 					<td colspan="5">
@@ -109,7 +103,7 @@ table.search-table td.d {
 					</td>
 				</tr>
 	            <tr>
-					<th class="h table-Search-h" data-item="LAB_001"><span>Bord Type</span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>Bord Type</span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="codeGrup" ID="s_codeGrup" data-options="width:150,height:30">
 							<option value="ALL">ALL</option>
@@ -118,7 +112,7 @@ table.search-table td.d {
 							</c:forEach>
 						</select>
 					</td>
-					<th class="h table-Search-h" data-item="LAB_002"><span>Condition</span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>Condition</span></th>
 					<td class="d">
 						<div class="dis_flex_gap5">
 							<div style="width: 100px;">
@@ -129,7 +123,7 @@ table.search-table td.d {
 							</div>
 						</div>
 					</td>
-					<td class="b"></td>
+					<td class="d"></td>
 				</tr>
 			</table>
 		</fieldset>
@@ -166,7 +160,7 @@ table.search-table td.d {
 
 
 <!-- 엑셀  진행상태 -->
-<div id="progress-popup" class="easyui-dialog" >
+<div id="progress-popup" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>

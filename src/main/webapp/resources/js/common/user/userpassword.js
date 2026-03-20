@@ -77,7 +77,7 @@ function checkPw(pw){
     var spe  = pw.search(/[#?!@$%^&*-]/gi);
 
     if(pw.search(/\s/) != -1){
-        alert(msg.MSG0123);
+        alert(msg.MSG0073);
         return false;
     }
     
@@ -88,15 +88,15 @@ function checkPw(pw){
     if(spe >= 0) cnt++;
     
     if(cnt < 2){
-        alert(msg.MSG0132);
+        alert(msg.MSG0064);
         return false;
     }
     
     if(cnt == 2 && pw.length < 10){
-        alert(msg.MSG0132);
+        alert(msg.MSG0065);
         return false;
     }else if(cnt > 2 && pw.length < 8){
-        alert(msg.MSG0133);
+        alert(msg.MSG0066);
         return false;
     }else {
     	return true;
@@ -129,7 +129,7 @@ function doSave() {
     });
 	
 	if(errMsg != 'Y'){
-		$.messager.alert(msg.MSG0121,msg.MSG0014,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0072,msg.MSG0051);
 		return false;
 	}
 	
@@ -143,7 +143,7 @@ function doSave() {
         data: chkParams,
         success: function(data){
         	if (!data.rows){
-        		$.messager.alert(msg.MSG0121,msg.MSG0110,msg.MSG0121);
+        		$.messager.alert(msg.MSG0051,msg.MSG0029,msg.MSG0051);
         	}else{
         		if(newPw == chkPw){
         			
@@ -164,13 +164,13 @@ function doSave() {
         		        type: 'post',
         		        data: saveParams,
         		        success: function(data){
-        		        	$.messager.alert(msg.MSG0122,msg.MSG0117,'info');
+        		        	$.messager.alert(msg.MSG0052,msg.MSG0035,'info');
         		        },
         		        error: function(){
         		        }
         		    });
         		}else{
-        			$.messager.alert(msg.MSG0121,msg.MSG0123,msg.MSG0121);
+        			$.messager.alert(msg.MSG0051,msg.MSG0014,msg.MSG0051);
         		}
         	}
         },

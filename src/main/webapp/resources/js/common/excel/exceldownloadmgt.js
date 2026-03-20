@@ -81,7 +81,7 @@ var consts = {
 
 $(function() {
 	$('#progress-popup').dialog({
-       title: tit.TITLE0009,
+       title: tit.TITLE0003,
        top:     100,
        width: 200,
        height: 200,
@@ -91,7 +91,7 @@ $(function() {
     });
 	
 	$('#regist-dialog').dialog({
-		title: tit.TITLE0041,
+		title: tit.TITLE0018,
 	    top:     10,
 	    width: 350,
 	    height: 200,
@@ -274,7 +274,7 @@ function doSave2(){
 		var v = $('#s_excelFile').filebox('getValue');
 
 		if (v == "") {
-			$.messager.alert(msg.MSG0121,msg.MSG0019,msg.MSG0121);
+			$.messager.alert(msg.MSG0051,msg.MSG0018,msg.MSG0051);
 			return;
 		}
 

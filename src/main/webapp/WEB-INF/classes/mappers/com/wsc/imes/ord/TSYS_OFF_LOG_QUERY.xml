@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSYS_OFF_LOG_QUERY.xml
+설명: 퇴근 로그 조회 매퍼 (TSYS_OFF_LOG 테이블)
+화면: ORD15A (실적/비가동 현황)
+작성자: 송우석
+작성일: 2026-03-16
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TSYS_OFF_LOG_QUERY">
+
+    <!--
+    ============================================================
+    TSYS_OFF_LOG_QUERY1: 퇴근 로그 조회
+    용도: ORD15A - 무작업/퇴근 행 계산용 퇴근 시각 데이터
+    파라미터: gsPltCode, sDate, eDate
+    작성자: 송우석
+    작성일: 2026-03-16
+    ============================================================
+    -->
+    <select id="TSYS_OFF_LOG_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tsys_off_log_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sDate, mode=IN, jdbcType=VARCHAR},
+            #{eDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

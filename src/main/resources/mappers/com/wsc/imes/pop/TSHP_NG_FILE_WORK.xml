@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_NG_FILE_WORK.xml
+설명: NG파일 작업 상세 CRUD 매퍼 (POP 모듈)
+원본: ProActive POP55A.cs (TSHP_NG_FILE_WORK CRUD)
+화면: POP55A (NAM공정 NG파일배포 확인)
+작성일: 2026-03-07
+============================================================================
+포함 SQL (3개):
+  1. SER  - 존재 여부 조회 (단건, 중복 방지용)
+  2. INS  - 신규 등록
+  3. DEL  - 삭제 (PROD_CODE 기반 일괄)
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_NG_FILE_WORK">
+
+    <!--
+    ============================================================
+    SER: 존재 여부 조회 (단건)
+    원본: POP55A TSHP_NG_FILE_WORK SER
+    용도: INS 전 기존 데이터 존재 여부 확인 (중복 방지)
+    호출: pop55aIns() — Step 3 (각 상세행 루프)
+    ============================================================
+    -->
+    <select id="SER" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ng_file_work_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{fileId, mode=IN, jdbcType=VARCHAR},
+            #{model, mode=IN, jdbcType=VARCHAR},
+            #{procCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    INS: 신규 등록
+    원본: POP55A TSHP_NG_FILE_WORK INS
+    용도: NG파일 작업 상세 등록
+    호출: pop55aIns() — Step 3 (SER 결과 null 시)
+    ============================================================
+    -->
+    <insert id="INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ng_file_work_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{fileId, mode=IN, jdbcType=VARCHAR},
+            #{model, mode=IN, jdbcType=VARCHAR},
+            #{procCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{image, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    DEL: 삭제 (PROD_CODE 기반 일괄)
+    원본: POP55A TSHP_NG_FILE_WORK DEL
+    용도: 제품코드 기반 NG파일 작업 일괄 삭제
+    호출: pop55aUde() — cascade 삭제 3단계
+    ============================================================
+    -->
+    <delete id="DEL" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_ng_file_work_del(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{prodCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+</mapper>

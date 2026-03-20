@@ -125,9 +125,18 @@
 <!-- fieldset 변경 20190628 박소현 -->
 	<form id="search-form">
 		<fieldset  class="div-line-new">
-	        <table cellpadding="5" class="search-table tableSearch-c">
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100">
+	        	<colgroup>
+	        		<col width="45px">
+	        		<col width="80px">
+	        		<col width="45px">
+	        		<col width="260px">
+	        		<col width="65px">
+	        		<col width="120px">
+	        		<col width="*">
+	        	</colgroup>
 	            <tr>
-					<th class="h table-Search-h"><span data-item="LAB_001">유형 </span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_001">유형 </span></th>
 					<td class="d">
 						<input class="easyui-combobox" name="userType" id="s_userType"
 							data-options="width:60,
@@ -138,7 +147,7 @@
 										"
 						/>
 					</td>
-					<th class="h"><span data-item="LAB_002">부서&nbsp;</span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_002">부서&nbsp;</span></th>
 					<td class="d">
 						<input class="easyui-combobox" name="deptPrnt" id="s_deptPrnt" 
 							data-options="width:120,
@@ -166,7 +175,7 @@
 											}
 										}] -->
 					</td>
-					<th class="h"><span data-item="LAB_003">사용여부 </span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_003">사용여부 </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="useFlag" ID="s_useFlag">
 							<c:forEach var="item" items="${result}">
@@ -181,8 +190,8 @@
 						</span> -->
 					</td>
 					<td class="b">
-						<!-- <a href="javascript:void(0)" class="easyui-linkbutton cgray" iconCls="icon-search" id="search-button">검색</a> -->
-						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001">검색</a> 
+						<!-- <a href="javascript:void(0)" class="easyui-linkbutton cgray" iconCls="icon-search" id="search-button">조회</a> -->
+						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001">조회</a> 
 						<input type="hidden" id="hdfIndex" value="-1" />
 						<input type="hidden" id="hdfChk" value="" />
 					</td>

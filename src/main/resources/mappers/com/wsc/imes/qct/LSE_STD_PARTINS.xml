@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    LSE_STD_PARTINS CRUD 매퍼
+    부품-검사그룹 연계 관리 (QCT06A)
+    작성자: 송우석
+-->
+<mapper namespace="com.wsc.imes.qct.LSE_STD_PARTINS">
+
+    <!-- 중복 체크 -->
+    <select id="LSE_STD_PARTINS_SER" parameterType="map" resultType="map"
+            statementType="CALLABLE">
+        {CALL sp_imes_lse_std_partins_ser(
+            #{gsPltCode}, #{partCode}, #{insGrpCode}
+        )}
+    </select>
+
+    <!-- MAX 순번 조회 -->
+    <select id="LSE_STD_PARTINS_SER3" parameterType="map" resultType="map"
+            statementType="CALLABLE">
+        {CALL sp_imes_lse_std_partins_ser3(
+            #{gsPltCode}, #{partCode}
+        )}
+    </select>
+
+    <!-- 연계 등록 -->
+    <insert id="LSE_STD_PARTINS_INS" parameterType="map"
+            statementType="CALLABLE">
+        {CALL sp_imes_lse_std_partins_ins(
+            #{gsPltCode}, #{partCode}, #{insGrpCode},
+            #{insGrpSeq}, #{gsUserId}
+        )}
+    </insert>
+
+    <!-- 순번 수정 -->
+    <update id="LSE_STD_PARTINS_UPD" parameterType="map"
+            statementType="CALLABLE">
+        {CALL sp_imes_lse_std_partins_upd(
+            #{gsPltCode}, #{partCode}, #{insGrpCode}, #{insGrpSeq}
+        )}
+    </update>
+
+    <!-- 연계 삭제 -->
+    <delete id="LSE_STD_PARTINS_DEL" parameterType="map"
+            statementType="CALLABLE">
+        {CALL sp_imes_lse_std_partins_del(
+            #{gsPltCode}, #{partCode}, #{insGrpCode}
+        )}
+    </delete>
+
+</mapper>

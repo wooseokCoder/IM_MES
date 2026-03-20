@@ -49,9 +49,20 @@
 <!-- fieldset 변경 20190628 박소현 -->
 	<form id="search-form">
 		<fieldset  class="div-line-new">
-	        <table cellpadding="5" class="search-table tableSearch-c">
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100">
+	        	<colgroup>
+	        		<col width="45px" />
+	        		<col width="120px" />
+	        		<col width="65px" />
+	        		<col width="120px" />
+	        		<col width="65px" />
+	        		<col width="120px" />
+	        		<col width="80px" />
+	        		<col width="120px" />
+	        		<col width="*" />
+	        	</colgroup>
 	            <tr>
-					<th class="h table-Search-h"><span data-item="LAB_001">유형 </span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_001">유형 </span></th>
 					<td class="d">
 						<input class="easyui-combobox" name="userType" id="s_userType"
 							data-options="width:60,
@@ -62,7 +73,7 @@
 										"
 						/>
 					</td>
-					<th class="h"><span data-item="LAB_002">사용여부 </span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_002">사용여부 </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="useFlag" ID="s_useFlag">
 							<c:forEach var="item" items="${result}">
@@ -72,16 +83,16 @@
 							</c:forEach>
 						</select>
 					</td>
-					<th class="h"><span data-item="LAB_003">사용자ID </span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_003">사용자ID </span></th>
 					<td class="d">
 						<input type="text" class="easyui-textbox" name="userId" id="s_userId" data-options="width:120"></input>
 					</td>
-					<th class="h"><span data-item="LAB_004">사용자명 </span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_004">사용자명 </span></th>
 					<td class="d">
 						<input type="text" class="easyui-textbox" name="userName" id="s_userName" data-options="width:120"></input>
 					</td>
-					<td class="b">
-						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001">검색</a> 
+					<td class="d">
+						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001">조회</a>
 						<input type="hidden" id="hdfIndex" value="-1" />
 						<input type="hidden" id="hdfChk" value="" />
 					</td>

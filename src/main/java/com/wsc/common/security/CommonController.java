@@ -60,10 +60,8 @@ public class CommonController extends BaseController {
 
 	@RequestMapping(value = {"/","/index*"})
 	public String index(HttpServletRequest request, HttpServletResponse response, Model model) {
-		//[WSC2.0] [2015.04 LSH] �긽�떒�젙蹂� �꽕�젙
 		initParams(model);
-		//EaiUtils.Cont();
-		
+
 		Object result = service.search("getUserType", initParams(model));
     	System.out.println("result::::::::::" + result.toString());
     	String sobj = result.toString();
@@ -73,34 +71,40 @@ public class CommonController extends BaseController {
     	String sobj2 = result2.toString();
     	sobj2 = sobj2.replace("[", "");
     	sobj2 = sobj2.replace("]", "");
-    	
+
 		model.addAttribute("userType", sobj);
 		model.addAttribute("userGroup", sobj2);
-		
-		// dash_type에 따른 index 화면 분기
+
+		// 탭 레이아웃 활성화 (index.jsp가 탭 컨테이너 역할)
+		model.addAttribute("frameYn", "Y");
+
+		return "index";
+	}
+
+	@RequestMapping(value="/homeContent")
+	public String homeContent(HttpServletRequest request, HttpServletResponse response, Model model) {
+		initParams(model);
+
+		Object result = service.search("getUserType", initParams(model));
+    	String sobj = result.toString();
+    	sobj = sobj.replace("[", "");
+    	sobj = sobj.replace("]", "");
+    	Object result2 = service.search("getUserGroup", initParams(model));
+    	String sobj2 = result2.toString();
+    	sobj2 = sobj2.replace("[", "");
+    	sobj2 = sobj2.replace("]", "");
+
+		model.addAttribute("userType", sobj);
+		model.addAttribute("userGroup", sobj2);
+
+		// dash_type에 따른 Home 탭 콘텐츠 분기
 		User user = (User) model.asMap().get("user");
 		String userDashType = user != null ? user.getDashType() : null;
-		String indexType = "index"; // 기본값
-		
-		if(userDashType == null || userDashType.equals("")) {
-			// dash_type이 없을 경우 기본 화면
-			indexType = "index";
+
+		if("DT02".equals(userDashType)) {
+			return "homeContent02";
 		}
-		else if(userDashType.equals("DT01")) {
-			// dash_type이 DT01인 경우 기본 index
-			indexType = "index";
-		}
-		else if(userDashType.equals("DT02")) {
-			// dash_type이 DT02인 경우 대시보드 화면
-			indexType = "index02";
-		}
-		else {
-			// 그 외의 경우 기본 화면
-			indexType = "index";
-		}
-		
-		return indexType;
-		
+		return "homeContent";
 	}
 	
 	@RequestMapping(value = {"/iframeTest"})
@@ -130,7 +134,7 @@ public class CommonController extends BaseController {
 	
 	@RequestMapping(value = {"/menuOverEvent"})
 	public String menuOverEvent(Model model) {
-		//[WSC2.0] [2015.04 LSH] �긽�떒�젙蹂� �꽕�젙
+		//[WSC2.0] [2015.04 LSH] 
 		//initParams(model);
 		return "menuOverEvent";
 	}

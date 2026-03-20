@@ -177,7 +177,7 @@ $(function() {
 	consts_item.init();
 	
 	$('#item-search-dialog').dialog({
-		title : tit.TITLE0005,// 샘플게시판 등록
+		title : tit.TITLE0001,// 샘플게시판 등록
 		iconCls : 'icon-search',
 		top : 10,
 		// width: 580,
@@ -189,7 +189,7 @@ $(function() {
 	});
 
 	$('#pdf-dialog').dialog({
-	    title: tit.TITLE0029,
+	    title: tit.TITLE0002,
 	    iconCls: 'icon-search',
 	    top:     10,
 	    bottom:  10,
@@ -216,7 +216,7 @@ $(function() {
 	});
 
 	$('#progress-popup').dialog({
-	       title: tit.TITLE0009,
+	       title: tit.TITLE0003,
 	       top:     100,
 	       width: 200,
 	       height: 200,
@@ -360,13 +360,13 @@ function doSave1() {
 
 	var itemSpec = $('#r_itemSpec').val();
 	if (itemSpec == "" || itemSpec == null) {
-		$.messager.alert(msg.MSG0121,msg.MSG0005,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0005,msg.MSG0051);
 		return;
 	}
 	var stocLoc = $("#r_stocLoc").combobox('getValue', '');
 
 	if (stocLoc == "" || stocLoc == null) {
-		$.messager.alert(msg.MSG0121,msg.MSG0102,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0009,msg.MSG0051);
 		return;
 	}
 
@@ -414,13 +414,13 @@ function doSave(){
 
 	var itemSpec = $('#r_itemSpec').val();
 	if (itemSpec == "" || itemSpec == null) {
-		$.messager.alert(msg.MSG0121,msg.MSG0005,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0005,msg.MSG0051);
 		return;
 	}
 	var stocLoc = $("#r_stocLoc").combobox('getValue', '');
 
 	if (stocLoc == "" || stocLoc == null) {
-		$.messager.alert(msg.MSG0121,msg.MSG0102,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0009,msg.MSG0051);
 		return;
 	}
 	
@@ -699,7 +699,7 @@ function doOpenItem() {
 	 * var custCode = $("#searchcustCode").val(); var isCode = false;
 	 * if($("#searchcustCode").textbox("getValue") != "" &&
 	 * $("#searchcustCode").textbox("getValue") != undefined){ isCode = true; }
-	 * if(!isCode){ $.messager.alert(msg.MSG0121,msg.MSG0121,msg.MSG0121); return; }
+	 * if(!isCode){ $.messager.alert(msg.MSG0051,msg.MSG0002,msg.MSG0051); return; }
 	 */
 
 	$("#pItemName").textbox("setValue", "");

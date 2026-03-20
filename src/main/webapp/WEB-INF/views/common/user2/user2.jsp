@@ -24,7 +24,6 @@
 <head>
 <style>
 	#excel-button, #excel-button .l-btn-text { width: 130px;}
-	.search-label-h { width: 10% !important; }
 	.dialog-button {
     padding: 5px;
     text-align: center !important;
@@ -38,7 +37,7 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/common/user2/user2.js?v=251111a" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/user2/user2.js?v=260227A" />"></script>
 <script type="text/javascript">
 	 doInit({
 		domain: '<spring:eval expression="@app['domain.user']"/>'
@@ -68,20 +67,22 @@
 			<th data-options="field:'userName', width:100, halign:'center', align:'center', editor:{type:'validatebox', options:{required:true}}, sortable:true,data_item:'GRD_002', sortable:true">User Name</th>
 		</tr>
 	</thead>
-	
+
 	<thead>
 		<tr>
-			<th data-options="field:'deptName',      width:100, halign:'center', align:'left', editor:{type:'textbox'},data_item:'GRD_003', hidden:true"  >부서명</th>
-			<th data-options="field:'deptCode',   width: 100, halign:'center', align:'center',editor:consts.combo.incomeDept.editor(),formatter:consts.combo.incomeDept.formatter(),sortable:true,data_item:'GRD_004'">Dept Name</th>
+			<th data-options="field:'deptCode',   width: 100, halign:'center', align:'center', sortable:true, data_item:'GRD_004', hidden:true">Dept Code</th>
+			<th data-options="field:'deptName',   width: 150, halign:'center', align:'left', editor:{type:'popupbox',options:{editable:true,onOpen:doOpenDeptPopup}}, sortable:true, data_item:'GRD_003'">Dept Name</th>
 			<th data-options="field:'userType', 	 width: 70, halign:'center', align:'center', editor:consts.combo.userType.editor(),formatter:consts.combo.userType.formatter(),data_item:'GRD_005', sortable:true">User Type</th>
 			<th data-options="field:'upprDeptCode',  width:100, halign:'center', align:'center', editor:{type:'textbox'},data_item:'GRD_006', hidden:true">Uppr Dept</th>
-			<th data-options="field:'orgAuthCode',   width:100, halign:'center', align:'center', editor:consts.combo.orgAuthCode.editor(),formatter:consts.combo.orgAuthCode.formatter(),data_item:'GRD_007'">Org Auth</th>
-			<th data-options="field:'spcAuthCode',   width: 100, halign:'center', align:'center',editor:'text',editor:{type:'popupbox',options:{editable:true,onOpen:doOpenPopup}},data_item:'GRD_008'">Spc Auth</th>
+			<th data-options="field:'orgAuthCode',   width:100, halign:'center', align:'center', hidden:true, editor:consts.combo.orgAuthCode.editor(),formatter:consts.combo.orgAuthCode.formatter(),data_item:'GRD_007'">Org Auth</th>
+			<th data-options="field:'spcAuthCode',   width: 100, halign:'center', align:'center', hidden:true, editor:'text',editor:{type:'popupbox',options:{editable:true,onOpen:doOpenPopup}},data_item:'GRD_008'">Spc Auth</th>
+			<th data-options="field:'ifMcCode',   width:120, halign:'center', align:'center', editor:{type:'popupbox',options:{editable:false,onOpen:doOpenMcPopup}}">SAP 작업장코드</th>
+			<th data-options="field:'ifMcName',   width:150, halign:'center', align:'center'">SAP 작업장명</th>
 			<th data-options="field:'menuSet',   width:100, halign:'center', align:'center', editor:{type:'textbox'},data_item:'GRD_009'">Root Menu</th>
 			<th data-options="field:'menuType', 	 width: 70, halign:'center', align:'center', editor:consts.combo.menuType.editor(),formatter:consts.combo.menuType.formatter(),data_item:'GRD_010'">Menu Type</th>
-			<th data-options="field:'dashType', 	 width: 70, halign:'center', align:'center', editor:consts.combo.dashType.editor(),formatter:consts.combo.dashType.formatter(),data_item:'GRD_010'">Dash Type</th>
+			<th data-options="field:'dashType', 	 width: 80, halign:'center', align:'center', editor:consts.combo.dashType.editor(),formatter:consts.combo.dashType.formatter(),data_item:'GRD_045'">Dash Type</th>
 			<th data-options="field:'mobileType', 	 width: 80, halign:'center', align:'center', editor:consts.combo.mobileType.editor(),formatter:consts.combo.mobileType.formatter(),data_item:'GRD_011', hidden:true">Mobile Type</th>
-			<th data-options="field:'userTel',       width:120, halign:'center', align:'center', editor:{type:'textbox'}, data_item:'GRD_012', sortable:true"  >Tel</th>
+			<th data-options="field:'userTel',       width:120, halign:'center', align:'center', editor:{type:'textbox'}, data_item:'GRD_012', sortable:true"  >telnum</th>
 			<th data-options="field:'userMail',      width:150, halign:'center', align:'left', editor:{type:'textbox'},data_item:'GRD_013', sortable:true"  >Email</th>
 			<th data-options="field:'saleGrup',      width:100, halign:'center', align:'center', editor:consts.combo.saleGrup.editor(),formatter:consts.combo.saleGrup.formatter(),data_item:'GRD_014', sortable:true"  >Sale Grup</th>
 			<th data-options="field:'regnMagr',      width:120, halign:'center', align:'center', editor:consts.combo.userBm.editor(),formatter:consts.combo.userBm.formatter(),data_item:'GRD_015', sortable:true"  >Regional Manager</th>
@@ -103,7 +104,7 @@
             <th data-options="field:'userCity',      width:100, halign:'center', align:'left', editor:{type:'textbox'},data_item:'GRD_024', sortable:true"  >User City</th>
             <th data-options="field:'userRegnCode',      width:100, halign:'center', align:'left', editor:{type:'textbox'},data_item:'GRD_024', sortable:true"  >User Regn Code</th>
             <th data-options="field:'userPostCode',      width:100, halign:'center', align:'left', editor:{type:'textbox'},data_item:'GRD_024', sortable:true"  >User Post Code</th>
-            <th data-options="field:'tpAccountId',      width:100, halign:'center', align:'left', editor:{type:'textbox'},data_item:'GRD_024', sortable:true"  >Tp Account ID</th>     -->                   
+            <th data-options="field:'tpAccountId',      width:100, halign:'center', align:'left', editor:{type:'textbox'},data_item:'GRD_024', sortable:true"  >Tp Account ID</th>     -->
 			<th data-options="field:'createMailFlag', width:150, halign:'center', align:'center', editor:{type:'textbox'},data_item:'GRD_025', sortable:true"  >Create Mail Flag</th>
 			<th data-options="field:'reviewMailFlag', width:150, halign:'center', align:'center', editor:{type:'textbox'},data_item:'GRD_026', sortable:true"  >Review Mail Flag</th>
 			<th data-options="field:'confMailFlag',   width:150, halign:'center', align:'center', editor:{type:'textbox'},data_item:'GRD_027', sortable:true"  >Confirm Mail Flag</th>
@@ -114,7 +115,7 @@
             <th data-options="field:'notiAllreadYn', width:150, halign:'center', align:'center', editor:{type:'textbox'},data_item:'GRD_031', sortable:true"  >Noti All Read Flag</th>
             <th data-options="field:'smtpId',      width:100, halign:'center', align:'center', editor:{type:'textbox'},data_item:'GRD_032', sortable:true"  >SMTP ID</th>
             <th data-options="field:'smtpPw',      width:100, halign:'center', align:'center', editor:{type:'textbox'},data_item:'GRD_032', sortable:true"  >SMTP PW</th>
-			<th data-options="field:'userRemk',      width:200, halign:'center', align:'left', editor:{type:'textbox'},data_item:'GRD_032', sortable:true"  >Remk</th>
+			<th data-options="field:'userRemk',      width:200, halign:'center', align:'left', editor:{type:'textbox'},data_item:'GRD_032', sortable:true"  >Remake</th>
 			<th data-options="field:'emplNo',        width:100, halign:'center', align:'center', editor:{type:'textbox'},data_item:'GRD_033', sortable:true">Empl No</th>
 			<th data-options="field:'comCode',       width:100, halign:'center', align:'center', editor:{type:'textbox'},data_item:'GRD_034', sortable:true">Company Code</th>
 			<th data-options="field:'comName',       width:120, halign:'center', align:'left', editor:{type:'textbox'},data_item:'GRD_035', sortable:true"  >Company Name</th>
@@ -145,21 +146,23 @@
 <!-- fieldset 변경 20190628 박소현 -->
 	<form id="search-form">
 		<fieldset  class="Remake-div-line-new">
-	        <table cellpadding="5" class="search-table tableSearch-c wd-100" >
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
 	        	<colgroup>
-	        		<col width="7%" style="min-width: 120px;" />
-	        		<col width="13%" style="min-width: 165px;" />
-	        		<col width="7%" style="min-width: 120px;" />
-	        		<col width="13%" style="min-width: 165px;" />
-	        		<col width="7%" style="min-width: 120px;" />
-	        		<col width="13%" style="min-width: 165px;" />
-	        		<col width="7%" style="min-width: 120px;" />
-	        		<col width="13%" style="min-width: 165px;" />
-	        		<col width="*" style="min-width: 120px;" />
+	        		<col width="43px">
+	        		<col width="120px">
+	        		<col width="70px">
+	        		<col width="120px">
+	        		<col width="70px">
+	        		<col width="120px">
+	        		<col width="70px">
+	        		<col width="180px">
+	        		<col width="65px">
+	        		<col width="120px">
+	        		<col width="*">
 	        	</colgroup>
-	        	
+
 	        	<tr class="topnav_sty">
-            		<td colspan="10" >
+            		<td colspan="11" >
             			<div>
 	            			<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
 	            			<div>
@@ -169,9 +172,9 @@
                         </div>
             		</td>
             	</tr>
-            	
+
 	            <tr>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_001"><span>Type </span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>Type </span></th>
 					<td class="d">
 						<input class="easyui-combobox" name="userType" id="s_userType"
 							data-options="width:100,
@@ -183,8 +186,7 @@
 										"
 						/>
 					</td>
-					<!-- search-label-h 1280x1024 크기떄문에 제거 -->
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_002"><span>Org Auth </span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>Org Auth </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="orgAuthCode" ID="s_orgAuthCode" style="width:100px;height:30px;" data-options="panelHeight:'auto'">
 							<option value="">ALL</option>
@@ -205,7 +207,7 @@
 										child: {id:'s_deptCode',name:'deptCode'},
 										onChange: jcombo.select
 										"
-						/>, 
+						/>,
 										icons:[{iconCls:'icon-cut',handler: function() {
 												$('#s_deptPrnt').combobox('clear');
 											}
@@ -217,13 +219,13 @@
 										params:{codeGrup:'DEPT_CODE',extNum01:2},
 										parent:{id:'s_deptPrnt',name:'extChr01'}
 										"
-						/>, 
+						/>,
 										icons:[{iconCls:'icon-cut',handler: function() {
 												$('#s_deptCode').combobox('clear');
 											}
 										}]
 					</td> -->
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_003"><span>Use Flag </span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_003"><span>Use Flag </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="useFlag" ID="s_useFlag" style="width:50px;height:30px;" data-options="panelHeight:'auto'">
 							 <option value="ALL">ALL</option>
@@ -238,18 +240,19 @@
 							<input name="useFlag" type="radio" value="N" id="s_useFlag2"/><label for="s_useFlag2">중지</label>
 						</span> -->
 					</td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_004"><span>User ID </span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_004"><span>User ID </span></th>
 					<td class="d">
-						<input type="text" class="easyui-textbox textbox-list" name="userId" id="s_userId" data-options="width:120,height:30" style="min-width: 119px;"></input>
+						<input type="text" class="easyui-textbox textbox-list" name="userId" id="s_userId" data-options="width:120,height:30"></input>
 						<input type="hidden" name="h_userIdList" id="h_userIdList" value=""/>
 						<a href="javascript:void(0)" style="" id="userId-list-button" class="easyui-linkbutton c12 searchListA">
 							<img id="userIdlist" style="width:16px; height:16px;" src="<%=request.getContextPath() %>/resources/images/icon_new/picklist_type.png" />
 						</a>
 					</td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_005"><span>User Name </span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_005"><span>User Name </span></th>
 					<td class="d">
 						<input type="text" class="easyui-textbox" name="userName" id="s_userName" data-options="width:120,height:30"></input>
 					</td>
+					<td class="d"></td>
 	            </tr>
 	        </table>
 	      </fieldset>
@@ -283,7 +286,7 @@
 			</tr>
 		</table>
 	</div> -->
-	
+
 	<!-- 메뉴타입 팝업 -->
 	<div id="search-menu-dialog" class="wui-dialog"	style="border-top-width: 1px;display:none">
 		<table id="search-menu-grid">
@@ -295,7 +298,7 @@
 				</tr>
 			</thead>
 		</table>
-	
+
 		<!-- fieldset 구분 변경  20160928 박소현 -->
 			<div id="search-menu-toolbar" class="wui-toolbar">
 				<form id="search-menu-form">
@@ -306,8 +309,8 @@
 				<input type="hidden" id="hdfChk" value="" />
 				<input type="hidden" id="testmenuType" value="" />
 		</div>
-		
-		
+
+
 		<!-- Appl List 팝업 -->
 		<div id="search-menu-appl-list-dialog" class="wui-dialog"	style="border-top-width: 1px;display:none">
 			<table id="search-menu-appl-list-grid">
@@ -319,7 +322,7 @@
 					</tr>
 				</thead>
 			</table>
-	
+
 		<!-- fieldset 구분 변경  20160928 박소현 -->
 			<div id="search-menu-appl-list-toolbar" class="wui-toolbar">
 				<form id="search-menu-appl-list-form">
@@ -330,7 +333,7 @@
 				<input type="hidden" id="hdfChk" value="" />
 				<input type="hidden" id="testmenuType" value="" />
 		</div>
-		
+
 		<form id="login-form" name="login-form" method="post">
 			<fieldset>
 				<input type="hidden" id="j_system" name="j_system" />
@@ -338,7 +341,7 @@
 				<input type="hidden" id="j_secure" name="j_secure" />
 			</fieldset>
 		</form>
-	
+
 </div>
 
 
@@ -353,7 +356,7 @@
 
 
 <!-- 엑셀  진행상태 -->
-<div id="progress-popup" class="easyui-dialog" >
+<div id="progress-popup" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>
@@ -364,7 +367,7 @@
 <%@ include file="/WEB-INF/views/include/body.foot.jsp" %>
 
 <!-- 등록화면 -->
-<div id="regist-dialog" class="wui-dialog" style="border-top-width:1px;">
+<div id="regist-dialog" class="wui-dialog" style="display:none;border-top-width:1px;">
 	<form id="search-create-form">
 		<input type="hidden" id="r_oper" name="oper" value="I" />
 		<fieldset class="div-line-new-sub">
@@ -526,7 +529,7 @@
 							<input class="easyui-textbox" name="telNo" id="r_telNo" value="" style="width:300px"/>
 						</td>
 					</tr>
-					
+
 					<tr>
 						<th class="h"><span data-item="LAB_021">E-Mail</span></th>
 						<td class="d">
@@ -651,5 +654,11 @@
         <a href="javascript:void(0)" class="easyui-linkbutton c6" id="poList-button3" data-options="width:50">Close</a>
 	</div>
 </div>
+
+<!-- 부서 검색 공통 팝업 -->
+<%@ include file="/WEB-INF/views/imes/com/acORGForm.jsp" %>
+
+<!-- 설비 검색 공통 팝업 -->
+<%@ include file="/WEB-INF/views/imes/com/acMachineForm.jsp" %>
 
 </html>

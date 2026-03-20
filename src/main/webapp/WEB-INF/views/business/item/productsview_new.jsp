@@ -273,7 +273,7 @@ function PrintBarcode(){
 								<select class="easyui-combobox" name="searchitemType2" ID="searchitemType2" data-options="width:150"></select></div> -->
 					</td>
 					<td style="vertical-align:top;">
-						<a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001" data-options="disabled:${RET}" >검색</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001" data-options="disabled:${RET}" >조회</a>
 					</td>
 				</tr>
 				</table>
@@ -622,41 +622,40 @@ function PrintBarcode(){
 	<div id="search-item-toolbar" class="wui-toolbar">
 		<form id="search-item-form">
 			<fieldset class="div-line-new" style="text-align:center;">
-		        <table cellpadding="5" class="search-table tableSearch-c" style="display:inline-block;">
+		        <table cellpadding="0" class="search-table tableSearch-c wd-100" style="display:inline-block;">
+		            <colgroup>
+		                <col width="65px">
+		                <col width="150px">
+		                <col width="45px">
+		                <col width="150px">
+		                <col width="*">
+		            </colgroup>
 		            <tr>
-						<th class="h table-Search-h" data-item = 'LAB_026'><span>품목코드</span></th>
+						<th class="h table-Search-h search-label-h" data-item = 'LAB_026'><span>품목코드</span></th>
 						<td class="d">
-							<input class="easyui-textbox" name="pItemCode" id="pItemCode" style="width:150px"/>							
-						</td>						
-						
-						<th class="h table-Search-h" data-item = 'LAB_026'><span>품명 </span></th>
+							<input class="easyui-textbox" name="pItemCode" id="pItemCode" style="width:150px"/>
+						</td>
+
+						<th class="h table-Search-h search-label-h" data-item = 'LAB_026'><span>품명 </span></th>
 						<td class="d">
 							<input class="easyui-textbox" name="pItemName" id="pItemName" style="width:150px"/>
 							<input type="hidden" name="pItemSearchType" id="pItemSearchType" value="0" />
 						</td>
 						<td class="b">
-							<a href="javascript:void(0)" id="search-item-pop-button" class="easyui-linkbutton cgray" data-item = 'BTN_007'>검색</a>
+							<a href="javascript:void(0)" id="search-item-pop-button" class="easyui-linkbutton cgray" data-item = 'BTN_007'>조회</a>
 						</td>
+					</tr>
 					<tr>
-						<th class="h table-Search-h" data-item = 'LAB_027'><span>재질 </span></th>
+						<th class="h table-Search-h search-label-h" data-item = 'LAB_027'><span>재질 </span></th>
 						<td class="d">
 							<input class="easyui-textbox" name="pItemMaterial" id="pItemMaterial" style="width:150px"/>
 						</td>
-						<th class="h table-Search-h" data-item = 'LAB_027'><span>규격 </span></th>
+						<th class="h table-Search-h search-label-h" data-item = 'LAB_027'><span>규격 </span></th>
 						<td class="d">
 							<input class="easyui-textbox" name="pItemSpec" id="pItemSpec" style="width:150px"/>
 						</td>
-						
-						<!-- <th><span data-item = 'LAB_028'>1차 구분명</span></th>
-						<td class="d">
-				            <input class="easyui-combobox" name="searchitemType1_2" ID="searchitemType1_2"  data-options="width:150,mode:'remote',loader:jcombo.loader,params:{codeGrup:'ITEM_TYPE1'},onChange: selectItemTypePop"/></div>
-						</td>
-						<th><span data-item = 'LAB_029'>2차 구분명</span></th>
-						<td class="d">
-							<select class="easyui-combobox" name="searchitemType2_2" ID="searchitemType2_2" data-options="width:150"></select></div>
-						</td> -->
+						<td class="d"></td>
 					</tr>
-		            </tr>
 		        </table>
 		   </fieldset>
 		    <fieldset class="div-line-new-sub">

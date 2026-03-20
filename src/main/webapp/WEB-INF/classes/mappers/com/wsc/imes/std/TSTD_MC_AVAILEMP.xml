@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    TSTD_MC_AVAILEMP CRUD 매퍼
+    설비 가용사원: DEL, INS
+    작성자: 송우석
+    작성일: 2026-02-23
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_MC_AVAILEMP">
+
+    <!-- 설비별 가용사원 전체 삭제 -->
+    <delete id="TSTD_MC_AVAILEMP_DEL" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_mc_availemp_del(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+    <!-- 설비 가용사원 등록 -->
+    <insert id="TSTD_MC_AVAILEMP_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_mc_availemp_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{empSeq, mode=IN, jdbcType=INTEGER}
+        )}
+    </insert>
+
+</mapper>

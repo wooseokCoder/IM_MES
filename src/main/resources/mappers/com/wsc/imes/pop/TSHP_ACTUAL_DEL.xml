@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_ACTUAL_DEL.xml
+설명: 실적 삭제 이력 CRUD 매퍼 (POP 모듈)
+원본: ProActive TSHP_ACTUAL_DEL.cs
+화면: POP33A (공수오류현황)
+작성일: 2026-03-05
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TSHP_ACTUAL_DEL">
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_DEL_SER: 삭제 이력 조회
+    원본: TSHP_ACTUAL_DEL.TSHP_ACTUAL_DEL_SER()
+    용도: 삭제 이력 테이블에서 해당 실적 존재 여부 조회
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_DEL_SER" resultType="record" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_del_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{actualId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_DEL_INS: 삭제 이력 등록 (전체 컬럼 백업)
+    원본: TSHP_ACTUAL_DEL.TSHP_ACTUAL_DEL_INS()
+    용도: 실적 삭제 전 전체 데이터를 삭제 이력 테이블에 백업
+    파라미터: 45개 (gsPltCode ~ isAutoIdleFlag)
+    ============================================================
+    -->
+    <insert id="TSHP_ACTUAL_DEL_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_del_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{actualId, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{isPreWork, mode=IN, jdbcType=VARCHAR},
+            #{procStat, mode=IN, jdbcType=VARCHAR},
+            #{panelStat, mode=IN, jdbcType=VARCHAR},
+            #{actStartTime, mode=IN, jdbcType=VARCHAR},
+            #{actEndTime, mode=IN, jdbcType=VARCHAR},
+            #{mcNmCheck, mode=IN, jdbcType=VARCHAR},
+            #{selfTime, mode=IN, jdbcType=INTEGER},
+            #{selfStartTime, mode=IN, jdbcType=VARCHAR},
+            #{selfEndTime, mode=IN, jdbcType=VARCHAR},
+            #{manTime, mode=IN, jdbcType=INTEGER},
+            #{manStartTime, mode=IN, jdbcType=VARCHAR},
+            #{manEndTime, mode=IN, jdbcType=VARCHAR},
+            #{otTime, mode=IN, jdbcType=INTEGER},
+            #{preTime, mode=IN, jdbcType=INTEGER},
+            #{preStartTime, mode=IN, jdbcType=VARCHAR},
+            #{preEndTime, mode=IN, jdbcType=VARCHAR},
+            #{pauseTime, mode=IN, jdbcType=INTEGER},
+            #{pauseStartTime, mode=IN, jdbcType=VARCHAR},
+            #{pauseEndTime, mode=IN, jdbcType=VARCHAR},
+            #{mcTime, mode=IN, jdbcType=INTEGER},
+            #{mcStartTime, mode=IN, jdbcType=VARCHAR},
+            #{mcEndTime, mode=IN, jdbcType=VARCHAR},
+            #{mcpTime, mode=IN, jdbcType=INTEGER},
+            #{mcpStartTime, mode=IN, jdbcType=VARCHAR},
+            #{mcpEndTime, mode=IN, jdbcType=VARCHAR},
+            #{okQty, mode=IN, jdbcType=NUMERIC},
+            #{ngQty, mode=IN, jdbcType=NUMERIC},
+            #{multiStartCnt, mode=IN, jdbcType=INTEGER},
+            #{actTlNo, mode=IN, jdbcType=VARCHAR},
+            #{stkId, mode=IN, jdbcType=VARCHAR},
+            #{inputFlag, mode=IN, jdbcType=VARCHAR},
+            #{pauseReason, mode=IN, jdbcType=VARCHAR},
+            #{regDate, mode=IN, jdbcType=VARCHAR},
+            #{regEmp, mode=IN, jdbcType=VARCHAR},
+            #{mdfyDate, mode=IN, jdbcType=VARCHAR},
+            #{mdfyEmp, mode=IN, jdbcType=VARCHAR},
+            #{ifFlag, mode=IN, jdbcType=VARCHAR},
+            #{ifSelFlag, mode=IN, jdbcType=VARCHAR},
+            #{isAutoIdleFlag, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_DEL_DEL: 삭제 이력 삭제
+    원본: TSHP_ACTUAL_DEL.TSHP_ACTUAL_DEL_DEL()
+    용도: 삭제 이력 테이블에서 기존 백업 데이터 삭제 (재백업 전)
+    ============================================================
+    -->
+    <delete id="TSHP_ACTUAL_DEL_DEL" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_actual_del_del(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{actualId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+</mapper>

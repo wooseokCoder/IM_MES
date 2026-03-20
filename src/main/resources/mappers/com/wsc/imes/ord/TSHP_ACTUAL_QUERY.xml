@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_ACTUAL_QUERY.xml
+설명: 공정 실적 조회 매퍼 (TSHP_ACTUAL 테이블) - ORD16A 완료처리 전용
+원본: ProActive TSHP_ACTUAL_QUERY.cs
+화면: ORD16A (생산오더 완료처리)
+작성일: 2026-03-04
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TSHP_ACTUAL_QUERY">
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY19: 작업자별 최신 실적 조회
+    용도: ORD16A 완료처리 - 작업지시번호(WO_NO) 기준으로
+          작업자(EMP_CODE)별 최신 실적을 조회
+          ROW_NUMBER() PARTITION BY EMP_CODE 사용하여
+          각 작업자의 가장 최근 실적 1건만 반환
+    파라미터: gsPltCode, woNo, procStat
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY19" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_actual_query19(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{procStat, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY42: 작업자 상태 집계
+    용도: ORD16A 완료처리 - 작업지시번호(WO_NO) 기준으로
+          전체 작업자의 상태를 집계 조회
+          RANK 함수를 사용하여 모든 상태(진행중/일시중단/완료 등)별
+          작업자 현황을 반환
+    파라미터: gsPltCode, woNo
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY42" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_actual_query42(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY6: 실적 상세 조회 (가공 실적관리)
+    용도: ORD14A 하단 그리드 - 작업지시별 실적 상세
+    파라미터: gsPltCode, woNo
+    추가일: 2026-03-06
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY6" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_actual_query6(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY15: 실적삭제 조회 (Tab1)
+    용도: ORD18A Tab1 - ACTUAL+IDLETIME UNION ALL
+    추가일: 2026-03-06
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY15" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_actual_query15(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sWorkDate, mode=IN, jdbcType=VARCHAR},
+            #{eWorkDate, mode=IN, jdbcType=VARCHAR},
+            #{sWoDate, mode=IN, jdbcType=VARCHAR},
+            #{eWoDate, mode=IN, jdbcType=VARCHAR},
+            #{orderLike, mode=IN, jdbcType=VARCHAR},
+            #{hogiLike, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY15_3: 삭제현황 조회 (Tab2)
+    용도: ORD18A Tab2 - ACTUAL_DEL+IDLETIME(DATA_FLAG=2) UNION ALL
+    추가일: 2026-03-06
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY15_3" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_actual_query15_3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sWorkDate, mode=IN, jdbcType=VARCHAR},
+            #{eWorkDate, mode=IN, jdbcType=VARCHAR},
+            #{sWoDate, mode=IN, jdbcType=VARCHAR},
+            #{eWoDate, mode=IN, jdbcType=VARCHAR},
+            #{orderLike, mode=IN, jdbcType=VARCHAR},
+            #{hogiLike, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_ACTUAL_QUERY15_4: 실적/비가동 현황 조회
+    용도: ORD15A - TSHP_ACTUAL + TSHP_IDLETIME UNION ALL
+          검색조건: 날짜구분(작업일/완료일), 판매오더, 호기, 거래처, 기계번호
+    작성자: 송우석
+    작성일: 2026-03-16
+    ============================================================
+    -->
+    <select id="TSHP_ACTUAL_QUERY15_4" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_actual_query15_4(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sWorkDate, mode=IN, jdbcType=VARCHAR},
+            #{eWorkDate, mode=IN, jdbcType=VARCHAR},
+            #{sWoDate, mode=IN, jdbcType=VARCHAR},
+            #{eWoDate, mode=IN, jdbcType=VARCHAR},
+            #{orderLike, mode=IN, jdbcType=VARCHAR},
+            #{hogiLike, mode=IN, jdbcType=VARCHAR},
+            #{cvndLike, mode=IN, jdbcType=VARCHAR},
+            #{mcNoLike, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

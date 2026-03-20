@@ -41,7 +41,7 @@
 <%-- <link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/common.css?v=250709A" />" /> --%>
 <link rel="stylesheet" type="text/css" href="<c:url value="/resources/jquery/font-awesome-4.7.0/css/font-awesome.min.css?v=250709A" />" />
 <!-- TODO 김원국 수정 -->
-<link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/custom.css?v=251031" />" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/custom.css?v=260226A" />" />
 
 <link rel="stylesheet" type="text/css" href="<c:url value="/resources/jquery/easyui-1.4/themes/color.css?v=250709A" />" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/cnodeCustom.css?v=250709A" />" />
@@ -49,7 +49,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/xpressengine/XEIcon/xeicon.min.css">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 
-<link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/common.css?v=251120A" />" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/common.css?v=260310A" />" />
 
 <!-- 프린터 레포트 변수 -->
 <input type="hidden" name="reportUrl" id="reportUrl" value="${reportUrl}"/>
@@ -64,7 +64,20 @@ var gconsts = {
 	ADMIN:      '${admin}',    //관리자 여부
 	SYS_ID:     '${sysId}',    //시스템 ID
 	PAGE_SIZE:  '${sessionScope.rows}', //목록 기본 출력수
-	TAB_PANEL:  '${tabPanel}'  //탭패널 사용여부
+	TAB_PANEL:  '${tabPanel}',  //탭패널 사용여부
+	// MES 통합 상수 추가
+	PLT_CODE:   '${user.pltCode}',   //플랜트코드
+	USER_ID:    '${user.userId}',    //사용자 ID
+	USER_NAME:  '${user.userName}',  //사용자명
+	USER_TYPE:  '${user.userType}',  //사용자유형
+	DEPT_CODE:  '${user.deptCode}',  //부서코드
+	DEPT_NAME:  '${user.deptName}',  //부서명
+	ORG_CODE:   '${user.orgCode}',   //조직코드
+	GRUP_ID:    '${user.grupId}',    //그룹 ID
+	GRUP_NM:    '${user.grupNm}',    //그룹명
+	IS_SYSTEM:  ${user.isSystem != null ? user.isSystem : 0}, //시스템관리자
+	POSITION:   '${user.position}',  //직위
+	LANG:       '${user.lang}'       //언어설정
 };
 
 var ehelp = {};
@@ -88,17 +101,19 @@ var ehelp = {};
 
 <script type="text/javascript" src="<c:url value="/resources/js/include/extension.js?v=250709A" />"></script>
 <script type="text/javascript" src="<c:url value="/resources/js/include/utilities.js?v=250709A" />"></script>
-<script type="text/javascript" src="<c:url value="/resources/js/include/widget.js?v=251118A"    />"></script>
-<script type="text/javascript" src="<c:url value="/resources/js/include/business.js?v=250709A"  />"></script>
-<script type="text/javascript" src="<c:url value="/resources/js/include/common.js?v=250709A"    />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/include/xlsx.core.js?v=260317B" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/include/FileSaver.js?v=260317A" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/include/widget.js?v=260318A"    />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/include/business.js?v=260224A"  />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/include/common.js?v=260310I"    />"></script>
 <script type="text/javascript" src="<c:url value="/resources/js/include/jquery.number.min.js?v=250709A"    />"></script>
 <script type="text/javascript" src="<c:url value="/resources/jquery/fullcalendar-2.1.1/lib/moment.min.js?v=250709A"/>"></script>
 <script type="text/javascript" src="<c:url value="/resources/jquery/lightslider/js/lightslider.js?v=250709A" />"></script>
-<script type="text/javascript" src="<c:url value="/resources/js/lsCommon.js?v=251209J" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/lsCommon.js?v=260317A" />"></script>
 <%
 if((LocaleUtil.getLocale(request)).toString().equals("ko")){
 %>
-	<script type="text/javascript" src="<c:url value="/resources/js/include/lang/message_ko.js?v=250725B"    />"></script>
+	<script type="text/javascript" src="<c:url value="/resources/js/include/lang/message_ko.js?v=260128A"    />"></script>
 	<script>
 		var locale = 'ko';
 	</script>
@@ -109,7 +124,7 @@ if((LocaleUtil.getLocale(request)).toString().equals("ko")){
 <%
 if((LocaleUtil.getLocale(request)).toString().equals("en")){
 %>
-	<script type="text/javascript" src="<c:url value="/resources/js/include/lang/message_en.js?v=251111a"    />"></script>
+	<script type="text/javascript" src="<c:url value="/resources/js/include/lang/message_en.js?v=260128A"    />"></script>
 	<script>
 		var locale = 'en';
 	</script>
@@ -131,6 +146,14 @@ if((LocaleUtil.getLocale(request)).toString().equals("pt")){
 	<script type="text/javascript" src="<c:url value="/resources/js/include/lang/message_pt.js?v=251111b"    />"></script>
 	<script>
 		var locale = 'pt';
+	</script>
+<%
+}
+if((LocaleUtil.getLocale(request)).toString().equals("zh")){
+%>
+	<script type="text/javascript" src="<c:url value="/resources/js/include/lang/message_zh.js?v=260128A"    />"></script>
+	<script>
+		var locale = 'zh';
 	</script>
 <%
 }

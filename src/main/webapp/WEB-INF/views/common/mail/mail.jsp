@@ -78,7 +78,7 @@ ALL RIGHTS RESERVED.
 			<input type="hidden" name="userType" id="s_userType" value="${userType}"/>
 			<input class="easyui-combobox" name="searchKey"  id="s_searchKey"  value="S01" codeGrup="MAIL_STYPE" data-options="mode:'remote',width:100,editable:false,loader:jcombo.loader,panelHeight:'auto'"/>
 			<input class="easyui-textbox"  name="searchText" id="r_searchText" style="width:300px"/>
-			<a href="javascript:void(0)" class="easyui-linkbutton cgray l-btn l-btn-small" id="search-button" data-item="BTN_001">검색</a>
+			<a href="javascript:void(0)" class="easyui-linkbutton cgray l-btn l-btn-small" id="search-button" data-item="BTN_001">조회</a>
 		</fieldset>
 			<input type="hidden" id="hdfIndex" value="-1" />
 			<input type="hidden" id="hdfChk" value="" />

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: POP30B_D4A_QUERY.xml
+설명: POP30B D4A 자주검사 팝업 전용 조회 매퍼
+작성자: 송우석
+작성일: 2026-03-20
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.POP30B_D4A_QUERY">
+
+    <!--
+    ============================================================
+    POP30B_D4A_WO_INFO: 작업지시 정보 조회 (정보 라벨용)
+    TO-BE 신규 쿼리 (AS-IS 대응 없음)
+    - 메인 QUERY27과 동일 테이블/JOIN, woNo 기준 단건 조회
+    - TSHP_WORKORDER W LEFT JOIN LSE_STD_PART P
+    ============================================================
+    -->
+    <select id="POP30B_D4A_WO_INFO" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_pop30b_d4a_wo_info(
+            #{gsPltCode,  mode=IN, jdbcType=VARCHAR},
+            #{woNo,       mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

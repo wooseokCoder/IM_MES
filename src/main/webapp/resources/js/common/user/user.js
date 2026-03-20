@@ -175,7 +175,7 @@ function doClickButton(index, field, value) {
 	         + ' 로 자동 로그인하시겠습니까?';
 	var win  = 'userwin';
 	
-	$.messager.confirm(msg.MSG0123, msg, function(r) {
+	$.messager.confirm(msg.MSG0053, msg, function(r) {
 		
 		if (!r)
 			return;

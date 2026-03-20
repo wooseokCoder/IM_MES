@@ -27,7 +27,7 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/common/user/group.js?v=1023A" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/user/group.js?v=260227A" />"></script>
 </head>
 
 <!-- BODY 상단 INCLUDE -->
@@ -59,9 +59,16 @@
 <div id="search-toolbar" class="wui-toolbar">
 	<form id="search-form">
 		<fieldset class="div-line3-new Remake-div-line-new" >
-	        <table cellpadding="4" class="search-table tableSearch-c wd-100" >
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+	        	<colgroup>
+	        		<col width="55px">
+	        		<col width="120px">
+	        		<col width="55px">
+	        		<col width="120px">
+	        		<col width="*">
+	        	</colgroup>
 	        	<tr class="topnav_sty">
-	           		<td colspan="8" >
+	           		<td colspan="5" >
 	           			<div>
 	           				<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
 	           				<div>
@@ -73,14 +80,11 @@
 	           	</tr>
 
 	            <tr>
-					<th class="h table-Search-h-right search-label-h"  data-item="LAB_001"><span>Group ID </span></th>
+					<th class="h table-Search-h search-label-h"  data-item="LAB_001"><span>Group ID </span></th>
 					<td class="d"><input class="easyui-textbox"   name="groupId" id="groupId" /></td>
-					<th class="h table-Search-h-right search-label-h" data-item="LAB_002"><span>Group Name</span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>Group Name</span></th>
 					<td class="d"><input class="easyui-textbox"   name="groupName" id="groupName"/></td>
-					<%-- <td class="b">
-						<a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001" data-options="disabled:${RET}" >Search</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton c12" id="dreload-button" data-item="BTN_006">Clear</a>
-					</td> --%>
+					<td class="d"></td>
 	            </tr>
 	        </table>
 	</fieldset>
@@ -106,7 +110,7 @@
 </div>
 
 <!-- 엑셀  진행상태 -->
-<div id="progress-popup" class="easyui-dialog" >
+<div id="progress-popup" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>

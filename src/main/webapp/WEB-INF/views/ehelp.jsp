@@ -41,16 +41,14 @@ ALL RIGHTS RESERVED.
 	<div id="search-toolbar" class="wui-toolbar">
 		<form id="move-form">
 			<fieldset class="div-line-new" style="margin-bottom: 0px">
-		        <table cellpadding="5" class="search-table tableSearch-c forcedTable" >
+		        <table cellpadding="0" class="search-table tableSearch-c forcedTable" >
+		            <colgroup>
+		                <col width="*" />
+		            </colgroup>
 		            <tr>
-						<!-- <th class="h table-Search-h"></th> -->
 						<td class="d" style="padding-left:5px;">
 							<input type="radio" name="chkinfoView" value="manu" checked="checked">메뉴얼
 							<input type="radio" name="chkinfoView" value="memo" onclick="javascript:doMoveMemo();">사용자메모
-						<!-- <td class="b">
-							<a href="javascript:void(0)" class="easyui-linkbutton cgray" iconCls="icon-search" id="search-button">검색</a>
-							<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray">검색</a> 
-						</td> -->
 		            </tr>
 		        </table>
 		   </fieldset>
@@ -119,16 +117,14 @@ ALL RIGHTS RESERVED.
 	<div id="search-toolbar" class="wui-toolbar">
 		<form id="move-form">
 			<fieldset class="div-line-new" style="margin-bottom: 0px">
-		        <table cellpadding="5" class="search-table tableSearch-c" >
+		        <table cellpadding="0" class="search-table tableSearch-c" >
+		            <colgroup>
+		                <col width="*" />
+		            </colgroup>
 		            <tr>
-						<!-- <th class="h table-Search-h"></th> -->
 						<td class="d" style="padding-left:5px;">
 							<input type="radio" name="chkinfoUpdate" value="manu" onclick="javascript:doMoveManu()">메뉴얼
 							<input type="radio" name="chkinfoUpdate" value="memo" checked="checked">사용자메모
-						<!-- <td class="b">
-							<a href="javascript:void(0)" class="easyui-linkbutton cgray" iconCls="icon-search" id="search-button">검색</a>
-							<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray">검색</a> 
-						</td> -->
 		            </tr>
 		        </table>
 		   </fieldset>

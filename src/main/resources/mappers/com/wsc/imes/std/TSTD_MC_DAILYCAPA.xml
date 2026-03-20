@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    TSTD_MC_DAILYCAPA CRUD 매퍼
+    설비 일일 CAPA: SER, INS, INS2, UPD, DEL2
+    작성자: 송우석
+    작성일: 2026-02-11
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_MC_DAILYCAPA">
+
+    <!-- 단건 조회 (PLT_CODE + MC_CODE + WORK_DATE) -->
+    <select id="TSTD_MC_DAILYCAPA_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_mc_dailycapa_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- CAPA 등록 (지정 CAPA 값) -->
+    <insert id="TSTD_MC_DAILYCAPA_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_mc_dailycapa_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{capa, mode=IN, jdbcType=DECIMAL}
+        )}
+    </insert>
+
+    <!-- CAPA=0 고정 등록 (비근무일용) -->
+    <insert id="TSTD_MC_DAILYCAPA_INS2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_mc_dailycapa_ins2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!-- CAPA 수정 (CAPA + SCOMMENT) -->
+    <update id="TSTD_MC_DAILYCAPA_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_mc_dailycapa_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR},
+            #{capa, mode=IN, jdbcType=DECIMAL},
+            #{scomment, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- 삭제 (PLT_CODE + MC_CODE + WORK_DATE) -->
+    <delete id="TSTD_MC_DAILYCAPA_DEL2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_mc_dailycapa_del2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{mcCode, mode=IN, jdbcType=VARCHAR},
+            #{workDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+</mapper>

@@ -56,15 +56,22 @@
 				<div id="user-toolbar" class="wui-toolbar">
 					<form id="user-form">
 						<fieldset class="div-line-new" style="margin-bottom:0px" >
-					        <table  cellpadding="5" cellspacing="2" class="search-table tableSearch-c">
+					        <table  cellpadding="0" class="search-table tableSearch-c wd-100">
+				        	<colgroup>
+				        		<col width="70px">
+				        		<col width="120px">
+				        		<col width="70px">
+				        		<col width="150px">
+				        		<col width="*">
+				        	</colgroup>
 					            <tr>
-									<th class="h table-Search-h"><span data-item="LAB_001">사용자ID </span></th>
-									<td class="d"><input class="easyui-textbox"   name="userId" id="userId" data-options="width:100" /></td> 
-									<th class="h"><span data-item="LAB_002">사용자명 </span></th>
+									<th class="h table-Search-h search-label-h"><span data-item="LAB_001">사용자ID </span></th>
+									<td class="d"><input class="easyui-textbox"   name="userId" id="userId" data-options="width:100" /></td>
+									<th class="h table-Search-h search-label-h"><span data-item="LAB_002">사용자명 </span></th>
 									<td class="d"><input class="easyui-textbox"   name="userName" id="userName" data-options="width:150" /></td>
 									<td class="b">
-										<a href="javascript:void(0)" class="easyui-linkbutton cgray" id="user-button" data-item="BTN_001">검색</a>
-									</td> 
+										<a href="javascript:void(0)" class="easyui-linkbutton cgray" id="user-button" data-item="BTN_001">조회</a>
+									</td>
 					            </tr>
 					        </table>
 					    </fieldset>
@@ -107,7 +114,7 @@
 		
 		<div id="search-toolbar" class="wui-toolbar tableEtc-c div-line-new-sub" style="padding-top:10px;">
 		    <a href="javascript:void(0)" class="easyui-linkbutton c8" id="reload-button" data-item="BTN_002">초기화</a>
-		    <!-- <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-search'" id="search-button">검색</a> -->
+		    <!-- <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-search'" id="search-button">조회</a> -->
 		    <a href="javascript:void(0)" class="easyui-linkbutton c6" id="append-button" data-item="BTN_003">추가</a>
 		    <a href="javascript:void(0)" class="easyui-linkbutton c6" id="remove-button" data-item="BTN_004">삭제</a>
 		    <a href="javascript:void(0)" class="easyui-linkbutton c6" id="save-button" data-item="BTN_005">저장</a>

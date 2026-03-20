@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: IF_QMS_DAILY_INS.xml
+설명: QMS 일상검사 연동 매퍼 (IF_QMS_DAILY_INS 테이블)
+원본: ProActive IF_QMS_DAILY_INS.cs
+화면: POP30B (단말기 - 가공)
+작성일: 2026-03-18
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.IF_QMS_DAILY_INS">
+
+    <!--
+    ============================================================
+    IF_QMS_DAILY_INS_INS: QMS 일상검사 등록
+    원본: IF_QMS_DAILY_INS.IF_QMS_DAILY_INS_INS()
+    용도: POP30B 검사 완료 시 QMS 인터페이스 테이블에 등록
+    ============================================================
+    -->
+    <insert id="IF_QMS_DAILY_INS_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_if_qms_daily_ins_ins(
+            #{gsPltCode,    mode=IN, jdbcType=VARCHAR},
+            #{insmNo,       mode=IN, jdbcType=VARCHAR},
+            #{woNo,         mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo,      mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode,   mode=IN, jdbcType=VARCHAR},
+            #{empCode,      mode=IN, jdbcType=VARCHAR},
+            #{qmsState,     mode=IN, jdbcType=VARCHAR},
+            #{gsUserId,     mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+</mapper>

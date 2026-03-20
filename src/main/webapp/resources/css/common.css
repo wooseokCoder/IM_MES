@@ -72,15 +72,15 @@ fieldset  {margin:0;padding:0;border:none;}
 
 table.search-table		   { table-layout: fixed; margin-bottom: 0; margin-top: 0; }
 table.search-table th.h    {
-	padding-right: 5px;
-    text-align: right;
+	padding-right: 0px;
+    text-align: left;
     font-weight: 600;
     font-size: 14px;
     line-height: 22.4px;
     color: #696969;	
 } /* padding-right:5px 추가 */
 /* table.search-table td.d    {padding-right: 20px; } */
-table.search-table td.d    { padding-right: 10px !important; }
+table.search-table td.d    { padding-right: 0px !important; }
 table.search-table th span {white-space:nowrap; }
 table.search-table td span {white-space:nowrap; }
 
@@ -1085,6 +1085,10 @@ i.fa, i.fas, i.far, i.fab {
  	box-sizing: border-box;
  }
 
+ .multiline.easyui-textbox + .textbox {
+ 	height: auto !important;
+ }
+
 .easyui-textbox + .textbox > .textbox-text,  
 .easyui-combobox + .combo > .textbox-text,
 .easyui-combogrid + .textbox.combo > .textbox-text,
@@ -1950,8 +1954,8 @@ input[type=button]:hover, button:hover {
 }
 
 .layout-panel-south .panel-body {
-	background-color: #f1f1f1 !important;
-	padding-top: 15px !important;
+	/* background-color: #f1f1f1 !important;
+	padding-top: 15px !important; */
 }
 
 .popBtnBckC {
@@ -2439,14 +2443,15 @@ input.textbox-text.validatebox-text{
 
 .datagrid-view:not(.noStyle) .datagrid-view2 .datagrid-header-inner, 
 .datagrid-view:not(.noStyle) .datagrid-view2 .datagrid-header-inner .datagrid-htable {
-	width: 100%;
+	/* width: 100%; */
+	background-color: #f5f5f5;
 }
 
 .datagrid-view:not(.noStyle) .datagrid-view2 .datagrid-btable {
-	width: 100%;
+	/* width: 100%; */
 }
 .datagrid-body table{
-	width: 100%;
+	/* width: 100%; */
 }
 
 
@@ -2556,5 +2561,78 @@ input.textbox-text.validatebox-text{
     border-color: #e2dddd;
     padding: 5px;
     color: #000000;
+}
+
+/* ============================================================================
+   그리드 내 버튼 공통 스타일
+   ============================================================================
+   기본:  class="grid-btn grid-btn-off"     (비활성)
+   파랑:  class="grid-btn grid-btn-blue"    (도면, 파일선택)
+   초록:  class="grid-btn grid-btn-green"   (승인, 완료)
+   빨강:  class="grid-btn grid-btn-red"     (삭제, 반려)
+   주황:  class="grid-btn grid-btn-orange"  (대기, 경고)
+   ============================================================================ */
+.grid-btn {
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    border: 1px solid;
+    border-radius: 2px;
+    font-size: 13px;
+    cursor: default;
+    vertical-align: middle;
+    text-decoration: none;
+}
+/* 비활성 */
+.grid-btn-off {
+    color: #aaa;
+    border-color: #ccc;
+    background: #f4f4f4;
+}
+/* 파랑 (도면, 파일선택) */
+.grid-btn-blue {
+    color: #003087;
+    border-color: #5b8ec4;
+    background: #e8f0fb;
+    cursor: pointer;
+}
+.grid-btn-blue:hover {
+    background: #ccddf5;
+    border-color: #003087;
+}
+/* 초록 (승인, 완료) */
+.grid-btn-green {
+    color: #1b6d1b;
+    border-color: #6db86d;
+    background: #e8f5e8;
+    cursor: pointer;
+}
+.grid-btn-green:hover {
+    background: #ccebcc;
+    border-color: #1b6d1b;
+}
+/* 빨강 (삭제, 반려) */
+.grid-btn-red {
+    color: #c62828;
+    border-color: #e57373;
+    background: #fce8e8;
+    cursor: pointer;
+}
+.grid-btn-red:hover {
+    background: #f5cccc;
+    border-color: #c62828;
+}
+/* 주황 (대기, 경고) */
+.grid-btn-orange {
+    color: #e65100;
+    border-color: #ffb74d;
+    background: #fff3e0;
+    cursor: pointer;
+}
+.grid-btn-orange:hover {
+    background: #ffe0b2;
+    border-color: #e65100;
 }
 

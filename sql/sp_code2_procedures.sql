@@ -1,0 +1,1067 @@
+-- ============================================================
+-- Code2.xml 쿼리 -> 프로시저 전환 스크립트
+-- 생성일: 2026-01-14
+-- 대상 테이블: SYS_CODE, SYS_CODE_HIST, SYS_CODE_TERM
+-- ============================================================
+
+DELIMITER //
+
+-- ============================================================
+-- 1. 코드 목록 조회 (페이징)
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_search//
+
+CREATE PROCEDURE sp_code2_search(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_grup VARCHAR(50),
+    IN p_code_cd VARCHAR(50),
+    IN p_code_name VARCHAR(200),
+    IN p_code_name_en VARCHAR(200),
+    IN p_code_desc VARCHAR(500),
+    IN p_use_flag VARCHAR(10),
+    IN p_ext_chr01 VARCHAR(100),
+    IN p_ext_chr02 VARCHAR(100),
+    IN p_ext_chr03 VARCHAR(100),
+    IN p_ext_chr04 VARCHAR(100),
+    IN p_ext_chr05 VARCHAR(100),
+    IN p_ext_chr06 VARCHAR(100),
+    IN p_ext_chr07 VARCHAR(100),
+    IN p_ext_chr08 VARCHAR(100),
+    IN p_ext_chr09 VARCHAR(100),
+    IN p_ext_chr10 VARCHAR(100),
+    IN p_ext_num01 VARCHAR(50),
+    IN p_ext_num02 VARCHAR(50),
+    IN p_ext_num03 VARCHAR(50),
+    IN p_ext_num04 VARCHAR(50),
+    IN p_ext_num05 VARCHAR(50),
+    IN p_ext_text TEXT,
+    IN p_sort_seq VARCHAR(20),
+    IN p_start VARCHAR(20),
+    IN p_end VARCHAR(20),
+    IN p_sort_str VARCHAR(500)
+)
+BEGIN
+    SET @rownum := 0;
+
+    -- 동적 정렬 처리
+    SET @order_clause = IF(p_sort_str IS NOT NULL AND p_sort_str != '', p_sort_str, 'CODE_GRUP, SORT_SEQ, CODE_CD');
+
+    SET @sql = CONCAT('
+        SELECT * FROM (
+            SELECT X.* FROM (
+                SELECT Z1.*, @rownum := @rownum + 1 AS RNUM
+                FROM (
+                    SELECT
+                        SYS_ID AS sysId,
+                        CODE_GRUP AS codeGrup,
+                        CODE_CD AS codeCd,
+                        CODE_NAME AS codeName,
+                        CODE_NAME_EN AS codeNameEn,
+                        CODE_DESC AS codeDesc,
+                        SORT_SEQ AS sortSeq,
+                        USE_FLAG AS useFlag,
+                        EXT_CHR01 AS extChr01,
+                        EXT_CHR02 AS extChr02,
+                        EXT_CHR03 AS extChr03,
+                        EXT_CHR04 AS extChr04,
+                        EXT_CHR05 AS extChr05,
+                        EXT_CHR06 AS extChr06,
+                        EXT_CHR07 AS extChr07,
+                        EXT_CHR08 AS extChr08,
+                        EXT_CHR09 AS extChr09,
+                        EXT_CHR10 AS extChr10,
+                        EXT_NUM01 AS extNum01,
+                        EXT_NUM02 AS extNum02,
+                        EXT_NUM03 AS extNum03,
+                        EXT_NUM04 AS extNum04,
+                        EXT_NUM05 AS extNum05,
+                        EXT_TEXT AS extText,
+                        REGI_ID AS regiId,
+                        DATE_FORMAT(REGI_DATE, ''%Y-%m-%d %H:%i:%s'') AS regiDate,
+                        CHNG_ID AS chngId,
+                        DATE_FORMAT(CHNG_DATE, ''%Y-%m-%d %H:%i:%s'') AS chngDate
+                    FROM SYS_CODE A
+                    WHERE SYS_ID = ''', p_sys_id, '''');
+
+    -- 동적 WHERE 조건 추가
+    IF p_code_grup IS NOT NULL AND p_code_grup != '' THEN
+        SET @sql = CONCAT(@sql, ' AND CODE_GRUP = ''', p_code_grup, '''');
+    END IF;
+
+    IF p_code_cd IS NOT NULL AND p_code_cd != '' THEN
+        SET @sql = CONCAT(@sql, ' AND CODE_CD = ''', p_code_cd, '''');
+    END IF;
+
+    IF p_code_name IS NOT NULL AND p_code_name != '' THEN
+        SET @sql = CONCAT(@sql, ' AND CODE_NAME = ''', p_code_name, '''');
+    END IF;
+
+    IF p_code_name_en IS NOT NULL AND p_code_name_en != '' THEN
+        SET @sql = CONCAT(@sql, ' AND CODE_NAME_EN = ''', p_code_name_en, '''');
+    END IF;
+
+    IF p_code_desc IS NOT NULL AND p_code_desc != '' THEN
+        SET @sql = CONCAT(@sql, ' AND CODE_DESC LIKE ''%', p_code_desc, '%''');
+    END IF;
+
+    IF p_use_flag IS NOT NULL AND p_use_flag != '' THEN
+        IF p_use_flag = 'ALL' THEN
+            SET @sql = CONCAT(@sql, ' AND USE_FLAG = USE_FLAG');
+        ELSE
+            SET @sql = CONCAT(@sql, ' AND USE_FLAG = ''', p_use_flag, '''');
+        END IF;
+    END IF;
+
+    IF p_ext_chr01 IS NOT NULL AND p_ext_chr01 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR01 = ''', p_ext_chr01, '''');
+    END IF;
+
+    IF p_ext_chr02 IS NOT NULL AND p_ext_chr02 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR02 = ''', p_ext_chr02, '''');
+    END IF;
+
+    IF p_ext_chr03 IS NOT NULL AND p_ext_chr03 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR03 = ''', p_ext_chr03, '''');
+    END IF;
+
+    IF p_ext_chr04 IS NOT NULL AND p_ext_chr04 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR04 = ''', p_ext_chr04, '''');
+    END IF;
+
+    IF p_ext_chr05 IS NOT NULL AND p_ext_chr05 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR05 = ''', p_ext_chr05, '''');
+    END IF;
+
+    IF p_ext_chr06 IS NOT NULL AND p_ext_chr06 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR06 = ''', p_ext_chr06, '''');
+    END IF;
+
+    IF p_ext_chr07 IS NOT NULL AND p_ext_chr07 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR07 = ''', p_ext_chr07, '''');
+    END IF;
+
+    IF p_ext_chr08 IS NOT NULL AND p_ext_chr08 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR08 = ''', p_ext_chr08, '''');
+    END IF;
+
+    IF p_ext_chr09 IS NOT NULL AND p_ext_chr09 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR09 = ''', p_ext_chr09, '''');
+    END IF;
+
+    IF p_ext_chr10 IS NOT NULL AND p_ext_chr10 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR10 = ''', p_ext_chr10, '''');
+    END IF;
+
+    IF p_ext_num01 IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_NUM01 = ', p_ext_num01);
+    END IF;
+
+    IF p_ext_num02 IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_NUM02 = ', p_ext_num02);
+    END IF;
+
+    IF p_ext_num03 IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_NUM03 = ', p_ext_num03);
+    END IF;
+
+    IF p_ext_num04 IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_NUM04 = ', p_ext_num04);
+    END IF;
+
+    IF p_ext_num05 IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_NUM05 = ', p_ext_num05);
+    END IF;
+
+    IF p_ext_text IS NOT NULL AND p_ext_text != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_TEXT LIKE ''%', p_ext_text, '%''');
+    END IF;
+
+    IF p_sort_seq IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' AND SORT_SEQ = ', p_sort_seq);
+    END IF;
+
+    SET @sql = CONCAT(@sql, ' ORDER BY ', @order_clause);
+    SET @sql = CONCAT(@sql, ') Z1, (SELECT @rownum:=0) Z2
+                ) X');
+
+    -- 페이징 처리
+    IF p_end IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' WHERE RNUM < ', p_end);
+    END IF;
+
+    SET @sql = CONCAT(@sql, ') X');
+
+    IF p_start IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' WHERE RNUM >= ', p_start);
+    END IF;
+
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+END//
+
+-- ============================================================
+-- 2. 코드 목록 카운트
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_search_count//
+
+CREATE PROCEDURE sp_code2_search_count(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_grup VARCHAR(50),
+    IN p_code_cd VARCHAR(50),
+    IN p_code_name VARCHAR(200),
+    IN p_code_name_en VARCHAR(200),
+    IN p_code_desc VARCHAR(500),
+    IN p_use_flag VARCHAR(10),
+    IN p_ext_chr01 VARCHAR(100),
+    IN p_ext_chr02 VARCHAR(100),
+    IN p_ext_chr03 VARCHAR(100),
+    IN p_ext_chr04 VARCHAR(100),
+    IN p_ext_chr05 VARCHAR(100),
+    IN p_ext_chr06 VARCHAR(100),
+    IN p_ext_chr07 VARCHAR(100),
+    IN p_ext_chr08 VARCHAR(100),
+    IN p_ext_chr09 VARCHAR(100),
+    IN p_ext_chr10 VARCHAR(100),
+    IN p_ext_num01 VARCHAR(50),
+    IN p_ext_num02 VARCHAR(50),
+    IN p_ext_num03 VARCHAR(50),
+    IN p_ext_num04 VARCHAR(50),
+    IN p_ext_num05 VARCHAR(50),
+    IN p_ext_text TEXT,
+    IN p_sort_seq VARCHAR(20)
+)
+BEGIN
+    SELECT COUNT(1) AS cnt
+    FROM SYS_CODE A
+    WHERE SYS_ID = p_sys_id
+      AND (p_code_grup IS NULL OR p_code_grup = '' OR CODE_GRUP = p_code_grup)
+      AND (p_code_cd IS NULL OR p_code_cd = '' OR CODE_CD = p_code_cd)
+      AND (p_code_name IS NULL OR p_code_name = '' OR CODE_NAME = p_code_name)
+      AND (p_code_name_en IS NULL OR p_code_name_en = '' OR CODE_NAME_EN = p_code_name_en)
+      AND (p_code_desc IS NULL OR p_code_desc = '' OR CODE_DESC LIKE CONCAT('%', p_code_desc, '%'))
+      AND (p_use_flag IS NULL OR p_use_flag = '' OR USE_FLAG = CASE WHEN p_use_flag = 'ALL' THEN USE_FLAG ELSE p_use_flag END)
+      AND (p_ext_chr01 IS NULL OR p_ext_chr01 = '' OR EXT_CHR01 = p_ext_chr01)
+      AND (p_ext_chr02 IS NULL OR p_ext_chr02 = '' OR EXT_CHR02 = p_ext_chr02)
+      AND (p_ext_chr03 IS NULL OR p_ext_chr03 = '' OR EXT_CHR03 = p_ext_chr03)
+      AND (p_ext_chr04 IS NULL OR p_ext_chr04 = '' OR EXT_CHR04 = p_ext_chr04)
+      AND (p_ext_chr05 IS NULL OR p_ext_chr05 = '' OR EXT_CHR05 = p_ext_chr05)
+      AND (p_ext_chr06 IS NULL OR p_ext_chr06 = '' OR EXT_CHR06 = p_ext_chr06)
+      AND (p_ext_chr07 IS NULL OR p_ext_chr07 = '' OR EXT_CHR07 = p_ext_chr07)
+      AND (p_ext_chr08 IS NULL OR p_ext_chr08 = '' OR EXT_CHR08 = p_ext_chr08)
+      AND (p_ext_chr09 IS NULL OR p_ext_chr09 = '' OR EXT_CHR09 = p_ext_chr09)
+      AND (p_ext_chr10 IS NULL OR p_ext_chr10 = '' OR EXT_CHR10 = p_ext_chr10)
+      AND (p_ext_num01 IS NULL OR EXT_NUM01 = p_ext_num01)
+      AND (p_ext_num02 IS NULL OR EXT_NUM02 = p_ext_num02)
+      AND (p_ext_num03 IS NULL OR EXT_NUM03 = p_ext_num03)
+      AND (p_ext_num04 IS NULL OR EXT_NUM04 = p_ext_num04)
+      AND (p_ext_num05 IS NULL OR EXT_NUM05 = p_ext_num05)
+      AND (p_ext_text IS NULL OR p_ext_text = '' OR EXT_TEXT LIKE CONCAT('%', p_ext_text, '%'))
+      AND (p_sort_seq IS NULL OR SORT_SEQ = p_sort_seq);
+END//
+
+-- ============================================================
+-- 3. 코드 단건 조회
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_select//
+
+CREATE PROCEDURE sp_code2_select(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_cd VARCHAR(50),
+    IN p_code_grup VARCHAR(50)
+)
+BEGIN
+    SELECT
+        SYS_ID AS sysId,
+        CODE_GRUP AS codeGrup,
+        CODE_CD AS codeCd,
+        CODE_NAME AS codeName,
+        CODE_NAME_EN AS codeNameEn,
+        CODE_DESC AS codeDesc,
+        SORT_SEQ AS sortSeq,
+        USE_FLAG AS useFlag,
+        EXT_CHR01 AS extChr01,
+        EXT_CHR02 AS extChr02,
+        EXT_CHR03 AS extChr03,
+        EXT_CHR04 AS extChr04,
+        EXT_CHR05 AS extChr05,
+        EXT_CHR06 AS extChr06,
+        EXT_CHR07 AS extChr07,
+        EXT_CHR08 AS extChr08,
+        EXT_CHR09 AS extChr09,
+        EXT_CHR10 AS extChr10,
+        EXT_NUM01 AS extNum01,
+        EXT_NUM02 AS extNum02,
+        EXT_NUM03 AS extNum03,
+        EXT_NUM04 AS extNum04,
+        EXT_NUM05 AS extNum05,
+        EXT_TEXT AS extText,
+        REGI_ID AS regiId,
+        DATE_FORMAT(REGI_DATE, '%Y-%m-%d %H:%i:%s') AS regiDate,
+        CHNG_ID AS chngId,
+        DATE_FORMAT(CHNG_DATE, '%Y-%m-%d %H:%i:%s') AS chngDate
+    FROM SYS_CODE A
+    WHERE SYS_ID = p_sys_id
+      AND CODE_CD = p_code_cd
+      AND CODE_GRUP = p_code_grup;
+END//
+
+-- ============================================================
+-- 4. 코드 등록
+-- NULLIF 패턴: 빈문자열이면 NULL로 변환
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_insert//
+
+CREATE PROCEDURE sp_code2_insert(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_cd VARCHAR(50),
+    IN p_code_grup VARCHAR(50),
+    IN p_code_name VARCHAR(200),
+    IN p_code_name_en VARCHAR(200),
+    IN p_code_desc VARCHAR(500),
+    IN p_sort_seq VARCHAR(20),
+    IN p_use_flag VARCHAR(1),
+    IN p_ext_chr01 VARCHAR(100),
+    IN p_ext_chr02 VARCHAR(100),
+    IN p_ext_chr03 VARCHAR(100),
+    IN p_ext_chr04 VARCHAR(100),
+    IN p_ext_chr05 VARCHAR(100),
+    IN p_ext_chr06 VARCHAR(100),
+    IN p_ext_chr07 VARCHAR(100),
+    IN p_ext_chr08 VARCHAR(100),
+    IN p_ext_chr09 VARCHAR(100),
+    IN p_ext_chr10 VARCHAR(100),
+    IN p_ext_num01 VARCHAR(50),
+    IN p_ext_num02 VARCHAR(50),
+    IN p_ext_num03 VARCHAR(50),
+    IN p_ext_num04 VARCHAR(50),
+    IN p_ext_num05 VARCHAR(50),
+    IN p_ext_text TEXT,
+    IN p_gs_user_id VARCHAR(50)
+)
+BEGIN
+    INSERT INTO SYS_CODE (
+        SYS_ID,
+        CODE_CD,
+        CODE_GRUP,
+        CODE_NAME,
+        CODE_NAME_EN,
+        CODE_DESC,
+        SORT_SEQ,
+        USE_FLAG,
+        EXT_CHR01,
+        EXT_CHR02,
+        EXT_CHR03,
+        EXT_CHR04,
+        EXT_CHR05,
+        EXT_CHR06,
+        EXT_CHR07,
+        EXT_CHR08,
+        EXT_CHR09,
+        EXT_CHR10,
+        EXT_NUM01,
+        EXT_NUM02,
+        EXT_NUM03,
+        EXT_NUM04,
+        EXT_NUM05,
+        EXT_TEXT,
+        REGI_ID,
+        REGI_DATE,
+        CHNG_ID,
+        CHNG_DATE
+    ) VALUES (
+        p_sys_id,
+        p_code_cd,
+        IFNULL(NULLIF(p_code_grup, ''), '0'),
+        NULLIF(p_code_name, ''),
+        NULLIF(p_code_name_en, ''),
+        NULLIF(p_code_desc, ''),
+        NULLIF(p_sort_seq, ''),
+        IFNULL(NULLIF(p_use_flag, ''), 'Y'),
+        NULLIF(p_ext_chr01, ''),
+        NULLIF(p_ext_chr02, ''),
+        NULLIF(p_ext_chr03, ''),
+        NULLIF(p_ext_chr04, ''),
+        NULLIF(p_ext_chr05, ''),
+        NULLIF(p_ext_chr06, ''),
+        NULLIF(p_ext_chr07, ''),
+        NULLIF(p_ext_chr08, ''),
+        NULLIF(p_ext_chr09, ''),
+        NULLIF(p_ext_chr10, ''),
+        NULLIF(p_ext_num01, ''),
+        NULLIF(p_ext_num02, ''),
+        NULLIF(p_ext_num03, ''),
+        NULLIF(p_ext_num04, ''),
+        NULLIF(p_ext_num05, ''),
+        NULLIF(p_ext_text, ''),
+        p_gs_user_id,
+        NOW(),
+        p_gs_user_id,
+        NOW()
+    );
+END//
+
+-- ============================================================
+-- 5. 코드 수정
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_update//
+
+CREATE PROCEDURE sp_code2_update(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_cd VARCHAR(50),
+    IN p_code_grup VARCHAR(50),
+    IN p_code_name VARCHAR(200),
+    IN p_code_name_en VARCHAR(200),
+    IN p_code_desc VARCHAR(500),
+    IN p_sort_seq VARCHAR(20),
+    IN p_use_flag VARCHAR(1),
+    IN p_ext_chr01 VARCHAR(100),
+    IN p_ext_chr02 VARCHAR(100),
+    IN p_ext_chr03 VARCHAR(100),
+    IN p_ext_chr04 VARCHAR(100),
+    IN p_ext_chr05 VARCHAR(100),
+    IN p_ext_chr06 VARCHAR(100),
+    IN p_ext_chr07 VARCHAR(100),
+    IN p_ext_chr08 VARCHAR(100),
+    IN p_ext_chr09 VARCHAR(100),
+    IN p_ext_chr10 VARCHAR(100),
+    IN p_ext_num01 VARCHAR(50),
+    IN p_ext_num02 VARCHAR(50),
+    IN p_ext_num03 VARCHAR(50),
+    IN p_ext_num04 VARCHAR(50),
+    IN p_ext_num05 VARCHAR(50),
+    IN p_ext_text TEXT,
+    IN p_gs_user_id VARCHAR(50)
+)
+BEGIN
+    UPDATE SYS_CODE
+    SET CHNG_ID = p_gs_user_id,
+        CHNG_DATE = NOW(),
+        CODE_NAME = IFNULL(p_code_name, CODE_NAME),
+        CODE_NAME_EN = IFNULL(p_code_name_en, CODE_NAME_EN),
+        CODE_DESC = IFNULL(p_code_desc, CODE_DESC),
+        SORT_SEQ = IFNULL(p_sort_seq, SORT_SEQ),
+        USE_FLAG = IFNULL(p_use_flag, USE_FLAG),
+        EXT_CHR01 = IFNULL(p_ext_chr01, EXT_CHR01),
+        EXT_CHR02 = IFNULL(p_ext_chr02, EXT_CHR02),
+        EXT_CHR03 = IFNULL(p_ext_chr03, EXT_CHR03),
+        EXT_CHR04 = IFNULL(p_ext_chr04, EXT_CHR04),
+        EXT_CHR05 = IFNULL(p_ext_chr05, EXT_CHR05),
+        EXT_CHR06 = IFNULL(p_ext_chr06, EXT_CHR06),
+        EXT_CHR07 = IFNULL(p_ext_chr07, EXT_CHR07),
+        EXT_CHR08 = IFNULL(p_ext_chr08, EXT_CHR08),
+        EXT_CHR09 = IFNULL(p_ext_chr09, EXT_CHR09),
+        EXT_CHR10 = IFNULL(p_ext_chr10, EXT_CHR10),
+        EXT_NUM01 = IFNULL(p_ext_num01, EXT_NUM01),
+        EXT_NUM02 = IFNULL(p_ext_num02, EXT_NUM02),
+        EXT_NUM03 = IFNULL(p_ext_num03, EXT_NUM03),
+        EXT_NUM04 = IFNULL(p_ext_num04, EXT_NUM04),
+        EXT_NUM05 = IFNULL(p_ext_num05, EXT_NUM05),
+        EXT_TEXT = IFNULL(p_ext_text, EXT_TEXT)
+    WHERE SYS_ID = p_sys_id
+      AND CODE_CD = p_code_cd
+      AND CODE_GRUP = p_code_grup;
+END//
+
+-- ============================================================
+-- 6. 코드 삭제
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_delete//
+
+CREATE PROCEDURE sp_code2_delete(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_cd VARCHAR(50),
+    IN p_code_grup VARCHAR(50)
+)
+BEGIN
+    DELETE FROM SYS_CODE
+    WHERE SYS_ID = p_sys_id
+      AND CODE_CD = p_code_cd
+      AND CODE_GRUP = p_code_grup;
+END//
+
+-- ============================================================
+-- 7. 전체 코드 조회
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_search_all//
+
+CREATE PROCEDURE sp_code2_search_all(
+    IN p_sys_id VARCHAR(20)
+)
+BEGIN
+    SELECT
+        SYS_ID AS sysId,
+        CODE_GRUP AS codeGrup,
+        CODE_CD AS codeCd,
+        CODE_NAME AS codeName,
+        CODE_NAME_EN AS codeNameEn,
+        CODE_DESC AS codeDesc,
+        SORT_SEQ AS sortSeq,
+        USE_FLAG AS useFlag,
+        EXT_CHR01 AS extChr01,
+        EXT_CHR02 AS extChr02,
+        EXT_CHR03 AS extChr03,
+        EXT_CHR04 AS extChr04,
+        EXT_CHR05 AS extChr05,
+        EXT_CHR06 AS extChr06,
+        EXT_CHR07 AS extChr07,
+        EXT_CHR08 AS extChr08,
+        EXT_CHR09 AS extChr09,
+        EXT_CHR10 AS extChr10,
+        EXT_NUM01 AS extNum01,
+        EXT_NUM02 AS extNum02,
+        EXT_NUM03 AS extNum03,
+        EXT_NUM04 AS extNum04,
+        EXT_NUM05 AS extNum05,
+        EXT_TEXT AS extText,
+        REGI_ID AS regiId,
+        DATE_FORMAT(REGI_DATE, '%Y-%m-%d %H:%i:%s') AS regiDate,
+        CHNG_ID AS chngId,
+        DATE_FORMAT(CHNG_DATE, '%Y-%m-%d %H:%i:%s') AS chngDate
+    FROM SYS_CODE
+    WHERE SYS_ID = p_sys_id
+    ORDER BY SYS_ID, CODE_GRUP, SORT_SEQ, CODE_CD;
+END//
+
+-- ============================================================
+-- 8. 코드 그룹 전체 삭제
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_delete_all//
+
+CREATE PROCEDURE sp_code2_delete_all(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_grup VARCHAR(50)
+)
+BEGIN
+    DELETE FROM SYS_CODE
+    WHERE SYS_ID = p_sys_id
+      AND CODE_GRUP = p_code_grup;
+END//
+
+-- ============================================================
+-- 9. 코드 변경 이력 등록
+-- NULLIF 패턴: 빈문자열이면 NULL로 변환
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_insert_hist//
+
+CREATE PROCEDURE sp_code2_insert_hist(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_cd VARCHAR(50),
+    IN p_code_grup VARCHAR(50),
+    IN p_code_name VARCHAR(200),
+    IN p_code_name_en VARCHAR(200),
+    IN p_code_desc VARCHAR(500),
+    IN p_sort_seq VARCHAR(20),
+    IN p_use_flag VARCHAR(1),
+    IN p_ext_chr01 VARCHAR(100),
+    IN p_ext_chr02 VARCHAR(100),
+    IN p_ext_chr03 VARCHAR(100),
+    IN p_ext_chr04 VARCHAR(100),
+    IN p_ext_chr05 VARCHAR(100),
+    IN p_ext_chr06 VARCHAR(100),
+    IN p_ext_chr07 VARCHAR(100),
+    IN p_ext_chr08 VARCHAR(100),
+    IN p_ext_chr09 VARCHAR(100),
+    IN p_ext_chr10 VARCHAR(100),
+    IN p_ext_num01 VARCHAR(50),
+    IN p_ext_num02 VARCHAR(50),
+    IN p_ext_num03 VARCHAR(50),
+    IN p_ext_num04 VARCHAR(50),
+    IN p_ext_num05 VARCHAR(50),
+    IN p_ext_text TEXT,
+    IN p_hist_type VARCHAR(10),
+    IN p_gs_user_id VARCHAR(50)
+)
+BEGIN
+    INSERT INTO SYS_CODE_HIST (
+        SYS_ID,
+        CODE_CD,
+        CODE_GRUP,
+        CODE_NAME,
+        CODE_NAME_EN,
+        CODE_DESC,
+        SORT_SEQ,
+        USE_FLAG,
+        EXT_CHR01,
+        EXT_CHR02,
+        EXT_CHR03,
+        EXT_CHR04,
+        EXT_CHR05,
+        EXT_CHR06,
+        EXT_CHR07,
+        EXT_CHR08,
+        EXT_CHR09,
+        EXT_CHR10,
+        EXT_NUM01,
+        EXT_NUM02,
+        EXT_NUM03,
+        EXT_NUM04,
+        EXT_NUM05,
+        EXT_TEXT,
+        HIST_TYPE,
+        HIST_DATE,
+        REGI_ID,
+        REGI_DATE,
+        CHNG_ID,
+        CHNG_DATE
+    ) VALUES (
+        p_sys_id,
+        p_code_cd,
+        IFNULL(NULLIF(p_code_grup, ''), '0'),
+        NULLIF(p_code_name, ''),
+        NULLIF(p_code_name_en, ''),
+        NULLIF(p_code_desc, ''),
+        NULLIF(p_sort_seq, ''),
+        IFNULL(NULLIF(p_use_flag, ''), 'Y'),
+        NULLIF(p_ext_chr01, ''),
+        NULLIF(p_ext_chr02, ''),
+        NULLIF(p_ext_chr03, ''),
+        NULLIF(p_ext_chr04, ''),
+        NULLIF(p_ext_chr05, ''),
+        NULLIF(p_ext_chr06, ''),
+        NULLIF(p_ext_chr07, ''),
+        NULLIF(p_ext_chr08, ''),
+        NULLIF(p_ext_chr09, ''),
+        NULLIF(p_ext_chr10, ''),
+        NULLIF(p_ext_num01, ''),
+        NULLIF(p_ext_num02, ''),
+        NULLIF(p_ext_num03, ''),
+        NULLIF(p_ext_num04, ''),
+        NULLIF(p_ext_num05, ''),
+        NULLIF(p_ext_text, ''),
+        p_hist_type,
+        NOW(),
+        p_gs_user_id,
+        NOW(),
+        p_gs_user_id,
+        NOW()
+    );
+END//
+
+-- ============================================================
+-- 10. 코드 기간 목록 조회 (페이징)
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_search_term//
+
+CREATE PROCEDURE sp_code2_search_term(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_grup VARCHAR(50),
+    IN p_code_cd VARCHAR(50),
+    IN p_code_name VARCHAR(200),
+    IN p_code_name_en VARCHAR(200),
+    IN p_code_desc VARCHAR(500),
+    IN p_use_flag VARCHAR(10),
+    IN p_ext_chr01 VARCHAR(100),
+    IN p_ext_chr02 VARCHAR(100),
+    IN p_ext_chr03 VARCHAR(100),
+    IN p_ext_chr04 VARCHAR(100),
+    IN p_ext_chr05 VARCHAR(100),
+    IN p_ext_chr06 VARCHAR(100),
+    IN p_ext_chr07 VARCHAR(100),
+    IN p_ext_chr08 VARCHAR(100),
+    IN p_ext_chr09 VARCHAR(100),
+    IN p_ext_chr10 VARCHAR(100),
+    IN p_ext_num01 VARCHAR(50),
+    IN p_ext_num02 VARCHAR(50),
+    IN p_ext_num03 VARCHAR(50),
+    IN p_ext_num04 VARCHAR(50),
+    IN p_ext_num05 VARCHAR(50),
+    IN p_ext_text TEXT,
+    IN p_sort_seq VARCHAR(20),
+    IN p_code_date VARCHAR(10),
+    IN p_start VARCHAR(20),
+    IN p_end VARCHAR(20),
+    IN p_sort_str VARCHAR(500)
+)
+BEGIN
+    SET @rownum := 0;
+
+    -- 동적 정렬 처리
+    SET @order_clause = IF(p_sort_str IS NOT NULL AND p_sort_str != '', p_sort_str, 'CODE_GRUP, SORT_SEQ, CODE_CD');
+
+    SET @sql = CONCAT('
+        SELECT * FROM (
+            SELECT X.* FROM (
+                SELECT Z1.*, @rownum := @rownum + 1 AS RNUM
+                FROM (
+                    SELECT
+                        SYS_ID AS sysId,
+                        CODE_GRUP AS codeGrup,
+                        CODE_CD AS codeCd,
+                        CODE_NAME AS codeName,
+                        CODE_NAME_EN AS codeNameEn,
+                        CODE_DESC AS codeDesc,
+                        SORT_SEQ AS sortSeq,
+                        USE_FLAG AS useFlag,
+                        EXT_CHR01 AS extChr01,
+                        EXT_CHR02 AS extChr02,
+                        EXT_CHR03 AS extChr03,
+                        EXT_CHR04 AS extChr04,
+                        EXT_CHR05 AS extChr05,
+                        EXT_CHR06 AS extChr06,
+                        EXT_CHR07 AS extChr07,
+                        EXT_CHR08 AS extChr08,
+                        EXT_CHR09 AS extChr09,
+                        EXT_CHR10 AS extChr10,
+                        EXT_NUM01 AS extNum01,
+                        EXT_NUM02 AS extNum02,
+                        EXT_NUM03 AS extNum03,
+                        EXT_NUM04 AS extNum04,
+                        EXT_NUM05 AS extNum05,
+                        EXT_TEXT AS extText,
+                        CODE_DATE AS codeDate,
+                        REGI_ID AS regiId,
+                        DATE_FORMAT(REGI_DATE, ''%Y-%m-%d %H:%i:%s'') AS regiDate,
+                        CHNG_ID AS chngId,
+                        DATE_FORMAT(CHNG_DATE, ''%Y-%m-%d %H:%i:%s'') AS chngDate
+                    FROM SYS_CODE_TERM A
+                    WHERE SYS_ID = ''', p_sys_id, '''');
+
+    -- 동적 WHERE 조건 추가
+    IF p_code_grup IS NOT NULL AND p_code_grup != '' THEN
+        SET @sql = CONCAT(@sql, ' AND CODE_GRUP = ''', p_code_grup, '''');
+    END IF;
+
+    IF p_code_cd IS NOT NULL AND p_code_cd != '' THEN
+        SET @sql = CONCAT(@sql, ' AND CODE_CD = ''', p_code_cd, '''');
+    END IF;
+
+    IF p_code_name IS NOT NULL AND p_code_name != '' THEN
+        SET @sql = CONCAT(@sql, ' AND CODE_NAME = ''', p_code_name, '''');
+    END IF;
+
+    IF p_code_name_en IS NOT NULL AND p_code_name_en != '' THEN
+        SET @sql = CONCAT(@sql, ' AND CODE_NAME_EN = ''', p_code_name_en, '''');
+    END IF;
+
+    IF p_code_desc IS NOT NULL AND p_code_desc != '' THEN
+        SET @sql = CONCAT(@sql, ' AND CODE_DESC LIKE ''%', p_code_desc, '%''');
+    END IF;
+
+    IF p_use_flag IS NOT NULL AND p_use_flag != '' THEN
+        IF p_use_flag = 'ALL' THEN
+            SET @sql = CONCAT(@sql, ' AND USE_FLAG = USE_FLAG');
+        ELSE
+            SET @sql = CONCAT(@sql, ' AND USE_FLAG = ''', p_use_flag, '''');
+        END IF;
+    END IF;
+
+    IF p_ext_chr01 IS NOT NULL AND p_ext_chr01 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR01 = ''', p_ext_chr01, '''');
+    END IF;
+
+    IF p_ext_chr02 IS NOT NULL AND p_ext_chr02 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR02 = ''', p_ext_chr02, '''');
+    END IF;
+
+    IF p_ext_chr03 IS NOT NULL AND p_ext_chr03 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR03 = ''', p_ext_chr03, '''');
+    END IF;
+
+    IF p_ext_chr04 IS NOT NULL AND p_ext_chr04 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR04 = ''', p_ext_chr04, '''');
+    END IF;
+
+    IF p_ext_chr05 IS NOT NULL AND p_ext_chr05 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR05 = ''', p_ext_chr05, '''');
+    END IF;
+
+    IF p_ext_chr06 IS NOT NULL AND p_ext_chr06 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR06 = ''', p_ext_chr06, '''');
+    END IF;
+
+    IF p_ext_chr07 IS NOT NULL AND p_ext_chr07 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR07 = ''', p_ext_chr07, '''');
+    END IF;
+
+    IF p_ext_chr08 IS NOT NULL AND p_ext_chr08 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR08 = ''', p_ext_chr08, '''');
+    END IF;
+
+    IF p_ext_chr09 IS NOT NULL AND p_ext_chr09 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR09 = ''', p_ext_chr09, '''');
+    END IF;
+
+    IF p_ext_chr10 IS NOT NULL AND p_ext_chr10 != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_CHR10 = ''', p_ext_chr10, '''');
+    END IF;
+
+    IF p_ext_num01 IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_NUM01 = ', p_ext_num01);
+    END IF;
+
+    IF p_ext_num02 IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_NUM02 = ', p_ext_num02);
+    END IF;
+
+    IF p_ext_num03 IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_NUM03 = ', p_ext_num03);
+    END IF;
+
+    IF p_ext_num04 IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_NUM04 = ', p_ext_num04);
+    END IF;
+
+    IF p_ext_num05 IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_NUM05 = ', p_ext_num05);
+    END IF;
+
+    IF p_ext_text IS NOT NULL AND p_ext_text != '' THEN
+        SET @sql = CONCAT(@sql, ' AND EXT_TEXT LIKE ''%', p_ext_text, '%''');
+    END IF;
+
+    IF p_sort_seq IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' AND SORT_SEQ = ', p_sort_seq);
+    END IF;
+
+    IF p_code_date IS NOT NULL AND p_code_date != '' THEN
+        SET @sql = CONCAT(@sql, ' AND CODE_DATE = ''', p_code_date, '''');
+    END IF;
+
+    SET @sql = CONCAT(@sql, ' ORDER BY ', @order_clause);
+    SET @sql = CONCAT(@sql, ') Z1, (SELECT @rownum:=0) Z2
+                ) X');
+
+    -- 페이징 처리
+    IF p_end IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' WHERE RNUM < ', p_end);
+    END IF;
+
+    SET @sql = CONCAT(@sql, ') X');
+
+    IF p_start IS NOT NULL THEN
+        SET @sql = CONCAT(@sql, ' WHERE RNUM >= ', p_start);
+    END IF;
+
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+END//
+
+-- ============================================================
+-- 11. 코드 기간 목록 카운트
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_search_term_count//
+
+CREATE PROCEDURE sp_code2_search_term_count(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_grup VARCHAR(50),
+    IN p_code_cd VARCHAR(50),
+    IN p_code_name VARCHAR(200),
+    IN p_code_name_en VARCHAR(200),
+    IN p_code_desc VARCHAR(500),
+    IN p_use_flag VARCHAR(10),
+    IN p_ext_chr01 VARCHAR(100),
+    IN p_ext_chr02 VARCHAR(100),
+    IN p_ext_chr03 VARCHAR(100),
+    IN p_ext_chr04 VARCHAR(100),
+    IN p_ext_chr05 VARCHAR(100),
+    IN p_ext_chr06 VARCHAR(100),
+    IN p_ext_chr07 VARCHAR(100),
+    IN p_ext_chr08 VARCHAR(100),
+    IN p_ext_chr09 VARCHAR(100),
+    IN p_ext_chr10 VARCHAR(100),
+    IN p_ext_num01 VARCHAR(50),
+    IN p_ext_num02 VARCHAR(50),
+    IN p_ext_num03 VARCHAR(50),
+    IN p_ext_num04 VARCHAR(50),
+    IN p_ext_num05 VARCHAR(50),
+    IN p_ext_text TEXT,
+    IN p_sort_seq VARCHAR(20),
+    IN p_code_date VARCHAR(10)
+)
+BEGIN
+    SELECT COUNT(1) AS cnt
+    FROM SYS_CODE_TERM A
+    WHERE SYS_ID = p_sys_id
+      AND (p_code_grup IS NULL OR p_code_grup = '' OR CODE_GRUP = p_code_grup)
+      AND (p_code_cd IS NULL OR p_code_cd = '' OR CODE_CD = p_code_cd)
+      AND (p_code_name IS NULL OR p_code_name = '' OR CODE_NAME = p_code_name)
+      AND (p_code_name_en IS NULL OR p_code_name_en = '' OR CODE_NAME_EN = p_code_name_en)
+      AND (p_code_desc IS NULL OR p_code_desc = '' OR CODE_DESC LIKE CONCAT('%', p_code_desc, '%'))
+      AND (p_use_flag IS NULL OR p_use_flag = '' OR USE_FLAG = CASE WHEN p_use_flag = 'ALL' THEN USE_FLAG ELSE p_use_flag END)
+      AND (p_ext_chr01 IS NULL OR p_ext_chr01 = '' OR EXT_CHR01 = p_ext_chr01)
+      AND (p_ext_chr02 IS NULL OR p_ext_chr02 = '' OR EXT_CHR02 = p_ext_chr02)
+      AND (p_ext_chr03 IS NULL OR p_ext_chr03 = '' OR EXT_CHR03 = p_ext_chr03)
+      AND (p_ext_chr04 IS NULL OR p_ext_chr04 = '' OR EXT_CHR04 = p_ext_chr04)
+      AND (p_ext_chr05 IS NULL OR p_ext_chr05 = '' OR EXT_CHR05 = p_ext_chr05)
+      AND (p_ext_chr06 IS NULL OR p_ext_chr06 = '' OR EXT_CHR06 = p_ext_chr06)
+      AND (p_ext_chr07 IS NULL OR p_ext_chr07 = '' OR EXT_CHR07 = p_ext_chr07)
+      AND (p_ext_chr08 IS NULL OR p_ext_chr08 = '' OR EXT_CHR08 = p_ext_chr08)
+      AND (p_ext_chr09 IS NULL OR p_ext_chr09 = '' OR EXT_CHR09 = p_ext_chr09)
+      AND (p_ext_chr10 IS NULL OR p_ext_chr10 = '' OR EXT_CHR10 = p_ext_chr10)
+      AND (p_ext_num01 IS NULL OR EXT_NUM01 = p_ext_num01)
+      AND (p_ext_num02 IS NULL OR EXT_NUM02 = p_ext_num02)
+      AND (p_ext_num03 IS NULL OR EXT_NUM03 = p_ext_num03)
+      AND (p_ext_num04 IS NULL OR EXT_NUM04 = p_ext_num04)
+      AND (p_ext_num05 IS NULL OR EXT_NUM05 = p_ext_num05)
+      AND (p_ext_text IS NULL OR p_ext_text = '' OR EXT_TEXT LIKE CONCAT('%', p_ext_text, '%'))
+      AND (p_sort_seq IS NULL OR SORT_SEQ = p_sort_seq)
+      AND (p_code_date IS NULL OR p_code_date = '' OR CODE_DATE = p_code_date);
+END//
+
+-- ============================================================
+-- 12. 코드 기간 단건 조회
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_select_term//
+
+CREATE PROCEDURE sp_code2_select_term(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_cd VARCHAR(50),
+    IN p_code_grup VARCHAR(50)
+)
+BEGIN
+    SELECT
+        SYS_ID AS sysId,
+        CODE_GRUP AS codeGrup,
+        CODE_CD AS codeCd,
+        CODE_NAME AS codeName,
+        CODE_NAME_EN AS codeNameEn,
+        CODE_DESC AS codeDesc,
+        SORT_SEQ AS sortSeq,
+        USE_FLAG AS useFlag,
+        EXT_CHR01 AS extChr01,
+        EXT_CHR02 AS extChr02,
+        EXT_CHR03 AS extChr03,
+        EXT_CHR04 AS extChr04,
+        EXT_CHR05 AS extChr05,
+        EXT_CHR06 AS extChr06,
+        EXT_CHR07 AS extChr07,
+        EXT_CHR08 AS extChr08,
+        EXT_CHR09 AS extChr09,
+        EXT_CHR10 AS extChr10,
+        EXT_NUM01 AS extNum01,
+        EXT_NUM02 AS extNum02,
+        EXT_NUM03 AS extNum03,
+        EXT_NUM04 AS extNum04,
+        EXT_NUM05 AS extNum05,
+        EXT_TEXT AS extText,
+        CODE_DATE AS codeDate,
+        REGI_ID AS regiId,
+        DATE_FORMAT(REGI_DATE, '%Y-%m-%d %H:%i:%s') AS regiDate,
+        CHNG_ID AS chngId,
+        DATE_FORMAT(CHNG_DATE, '%Y-%m-%d %H:%i:%s') AS chngDate
+    FROM SYS_CODE_TERM A
+    WHERE SYS_ID = p_sys_id
+      AND CODE_CD = p_code_cd
+      AND CODE_GRUP = p_code_grup;
+END//
+
+-- ============================================================
+-- 13. 코드 기간 등록
+-- NULLIF 패턴: 빈문자열이면 NULL로 변환
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_insert_term//
+
+CREATE PROCEDURE sp_code2_insert_term(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_cd VARCHAR(50),
+    IN p_code_grup VARCHAR(50),
+    IN p_code_name VARCHAR(200),
+    IN p_code_name_en VARCHAR(200),
+    IN p_code_desc VARCHAR(500),
+    IN p_sort_seq VARCHAR(20),
+    IN p_use_flag VARCHAR(1),
+    IN p_ext_chr01 VARCHAR(100),
+    IN p_ext_chr02 VARCHAR(100),
+    IN p_ext_chr03 VARCHAR(100),
+    IN p_ext_chr04 VARCHAR(100),
+    IN p_ext_chr05 VARCHAR(100),
+    IN p_ext_chr06 VARCHAR(100),
+    IN p_ext_chr07 VARCHAR(100),
+    IN p_ext_chr08 VARCHAR(100),
+    IN p_ext_chr09 VARCHAR(100),
+    IN p_ext_chr10 VARCHAR(100),
+    IN p_ext_num01 VARCHAR(50),
+    IN p_ext_num02 VARCHAR(50),
+    IN p_ext_num03 VARCHAR(50),
+    IN p_ext_num04 VARCHAR(50),
+    IN p_ext_num05 VARCHAR(50),
+    IN p_ext_text TEXT,
+    IN p_code_date VARCHAR(10),
+    IN p_gs_user_id VARCHAR(50)
+)
+BEGIN
+    INSERT INTO SYS_CODE_TERM (
+        SYS_ID,
+        CODE_CD,
+        CODE_GRUP,
+        CODE_NAME,
+        CODE_NAME_EN,
+        CODE_DESC,
+        SORT_SEQ,
+        USE_FLAG,
+        EXT_CHR01,
+        EXT_CHR02,
+        EXT_CHR03,
+        EXT_CHR04,
+        EXT_CHR05,
+        EXT_CHR06,
+        EXT_CHR07,
+        EXT_CHR08,
+        EXT_CHR09,
+        EXT_CHR10,
+        EXT_NUM01,
+        EXT_NUM02,
+        EXT_NUM03,
+        EXT_NUM04,
+        EXT_NUM05,
+        EXT_TEXT,
+        CODE_DATE,
+        REGI_ID,
+        REGI_DATE,
+        CHNG_ID,
+        CHNG_DATE
+    ) VALUES (
+        p_sys_id,
+        p_code_cd,
+        IFNULL(NULLIF(p_code_grup, ''), '0'),
+        NULLIF(p_code_name, ''),
+        NULLIF(p_code_name_en, ''),
+        NULLIF(p_code_desc, ''),
+        NULLIF(p_sort_seq, ''),
+        IFNULL(NULLIF(p_use_flag, ''), 'Y'),
+        NULLIF(p_ext_chr01, ''),
+        NULLIF(p_ext_chr02, ''),
+        NULLIF(p_ext_chr03, ''),
+        NULLIF(p_ext_chr04, ''),
+        NULLIF(p_ext_chr05, ''),
+        NULLIF(p_ext_chr06, ''),
+        NULLIF(p_ext_chr07, ''),
+        NULLIF(p_ext_chr08, ''),
+        NULLIF(p_ext_chr09, ''),
+        NULLIF(p_ext_chr10, ''),
+        NULLIF(p_ext_num01, ''),
+        NULLIF(p_ext_num02, ''),
+        NULLIF(p_ext_num03, ''),
+        NULLIF(p_ext_num04, ''),
+        NULLIF(p_ext_num05, ''),
+        NULLIF(p_ext_text, ''),
+        NULLIF(p_code_date, ''),
+        p_gs_user_id,
+        NOW(),
+        p_gs_user_id,
+        NOW()
+    );
+END//
+
+-- ============================================================
+-- 14. 코드 기간 삭제
+-- ============================================================
+DROP PROCEDURE IF EXISTS sp_code2_delete_term//
+
+CREATE PROCEDURE sp_code2_delete_term(
+    IN p_sys_id VARCHAR(20),
+    IN p_code_cd VARCHAR(50),
+    IN p_code_grup VARCHAR(50),
+    IN p_code_date VARCHAR(10)
+)
+BEGIN
+    DELETE FROM SYS_CODE_TERM
+    WHERE SYS_ID = p_sys_id
+      AND CODE_CD = p_code_cd
+      AND CODE_GRUP = p_code_grup
+      AND CODE_DATE = p_code_date;
+END//
+
+DELIMITER ;

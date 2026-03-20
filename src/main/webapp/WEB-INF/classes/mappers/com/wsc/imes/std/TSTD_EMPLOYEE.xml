@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_EMPLOYEE.xml
+설명: 사원 검증 매퍼 (SYS_USER 테이블 기반)
+작성자: 송우석
+작성일: 2026-02-10
+수정일: 2026-02-25 TSTD_EMPLOYEE → SYS_USER 테이블로 교체
+============================================================================
+PK: SYS_ID + USER_ID
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_EMPLOYEE">
+
+    <!--
+    ============================================================
+    TSTD_EMPLOYEE_SER: 사원 존재 여부 확인 (SYS_USER 기반)
+    용도: 엑셀업로드 사원코드 검증 등
+    ============================================================
+    -->
+    <select id="TSTD_EMPLOYEE_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_sys_user_emp_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{empCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

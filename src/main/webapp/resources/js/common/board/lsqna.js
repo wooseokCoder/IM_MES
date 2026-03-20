@@ -42,7 +42,7 @@ $(window).load(function() {
 				doSearch();
 			}
 		});
-		
+
 		$("#s_searchKey").combobox({
 			onChange:function(newValue,oldValue){
 				if(newValue == "S05") {
@@ -232,6 +232,9 @@ function doRemove() {
 	if($('#'+this.id).hasClass('l-btn-disabled')){
 		return false;
 	}
+
+
+	debugger;
 	jgrid.remove();
 }
 //등록버튼 클릭시 등록페이지로 이동

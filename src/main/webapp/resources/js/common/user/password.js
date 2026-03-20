@@ -65,15 +65,15 @@ function checkPw(pw){
     if(spe >= 0) cnt++;
     
     if(cnt < 2){
-        alert(msg.MSG0132);
+        alert(msg.MSG0064);
         return false;
     }
     
     if(cnt == 2 && pw.length < 10){
-        alert(msg.MSG0132);
+        alert(msg.MSG0065);
         return false;
     }else if(cnt > 2 && pw.length < 8){
-        alert(msg.MSG0133);
+        alert(msg.MSG0066);
         return false;
     }else {
     	return true;
@@ -86,15 +86,15 @@ function doSave() {
 	var chkPw = $('#chkPw').val();
 	var userId = $('#userId').val();
 	if(userId == "") {
-		$.messager.alert(msg.MSG0122,msg.MSG0120,msg.MSG0122);
+		$.messager.alert(msg.MSG0052,msg.MSG0040,msg.MSG0052);
 		return;
 	}else if(chkPw == "" || newPw == "") {
-		$.messager.alert(msg.MSG0122,msg.MSG0123,msg.MSG0122);
+		$.messager.alert(msg.MSG0052,msg.MSG0014,msg.MSG0052);
 		return;
 	}
 	
 	if(userId.substring(0,3) == "dev" && $('#gsUserId').val().substring(0,3) != "dev") {
-		$.messager.alert(msg.MSG0122,msg.MSG0121,msg.MSG0122);
+		$.messager.alert(msg.MSG0052,msg.MSG0067,msg.MSG0052);
 		return;
 	}
 
@@ -118,12 +118,12 @@ function doSave() {
 	        type: 'post',
 	        data: saveParams,
 	        success: function(data){
-	        	$.messager.alert(msg.MSG0122,msg.MSG0117,msg.MSG0122);
+	        	$.messager.alert(msg.MSG0052,msg.MSG0035,msg.MSG0052);
 	        },
 	        error: function(){
 	        }
 	    });
 	}else{
-		$.messager.alert(msg.MSG0121,msg.MSG0123,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0014,msg.MSG0051);
 	}
 }

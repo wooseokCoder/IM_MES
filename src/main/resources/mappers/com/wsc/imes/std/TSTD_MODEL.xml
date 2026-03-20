@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_MODEL.xml
+설명: 모델군 관리 CRUD 매퍼 (TSTD_MODEL 테이블)
+작성자: 송우석
+작성일: 2026-02-20
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_MODEL">
+
+    <!--
+    ============================================================
+    TSTD_MODEL_SER_B: B(구분) 타입 중복 체크
+    용도: PLT_CODE + DATA_TYPE + MODEL_TYPE 존재 여부 확인
+    ============================================================
+    -->
+    <select id="TSTD_MODEL_SER_B" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_model_ser_b(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{dataType, mode=IN, jdbcType=VARCHAR},
+            #{modelType, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_MODEL_SER_M: M(시리즈) 타입 중복 체크
+    용도: PLT_CODE + DATA_TYPE + MODEL_TYPE + MODEL_SERISE 존재 여부 확인
+    ============================================================
+    -->
+    <select id="TSTD_MODEL_SER_M" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_model_ser_m(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{dataType, mode=IN, jdbcType=VARCHAR},
+            #{modelType, mode=IN, jdbcType=VARCHAR},
+            #{modelSerise, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_MODEL_SER_S: S(모델) 타입 중복 체크
+    용도: PLT_CODE + DATA_TYPE + MODEL_TYPE + MODEL_SERISE + MODEL_NO 존재 여부 확인
+    ============================================================
+    -->
+    <select id="TSTD_MODEL_SER_S" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_model_ser_s(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{dataType, mode=IN, jdbcType=VARCHAR},
+            #{modelType, mode=IN, jdbcType=VARCHAR},
+            #{modelSerise, mode=IN, jdbcType=VARCHAR},
+            #{modelNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_MODEL_INS: 등록
+    용도: 신규 모델군 데이터 등록
+    ============================================================
+    -->
+    <insert id="TSTD_MODEL_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_model_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{scode, mode=IN, jdbcType=VARCHAR},
+            #{pScode, mode=IN, jdbcType=VARCHAR},
+            #{prodType, mode=IN, jdbcType=VARCHAR},
+            #{dataType, mode=IN, jdbcType=VARCHAR},
+            #{modelType, mode=IN, jdbcType=VARCHAR},
+            #{modelSerise, mode=IN, jdbcType=VARCHAR},
+            #{modelNo, mode=IN, jdbcType=VARCHAR},
+            #{modelCode, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSTD_MODEL_UPD_B: B(구분) 타입 수정
+    용도: PROD_TYPE, USE_FLAG 수정
+    WHERE: PLT_CODE + MODEL_TYPE
+    ============================================================
+    -->
+    <update id="TSTD_MODEL_UPD_B" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_model_upd_b(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{modelType, mode=IN, jdbcType=VARCHAR},
+            #{prodType, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSTD_MODEL_UPD_M: M(시리즈) 타입 수정
+    용도: USE_FLAG 수정
+    WHERE: PLT_CODE + MODEL_TYPE + MODEL_SERISE
+    ============================================================
+    -->
+    <update id="TSTD_MODEL_UPD_M" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_model_upd_m(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{modelType, mode=IN, jdbcType=VARCHAR},
+            #{modelSerise, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSTD_MODEL_UPD_S: S(모델) 타입 수정
+    용도: USE_FLAG, MODEL_CODE 수정
+    WHERE: PLT_CODE + MODEL_TYPE + MODEL_SERISE + MODEL_NO
+    ============================================================
+    -->
+    <update id="TSTD_MODEL_UPD_S" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_model_upd_s(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{modelType, mode=IN, jdbcType=VARCHAR},
+            #{modelSerise, mode=IN, jdbcType=VARCHAR},
+            #{modelNo, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{modelCode, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSTD_MODEL_UDE: 논리 삭제 (DATA_FLAG = 2)
+    용도: SCODE 기반 논리 삭제
+    ============================================================
+    -->
+    <update id="TSTD_MODEL_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_model_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{scode, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

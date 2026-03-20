@@ -118,7 +118,7 @@ consts = {
 	//저장,삭제 후 이동처리
 	doResult: function(res, callback) {
 		//jboard.doList();
-		$.messager.alert(msg.MSG0123, res.success, msg.MSG0123, function() {
+		$.messager.alert(msg.MSG0053, res.success, msg.MSG0053, function() {
 			if(editType == "D") {
 				doClose();
 			}
@@ -155,7 +155,7 @@ function doSave() {
 	//썸네일 체크
 	/*if($('input[name="thumbnail"]:checkbox:checked').length == 0 ){
 		$("#h_thumbnail").val('');
-		alert(msg.MSG0138);
+		alert(msg.MSG0074);
 		return;
 	}*/
 	editType = "S";

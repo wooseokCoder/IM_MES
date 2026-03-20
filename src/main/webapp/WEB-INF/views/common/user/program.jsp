@@ -27,7 +27,7 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/common/user/program.js" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/user/program.js?v=260310A" />"></script>
 <script type="text/javascript">
 	 doInit({
 		sysId: '${sysId}',
@@ -67,13 +67,13 @@
 			<th data-options="field:'tran3'     ,width:60,align:'center',editor:{type:'checkbox',options:{on:'1',off:'0'}},formatter:jformat.tran,data_item:'GRD_012'" formatter="formatCheck">AU3</th>
 			<th data-options="field:'tran4'     ,width:60,align:'center',editor:{type:'checkbox',options:{on:'1',off:'0'}},formatter:jformat.tran,data_item:'GRD_013'" formatter="formatCheck">AU4</th>
 			<th data-options="field:'tran5'     ,width:60,align:'center',editor:{type:'checkbox',options:{on:'1',off:'0'}},formatter:jformat.tran,data_item:'GRD_014'" formatter="formatCheck">AU5</th>
-			<th data-options="field:'progType'  ,width:100,align:'center',editor:'text',data_item:'GRD_015'">Type</th>
-			<th data-options="field:'sysLoc'    ,width:60,editor:'text',data_item:'GRD_016'">Loc</th>
-			<th data-options="field:'pattern'  ,width:100,align:'center',editor:consts.combo.Pattern.editor(),data_item:'GRD_015'">Pattern</th>
-			<th data-options="field:'regiId',data_item:'GRD_017'"    >Regi ID</th>
-			<th data-options="field:'regiDate',data_item:'GRD_018'"  >Regi Date</th>
-			<th data-options="field:'chngId',data_item:'GRD_019'"    >Chng ID</th>
-			<th data-options="field:'chngDate',data_item:'GRD_020'"  >Chng Date</th>
+			<th data-options="field:'progType'  ,width:100,align:'center',editor:'text',data_item:'GRD_015'">타입</th>
+			<th data-options="field:'sysLoc'    ,width:60,editor:'text',data_item:'GRD_016'">위치</th>
+			<th data-options="field:'pattern'  ,width:100,align:'center',editor:consts.combo.Pattern.editor(),data_item:'GRD_015'">패턴</th>
+			<th data-options="field:'regiId'   ,width:100,data_item:'GRD_017'"    >Regi ID</th>
+			<th data-options="field:'regiDate',width:150,data_item:'GRD_018'"  >Regi Date</th>
+			<th data-options="field:'chngId',width:100,data_item:'GRD_019'"    >Chng ID</th>
+			<th data-options="field:'chngDate',width:150,data_item:'GRD_020'"  >Chng Date</th>
 		</tr>
 	</thead>
 </table>
@@ -91,12 +91,20 @@
 
 	<form id="search-form">
 	<fieldset class="div-line-new" >
-		<table  cellpadding="5" cellspacing="2" class="search-table  tableSearch-c">
+		<table cellpadding="0" class="search-table tableSearch-c wd-100">
+			<colgroup>
+				<col width="80px">
+				<col width="120px">
+				<col width="80px">
+				<col width="150px">
+				<col width="*">
+			</colgroup>
 			<tr>
-				<th class="h table-Search-h" data-item="LAB_001"><span>Prog ID </span></th>
+				<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>Prog ID </span></th>
 				<td class="d"><input class="easyui-textbox"   name="progId" id="progId" data-options="width:100" /></td>
-				<th class="h" data-item="LAB_002"><span>Prog Name </span></th>
+				<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>Prog Name </span></th>
 				<td class="d"><input class="easyui-textbox"   name="progName" id="progName" data-options="width:150" /></td>
+				<td class="d"></td>
 			</tr>
 		</table>
 	</fieldset>
@@ -117,7 +125,7 @@
 
 
 <!-- 엑셀  진행상태 -->
-<div id="progress-popup" class="easyui-dialog" >
+<div id="progress-popup" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>

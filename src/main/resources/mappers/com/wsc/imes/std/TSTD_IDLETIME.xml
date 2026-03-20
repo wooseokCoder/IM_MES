@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_IDLETIME.xml
+설명: 비가동시간 CRUD 매퍼 (TSTD_IDLETIME 테이블)
+원본: ProActive TSTD_IDLETIME.cs
+작성일: 2026-02-10
+============================================================================
+주의: IDLE_NO 채번은 공통 서비스 사용 (UtilityService.getSerialNo)
+      sr_code="IDT", format=YYYYMMDD → IDT20260210-0001
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_IDLETIME">
+
+    <!--
+    ============================================================
+    TSTD_IDLETIME_SER: 단건 조회 (PLT_CODE + IDLE_NO)
+    원본: TSTD_IDLETIME.TSTD_IDLETIME_SER()
+    용도: 존재 여부 확인, 상세 조회, 삭제이력 조회
+    ============================================================
+    -->
+    <select id="TSTD_IDLETIME_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_idletime_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_IDLETIME_INS: 등록
+    원본: TSTD_IDLETIME.TSTD_IDLETIME_INS()
+    용도: 신규 비가동시간 등록
+    ============================================================
+    -->
+    <insert id="TSTD_IDLETIME_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_idletime_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleNo, mode=IN, jdbcType=VARCHAR},
+            #{scode, mode=IN, jdbcType=VARCHAR},
+            #{idleStartTime, mode=IN, jdbcType=VARCHAR},
+            #{idleEndTime, mode=IN, jdbcType=VARCHAR},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSTD_IDLETIME_UPD: 수정
+    원본: TSTD_IDLETIME.TSTD_IDLETIME_UPD()
+    용도: 다이얼로그에서 수정 (저장&닫기)
+    ============================================================
+    -->
+    <update id="TSTD_IDLETIME_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_idletime_upd(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleNo, mode=IN, jdbcType=VARCHAR},
+            #{scode, mode=IN, jdbcType=VARCHAR},
+            #{idleStartTime, mode=IN, jdbcType=VARCHAR},
+            #{idleEndTime, mode=IN, jdbcType=VARCHAR},
+            #{scomment, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TSTD_IDLETIME_UDE: 삭제 (논리삭제)
+    원본: TSTD_IDLETIME.TSTD_IDLETIME_UDE()
+    용도: DATA_FLAG = 2로 논리 삭제 + 삭제사유
+    ============================================================
+    -->
+    <update id="TSTD_IDLETIME_UDE" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_idletime_ude(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{idleNo, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+</mapper>

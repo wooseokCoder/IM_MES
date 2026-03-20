@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_WORKORDER_PLN_HIS.xml
+설명: 계획시간 변경이력 매퍼 (TSHP_WORKORDER_PLN_HIS 테이블)
+원본: ProActive TSHP_WORKORDER_PLN_HIS.cs
+작성일: 2026-02-24
+사용화면: ORD06A
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.ord.TSHP_WORKORDER_PLN_HIS">
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_PLN_HIS_INS: 계획시간 변경 이력 등록
+    ============================================================
+    -->
+    <insert id="TSHP_WORKORDER_PLN_HIS_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_pln_his_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{wphId, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR},
+            #{bfPlnStartTime, mode=IN, jdbcType=VARCHAR},
+            #{bfPlnEndTime, mode=IN, jdbcType=VARCHAR},
+            #{plnStartTime, mode=IN, jdbcType=VARCHAR},
+            #{plnEndTime, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSHP_WORKORDER_PLN_HIS_DEL: 계획시간 이력 삭제
+    ============================================================
+    -->
+    <delete id="TSHP_WORKORDER_PLN_HIS_DEL" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tshp_workorder_pln_his_del(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+</mapper>

@@ -6,164 +6,90 @@
 <mapper namespace="com.wsc.common.user.BatchWork">
 
     <!-- ========================================================== -->
-    <!--   Oracle Paging Clause                                     -->
+    <!--   BatchWork Procedures - Converted to CALL statements      -->
+    <!--   Table: SYS_JOB_MAST                                      -->
     <!-- ========================================================== -->
-    <sql id="pagingColumns">
-        <if test="start == null or end == null">
-            ,0 AS RNUM
-        </if>
-    </sql>
-    <sql id="pagingOpen">
-        <if test="start != null and end != null">
-            SELECT * 
-              FROM (
-                    SELECT X.*
-                      FROM (
-                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
-                              FROM (
-        </if>
-    </sql>
-    <sql id="pagingClose">
-        <if test="start != null and end != null">
-                                   ) Z1, (SELECT @rownum:=0 ) Z2
-                           ) X
-                     WHERE RNUM <![CDATA[< ]]> #{end}
-                   ) X
-             WHERE RNUM <![CDATA[>= ]]> #{start}
-        </if>  
-    </sql>
-    
-    <sql id="sortClause">
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
-		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
-		        ${sort}
-		  	</foreach>
-	  	</if>
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
-         	   JOB_ID, JOB_TYPE DESC
-	  	</if>
-    </sql>
 
-    <sql id="selectColumns">
-           JOB_ID           AS "jobId"
-        ,JOB_GRUP		    AS "jobGrup"
-        ,JOB_TYPE           AS "jobType"
-        ,JOB_TERM           AS "jobTerm"
-        ,JOB_TIME           AS "jobTime"
-        ,JOB_CMD			AS "jobCmd"
-        ,JOB_DESC			AS "jobDesc"
-        ,ERR_PROC			AS "errProc"
-        ,JOB_MNG			AS "jobMng"
-        ,USE_FLAG			AS "useFlag"
-        ,JOB_REMK			AS "jobRemk"
-        ,REGI_ID			AS "regiId"
-        ,REGI_DATE 			AS "regiDate"
-        ,CHNG_ID 			AS "chngId"
-        ,CHNG_DATE 			AS "chngDate"
-    </sql>
-    
-    <sql id="updateColumns">
-           CHNG_ID   = #{gsUserId}
-         , CHNG_DATE = NOW()
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobId)">, JOB_ID = #{jobId}  </if>
-        ,JOB_GRUP = #{jobGrup}
-        ,JOB_TYPE = #{jobType}
-        ,JOB_TERM = #{jobTerm} 
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobTime )"> ,JOB_TIME = #{jobTime}   </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobCmd)"> ,JOB_CMD = #{jobCmd}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobDesc)"> ,JOB_DESC = #{jobDesc}  </if>
-        ,ERR_PROC = #{errProc}
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobMng)"> ,JOB_MNG	= #{jobMng}  </if>
-        ,USE_FLAG = #{useFlag}
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobRemk)"> ,JOB_REMK = #{jobRemk}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(regiId)"> ,REGI_ID = #{regiId}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(regiDate)"> ,REGI_DATE = #{regiDate}  </if>
-    </sql>
-    
-    <sql id="whereClause">
-    	SYS_ID = #{sysId}
-    	
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobGrup)">AND JOB_GRUP = #{jobGrup}    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(jobTerm)">AND JOB_TERM = #{jobTerm}    </if>
-    </sql>
-    
-    <select id="search" resultType="record" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectColumns" />
-               <include refid="pagingColumns" /><!-- PAGING -->
-          FROM SYS_JOB_MAST                                                                                                                                                   
-         WHERE <include refid="whereClause"/>         
-         ORDER 
-            BY <include refid="sortClause" /><!-- SORT -->
-        <include refid="pagingClose" /><!-- PAGING -->
+    <!-- ========================================================== -->
+    <!--   search - Search batch work list with pagination          -->
+    <!-- ========================================================== -->
+    <select id="search" statementType="CALLABLE" resultType="record" parameterType="params">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_batchwork_search(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobGrup, mode=IN, jdbcType=VARCHAR},
+            #{jobTerm, mode=IN, jdbcType=VARCHAR},
+            #{sortStr, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=INTEGER},
+            #{end, mode=IN, jdbcType=INTEGER}
+        )}
     </select>
-    
-    <select id="searchCount" resultType="int" parameterType="params">
-        SELECT COUNT(1) 
-          FROM SYS_JOB_MAST
-		 WHERE <include refid="whereClause" />
+
+    <!-- ========================================================== -->
+    <!--   searchCount - Count batch work records                   -->
+    <!-- ========================================================== -->
+    <select id="searchCount" statementType="CALLABLE" resultType="int" parameterType="params">
+        {CALL sp_batchwork_search_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobGrup, mode=IN, jdbcType=VARCHAR},
+            #{jobTerm, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    
-     <select id="select" resultType="record" parameterType="params">
-        SELECT <include refid="selectColumns" />
-          FROM SYS_JOB_MAST
-         WHERE SYS_ID = #{sysId}
-           AND JOB_ID = #{jobId}
+
+    <!-- ========================================================== -->
+    <!--   select - Select single batch work record by ID           -->
+    <!-- ========================================================== -->
+    <select id="select" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_batchwork_select(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobId, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    
-    <insert id="insert" parameterType="params">
-    <selectKey resultType="string" keyProperty="jobId" order="BEFORE">
-            SELECT CONCAT('SYS-JOB-', LPAD(CAST(ifnull(SUBSTR(MAX(JOB_ID),9,4),'0') AS UNSIGNED)+1, 4, '0') )
-                AS "jobId"
-              FROM SYS_JOB_MAST
-              WHERE SYS_ID = #{sysId}
-         <!--  AND JOB_ID = #{jobId} -->   
-    </selectKey>
-        INSERT 
-          INTO SYS_JOB_MAST 
-             ( SYS_ID
-             , JOB_ID
-             , JOB_GRUP
-             , JOB_TYPE
-             , JOB_TERM
-             , JOB_TIME
-             , JOB_CMD
-             , JOB_DESC
-             , ERR_PROC
-             , JOB_MNG
-             , USE_FLAG
-             , JOB_REMK
-             , REGI_ID
-             , REGI_DATE
-             , CHNG_ID
-             , CHNG_DATE
-             )
-        VALUES
-             ( #{sysId}
-             , #{jobId}
-             , #{jobGrup}
-             , #{jobType}
-             , #{jobTerm}
-             , #{jobTime}
-             , #{jobCmd}
-             , #{jobDesc}
-             , #{errProc}
-             , #{jobMng}
-             , #{useFlag}
-             , #{jobRemk}
-             , #{gsUserId}
-             , NOW()
-             , #{gsUserId}
-             , NOW()     
-             )
-    </insert>
-    
-    <update id="update" parameterType="params">
-        UPDATE SYS_JOB_MAST
-           SET <include refid="updateColumns" />
-         WHERE SYS_ID = #{sysId}
-           AND JOB_ID = #{jobId}
+
+    <!-- ========================================================== -->
+    <!--   insert - Insert new batch work record                    -->
+    <!--   Note: jobId is returned via OUT parameter                -->
+    <!-- ========================================================== -->
+    <select id="insert" statementType="CALLABLE" parameterType="params">
+        {CALL sp_batchwork_insert(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobGrup, mode=IN, jdbcType=VARCHAR},
+            #{jobType, mode=IN, jdbcType=VARCHAR},
+            #{jobTerm, mode=IN, jdbcType=VARCHAR},
+            #{jobTime, mode=IN, jdbcType=VARCHAR},
+            #{jobCmd, mode=IN, jdbcType=VARCHAR},
+            #{jobDesc, mode=IN, jdbcType=VARCHAR},
+            #{errProc, mode=IN, jdbcType=VARCHAR},
+            #{jobMng, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{jobRemk, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR},
+            #{jobId, mode=OUT, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- ========================================================== -->
+    <!--   update - Update batch work record                        -->
+    <!-- ========================================================== -->
+    <update id="update" statementType="CALLABLE" parameterType="params">
+        {CALL sp_batchwork_update(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{jobId, mode=IN, jdbcType=VARCHAR},
+            #{newJobId, mode=IN, jdbcType=VARCHAR},
+            #{jobGrup, mode=IN, jdbcType=VARCHAR},
+            #{jobType, mode=IN, jdbcType=VARCHAR},
+            #{jobTerm, mode=IN, jdbcType=VARCHAR},
+            #{jobTime, mode=IN, jdbcType=VARCHAR},
+            #{jobCmd, mode=IN, jdbcType=VARCHAR},
+            #{jobDesc, mode=IN, jdbcType=VARCHAR},
+            #{errProc, mode=IN, jdbcType=VARCHAR},
+            #{jobMng, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR},
+            #{jobRemk, mode=IN, jdbcType=VARCHAR},
+            #{regiId, mode=IN, jdbcType=VARCHAR},
+            #{regiDate, mode=IN, jdbcType=TIMESTAMP},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </update>
-    
 
 </mapper>

@@ -27,16 +27,10 @@
 <%@ include file="/WEB-INF/views/include/common.jsp" %>
 
 <!-- BUSINESS JAVASCRIPT -->
-<script type="text/javascript" src="<c:url value="/resources/js/common/code/svccode.js?v=0925A" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/code/svccode.js?v=260227A" />"></script>
 
 <style>
 #account-layout{min-width:1200px !important;}
-.search-label-h2 {
-    width: 128px;
-}
-table.search-table td.d {
-    padding-right: 20px;
-}
 #menu-button, #menu-button .l-btn-text { width: 100px; height: 32px;}
 #excel-button3, #excel-button3 .l-btn-text { width: 218px; text-align: left; border-radius:0px;}
 #excel-button3 .l-btn-text, #excel-button4 .l-btn-text { padding-left: 25px;} 
@@ -48,7 +42,6 @@ table.search-table td.d {
 #report-button-pdf .l-btn-text{
 	width: 100px;
 }
-.search-label-h {width:10%;}
 </style>
 </head>
 
@@ -106,19 +99,18 @@ table.search-table td.d {
 <div id="search-toolbar" class="wui-toolbar">
 	<form id="search-form">
 		<fieldset class="Remake-div-line-new">
-	        <table cellpadding="5" class="search-table tableSearch-c wd-100">
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100">
 	        	<colgroup>
-	        		<col width="7%" style="min-width: 120px;" />
-	        		<col width="18%" style="min-width: 150px;" />
-	        		<col width="7%" style="min-width: 120px;" />
-	        		<col width="18%" style="min-width: 150px;" />
-	        		<col width="7%" style="min-width: 120px;" />
-	        		<col width="18%" style="min-width: 150px;" />
-	        		<col width="7%" style="min-width: 120px;" />
-	        		<col width="*%" style="min-width: 150px;" />
+	        		<col width="45px" />
+	        		<col width="120px" />
+	        		<col width="75px" />
+	        		<col width="120px" />
+	        		<col width="65px" />
+	        		<col width="120px" />
+	        		<col width="*" />
 	        	</colgroup>
 	        	<tr class="topnav_sty">
-	        		<td colspan="8">
+	        		<td colspan="7">
 	        			<div>
 	        				<%@ include file="/WEB-INF/views/include/topnav2.jsp" %>
 	        				<div>
@@ -140,15 +132,15 @@ table.search-table td.d {
 							<option value="0" selected>Code Group</option>
 						</select>
 					</td> --%>
-					<th class="h table-Search-h" data-item="LAB_002"><span>Code</span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>Code</span></th>
 					<td class="d">
 						<input class="easyui-textbox" name="codeCd" id="s_codeCd"  data-options="width:180,height:30"/>
 					</td>
-					<th class="h table-Search-h" data-item="LAB_003"><span>Code Desc</span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_003"><span>Code Desc</span></th>
 					<td class="d">
 						<input class="easyui-textbox" name="codeDesc" id="s_codeDesc"  data-options="width:180,height:30"/>
 					</td>
-					<th class="h table-Search-h" data-item="LAB_004"><span>Use Flag</span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_004"><span>Use Flag</span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="useFlag" ID="s_useFlag" data-options="width:50,height:30,panelHeight:'auto'">
 						<option value="ALL">ALL</option>
@@ -159,6 +151,7 @@ table.search-table td.d {
 							</c:forEach>
 						</select>
 					</td>
+					<td class="d"></td>
 	            </tr>
 	        </table>
 	   </fieldset>

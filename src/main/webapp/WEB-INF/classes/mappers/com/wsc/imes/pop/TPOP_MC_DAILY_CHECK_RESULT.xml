@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TPOP_MC_DAILY_CHECK_RESULT_POP30B.xml
+설명: 일일점검 결과 CRUD 매퍼 (TPOP_MC_DAILY_CHECK_RESULT 테이블)
+원본: ProActive TPOP_MC_DAILY_CHECK_RESULT.cs
+화면: POP30B (단말기 - 가공)
+작성일: 2026-03-18
+수정일: 2026-03-19 (AS-IS 충실 전환 - UPD 전체컬럼, SER→QUERY1 변경)
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.TPOP_MC_DAILY_CHECK_RESULT">
+
+    <!--
+    ============================================================
+    TPOP_MC_DAILY_CHECK_RESULT_INS: 일일점검 결과 등록
+    원본: TPOP_MC_DAILY_CHECK_RESULT.TPOP_MC_DAILY_CHECK_RESULT_INS()
+    ============================================================
+    -->
+    <insert id="TPOP_MC_DAILY_CHECK_RESULT_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tpop_mc_daily_check_result_ins(
+            #{gsPltCode,     mode=IN, jdbcType=VARCHAR},
+            #{mdcrNo,        mode=IN, jdbcType=VARCHAR},
+            #{mdcrDate,      mode=IN, jdbcType=VARCHAR},
+            #{mdcrMcCode,    mode=IN, jdbcType=VARCHAR},
+            #{mdcrType,      mode=IN, jdbcType=VARCHAR},
+            #{mdcrNum,       mode=IN, jdbcType=VARCHAR},
+            #{mdcrContents,  mode=IN, jdbcType=VARCHAR},
+            #{mdcrCheck,     mode=IN, jdbcType=VARCHAR},
+            #{mdcrMeans,     mode=IN, jdbcType=VARCHAR},
+            #{mdcrResult,    mode=IN, jdbcType=VARCHAR},
+            #{mdcrScomment,  mode=IN, jdbcType=VARCHAR},
+            #{mdcrSeq,       mode=IN, jdbcType=INTEGER},
+            #{gsUserId,      mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TPOP_MC_DAILY_CHECK_RESULT_UPD: 일일점검 결과 수정
+    원본: TPOP_MC_DAILY_CHECK_RESULT.TPOP_MC_DAILY_CHECK_RESULT_UPD()
+    AS-IS: 모든 MDCR_* 컬럼 UPDATE (RESULT/SCOMMENT뿐 아니라 전체)
+    수정일: 2026-03-19
+    ============================================================
+    -->
+    <update id="TPOP_MC_DAILY_CHECK_RESULT_UPD" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tpop_mc_daily_check_result_upd(
+            #{gsPltCode,     mode=IN, jdbcType=VARCHAR},
+            #{mdcrNo,        mode=IN, jdbcType=VARCHAR},
+            #{mdcrDate,      mode=IN, jdbcType=VARCHAR},
+            #{mdcrMcCode,    mode=IN, jdbcType=VARCHAR},
+            #{mdcrType,      mode=IN, jdbcType=VARCHAR},
+            #{mdcrNum,       mode=IN, jdbcType=VARCHAR},
+            #{mdcrContents,  mode=IN, jdbcType=VARCHAR},
+            #{mdcrCheck,     mode=IN, jdbcType=VARCHAR},
+            #{mdcrMeans,     mode=IN, jdbcType=VARCHAR},
+            #{mdcrResult,    mode=IN, jdbcType=VARCHAR},
+            #{mdcrScomment,  mode=IN, jdbcType=VARCHAR},
+            #{mdcrSeq,       mode=IN, jdbcType=INTEGER},
+            #{gsUserId,      mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!--
+    ============================================================
+    TPOP_MC_DAILY_CHECK_RESULT_SER: 일일점검 결과 단건 조회
+    원본: TPOP_MC_DAILY_CHECK_RESULT.TPOP_MC_DAILY_CHECK_RESULT_SER()
+    AS-IS WHERE: PLT_CODE + MDCR_NO (PK 기준)
+    용도: POP30B_INS3에서 INSERT/UPDATE 분기 판단
+    ============================================================
+    -->
+    <select id="TPOP_MC_DAILY_CHECK_RESULT_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tpop_mc_daily_check_result_ser(
+            #{gsPltCode,     mode=IN, jdbcType=VARCHAR},
+            #{mdcrNo,        mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

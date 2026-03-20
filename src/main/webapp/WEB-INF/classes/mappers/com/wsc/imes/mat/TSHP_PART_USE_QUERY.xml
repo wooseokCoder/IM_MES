@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSHP_PART_USE_QUERY.xml
+설명: 소요자재 조회 매퍼 (TSHP_PART_USE 테이블)
+원본: ProActive TSHP_PART_USE_QUERY.cs
+작성일: 2026-03-04
+사용화면: MAT05A
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.mat.TSHP_PART_USE_QUERY">
+
+    <!--
+    ============================================================
+    TSHP_PART_USE_QUERY3: 소요자재 디테일 조회
+    용도: MAT05A_SER2 - Tab1 디테일 그리드
+    ============================================================
+    -->
+    <select id="TSHP_PART_USE_QUERY3" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_part_use_query3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR},
+            #{orderNo, mode=IN, jdbcType=VARCHAR},
+            #{orderLine, mode=IN, jdbcType=VARCHAR},
+            #{partCode, mode=IN, jdbcType=VARCHAR},
+            #{mrpEmpIn, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_PART_USE_QUERY4: MRP 담당자 목록 조회
+    용도: MAT05A_SER - empList (동적 MRP_EMP 컬럼)
+    ============================================================
+    -->
+    <select id="TSHP_PART_USE_QUERY4" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_part_use_query4(
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{isSim, mode=IN, jdbcType=VARCHAR},
+            #{orderNo, mode=IN, jdbcType=VARCHAR},
+            #{orderLine, mode=IN, jdbcType=VARCHAR},
+            #{sPlnStartDate, mode=IN, jdbcType=VARCHAR},
+            #{ePlnStartDate, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_PART_USE_QUERY5: 담당자 목록 (D0A용)
+    용도: MAT05A_SER3 - D0A 다이얼로그 담당자 그리드
+    ============================================================
+    -->
+    <select id="TSHP_PART_USE_QUERY5" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_part_use_query5(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR},
+            #{orderNo, mode=IN, jdbcType=VARCHAR},
+            #{orderLine, mode=IN, jdbcType=VARCHAR},
+            #{partCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_PART_USE_QUERY6: 자재 상세 (D0A/D1A용)
+    용도: MAT05A_SER4 - D0A/D1A 다이얼로그 자재 그리드
+    ============================================================
+    -->
+    <select id="TSHP_PART_USE_QUERY6" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_part_use_query6(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR},
+            #{orderNo, mode=IN, jdbcType=VARCHAR},
+            #{orderLine, mode=IN, jdbcType=VARCHAR},
+            #{partCode, mode=IN, jdbcType=VARCHAR},
+            #{mrpEmp, mode=IN, jdbcType=VARCHAR},
+            #{mrpEmpName, mode=IN, jdbcType=VARCHAR},
+            #{stkOutNo, mode=IN, jdbcType=VARCHAR},
+            #{outFlag, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSHP_PART_USE_QUERY8: 불출율 계산용 기준 건수
+    용도: 불출율 분모 (제외 코드 필터 적용)
+    ============================================================
+    -->
+    <select id="TSHP_PART_USE_QUERY8" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tshp_part_use_query8(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo, mode=IN, jdbcType=VARCHAR},
+            #{orderNo, mode=IN, jdbcType=VARCHAR},
+            #{orderLine, mode=IN, jdbcType=VARCHAR},
+            #{partCode, mode=IN, jdbcType=VARCHAR},
+            #{mrpEmp, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

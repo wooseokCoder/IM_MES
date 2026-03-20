@@ -178,9 +178,22 @@ $(function(){
 <!-- fieldset 변경 20190628 박소현 -->
 	<form id="search-form">
 		<fieldset  class="div-line-new" style="padding-left:20px;">
-	        <table cellpadding="5" class="search-table tableSearch-c">
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100">
+	            <colgroup>
+	                <col width="45px">
+	                <col width="150px">
+	                <col width="55px">
+	                <col width="150px">
+	                <col width="43px">
+	                <col width="150px">
+	                <col width="65px">
+	                <col width="120px">
+	                <col width="65px">
+	                <col width="150px">
+	                <col width="*">
+	            </colgroup>
 	            <tr>
-					<th class="h"><span data-item="LAB_001">부서&nbsp;</span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_001">부서</span></th>
 					<td class="d">
 						<input class="easyui-combobox" name="deptCode" id="deptCode"
 							data-options="width:100,
@@ -191,12 +204,12 @@ $(function(){
 										"
 						/>
 					</td>
-					<th class="h "><span data-item="LAB_002">사원명</span></td>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_002">사원명</span></th>
 								<td class="d"><input class="easyui-textbox"  name="searchEmplName" id="searchEmplName" style="width:150px"/></td>
-	            	<th class="h "><span data-item="LAB_003">사번</span></td>
+	            	<th class="h table-Search-h search-label-h"><span data-item="LAB_003">사번</span></th>
 								<td class="d"><input class="easyui-textbox"  name="searchEmplNo" id="searchEmplNo" style="width:150px"/></td>
 
-					<th class="h"><span data-item="LAB_004">재직여부 </span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_004">재직여부 </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="s_exitYn" ID="s_exitYn" style="width:80px" data-options="panelHeight:'auto'"/>
 							<option value="ALL">전체</option>
@@ -207,7 +220,7 @@ $(function(){
 							</c:forEach>
 						</select>
 					</td>
-					<th class="h"><span data-item="LAB_0034">담당업무 </span></th>
+					<th class="h table-Search-h search-label-h"><span data-item="LAB_0034">담당업무 </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="s_busiCharge" ID="s_busiCharge" style="width:100px" data-options="panelHeight:'auto'"/>
 							<option value="ALL">전체</option>
@@ -219,7 +232,7 @@ $(function(){
 						</select>
 					</td>
 					<td class="b">
-						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001" data-options="disabled:${RET}" >검색</a>
+						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001" data-options="disabled:${RET}" >조회</a>
 						<input type="hidden" id="hdfIndex" value="-1" />
 						<input type="hidden" id="hdfChk" value="" />
 					</td>

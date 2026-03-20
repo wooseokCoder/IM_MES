@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: IF_SAP_ACTUAL_QUERY.xml
+설명: SAP 실적 조회 매퍼 (IF_SAP_ACTUAL 테이블)
+원본: ProActive IF_SAP_ACTUAL.cs
+화면: POP30B (단말기 - 가공)
+작성일: 2026-03-18
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.pop.IF_SAP_ACTUAL_QUERY">
+
+    <!--
+    ============================================================
+    IF_SAP_ACTUAL_QUERY1: WO_NO 기준 SAP 실적 조회
+    원본: IF_SAP_ACTUAL.IF_SAP_ACTUAL_QUERY1()
+    용도: POP30B 작업오더번호 기준 SAP 실적 조회
+    ============================================================
+    -->
+    <select id="IF_SAP_ACTUAL_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_if_sap_actual_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{woNo,      mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    IF_SAP_ACTUAL_QUERY2: 기간/공장 기준 SAP 실적 조회
+    원본: IF_SAP_ACTUAL.IF_SAP_ACTUAL_QUERY2()
+    용도: POP30B 기간/공장별 SAP 실적 조회 (작업오더 JOIN)
+    ============================================================
+    -->
+    <select id="IF_SAP_ACTUAL_QUERY2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_if_sap_actual_query2(
+            #{gsPltCode,   mode=IN, jdbcType=VARCHAR},
+            #{sWorkDate,   mode=IN, jdbcType=VARCHAR},
+            #{eWorkDate,   mode=IN, jdbcType=VARCHAR},
+            #{plants,      mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    IF_SAP_ACTUAL_QUERY3: SAP_WO_NO 기준 SAP 실적 조회
+    원본: IF_SAP_ACTUAL.IF_SAP_ACTUAL_QUERY3()
+    용도: POP30B SAP 작업오더번호 기준 실적 조회
+    ============================================================
+    -->
+    <select id="IF_SAP_ACTUAL_QUERY3" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_if_sap_actual_query3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{sapWoNo,   mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

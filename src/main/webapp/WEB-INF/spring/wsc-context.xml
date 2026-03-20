@@ -34,7 +34,8 @@
 	
     <context:component-scan base-package="com.wsc"/>
     <context:component-scan base-package="com.lsbas.service"/>
-
+	<context:component-scan base-package="com.immes"/>
+	
 	<util:properties id="app" location="classpath:app.properties"/>
 
     <bean id="wscCacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
@@ -79,10 +80,12 @@
     	</constructor-arg>
  	</bean>
  	
-    <!-- Simple Mapping Exception Resolver -->
+    <!-- Simple Mapping Exception Resolver (non-AJAX fallback) -->
+    <!-- GlobalExceptionHandler(@ControllerAdvice)가 AJAX 요청을 먼저 처리함 -->
     <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
 		<property name="warnLogCategory" value="apperror" />
         <property name="defaultErrorView" value="error/system" />
+        <property name="order" value="1" /><!-- @ControllerAdvice가 order 0으로 먼저 처리됨 -->
         <property name="exceptionMappings">
             <props>
                 <prop key="com.wsc.framework.exception.SessionException"  >error/session</prop>
@@ -94,7 +97,7 @@
         </property>
     </bean>
 
-    <bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
+    <bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
     <bean id="jxlsView" class="com.wsc.framework.view.JxlsView" />
     <bean id="fileView" class="com.wsc.framework.view.FileView" />
 

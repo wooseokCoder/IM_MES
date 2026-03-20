@@ -21,6 +21,7 @@ app.properties
 /lsbas/src/main/resources/certification/lsdpw_private.key
 
 # --- OS 및 도구 관련 ---
+
 .DS_Store
 Thumbs.db
 .vscode/
@@ -28,3 +29,15 @@ Thumbs.db
 
 # --- SVN 관련 (Git과 혼용 시 SVN 메타데이터 제외) ---
 .svn/
+
+# --- CLAUDE CODE 파일 ---
+CLAUDE.md
+tmpclaude*
+.claude
+
+# --- Test 파일 ---
+test*
+Test*
+TEST*
+
+nul

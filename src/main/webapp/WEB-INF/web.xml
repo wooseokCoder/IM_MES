@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
-  <display-name>LSTA Dealer Portal</display-name>
+  <display-name>LSTA Injection MES</display-name>
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>
@@ -30,18 +30,6 @@
     <url-pattern>*.json</url-pattern>
   </filter-mapping>
   <servlet>
-  	<filter>
-	  <filter-name>CrossDomainFilter</filter-name>
-	  <filter-class>your.java.package.CrossDomainFilter</filter-class>
-	  <init-param>
-	    <param-name>encoding</param-name>
-	    <param-value>UTF-8</param-value>
-	  </init-param>
-	</filter>
-	<filter-mapping>
-	  <filter-name>CrossDomainFilter</filter-name>
-	  <url-pattern>/*</url-pattern>
-	</filter-mapping>
     <servlet-name>wscServlet</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
     <init-param>
@@ -77,7 +65,7 @@
   <welcome-file-list>
     <welcome-file>index.do</welcome-file>
   </welcome-file-list>
-  
+
   <servlet>
     <servlet-name>postNWSpeedChk</servlet-name>
     <servlet-class>com.wsc.common.network.NwSpeedChk</servlet-class>
@@ -88,10 +76,10 @@
 		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
 		<load-on-startup>3</load-on-startup>
 	</servlet>
-	<!-- <filter-mapping> <filter-name>webServiceAuthenticationFilter</filter-name> 
+	<!-- <filter-mapping> <filter-name>webServiceAuthenticationFilter</filter-name>
 		<servlet-name>cxfServlet</servlet-name> </filter-mapping> -->
 	<servlet-mapping>
 		<servlet-name>cxf-servlet</servlet-name>
 		<url-pattern>/cxf/*</url-pattern>
-	</servlet-mapping> 
+	</servlet-mapping>
 </web-app>

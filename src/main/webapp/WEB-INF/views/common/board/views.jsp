@@ -66,7 +66,7 @@ $(function(){
 				<input type="hidden" name="bordGrup" id="r_bordGrup" value="${bordGrup}" />
 				<input class="easyui-combobox" name="searchKey"  id="s_searchKey"  value="S01" codeGrup="VIEWS_STYPE" data-options="mode:'remote',width:100,editable:false,loader:jcombo.loader"/>
 				<input class="easyui-textbox"  name="searchText" id="r_searchText" style="width:150px"/>
-				<a href="javascript:void(0)" class="easyui-linkbutton cgray l-btn l-btn-small" id="search-button" data-popup="POP_BTN_001">검색</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton cgray l-btn l-btn-small" id="search-button" data-popup="POP_BTN_001">조회</a>
 			</fieldset>
 		</form>
 	</div>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    LSE_STD_PROC QUERY 매퍼
+    표준공정 조회: QUERY8, QUERY10
+    작성자: 송우석
+    작성일: 2026-02-23
+-->
+<mapper namespace="com.wsc.imes.std.LSE_STD_PROC_QUERY">
+
+    <!-- 마스터 공정 목록 (ORD04A_PROC, Tab3 동적 컬럼용) -->
+    <select id="LSE_STD_PROC_QUERY8" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_std_proc_query8(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{isFirstProc, mode=IN, jdbcType=VARCHAR},
+            #{lprocCode, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=VARCHAR},
+            #{useFlag, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- 공정 콤보 데이터 조회 (MPROC_CODE 중복 제거) -->
+    <select id="LSE_STD_PROC_QUERY10" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_lse_std_proc_query10(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+</mapper>

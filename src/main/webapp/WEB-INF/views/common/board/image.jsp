@@ -84,16 +84,24 @@ $(document).ready(function() {
 				<input type="hidden" name="sysId"    id="s_sysId"    value="${model.sysId}"   />
 				<input type="hidden" name="bordGrup" id="s_bordGrup" value="${model.bordGrup}"/>
 				<input type="hidden" name="userType" id="s_userType" value="${userType}"/>
-				<table cellpadding="5" class="search-table tableSearch-c" >
+				<table cellpadding="0" class="search-table tableSearch-c wd-100" >
+					<colgroup>
+						<col width="120px" />
+						<col width="120px" />
+						<col width="*" />
+					</colgroup>
+					<tr>
 					<td class="d">
 						<input class="easyui-combobox" name="searchKey"  id="s_searchKey"  value="S01" codeGrup="BORD_STYPE" data-options="mode:'remote',width:100,editable:false,loader:jcombo.loader,panelHeight:'auto'"/>
 						<input class="easyui-textbox"  name="searchText" id="r_searchText" style="width:300px"/>
 					</td>
 					<td class="b">
-						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001" data-options="disabled:${RET}">검색</a>
+						<a href="javascript:void(0)" id="search-button" class="easyui-linkbutton cgray" data-item="BTN_001" data-options="disabled:${RET}">조회</a>
 						<a href="javascript:void(0)" class="easyui-linkbutton c4" iconCls="icon-excel"  id="excel-button"  data-item="BTN_002">엑셀</a>
 	<!-- 					<a href="javascript:void(0)" class="easyui-linkbutton c4" iconCls="icon-excel"  id="textsearch-button"  data-item="A003">찾기</a> -->
 					</td>
+					<td class="d"></td>
+					</tr>
 				</table>
 			</fieldset>
 				<input type="hidden" id="hdfIndex" value="-1" />

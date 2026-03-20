@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_INS_GRP_LIST.xml
+설명: 검사그룹-항목 연결 CRUD 매퍼 (TSTD_INS_GRP_LIST 테이블)
+작성자: 송우석
+작성일: 2026-02-27
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.qct.TSTD_INS_GRP_LIST">
+
+    <!--
+    ============================================================
+    TSTD_INS_GRP_LIST_INS: 검사그룹 연결 등록 (단건)
+    ============================================================
+    -->
+    <insert id="TSTD_INS_GRP_LIST_INS" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ins_grp_list_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR},
+            #{insCode, mode=IN, jdbcType=VARCHAR},
+            #{insSeq, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!--
+    ============================================================
+    TSTD_INS_GRP_LIST_DEL3: 특정 검사항목의 그룹 연결 전체 삭제
+    ============================================================
+    -->
+    <delete id="TSTD_INS_GRP_LIST_DEL3" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ins_grp_list_del3(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+</mapper>

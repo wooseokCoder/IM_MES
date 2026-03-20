@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+ * ==========================================================================
+ * 화면명: QCT02A - 부적합/결품 현황
+ * ==========================================================================
+ * 설명: 부적합/결품 조회 매퍼
+ * 테이블: TSHP_NG (주), TSHP_WORKORDER, TORD_PRODUCT, TSTD_MODEL,
+ *         LSE_STD_PART, IF_SAP_WORKORDER_PROD, IF_QMS_PROC_RSLT,
+ *         TSHP_IDLETIME, TSTD_IDLECODE, SYS_USER
+ * 작성일: 2026-03-09
+ * @author 송우석
+ * ==========================================================================
+-->
+<mapper namespace="com.wsc.imes.qct.TSHP_NG_QUERY">
+
+    <!-- 부적합/결품 목록 조회 -->
+    <select id="TSHP_NG_QUERY3" parameterType="map" statementType="CALLABLE" resultType="map">
+        {CALL sp_imes_tshp_ng_query3(
+            #{gsPltCode},
+            #{procCode},
+            #{ngState},
+            #{sNgDate},
+            #{eNgDate},
+            #{plants}
+        )}
+    </select>
+
+    <!-- 부적합 사진 base64 단건 조회 -->
+    <select id="TSHP_NG_IMG" parameterType="map" statementType="CALLABLE" resultType="map">
+        {CALL sp_imes_tshp_ng_img(
+            #{gsPltCode},
+            #{ngId},
+            #{imgNo}
+        )}
+    </select>
+
+</mapper>

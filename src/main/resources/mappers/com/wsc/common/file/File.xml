@@ -5,189 +5,115 @@
 
 <mapper namespace="com.wsc.common.file.File">
 
-    <!-- ========================================================== -->
-    <!--   Oracle Paging Clause                                     -->
-    <!-- ========================================================== -->
-    <sql id="pagingColumns">
-        <if test="start == null or end == null">
-            ,0 AS "rnum"
-        </if>
-    </sql>
-    <sql id="pagingOpen">
-        <if test="start != null and end != null">
-            SELECT * 
-              FROM (
-                    SELECT X.*
-                      FROM (
-                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
-                              FROM (
-        </if>
-    </sql>
-    <sql id="pagingClose">
-        <if test="start != null and end != null">
-                                   ) Z1, (SELECT @rownum:=0 ) Z2
-                           ) X
-                     WHERE RNUM <![CDATA[< ]]> #{end}
-                   ) X
-             WHERE RNUM <![CDATA[>= ]]> #{start}
-        </if>  
-    </sql>
-    <sql id="sortClause">
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
-		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
-		        ${sort}
-		  	</foreach>
-	  	</if>
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
-               ATCH_GRUP
-              ,ATCH_NO
-              ,FILE_NO
-	  	</if>
-    </sql>
-    
-    <sql id="selectColumns">
-         SYS_ID        AS "sysId"
-        ,ATCH_GRUP     AS "atchGrup"
-        ,ATCH_NO       AS "atchNo"
-        ,FILE_NO       AS "fileNo"
-        ,FILE_NAME     AS "fileName"
-        ,SAVE_NAME     AS "saveName"
-        ,FILE_PATH     AS "filePath"
-        ,FILE_TYPE     AS "fileType"
-        ,FILE_SIZE     AS "fileSize"
-        ,IFNULL(FILE_REMK, '')
-                       AS "comment"
-        ,REGI_ID       AS "regiId"
-        ,DATE_FORMAT(REGI_DATE,'%Y-%m-%d %H:%i:%s')   
-                       AS "regiDate"
-        ,CHNG_ID       AS "chngId"
-        ,DATE_FORMAT(CHNG_DATE,'%Y-%m-%d %H:%i:%s') 
-                       AS "chngDate"
-    </sql>
-    
-    <sql id="insertColumns-fields">
-           SYS_ID
-         , ATCH_GRUP
-         , ATCH_NO
-         , FILE_NO
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(fileName)">, FILE_NAME  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saveName)">, SAVE_NAME  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(filePath)">, FILE_PATH  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(fileType)">, FILE_TYPE  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(fileSize)">, FILE_SIZE  </if>
-         , FILE_REMK
-         , REGI_ID
-         , REGI_DATE
-         , CHNG_ID
-         , CHNG_DATE
-    </sql>
+    <!-- [search] 파일 목록 조회 (페이징 없음) -->
+    <select id="search" statementType="CALLABLE" parameterType="params" resultType="file">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_file_search(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{atchGrup, mode=IN, jdbcType=VARCHAR},
+            #{atchNo, mode=IN, jdbcType=VARCHAR},
+            #{fileNo, mode=IN, jdbcType=VARCHAR},
+            #{fileName, mode=IN, jdbcType=VARCHAR},
+            #{saveName, mode=IN, jdbcType=VARCHAR},
+            #{filePath, mode=IN, jdbcType=VARCHAR},
+            #{fileType, mode=IN, jdbcType=VARCHAR},
+            #{fileSize, mode=IN, jdbcType=VARCHAR},
+            #{sortStr, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
 
-    <sql id="insertColumns-values">
-           #{sysId}
-         , #{atchGrup}
-         , #{atchNo}
-         , #{fileNo}
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(fileName)">, #{fileName}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saveName)">, #{saveName}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(filePath)">, #{filePath}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(fileType)">, #{fileType}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(fileSize)">, #{fileSize}  </if>
-         , IFNULL(#{comment}, '')
-         , #{gsUserId}
-         , NOW()
-         , #{gsUserId}
-         , NOW()
-    </sql>
-    
-    <sql id="whereClause">
-        	SYS_ID    = #{sysId}
-        AND ATCH_GRUP = #{atchGrup}
-        AND ATCH_NO   = #{atchNo}
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(fileNo  )">AND FILE_NO   = #{fileNo}    </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(fileName)">AND FILE_NAME = #{fileName}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(saveName)">AND SAVE_NAME = #{saveName}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(filePath)">AND FILE_PATH = #{filePath}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(fileType)">AND FILE_TYPE = #{fileType}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(fileSize)">AND FILE_SIZE = #{fileSize}  </if>
-        AND FILE_NO   != 'F9999'
-    </sql>
-    
-    <select id="search" resultType="file" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectColumns" />
-               <include refid="pagingColumns" /><!-- PAGING -->
-          FROM SYS_FILE A
-         WHERE <include refid="whereClause" />
-         ORDER 
-            BY <include refid="sortClause" /><!-- SORT -->
-        <include refid="pagingClose" /><!-- PAGING -->
+    <!-- [searchCount] 파일 카운트 -->
+    <select id="searchCount" statementType="CALLABLE" parameterType="params" resultType="int">
+        {CALL sp_file_search_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{atchGrup, mode=IN, jdbcType=VARCHAR},
+            #{atchNo, mode=IN, jdbcType=VARCHAR},
+            #{fileNo, mode=IN, jdbcType=VARCHAR},
+            #{fileName, mode=IN, jdbcType=VARCHAR},
+            #{saveName, mode=IN, jdbcType=VARCHAR},
+            #{filePath, mode=IN, jdbcType=VARCHAR},
+            #{fileType, mode=IN, jdbcType=VARCHAR},
+            #{fileSize, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="searchCount" resultType="int" parameterType="params">
-        SELECT COUNT(1) 
-          FROM SYS_FILE A
-         WHERE <include refid="whereClause" />
+
+    <!-- [select] 파일 단건 조회 -->
+    <select id="select" statementType="CALLABLE" parameterType="params" resultType="file">
+        {CALL sp_file_select(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{atchGrup, mode=IN, jdbcType=VARCHAR},
+            #{atchNo, mode=IN, jdbcType=VARCHAR},
+            #{fileNo, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="select" resultType="file" parameterType="params">
-        SELECT <include refid="selectColumns" />
-          FROM SYS_FILE A
-         WHERE SYS_ID    = #{sysId}
-           AND ATCH_GRUP = #{atchGrup}
-           AND ATCH_NO   = #{atchNo}
-           AND FILE_NO   = #{fileNo}
-           AND FILE_NO   != 'F9999'
+
+    <!-- [insert] 파일 등록 - fileNo 반환 -->
+    <select id="insert" statementType="CALLABLE" parameterType="file" resultType="file">
+        {CALL sp_file_insert(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{atchGrup, mode=IN, jdbcType=VARCHAR},
+            #{atchNo, mode=IN, jdbcType=VARCHAR},
+            #{fileName, mode=IN, jdbcType=VARCHAR},
+            #{saveName, mode=IN, jdbcType=VARCHAR},
+            #{filePath, mode=IN, jdbcType=VARCHAR},
+            #{fileType, mode=IN, jdbcType=VARCHAR},
+            #{fileSize, mode=IN, jdbcType=VARCHAR},
+            #{comment, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <insert id="insert" parameterType="file">
-        <selectKey resultType="string" keyProperty="fileNo" order="BEFORE">
-            SELECT CONCAT('F', LPAD(CAST(ifnull(SUBSTR(MAX(FILE_NO),2,4),'0')  AS UNSIGNED)+1, 4, '0') )
-                AS "fileNo"
-              FROM SYS_FILE
-             WHERE SYS_ID    = #{sysId}
-               AND ATCH_GRUP = #{atchGrup}
-               AND ATCH_NO   = #{atchNo}
-        </selectKey>
-        INSERT 
-          INTO SYS_FILE 
-             ( <include refid="insertColumns-fields" /> )
-        VALUES
-             ( <include refid="insertColumns-values" /> )
-    </insert>
-    <delete id="delete" parameterType="file">
-        DELETE 
-          FROM SYS_FILE
-         WHERE SYS_ID    = #{sysId}
-           AND ATCH_GRUP = #{atchGrup}
-           AND ATCH_NO   = #{atchNo}
-           AND FILE_NO   = #{fileNo}
+
+    <!-- [delete] 파일 삭제 -->
+    <delete id="delete" statementType="CALLABLE" parameterType="file">
+        {CALL sp_file_delete(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{atchGrup, mode=IN, jdbcType=VARCHAR},
+            #{atchNo, mode=IN, jdbcType=VARCHAR},
+            #{fileNo, mode=IN, jdbcType=VARCHAR}
+        )}
     </delete>
-    <delete id="deleteAll" parameterType="file">
-        DELETE 
-          FROM SYS_FILE
-         WHERE SYS_ID    = #{sysId}
-           AND ATCH_GRUP = #{atchGrup}
-           AND ATCH_NO   = #{atchNo}
+
+    <!-- [deleteAll] 파일 전체 삭제 -->
+    <delete id="deleteAll" statementType="CALLABLE" parameterType="file">
+        {CALL sp_file_delete_all(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{atchGrup, mode=IN, jdbcType=VARCHAR},
+            #{atchNo, mode=IN, jdbcType=VARCHAR}
+        )}
     </delete>
-    <update id="updateThumbNail" parameterType="params">
-        UPDATE SYS_FILE
-           SET THUMB_NAIL = "Y"
-         WHERE SYS_ID    = #{sysId}
-           AND ATCH_GRUP = #{atchGrup}
-           AND ATCH_NO   = #{atchNo}
-           AND FILE_NAME   = #{h_thumbnail}
+
+    <!-- [updateThumbNail] 썸네일 설정 -->
+    <update id="updateThumbNail" statementType="CALLABLE" parameterType="params">
+        {CALL sp_file_update_thumbnail(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{atchGrup, mode=IN, jdbcType=VARCHAR},
+            #{atchNo, mode=IN, jdbcType=VARCHAR},
+            #{h_thumbnail, mode=IN, jdbcType=VARCHAR}
+        )}
     </update>
-    <update id="updateThumbNailNull" parameterType="params">
-        UPDATE SYS_FILE
-           SET THUMB_NAIL = NULL
-         WHERE SYS_ID    = #{sysId}
-           AND ATCH_GRUP = #{atchGrup}
-           AND ATCH_NO   = #{atchNo}
+
+    <!-- [updateThumbNailNull] 썸네일 초기화 -->
+    <update id="updateThumbNailNull" statementType="CALLABLE" parameterType="params">
+        {CALL sp_file_update_thumbnail_null(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{atchGrup, mode=IN, jdbcType=VARCHAR},
+            #{atchNo, mode=IN, jdbcType=VARCHAR}
+        )}
     </update>
+
+    <!-- [getNdaFileInfo] NDA 파일 정보 조회 (기존 프로시저 유지) -->
     <select id="getNdaFileInfo" resultType="file" parameterType="params">
-        CALL sp_search_nda_file_info(#{sysId},#{gsUserId},#{atchGrup},#{atchNo})
+        CALL sp_search_nda_file_info(#{sysId}, #{gsUserId}, #{atchGrup}, #{atchNo})
     </select>
+
+    <!-- [updateFileComment] 파일 코멘트 수정 (기존 프로시저 유지) -->
     <update id="updateFileComment" parameterType="params">
-        CALL sp_update_file_comment(#{sysId},#{gsUserId},#{atchGrup},#{atchNo},#{updateNo},#{comment},#{fileOper})
+        CALL sp_update_file_comment(#{sysId}, #{gsUserId}, #{atchGrup}, #{atchNo}, #{updateNo}, #{comment}, #{fileOper})
     </update>
+
+    <!-- [insertFileChngHist] 파일 변경 이력 등록 (기존 프로시저 유지) -->
     <insert id="insertFileChngHist" parameterType="params">
-        CALL sp_insert_file_chng_hist(#{sysId},#{gsUserId},#{tempId},#{applId},#{atchGrup},#{atchNo},#{updateNo},#{fileName},#{comment},#{fileOper})
+        CALL sp_insert_file_chng_hist(#{sysId}, #{gsUserId}, #{tempId}, #{applId}, #{atchGrup}, #{atchNo}, #{updateNo}, #{fileName}, #{comment}, #{fileOper})
     </insert>
+
 </mapper>

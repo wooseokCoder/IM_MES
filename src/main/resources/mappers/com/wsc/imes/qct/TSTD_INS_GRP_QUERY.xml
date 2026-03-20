@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_INS_GRP_QUERY.xml
+설명: 검사그룹 조회 매퍼 (QCT05A 디테일 + D0A 팝업)
+작성자: 송우석
+작성일: 2026-03-04
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.qct.TSTD_INS_GRP_QUERY">
+
+    <!--
+    ============================================================
+    TSTD_INS_GRP_LIST_SER: 선택 그룹의 매핑 검사항목 조회 (디테일)
+    ============================================================
+    -->
+    <select id="TSTD_INS_GRP_LIST_SER" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_ins_grp_list_ser(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_PROC_INS_SER2: D0A 미매핑 검사항목 조회
+    ============================================================
+    -->
+    <select id="TSTD_PROC_INS_SER2" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_proc_ins_ser2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR},
+            #{lprocCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_PROC_INS_D0A_SEARCH: D0A 전체항목 검색
+    ============================================================
+    -->
+    <select id="TSTD_PROC_INS_D0A_SEARCH" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_proc_ins_d0a_search(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{plants, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR},
+            #{procCode, mode=IN, jdbcType=VARCHAR},
+            #{searchLike, mode=IN, jdbcType=VARCHAR},
+            #{lprocCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!--
+    ============================================================
+    TSTD_INS_GRP_LIST_DEL2: 그룹 매핑 전체 삭제
+    ============================================================
+    -->
+    <delete id="TSTD_INS_GRP_LIST_DEL2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ins_grp_list_del2(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+    <!--
+    ============================================================
+    TSTD_INS_GRP_LIST_DEL: 매핑 개별 삭제
+    ============================================================
+    -->
+    <delete id="TSTD_INS_GRP_LIST_DEL" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ins_grp_list_del(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR},
+            #{insCode, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+    <!--
+    ============================================================
+    TSTD_INS_GRP_LIST_INS2: D0A 검사항목 매핑 등록
+    ============================================================
+    -->
+    <insert id="TSTD_INS_GRP_LIST_INS2" statementType="CALLABLE" parameterType="params">
+        {CALL sp_imes_tstd_ins_grp_list_ins(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{insGrpCode, mode=IN, jdbcType=VARCHAR},
+            #{insCode, mode=IN, jdbcType=VARCHAR},
+            #{insSeq, mode=IN, jdbcType=INTEGER},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+</mapper>

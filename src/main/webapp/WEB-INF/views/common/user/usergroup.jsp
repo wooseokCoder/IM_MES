@@ -28,7 +28,7 @@
 
 <!-- BUSINESS JAVASCRIPT -->
 <script type="text/javascript" src="<c:url value="/resources/js/include/system.js" />"></script>
-<script type="text/javascript" src="<c:url value="/resources/js/common/user/usergroup.js?v=0626A" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/common/user/usergroup.js?v=260227A" />"></script>
 </head>
 
 <!-- BODY 상단 INCLUDE -->
@@ -47,13 +47,13 @@
 <div id="search-toolbar" class="wui-toolbar">
 	<form id="search-form">
 		<fieldset class="div-line-new" >
-	        <table cellpadding="7" class="search-table tableSearch-c" >
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
 	        	<colgroup>
-	        		<col width="7%" style="min-width: 120px;" />
-	        		<col width="13%" style="min-width: 165px;" />
-	        		<col width="7%" style="min-width: 120px;" />
-	        		<col width="13%" style="min-width: 165px;" />
-	        		<col width="*" style="min-width: 120px;" />
+	        		<col width="65px" />
+	        		<col width="150px" />
+	        		<col width="55px" />
+	        		<col width="150px" />
+	        		<col width="*" />
 	        	</colgroup>
 	        	<tr class="topnav_sty">
 	        		<td colspan="5" >
@@ -67,7 +67,7 @@
 	        		</td>
 	        	</tr>
 	            <tr>
-					<th class="h table-Search-h search-label-h2" data-item="LAB_001"><span>User Name </span></th>
+					<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>User Name </span></th>
 					<td class="d">
 						<select class="easyui-combobox textbox-list" name="userId" ID="userId" data-options="width:150,height:30">
 							<option value="">ALL</option>
@@ -76,7 +76,7 @@
 							</c:forEach>
 						</select>
 					</td>
-                    <th class="h table-Search-h search-label-h2" data-item="LAB_002"><span>Group Name </span></th>
+                    <th class="h table-Search-h search-label-h" data-item="LAB_002"><span>Group Name </span></th>
                     <td class="d">
                         <select class="easyui-combobox textbox-list" name="groupId" ID="groupId" data-options="width:150">
                             <option value="">ALL</option>
@@ -130,7 +130,7 @@
 
 
 <!-- 엑셀  진행상태 -->
-<div id="progress-popup" class="easyui-dialog" >
+<div id="progress-popup" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>

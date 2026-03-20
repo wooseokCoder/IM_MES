@@ -54,13 +54,24 @@
 <div id="search-toolbar" class="wui-toolbar">
 	<form id="search-form">
 		<fieldset class="div-line-new" >
-	        <table cellpadding="5" class="search-table tableSearch-c" style="margin-left:20px;" >
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+	            <colgroup>
+	                <col width="45px">
+	                <col width="120px">
+	                <col width="65px">
+	                <col width="150px">
+	                <col width="65px">
+	                <col width="150px">
+	                <col width="55px">
+	                <col width="120px">
+	                <col width="*">
+	            </colgroup>
 	            <tr>
-	            	<th class="h table-Search-h" data-item="LAB_001"><span>모델 </span></th>
+	            	<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>모델 </span></th>
 					<td class="d">
 						<input class="easyui-textbox"  name="modelName" id="modelName" style="width:120px"/>
 					</td>
-	            	<th class="h table-Search-h" data-item="LAB_002"><span>관리부분</span></th>
+	            	<th class="h table-Search-h search-label-h" data-item="LAB_002"><span>관리부분</span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="admIdx" ID="admIdx" data-options="width:100">
 							<option value="">전체</option>
@@ -71,7 +82,7 @@
 							</c:forEach>
 						</select>
 					</td>
-	            	<th class="h table-Search-h" data-item="LAB_003"><span>저장위치 </span></th>
+	            	<th class="h table-Search-h search-label-h" data-item="LAB_003"><span>저장위치 </span></th>
 					<td class="d">
 						<select class="easyui-combobox" name="modelLoc" ID="modelLoc" data-options="width:100">
 							<option value="">전체</option>
@@ -82,11 +93,11 @@
 							</c:forEach>
 						</select>
 					</td>
-	            	<th class="h table-Search-h" data-item="LAB_004"><span>담당자 </span></th>
+	            	<th class="h table-Search-h search-label-h" data-item="LAB_004"><span>담당자 </span></th>
 					<td class="d">
 						<input class="easyui-textbox"  name="stafName" id="stafName" style="width:100px"/>
 					</td>
-					<td class="b"><a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001" data-options="disabled:${RET}">검색</a></td>
+					<td class="b"><a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001" data-options="disabled:${RET}">조회</a></td>
 	            </tr>
 	        </table>
 	   </fieldset>

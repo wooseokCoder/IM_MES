@@ -429,6 +429,74 @@ public abstract class BaseService {
 		return delete(getNameSpace()+".delete" + postKey, params);
 	}
 
+	// ========================================================================
+	// 다른 Namespace 매퍼 접근 메서드 (ProActive 전환용)
+	// ========================================================================
+
+	/**
+	 * 다른 namespace의 매퍼에서 목록을 조회한다.
+	 * ProActive 전환 시 테이블 기반 매퍼(TSTD_IDLECODE 등)에 접근할 때 사용.
+	 *
+	 * @param namespace 매퍼 namespace (예: "com.wsc.imes.std.TSTD_IDLECODE")
+	 * @param id 매퍼 ID (예: "TSTD_IDLECODE_QUERY1")
+	 * @param params 파라미터
+	 * @return 조회 결과 목록
+	 */
+	protected List searchByMapper(String namespace, String id, Object params) {
+		return search(namespace + "." + id, params);
+	}
+
+	/**
+	 * 다른 namespace의 매퍼에서 단건을 조회한다.
+	 *
+	 * @param namespace 매퍼 namespace
+	 * @param id 매퍼 ID
+	 * @param params 파라미터
+	 * @return 조회 결과
+	 */
+	protected Object selectByMapper(String namespace, String id, Object params) {
+		return select(namespace + "." + id, params);
+	}
+
+	/**
+	 * 다른 namespace의 매퍼에서 등록한다.
+	 *
+	 * @param namespace 매퍼 namespace
+	 * @param id 매퍼 ID
+	 * @param params 파라미터
+	 * @return 등록 건수
+	 */
+	@Transactional
+	protected int insertByMapper(String namespace, String id, Object params) {
+		return insert(namespace + "." + id, params);
+	}
+
+	/**
+	 * 다른 namespace의 매퍼에서 수정한다.
+	 *
+	 * @param namespace 매퍼 namespace
+	 * @param id 매퍼 ID
+	 * @param params 파라미터
+	 * @return 수정 건수
+	 */
+	@Transactional
+	protected int updateByMapper(String namespace, String id, Object params) {
+		return update(namespace + "." + id, params);
+	}
+
+	/**
+	 * 다른 namespace의 매퍼에서 삭제한다.
+	 *
+	 * @param namespace 매퍼 namespace
+	 * @param id 매퍼 ID
+	 * @param params 파라미터
+	 * @return 삭제 건수
+	 */
+	@Transactional
+	protected int deleteByMapper(String namespace, String id, Object params) {
+		return delete(namespace + "." + id, params);
+	}
+
 	@Transactional
 	protected ResultMap saveByName(String postKey, Object params) {
 		if (postKey == null)

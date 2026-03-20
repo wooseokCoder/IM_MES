@@ -45,7 +45,7 @@ var consts = {
 
 		if (rows == null ||
 			rows.length == 0) {
-			$.messager.alert(msg.MSG0121,msg.MSG0023,msg.MSG0121);
+			$.messager.alert(msg.MSG0051,msg.MSG0022,msg.MSG0051);
 			return;
 		}
 		var data = {models: $.toJSON(rows)};
@@ -69,7 +69,7 @@ var consts = {
 	    	//보내기전 validation check가 필요할경우
 	    	beforeSubmit: function () {
 	    		if ($("#s_excelFile").val() == '') {
-	    			$.messager.alert(msg.MSG0121,msg.MSG0019,msg.MSG0121);
+	    			$.messager.alert(msg.MSG0051,msg.MSG0018,msg.MSG0051);
 	    			return false;
 	    		}
 	    		return true;

@@ -10425,7 +10425,13 @@ var XLSX = {};
         var o = [];
         o[o.length] = writextag("cellXfs", null);
         cellXfs.forEach(function (c) {
-            o[o.length] = writextag("xf", null, c)
+            if (c._alignment) {
+                var a = c._alignment, cc = {};
+                keys(c).forEach(function(k){ if(k !== '_alignment') cc[k] = c[k]; });
+                o[o.length] = writextag("xf", '<alignment' + wxt_helper(a) + '/>', cc);
+            } else {
+                o[o.length] = writextag("xf", null, c);
+            }
         });
         o[o.length] = "</cellXfs>";
         if (o.length === 2)return "";
@@ -10450,9 +10456,9 @@ var XLSX = {};
     function write_sty_xml(wb, opts) {
         var o = [XML_HEADER, STYLES_XML_ROOT], w;
         if ((w = write_numFmts(wb.SSF)) != null) o[o.length] = w;
-        o[o.length] = '<fonts count="1"><font><sz val="12"/><color theme="1"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font></fonts>';
-        o[o.length] = '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>';
-        o[o.length] = '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>';
+        o[o.length] = '<fonts count="2"><font><sz val="11"/><color theme="1"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font><font><b/><sz val="11"/><color theme="0"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font></fonts>';
+        o[o.length] = '<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF4472C4"/><bgColor indexed="64"/></patternFill></fill></fills>';
+        o[o.length] = '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color indexed="64"/></left><right style="thin"><color indexed="64"/></right><top style="thin"><color indexed="64"/></top><bottom style="thin"><color indexed="64"/></bottom><diagonal/></border></borders>';
         o[o.length] = '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>';
         if (w = write_cellXfs(opts.cellXfs)) o[o.length] = w;
         o[o.length] = '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>';
@@ -13080,7 +13086,7 @@ var XLSX = {};
                 break
         }
         var v = writetag("v", escapexml(vv)), o = {r: ref};
-        var os = get_cell_style(opts.cellXfs, cell, opts);
+        var os = (typeof cell.s === 'number') ? cell.s : get_cell_style(opts.cellXfs, cell, opts);
         if (os !== 0) o.s = os;
         switch (cell.t) {
             case"n":
@@ -17538,6 +17544,7 @@ var XLSX = {};
         var f = "", rId = 0;
         opts.cellXfs = [];
         get_cell_style(opts.cellXfs, {}, {revssf: {General: 0}});
+        opts.cellXfs.push({numFmtId:0, fontId:1, fillId:2, borderId:1, xfId:0, applyFont:1, applyFill:1, applyBorder:1, applyAlignment:1, _alignment:{horizontal:"center", vertical:"center", wrapText:1}});
         f = "docProps/core.xml";
         zip.file(f, write_core_props(wb.Props, opts));
         ct.coreprops.push(f);

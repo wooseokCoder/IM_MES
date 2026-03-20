@@ -6,362 +6,227 @@
 <mapper namespace="com.wsc.common.board.Address">
 
     <!-- ========================================================== -->
-    <!--   Oracle Paging Clause                                     -->
+    <!--   주소록 관리 (SYS_BORD_ADDR) - 프로시저 호출               -->
     <!-- ========================================================== -->
-    <sql id="pagingColumns">
-        <if test="start == null or end == null">
-            ,0 AS "rnum"
-        </if>
-    </sql>
-    <sql id="pagingOpen">
-        <if test="start != null and end != null">
-            SELECT * 
-              FROM (
-                    SELECT X.*
-                      FROM (
-                            SELECT Z1.*, @rownum := @rownum+1 as RNUM
-                              FROM (
-        </if>
-    </sql>
-    <sql id="pagingClose">
-        <if test="start != null and end != null">
-                                   ) Z1, (SELECT @rownum:=0 ) Z2
-                           ) X
-                     WHERE RNUM <![CDATA[< ]]> #{end}
-                   ) X
-             WHERE RNUM <![CDATA[>= ]]> #{start}
-        </if>  
-    </sql>
-    <sql id="sortClause">
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(gsSorts)">
-		  	<foreach item="sort" collection="gsSorts" open="" separator="," close="">
-		        ${sort}
-		  	</foreach>
-	  	</if>
-	  	<if test="@com.wsc.framework.utils.MybatisUtils@empty(gsSorts)">
-         	   A.REGI_DATE DESC
-         	  ,A.CHNG_DATE DESC
-	  	</if>
-    </sql>
-    
-    <sql id="selectColumns">
-         SYS_ID        AS "sysId"
-        ,BORD_GRUP     AS "bordGrup"
-        ,USER_ID       AS "userId"
-        ,REGI_ID       AS "regiId"
-        ,DATE_FORMAT(REGI_DATE,'%Y-%m-%d %H:%i:%s')     
-                       AS "regiDate"
-        ,CHNG_ID       AS "chngId"
-        ,DATE_FORMAT(CHNG_DATE,'%Y-%m-%d %H:%i:%s')     
-                       AS "chngDate"
-        ,TGT_USER_ID   AS "tgtUserId"
-        ,TGT_USER_NAME AS "tgtUserName"
-        ,TGT_USER_RMK  AS "tgtUserRmk"
-        ,TGT_VNDR_CODE AS "tgtVndrCode"
-        ,TGT_VNDR_NAME AS "tgtVndrName"
-    </sql>
-    <sql id="insertColumns-fields">
-           SYS_ID
-         , BORD_GRUP
-         , USER_ID
-         , REGI_ID
-         , REGI_DATE
-         , CHNG_ID
-         , CHNG_DATE
-         , TGT_USER_ID
-         , TGT_USER_NAME
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtUserRmk )">, TGT_USER_RMK  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrCode)">, TGT_VNDR_CODE </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrName)">, TGT_VNDR_NAME </if>
-    </sql>
-    <sql id="insertColumns-values">
-           #{sysId}
-         , #{bordGrup}
-         , #{userId}
-         , #{gsUserId}
-         , NOW()
-         , #{gsUserId}
-         , NOW()
-         , #{tgtUserId}
-         , #{tgtUserName}
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtUserRmk )">, #{tgtUserRmk}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrCode)">, #{tgtVndrCode} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrName)">, #{tgtVndrName} </if>
-    </sql>
-    <sql id="updateColumns">
-           CHNG_ID   = #{gsUserId}
-         , CHNG_DATE = NOW()
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtUserName)">, TGT_USER_NAME = #{tgtUserName} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtUserRmk )">, TGT_USER_RMK  = #{tgtUserRmk}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrCode)">, TGT_VNDR_CODE = #{tgtVndrCode} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrName)">, TGT_VNDR_NAME = #{tgtVndrName} </if>
-    </sql>
-    <sql id="whereClause">
-            SYS_ID    = #{sysId}
-        AND BORD_GRUP = #{bordGrup}
-        AND USER_ID   = #{userId} 
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtUserId  )">AND TGT_USER_ID   = #{tgtUserId}   </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtUserName)">AND TGT_USER_NAME = #{tgtUserName} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtUserRmk )">AND TGT_USER_RMK  = #{tgtUserRmk}  </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrCode)">AND TGT_VNDR_CODE = #{tgtVndrCode} </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrName)">AND TGT_VNDR_NAME = #{tgtVndrName} </if>
-    </sql>
 
-    <select id="search" resultType="record" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectColumns" />
-               <include refid="pagingColumns" /><!-- PAGING -->
-          FROM SYS_BORD_ADDR A
-         WHERE <include refid="whereClause" />
-         ORDER 
-            BY <include refid="sortClause" /><!-- SORT -->
-        <include refid="pagingClose" /><!-- PAGING -->
+    <!-- [search] 주소록 목록 조회 (페이징, 동적 정렬) -->
+    <select id="search" statementType="CALLABLE" resultType="record" parameterType="params">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_address_search(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{bordGrup, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserName, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserRmk, mode=IN, jdbcType=VARCHAR},
+            #{tgtVndrCode, mode=IN, jdbcType=VARCHAR},
+            #{tgtVndrName, mode=IN, jdbcType=VARCHAR},
+            #{sortStr, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=VARCHAR},
+            #{end, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="searchCount" resultType="int" parameterType="params">
-        SELECT COUNT(1) 
-          FROM SYS_BORD_ADDR A
-         WHERE <include refid="whereClause" />
-    </select>
-    <select id="select" resultType="record" parameterType="params">
-        SELECT <include refid="selectColumns" />
-          FROM SYS_BORD_ADDR A
-         WHERE SYS_ID      = #{sysId}
-           AND BORD_GRUP   = #{bordGrup}
-           AND USER_ID     = #{userId}
-           AND TGT_USER_ID = #{tgtUserId}
-    </select>
-    <insert id="insert" parameterType="params">
-        INSERT 
-          INTO SYS_BORD_ADDR 
-             ( <include refid="insertColumns-fields" /> )
-        VALUES
-             ( <include refid="insertColumns-values" /> )
-    </insert>
-    <update id="update" parameterType="params">
-        UPDATE SYS_BORD_ADDR
-           SET <include refid="updateColumns" />
-         WHERE SYS_ID      = #{sysId}
-           AND BORD_GRUP   = #{bordGrup}
-           AND USER_ID     = #{userId}
-           AND TGT_USER_ID = #{tgtUserId}
-    </update>
-    <delete id="delete" parameterType="params">
-        DELETE 
-          FROM SYS_BORD_ADDR
-         WHERE SYS_ID      = #{sysId}
-           AND BORD_GRUP   = #{bordGrup}
-           AND USER_ID     = #{userId}
-           AND TGT_USER_ID = #{tgtUserId}
-    </delete>
-    
-    <!-- ========================================================== -->
-    <!--   Board Address Group Management                           -->
-    <!-- ========================================================== -->
-    <sql id="selectColumns-group">
-         SYS_ID        AS "sysId"
-        ,BORD_GRUP     AS "bordGrup"
-        ,USER_ID       AS "userId"
-        ,REGI_ID       AS "regiId"
-        ,DATE_FORMAT(REGI_DATE,'%Y-%m-%d %H:%i:%s')     
-                       AS "regiDate"
-        ,CHNG_ID       AS "chngId"
-        ,DATE_FORMAT(CHNG_DATE,'%Y-%m-%d %H:%i:%s')     
-                       AS "chngDate"
-        ,TGT_GRUP_ID   AS "tgtGrupId"
-        ,TGT_GRUP_NAME AS "tgtGrupName"
-        ,TGT_GRUP_RMK  AS "tgtGrupRmk"
-    </sql>
-    <sql id="whereClause-group">
-            SYS_ID        = #{sysId}
-        AND BORD_GRUP     = #{bordGrup}
-        AND USER_ID       = #{userId}
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtGrupId  )">
-        AND TGT_GRUP_ID   = #{tgtGrupId}   
-        </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtGrupName)">
-        AND TGT_GRUP_NAME = #{tgtGrupName} 
-        </if>
-    </sql>
 
-    <select id="searchGroup" resultType="record" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectColumns-group" />
-               <include refid="pagingColumns" /><!-- PAGING -->
-          FROM SYS_BORD_GRUP A
-         WHERE <include refid="whereClause-group" />
-         ORDER 
-            BY <include refid="sortClause" /><!-- SORT -->
-        <include refid="pagingClose" /><!-- PAGING -->
+    <!-- [searchCount] 주소록 카운트 -->
+    <select id="searchCount" statementType="CALLABLE" resultType="int" parameterType="params">
+        {CALL sp_address_search_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{bordGrup, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserName, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserRmk, mode=IN, jdbcType=VARCHAR},
+            #{tgtVndrCode, mode=IN, jdbcType=VARCHAR},
+            #{tgtVndrName, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="searchGroupCount" resultType="int" parameterType="params">
-        SELECT COUNT(1) 
-          FROM SYS_BORD_GRUP A
-         WHERE <include refid="whereClause-group" />
+
+    <!-- [select] 주소록 단건 조회 -->
+    <select id="select" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_address_select(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{bordGrup, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="selectGroup" resultType="record" parameterType="params">
-        SELECT <include refid="selectColumns-group" />
-          FROM SYS_BORD_GRUP A
-         WHERE SYS_ID      = #{sysId}
-           AND TGT_GRUP_ID = #{tgtGrupId}
-    </select>
-    <insert id="insertGroup" parameterType="params">
-        <selectKey resultType="string" keyProperty="tgtGrupId" order="BEFORE">
-            SELECT CONCAT('G', LPAD(CAST(ifnull(SUBSTR(MAX(TGT_GRUP_ID),2,9),'0') AS UNSIGNED)+1, 9, '0') )
-                AS "tgtGrupId"
-              FROM SYS_BORD_GRUP
-        </selectKey>
-        INSERT 
-          INTO SYS_BORD_GRUP 
-             ( SYS_ID
-	         , BORD_GRUP
-	         , USER_ID
-	         , REGI_ID
-	         , REGI_DATE
-	         , CHNG_ID
-	         , CHNG_DATE
-	         , TGT_GRUP_ID
-	         , TGT_GRUP_NAME
-	    <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtGrupRmk )">
-	         , TGT_GRUP_RMK  
-	    </if>
-             )
-        VALUES
-             ( #{sysId}
-	         , #{bordGrup}
-	         , #{userId}
-	         , #{gsUserId}
-	         , NOW()
-	         , #{gsUserId}
-	         , NOW()
-	         , #{tgtGrupId}
-	         , #{tgtGrupName}
-		<if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtGrupRmk )">
-	         , #{tgtGrupRmk}  
-	    </if>
-             )
+
+    <!-- [insert] 주소록 등록 -->
+    <insert id="insert" statementType="CALLABLE" parameterType="params">
+        {CALL sp_address_insert(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{bordGrup, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserName, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserRmk, mode=IN, jdbcType=VARCHAR},
+            #{tgtVndrCode, mode=IN, jdbcType=VARCHAR},
+            #{tgtVndrName, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </insert>
-    <update id="updateGroup" parameterType="params">
-        UPDATE SYS_BORD_GRUP
-           SET CHNG_ID       = #{gsUserId}
-	         , CHNG_DATE     = NOW()
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtGrupName)">
-	         , TGT_GRUP_NAME = #{tgtGrupName} 
-        </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtGrupRmk )">
-	         , TGT_GRUP_RMK  = #{tgtGrupRmk}  
-        </if>
-         WHERE SYS_ID      = #{sysId}
-           AND TGT_GRUP_ID = #{tgtGrupId}
+
+    <!-- [update] 주소록 수정 -->
+    <update id="update" statementType="CALLABLE" parameterType="params">
+        {CALL sp_address_update(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{bordGrup, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserName, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserRmk, mode=IN, jdbcType=VARCHAR},
+            #{tgtVndrCode, mode=IN, jdbcType=VARCHAR},
+            #{tgtVndrName, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </update>
-    <delete id="deleteGroup" parameterType="params">
-        DELETE 
-          FROM SYS_BORD_GRUP
-         WHERE SYS_ID      = #{sysId}
-           AND TGT_GRUP_ID = #{tgtGrupId}
+
+    <!-- [delete] 주소록 삭제 -->
+    <delete id="delete" statementType="CALLABLE" parameterType="params">
+        {CALL sp_address_delete(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{bordGrup, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </delete>
 
-
     <!-- ========================================================== -->
-    <!--   Board Address Group Item Management                      -->
+    <!--   그룹 관리 (SYS_BORD_GRUP) - 프로시저 호출                 -->
     <!-- ========================================================== -->
-    <sql id="selectColumns-item">
-         SYS_ID        AS "sysId"
-        ,REGI_ID       AS "regiId"
-        ,DATE_FORMAT(REGI_DATE,'%Y-%m-%d %H:%i:%s')     
-                       AS "regiDate"
-        ,CHNG_ID       AS "chngId"
-        ,DATE_FORMAT(CHNG_DATE,'%Y-%m-%d %H:%i:%s')     
-                       AS "chngDate"
-        ,TGT_GRUP_ID   AS "tgtGrupId"
-        ,TGT_USER_ID   AS "tgtUserId"
-        ,TGT_USER_NAME AS "tgtUserName"
-        ,TGT_VNDR_CODE AS "tgtVndrCode"
-        ,TGT_VNDR_NAME AS "tgtVndrName"
-    </sql>
 
-    <select id="searchGroupItem" resultType="record" parameterType="params">
-        <include refid="pagingOpen"  /><!-- PAGING -->
-        SELECT <include refid="selectColumns-item" />
-               <include refid="pagingColumns" /><!-- PAGING -->
-          FROM SYS_BORD_ITEM A
-         WHERE SYS_ID      = #{sysId}
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtGrupId)">
-           AND TGT_GRUP_ID = #{tgtGrupId} 
-        </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtUserId)">
-           AND TGT_USER_ID = #{tgtUserId} 
-        </if>
-         ORDER 
-            BY <include refid="sortClause" /><!-- SORT -->
-        <include refid="pagingClose" /><!-- PAGING -->
+    <!-- [searchGroup] 그룹 목록 조회 (페이징, 동적 정렬) -->
+    <select id="searchGroup" statementType="CALLABLE" resultType="record" parameterType="params">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_address_search_group(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{bordGrup, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupName, mode=IN, jdbcType=VARCHAR},
+            #{sortStr, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=VARCHAR},
+            #{end, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="searchGroupItemCount" resultType="int" parameterType="params">
-        SELECT COUNT(1) 
-          FROM SYS_BORD_ITEM A
-         WHERE SYS_ID      = #{sysId}
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtGrupId)">
-           AND TGT_GRUP_ID = #{tgtGrupId} 
-        </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtUserId)">
-           AND TGT_USER_ID = #{tgtUserId} 
-        </if>
+
+    <!-- [searchGroupCount] 그룹 카운트 -->
+    <select id="searchGroupCount" statementType="CALLABLE" resultType="int" parameterType="params">
+        {CALL sp_address_search_group_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{bordGrup, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupName, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <select id="selectGroupItem" resultType="record" parameterType="params">
-        SELECT <include refid="selectColumns-item" />
-          FROM SYS_BORD_ITEM A
-         WHERE SYS_ID      = #{sysId}
-           AND TGT_GRUP_ID = #{tgtGrupId}
-           AND TGT_USER_ID = #{tgtUserId}
+
+    <!-- [selectGroup] 그룹 단건 조회 -->
+    <select id="selectGroup" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_address_select_group(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupId, mode=IN, jdbcType=VARCHAR}
+        )}
     </select>
-    <insert id="insertGroupItem" parameterType="params">
-        INSERT 
-          INTO SYS_BORD_ITEM 
-             ( SYS_ID
-	         , TGT_GRUP_ID
-	         , TGT_USER_ID
-	         , TGT_USER_NAME
-	        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrCode)">, TGT_VNDR_CODE </if>
-	        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrName)">, TGT_VNDR_NAME </if>
-	         , REGI_ID
-	         , REGI_DATE
-	         , CHNG_ID
-	         , CHNG_DATE
-             )
-        VALUES
-             ( #{sysId}
-	         , #{tgtGrupId}
-	         , #{tgtUserId}
-	         , #{tgtUserName}
-	        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrCode)">, #{tgtVndrCode} </if>
-	        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrName)">, #{tgtVndrName} </if>
-	         , #{gsUserId}
-	         , NOW()
-	         , #{gsUserId}
-	         , NOW()
-             )
-    </insert>
-    <update id="updateGroupItem" parameterType="params">
-        UPDATE SYS_BORD_ITEM
-           SET CHNG_ID       = #{gsUserId}
-	         , CHNG_DATE     = NOW()
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtUserName)">
-	         , TGT_USER_NAME = #{tgtUserName} 
-        </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrCode)">
-	         , TGT_VNDR_CODE = #{tgtVndrCode} 
-        </if>
-        <if test="@com.wsc.framework.utils.MybatisUtils@notEmpty(tgtVndrName)">
-	         , TGT_VNDR_NAME = #{tgtVndrName} 
-        </if>
-         WHERE SYS_ID      = #{sysId}
-           AND TGT_GRUP_ID = #{tgtGrupId}
-           AND TGT_USER_ID = #{tgtUserId}
+
+    <!-- [insertGroup] 그룹 등록 (PK 자동 생성 후 반환) -->
+    <select id="insertGroup" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_address_insert_group(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{bordGrup, mode=IN, jdbcType=VARCHAR},
+            #{userId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupName, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupRmk, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- [updateGroup] 그룹 수정 -->
+    <update id="updateGroup" statementType="CALLABLE" parameterType="params">
+        {CALL sp_address_update_group(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupName, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupRmk, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
     </update>
-    <delete id="deleteGroupItemAll" parameterType="params">
-        DELETE 
-          FROM SYS_BORD_ITEM
-         WHERE SYS_ID      = #{sysId}
-           AND TGT_GRUP_ID = #{tgtGrupId}
+
+    <!-- [deleteGroup] 그룹 삭제 -->
+    <delete id="deleteGroup" statementType="CALLABLE" parameterType="params">
+        {CALL sp_address_delete_group(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </delete>
+
+    <!-- ========================================================== -->
+    <!--   그룹 아이템 관리 (SYS_BORD_ITEM) - 프로시저 호출          -->
+    <!-- ========================================================== -->
+
+    <!-- [searchGroupItem] 그룹 아이템 목록 조회 (페이징, 동적 정렬) -->
+    <select id="searchGroupItem" statementType="CALLABLE" resultType="record" parameterType="params">
+        <bind name="sortStr" value="gsSorts != null and gsSorts.size() > 0 ? @com.wsc.framework.utils.MybatisUtils@join(',', gsSorts) : null" />
+        {CALL sp_address_search_group_item(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserId, mode=IN, jdbcType=VARCHAR},
+            #{sortStr, mode=IN, jdbcType=VARCHAR},
+            #{start, mode=IN, jdbcType=VARCHAR},
+            #{end, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- [searchGroupItemCount] 그룹 아이템 카운트 -->
+    <select id="searchGroupItemCount" statementType="CALLABLE" resultType="int" parameterType="params">
+        {CALL sp_address_search_group_item_count(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- [selectGroupItem] 그룹 아이템 단건 조회 -->
+    <select id="selectGroupItem" statementType="CALLABLE" resultType="record" parameterType="params">
+        {CALL sp_address_select_group_item(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </select>
+
+    <!-- [insertGroupItem] 그룹 아이템 등록 -->
+    <insert id="insertGroupItem" statementType="CALLABLE" parameterType="params">
+        {CALL sp_address_insert_group_item(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserName, mode=IN, jdbcType=VARCHAR},
+            #{tgtVndrCode, mode=IN, jdbcType=VARCHAR},
+            #{tgtVndrName, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </insert>
+
+    <!-- [updateGroupItem] 그룹 아이템 수정 -->
+    <update id="updateGroupItem" statementType="CALLABLE" parameterType="params">
+        {CALL sp_address_update_group_item(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserId, mode=IN, jdbcType=VARCHAR},
+            #{tgtUserName, mode=IN, jdbcType=VARCHAR},
+            #{tgtVndrCode, mode=IN, jdbcType=VARCHAR},
+            #{tgtVndrName, mode=IN, jdbcType=VARCHAR},
+            #{gsUserId, mode=IN, jdbcType=VARCHAR}
+        )}
+    </update>
+
+    <!-- [deleteGroupItemAll] 그룹 아이템 전체 삭제 -->
+    <delete id="deleteGroupItemAll" statementType="CALLABLE" parameterType="params">
+        {CALL sp_address_delete_group_item_all(
+            #{sysId, mode=IN, jdbcType=VARCHAR},
+            #{tgtGrupId, mode=IN, jdbcType=VARCHAR}
+        )}
     </delete>
 
 </mapper>

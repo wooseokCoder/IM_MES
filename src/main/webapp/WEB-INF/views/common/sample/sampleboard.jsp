@@ -81,15 +81,15 @@ a[href*="reorderColumns"], a[href*="reorderColumns"] .l-btn-text { width: 198px;
 			<input type="hidden" name="windId"   id="windId"     value="${progId}"/>
 			<input type="hidden" name="myViewId" id="myViewId"   value="${myViewId}"/>
 			<input type="hidden" name="vOper"   id="vOper"      value=""/>
-			<table cellpadding="5" class="search-table tableSearch-c wd-100" >
+			<table cellpadding="0" class="search-table tableSearch-c wd-100" >
 				<colgroup>
-					<col width="7%" style="min-width: 120px;" />
-					<col width="18%" style="min-width: 165px;" />
-					<col width="7%" style="min-width: 120px;" />
-					<col width="13%" style="min-width: 165px;" />
-					<col width="7%" style="min-width: 120px;" />
-					<col width="13%" style="min-width: 165px;" />
-					<col width="*" style="min-width: 120px;" />
+					<col width="110px" />
+					<col width="200px" />
+					<col width="75px" />
+					<col width="150px" />
+					<col width="60px" />
+					<col width="200px" />
+					<col width="*" />
 				</colgroup>
 
 				<tr class="topnav_sty">
@@ -105,7 +105,7 @@ a[href*="reorderColumns"], a[href*="reorderColumns"] .l-btn-text { width: 198px;
 				</tr>
 
 				<tr>
-					<th class="h table-Search-h">
+					<th class="h table-Search-h search-label-h">
 						<span data-item="LAB_001">Date (Datebox)</span>
 					</th>
 					<td class="d">
@@ -114,7 +114,7 @@ a[href*="reorderColumns"], a[href*="reorderColumns"] .l-btn-text { width: 198px;
 							<input class="easyui-datebox datebox-f combo-f textbox-f date-R" value="" style="" textboxname="SEARCH_DATE_TO" comboname="SEARCH_DATE_TO" id="SEARCH_DATE_TO" name="SEARCH_DATE_TO"/>
 						</div>
 					</td>
-					<th class="h table-Search-h">
+					<th class="h table-Search-h search-label-h">
 						<span data-item="LAB_002">Combobox</span>
 					</th>
 					<td class="d">
@@ -125,7 +125,7 @@ a[href*="reorderColumns"], a[href*="reorderColumns"] .l-btn-text { width: 198px;
 							<option value="3">Option3</option>
 						</select>
 					</td>
-					<th class="h table-Search-h">
+					<th class="h table-Search-h search-label-h">
 						<span data-item="LAB_004">Textbox</span>
 					</th>
 					<td class="d">
@@ -135,7 +135,7 @@ a[href*="reorderColumns"], a[href*="reorderColumns"] .l-btn-text { width: 198px;
 				</tr>
 
 				<tr>
-					<th class="h table-Search-h">
+					<th class="h table-Search-h search-label-h">
 						<span data-item="LAB_005">Checkbox</span>
 					</th>
 					<td class="chk-label">
@@ -159,7 +159,7 @@ a[href*="reorderColumns"], a[href*="reorderColumns"] .l-btn-text { width: 198px;
 							</div>
 						</div>
 					</td>
-					<th class="h table-Search-h">
+					<th class="h table-Search-h search-label-h">
 						<span data-item="LAB_010">Combogrid</span>
 					</th>
 					<td class="d">
@@ -167,11 +167,11 @@ a[href*="reorderColumns"], a[href*="reorderColumns"] .l-btn-text { width: 198px;
 						<input type="hidden" name="h_optionStat" id="h_optionStat" value=""/>
 						<input type="hidden" id="optionStatList" value='[{"value":"OPT1","text":"Option1"},{"value":"OPT2","text":"Option2"},{"value":"OPT3","text":"Option3"}]'>
 					</td>
-					<th class="h table-Search-h">
+					<th class="h table-Search-h search-label-h">
 						<span data-item="LAB_011">Multi Dialog</span>
 					</th>
 					<td class="d">
-						<input class="easyui-textbox textbox-list" style="min-width: 150px;" name="SEARCH_MULTI" id="SEARCH_MULTI" value="" />
+						<input class="easyui-textbox textbox-list" name="SEARCH_MULTI" id="SEARCH_MULTI" value="" />
 						<input type="hidden" name="h_multiList" id="h_multiList" value=""/>
 						<a href="javascript:void(0)" style="" id="multi-list-button" class="easyui-linkbutton c12 searchListA">
 							<img id="multilist" style="width:16px; height:16px;" src="<%=request.getContextPath() %>/resources/images/icon_new/picklist_type.png" />
@@ -293,13 +293,13 @@ a[href*="reorderColumns"], a[href*="reorderColumns"] .l-btn-text { width: 198px;
 </div>
 
 <!-- 엑셀 진행상태 -->
-<div id="progress-popup" class="easyui-dialog">
+<div id="progress-popup" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>
 
 <!-- 업로드 진행상태 -->
-<div id="progress-popup2" class="easyui-dialog">
+<div id="progress-popup2" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>

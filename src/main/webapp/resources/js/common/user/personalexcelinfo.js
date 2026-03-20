@@ -84,7 +84,7 @@ $(function() {
 	consts.init();
 	
 	$('#progress-popup').dialog({
-       title: tit.TITLE0009,
+       title: tit.TITLE0003,
        top:     100,
        width: 200,
        height: 200,
@@ -157,9 +157,7 @@ $(window).load(function() {
 		  ,{"sortText":"Code Desc","sortValue":"CODE_DESC"}
 		  ,{"sortText":"Ext Text","sortValue":"EXT_TEXT"}];
 		jSortInit(sortContentParame);
-		if($("#sortValue").val() != ""){
-			doSearch();
-		}
+		doSearch();
 
 	}, 100);
 
@@ -229,7 +227,7 @@ function docheck() {
 			success: function(data){
 				$.messager.show({
 					title: 'Information',
-					msg: msg.MSG0103
+					msg: msg.MSG0020
 				});
 			},
 			error: function(){
@@ -287,7 +285,7 @@ function doExtChr() {
 	doCloseCreat();
 	var row = $('#search-grid').datagrid('getSelected');
 	if(row == null || row == ""){
-		$.messager.alert('Warning',msg.MSG0114,'warning');
+		$.messager.alert('Warning',msg.MSG0028,'warning');
 		return;
 	}
 }
@@ -298,7 +296,7 @@ function doExtNum(){
 	doCloseCreat2();
 	var row = $('#search-grid').datagrid('getSelected');
 	if(row == null || row == ""){
-		$.messager.alert('Warning',msg.MSG0114,'warning');
+		$.messager.alert('Warning',msg.MSG0028,'warning');
 		return;
 }
 }

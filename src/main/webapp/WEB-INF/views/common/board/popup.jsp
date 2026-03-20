@@ -44,13 +44,9 @@
 #report-button-pdf .l-btn-text{
 	width: 100px;
 }
-.search-label-h {width:10%;}
-
 #s_searchKey + .combo {
 	width: 100px !important;
 }
-
-
 </style>
 </head>
 
@@ -79,12 +75,12 @@
 
 		<!-- 검색 영역 -->
 		<fieldset class="Remake-div-line-new" >
-	        <table cellpadding="2" class="search-table tableSearch-c wd-100" >
+	        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
 	        	<colgroup>
-					<col width="7%" style="min-width: 80px;" />
-					<col width="15%" style="min-width: 80px;" />
-					<col width="20%" style="min-width: 80px;" />
-					<col width="*" style="min-width: 140px;" />
+					<col width="120px" />
+					<col width="120px" />
+					<col width="120px" />
+					<col width="*" />
 				</colgroup>
 	        	<tr class="topnav_sty">
             		<td colspan="4">
@@ -98,7 +94,7 @@
             	</tr>
 
 				<tr>
-					<td class="d">
+					<td class="h table-Search-h search-label-h">
 						<input class="easyui-combobox" name="searchKey"  id="s_searchKey"  value="${model.searchKey}"  codeGrup="BORD_STYPE" data-options="mode:'remote',editable:false,loader:jcombo.loader,panelHeight:'auto' ,onChange:doChange"/>
 					</td>
 					<td class="d">
@@ -112,7 +108,7 @@
 							<input class="easyui-datebox date-R" name="date2" id="date2" value="${date2}" />
 						</span>
 					</td>
-					<td></td>
+					<td class="d"></td>
 				</tr>
 			</table>
 		</fieldset>
@@ -162,7 +158,7 @@
 <%@ include file="/WEB-INF/views/include/body.foot.jsp" %>
 
 <!-- 엑셀  진행상태 -->
-<div id="progress-popup" class="easyui-dialog" >
+<div id="progress-popup" class="easyui-dialog" style="display:none">
     <br></br>
     <center><img src="<%=request.getContextPath() %>/resources/images/ajax_loader_red_48.gif"></img></center>
 </div>

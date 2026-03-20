@@ -46,13 +46,18 @@
 			<div id="search-toolbar" class="wui-toolbar">
 				<form id="search-form">
 					<fieldset class="div-line-new" >
-				        <table cellpadding="5" class="search-table tableSearch-c" >
+				        <table cellpadding="0" class="search-table tableSearch-c wd-100" >
+				            <colgroup>
+				                <col width="45px">
+				                <col width="150px">
+				                <col width="*">
+				            </colgroup>
 				            <tr>
-				            	<th class="h table-Search-h" data-item="LAB_001"><span>품명 </span></th>
+				            	<th class="h table-Search-h search-label-h" data-item="LAB_001"><span>품명 </span></th>
 								<td class="d">
 									<span class="textbox"><input class="textbox-text" name="searchText" id="r_searchText" style="width:150px" /></span>
 								</td>
-								<td class="b"><a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001">검색</a></td>
+								<td class="b"><a href="javascript:void(0)" class="easyui-linkbutton cgray" id="search-button" data-item="BTN_001">조회</a></td>
 				            </tr>
 				        </table>
 				   </fieldset>

@@ -50,7 +50,7 @@
 						<input type="hidden" name="hdfIndex" id="hdfIndex" value="-1" />
 						<input class="easyui-combobox" name="searchKey"  id="s_searchKey"  value="S01" codeGrup="ADDR_STYPE" data-options="mode:'remote',width:100,editable:false,loader:jcombo.loader"/>
 						<input class="easyui-textbox"  name="searchText" id="r_searchText" style="width:150px"/>
-						<a href="javascript:void(0)" class="easyui-linkbutton cgray l-btn l-btn-small" id="search-button" data-popup="POP_BTN_002">검색</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton cgray l-btn l-btn-small" id="search-button" data-popup="POP_BTN_002">조회</a>
 					</fieldset>
 					<fieldset class="div-line-new-sub">
 				        <table cellpadding="5" class="search-table  tableEtc-c" style="width:98%;">

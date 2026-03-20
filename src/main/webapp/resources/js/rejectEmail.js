@@ -56,7 +56,7 @@ function doReject() {
 	        async: true,
 	        type: 'post',
 	        data: {
-			sysId : 'IMMES',
+	        	sysId : 'LSBAS',
 	        	bolNo :$("#bolNo").val(),
 	        	Reason:$("#Reason").val()
 	        },
@@ -73,7 +73,7 @@ function doReject() {
 	        async: true,
 	        type: 'post',
 	        data: {
-			sysId     : 'IMMES',
+	        	sysId     : 'LSBAS',
 	        	userId    :$("#userId").val(),
 	        	ftokenNo  :$("#ftokenNo").val(),
 	        	Cmail     :$("#Cmail").val(),

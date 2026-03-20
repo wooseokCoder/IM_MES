@@ -247,7 +247,7 @@ function doRemove() {
 	if($('#'+this.id).hasClass('l-btn-disabled')){
 		return false;
 	}
-
+	debugger;
 	jgrid.remove();
 }
 //추가버튼 클릭시 등록폼 오픈

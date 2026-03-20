@@ -41,12 +41,12 @@ function onPopUpSms() {
 		$("#receive_number").val("");
 	}
 	if(sms_return_value =="1"){
-		$.messager.alert(msg.MSG0121,msg.MSG0051,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0012,msg.MSG0051);
 		return false;
 		//window.close();
 	}
 	if(sms_return_value !="" && sms_return_value !="1" && sms_return_value !="null" ){
-		$.messager.alert(msg.MSG0121,msg.MSG0111,msg.MSG0121);
+		$.messager.alert(msg.MSG0051,msg.MSG0011,msg.MSG0051);
 		return false;
 		//window.close();
 	}

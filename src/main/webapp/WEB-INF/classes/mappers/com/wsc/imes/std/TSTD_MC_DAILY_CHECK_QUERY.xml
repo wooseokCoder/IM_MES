@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+============================================================================
+파일명: TSTD_MC_DAILY_CHECK_QUERY.xml
+설명: 설비점검항목 조회 매퍼 (TSTD_MC_DAILY_CHECK 테이블)
+작성자: 송우석
+작성일: 2026-02-06
+============================================================================
+-->
+<mapper namespace="com.wsc.imes.std.TSTD_MC_DAILY_CHECK_QUERY">
+
+    <!--
+    ============================================================
+    TSTD_MC_DAILY_CHECK_QUERY1: 점검항목 목록 조회
+    용도: 메인 그리드 목록 조회
+    ============================================================
+    -->
+    <select id="TSTD_MC_DAILY_CHECK_QUERY1" statementType="CALLABLE" parameterType="params" resultType="record">
+        {CALL sp_imes_tstd_mc_daily_check_query1(
+            #{gsPltCode, mode=IN, jdbcType=VARCHAR},
+            #{typeLike, mode=IN, jdbcType=VARCHAR},
+            #{contentsLike, mode=IN, jdbcType=VARCHAR},
+            #{dataFlag, mode=IN, jdbcType=INTEGER}
+        )}
+    </select>
+
+</mapper>

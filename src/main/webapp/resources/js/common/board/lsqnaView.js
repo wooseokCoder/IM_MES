@@ -260,7 +260,7 @@ function doReplyModify(bordNo){
 }
 
 function doReplyRemove(bordNo){
-	$.messager.confirm(msg.MSG0123,msg.MSG0123, function(r) {
+	$.messager.confirm(msg.MSG0053,msg.MSG0094, function(r) {
 		if (!r){return;}
 
 		$.ajax({

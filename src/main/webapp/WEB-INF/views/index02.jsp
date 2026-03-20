@@ -248,7 +248,7 @@
 		}
 		
 		.backLogo {
-			background-image: url('resources/images/lsta_logo.png');
+			background-image: url('resources/images/mes_logo.png');
 			background-repeat: no-repeat;
 			background-position: center center;
 			background-size: 40%;
@@ -334,7 +334,7 @@
 			</div>
 			
 			<div class="col-md-12 col-sm-12 col-xs-12 pdl-0 pdr-0 backLogo" style="height: calc(100% - 200px);">
-				<%-- <img class="logoImg" src="<c:url value="/resources/images/lsta_logo.png" />" style="width: 40%; min-width: 300px;" > --%>
+				<%-- <img class="logoImg" src="<c:url value="/resources/images/mes_logo.png" />" style="width: 40%; min-width: 300px;" > --%>
 				
 				<div class="dashboard-container">
 					<div class="dashboard-grid">
